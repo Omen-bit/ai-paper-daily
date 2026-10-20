@@ -29,11 +29,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
 
       # ── 3. Install dependencies ──────────────────────────────────────────
       - name: 📦 Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install --no-cache-dir --upgrade -r requirements.txt
 
       # ── 4. Run the main pipeline ─────────────────────────────────────────
       - name: 🚀 Run AI Paper Daily pipeline
