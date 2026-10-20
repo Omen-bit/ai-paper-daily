@@ -32,7 +32,7 @@
 `⭐ Top Pick` `🔥 Trending on HF` `🧠 Reasoning & Agents` `🤖 LLMs & Language Models`
 
 > 💡 **Why It Matters:**  
-> Introduces Sauron, an evidence-first agentic verifier that inspects state and execution traces to ensure claims are verified before being used as RL rewards, preventing misleading optimization signals.
+> We introduce Sauron, an evidence-first agentic verifier that investigates both state and trace and relies on a claim only after independently validating it against its source.
 
 👥 **Authors:** Reza Sanayei, Razvan-Gabriel Dumitru, Sunjie Hou et al.  
 🔗 **Links:** [📄 arXiv Paper](https://arxiv.org/abs/2610.17724) &nbsp;•&nbsp; [📥 Direct PDF](https://arxiv.org/pdf/2610.17724) &nbsp;•&nbsp; [🤗 Community Discussion](https://huggingface.co/papers/2610.17724)  
@@ -41,7 +41,7 @@
 `🔥 Trending on HF` `🔀 Interdisciplinary` `📊 ML Theory & Optimization` `🤖 LLMs & Language Models`
 
 > 💡 **Why It Matters:**  
-> Proposes PhysRSI-eval, a five-axis framework to quantify recursive self-improvement in physical environments and formulates the Physical Barrel Hypothesis for LLM agent policies.
+> We introduce PhysRSI-eval to quantify physical RSI through a five-axis metric: First-Attempt Performance, Efficiency, Success, Budget and Improvement from failure.
 
 👥 **Authors:** Zekai Li, Jiayi Yu, Jinlu Zhang et al.  
 🔗 **Links:** [📄 arXiv Paper](https://arxiv.org/abs/2610.26848) &nbsp;•&nbsp; [📥 Direct PDF](https://arxiv.org/pdf/2610.26848) &nbsp;•&nbsp; [🤗 Community Discussion](https://huggingface.co/papers/2610.26848)  
@@ -83,17 +83,17 @@ Explore past curated papers categorized by research subfield:
 
 | Metric | Value |
 | :--- | :--- |
-| 📄 **Total Research Papers Curated** | **4** |
-| 📅 **Total Daily Editions Published** | **2** |
+| 📄 **Total Research Papers Curated** | **6** |
+| 📅 **Total Daily Editions Published** | **3** |
 | 🗓️ **Tracking Since** | `2026-10-20` |
 | 🔄 **Last Pipeline Execution** | `2026-10-20` |
 
 **🏆 Most Active Research Categories:**
 
-- 🧠 **Reasoning & Agents**: `4` papers
-- 🤖 **LLMs & Language Models**: `4` papers
-- 🎨 **Generative AI & Diffusion**: `2` papers
-- 📊 **ML Theory & Optimization**: `2` papers
+- 🧠 **Reasoning & Agents**: `6` papers
+- 🤖 **LLMs & Language Models**: `6` papers
+- 🎨 **Generative AI & Diffusion**: `3` papers
+- 📊 **ML Theory & Optimization**: `3` papers
 <!-- STATS_END -->
 
 ---
