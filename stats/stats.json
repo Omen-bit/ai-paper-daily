@@ -1,0 +1,63 @@
+{
+  "total_papers": 2,
+  "total_digests": 1,
+  "first_digest": "2026-10-20",
+  "last_updated": "2026-10-20T18:28:12.255591+00:00",
+  "papers_by_date": {
+    "2026-10-20": 2
+  },
+  "papers_by_category": {
+    "reasoning-agents": 2,
+    "llms": 2,
+    "generative-ai": 1,
+    "ml-theory": 1
+  },
+  "top_authors": {
+    "Reza Sanayei": 1,
+    "Razvan-Gabriel Dumitru": 1,
+    "Sunjie Hou": 1,
+    "MohammadHossein Rezaei": 1,
+    "Haris Riaz": 1,
+    "Robert Vacareanu": 1,
+    "Minglai Yang": 1,
+    "Ying Liu": 1,
+    "Mihai Surdeanu": 1,
+    "Daniel Yue Zhang": 1,
+    "Zekai Li": 1,
+    "Jiayi Yu": 1,
+    "Jinlu Zhang": 1,
+    "Luyang Niu": 1,
+    "Zekun Qi": 1,
+    "Jun Zheng": 1,
+    "Xuchuan Chen": 1,
+    "Dairu Liu": 1,
+    "Yintianrun Zhang": 1,
+    "He Wang": 1,
+    "Li Yi": 1
+  },
+  "top_keywords": {
+    "evidence-first": 1,
+    "agentic": 1,
+    "verification": 1,
+    "where": 1,
+    "physical": 1,
+    "capability": 1,
+    "from?": 1,
+    "observational": 1,
+    "scaling": 1,
+    "llm-as-policy": 1
+  },
+  "digests": [
+    {
+      "date": "2026-10-20",
+      "paper_count": 2,
+      "top_category": "Reasoning & Agents",
+      "categories_covered": [
+        "reasoning-agents",
+        "llms",
+        "generative-ai",
+        "ml-theory"
+      ]
+    }
+  ]
+}

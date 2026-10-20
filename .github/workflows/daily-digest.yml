@@ -1,0 +1,60 @@
+name: 🧠 Daily AI Paper Digest
+
+on:
+  schedule:
+    # Runs every day at 06:30 UTC (12:00 IST)
+    # arXiv submissions are usually available by 06:00 UTC
+    - cron: "30 6 * * *"
+
+  # Allows manual trigger from the GitHub Actions UI anytime
+  workflow_dispatch:
+
+jobs:
+  generate-digest:
+    name: Fetch, Classify & Commit Daily Digest
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # Required to push commits
+
+    steps:
+      # ── 1. Checkout the repository ──────────────────────────────────────
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Full history needed for accurate git log
+
+      # ── 2. Set up Python ─────────────────────────────────────────────────
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # ── 3. Install dependencies ──────────────────────────────────────────
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
+
+      # ── 4. Run the main pipeline ─────────────────────────────────────────
+      - name: 🚀 Run AI Paper Daily pipeline
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python main.py
+
+      # ── 5. Commit & push all changes ──────────────────────────────────────
+      - name: 📤 Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          # Only commit if there are actual changes
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit today."
+          else
+            DATE=$(date -u +'%Y-%m-%d')
+            git commit -m "📄 Daily digest: ${DATE} — AI Paper Daily"
+            git push
+            echo "✅ Changes pushed successfully."
+          fi
