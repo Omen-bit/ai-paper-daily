@@ -141,19 +141,19 @@ Want to run this automated digest for your own profile?
 ```text
 ai-paper-daily/
 ├── .github/workflows/
-│   └── daily-digest.yml      # Automated 06:30 UTC cron workflow
-├── src/                      # Modular Python pipeline
-│   ├── classifier.py         # Multi-label research category classifier
+│   └── daily-digest.yml      # Automated 06:30 UTC daily runner
+├── src/                      # 100% of pipeline code lives here
+│   ├── main.py               # Pipeline orchestrator & entrypoint
+│   ├── classifier.py         # 12-category research classifier
 │   ├── fetcher.py            # arXiv & HuggingFace API scraper
-│   ├── groq_summarizer.py    # Multi-model LLM fallback summarizer
+│   ├── groq_summarizer.py    # LLM summarizer with fallback chain
 │   ├── readme_updater.py     # Live README section manager
-│   ├── renderer.py           # Markdown digest & category page builder
-│   ├── scorer.py             # Paper scoring heuristics & status badges
-│   └── stats_tracker.py      # Cumulative analytics & JSON storage
+│   ├── renderer.py           # Markdown digest & category builder
+│   ├── scorer.py             # Heuristic scoring & status badges
+│   └── stats_tracker.py      # Cumulative JSON analytics manager
 ├── digests/                  # Published daily edition markdown files
 ├── categories/               # Dedicated archive per research field
 ├── stats/                    # stats.json persistent dataset
-├── main.py                   # Pipeline launcher
 ├── requirements.txt          # Python dependencies
 └── README.md                 # Public project dashboard
 ```

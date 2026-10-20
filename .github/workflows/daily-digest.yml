@@ -38,7 +38,7 @@ jobs:
       - name: 🚀 Run AI Paper Daily pipeline
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: python main.py
+        run: python src/main.py
 
       # ── 5. Commit & push all changes ──────────────────────────────────────
       - name: 📤 Commit and push changes

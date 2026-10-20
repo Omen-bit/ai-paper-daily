@@ -5,7 +5,10 @@ Generates beautiful, reader-friendly markdown for each daily digest.
 
 import os
 from datetime import datetime
-from .scorer import format_badges, format_authors
+try:
+    from .scorer import format_badges, format_authors
+except (ImportError, ValueError):
+    from scorer import format_badges, format_authors
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIGESTS_DIR = os.path.join(ROOT_DIR, "digests")

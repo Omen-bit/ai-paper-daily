@@ -7,8 +7,12 @@ Uses HTML comment markers to identify and replace specific sections.
 import os
 import re
 from datetime import datetime
-from .stats_tracker import get_top_categories, get_recent_digests
-from .classifier import get_category_display
+try:
+    from .stats_tracker import get_top_categories, get_recent_digests
+    from .classifier import get_category_display
+except (ImportError, ValueError):
+    from stats_tracker import get_top_categories, get_recent_digests
+    from classifier import get_category_display
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 README_PATH = os.path.join(ROOT_DIR, "README.md")

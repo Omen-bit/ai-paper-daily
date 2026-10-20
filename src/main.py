@@ -20,16 +20,24 @@ import os
 import sys
 from datetime import datetime, timezone
 
-from src.fetcher import fetch_all_papers
-from src.classifier import classify_papers, get_all_category_slugs, get_category_display
-from src.scorer import score_and_rank_papers
-from src.groq_summarizer import summarize_papers
-from src.renderer import render_digest, save_digest, render_category_page
-from src.readme_updater import update_readme
-from src.stats_tracker import update_stats, load_stats
+# Resolve project root & src paths
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SRC_DIR)
+if SRC_DIR not in sys.path:
+    sys.path.insert(0, SRC_DIR)
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from fetcher import fetch_all_papers
+from classifier import classify_papers, get_all_category_slugs, get_category_display
+from scorer import score_and_rank_papers
+from groq_summarizer import summarize_papers
+from renderer import render_digest, save_digest, render_category_page
+from readme_updater import update_readme
+from stats_tracker import update_stats, load_stats
 
 
-CATEGORIES_DIR = os.path.join(os.path.dirname(__file__), "categories")
+CATEGORIES_DIR = os.path.join(ROOT_DIR, "categories")
 TOP_N_PAPERS = 2  # Number of papers to feature per day
 
 
