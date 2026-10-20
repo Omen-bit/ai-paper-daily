@@ -6,6 +6,7 @@ Falls back through multiple models if one is unavailable.
 
 import os
 import time
+import httpx
 from typing import Optional
 
 # Groq model fallback chain — ordered by preference.
@@ -29,7 +30,7 @@ _groq_client = None
 
 
 def _get_client():
-    """Lazy-initialize Groq client."""
+    """Lazy-initialize Groq client with a clean httpx client to avoid proxies conflict."""
     global _groq_client
     if _groq_client is None:
         try:
@@ -37,7 +38,9 @@ def _get_client():
             api_key = os.environ.get("GROQ_API_KEY", "")
             if not api_key:
                 raise ValueError("GROQ_API_KEY environment variable not set")
-            _groq_client = Groq(api_key=api_key)
+            # Pass our own httpx.Client to bypass groq's internal client
+            # which passes `proxies` — removed in httpx>=0.28.0
+            _groq_client = Groq(api_key=api_key, http_client=httpx.Client())
         except ImportError:
             raise ImportError("groq package not installed. Run: pip install groq")
     return _groq_client
