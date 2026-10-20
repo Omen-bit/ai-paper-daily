@@ -61,17 +61,17 @@
 
 | Metric | Value |
 |--------|-------|
-| 📄 Total papers tracked | **2** |
-| 📅 Total daily digests | **1** |
+| 📄 Total papers tracked | **4** |
+| 📅 Total daily digests | **2** |
 | 🗓️ Tracking since | **2026-10-20** |
 | 🔄 Last updated | **2026-10-20** |
 
 **🏆 Top Categories (all time):**
 
-- 🧠 **Reasoning & Agents**: 2 papers
-- 🤖 **LLMs & Language Models**: 2 papers
-- 🎨 **Generative AI & Diffusion**: 1 papers
-- 📊 **ML Theory & Optimization**: 1 papers
+- 🧠 **Reasoning & Agents**: 4 papers
+- 🤖 **LLMs & Language Models**: 4 papers
+- 🎨 **Generative AI & Diffusion**: 2 papers
+- 📊 **ML Theory & Optimization**: 2 papers
 <!-- STATS_END -->
 
 ---

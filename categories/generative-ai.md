@@ -9,7 +9,7 @@
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
-| 2026-10-12 | [⭐ 🔥 🔀 📖 Evidence-First Agentic Verification](https://arxiv.org/abs/2610.17724) | Reza Sanayei, Razvan-Gabriel Dumitru *+8 more* | [arXiv](https://arxiv.org/abs/2610.17724) · [PDF](https://arxiv.org/pdf/2610.17724) |
+| 2026-10-12 | [ Evidence-First Agentic Verification](https://arxiv.org/abs/2610.17724) | Reza Sanayei, Razvan-Gabriel Dumitru *+8 more* | [arXiv](https://arxiv.org/abs/2610.17724) · [PDF](https://arxiv.org/pdf/2610.17724) |
 
 ---
 
