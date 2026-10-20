@@ -5,10 +5,10 @@ Generates beautiful, reader-friendly markdown for each daily digest.
 
 import os
 from datetime import datetime
-from scorer import format_badges, format_authors
+from .scorer import format_badges, format_authors
 
-
-DIGESTS_DIR = os.path.join(os.path.dirname(__file__), "digests")
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DIGESTS_DIR = os.path.join(ROOT_DIR, "digests")
 
 
 def _truncate_abstract(abstract: str, max_sentences: int = 5) -> str:
@@ -21,7 +21,7 @@ def _truncate_abstract(abstract: str, max_sentences: int = 5) -> str:
 
 
 def _render_paper_entry(paper: dict, index: int, is_only: bool = False) -> str:
-    """Render a single paper entry as rich markdown."""
+    """Render a single paper entry as rich, uncluttered markdown."""
     title = paper.get("title", "Untitled")
     url = paper.get("url", "#")
     pdf_url = paper.get("pdf_url", "#")
@@ -35,56 +35,56 @@ def _render_paper_entry(paper: dict, index: int, is_only: bool = False) -> str:
     hf_upvotes = paper.get("hf_upvotes", 0)
     arxiv_id = paper.get("id", "")
 
-    # Category badges (show first 3)
-    cat_badges = " ".join([f"`{c['emoji']} {c['name']}`" for c in categories[:3]])
+    # Category chips
+    cat_chips = " ".join([f"`{c['emoji']} {c['name']}`" for c in categories[:3]])
 
-    # Status badges (Top Pick, Trending, etc.)
-    status_badges = format_badges(badges)
+    # Status badges
+    status_chips = " ".join([f"`{b[0]} {b[1]}`" for b in badges if len(b) >= 2])
 
     # Authors line
-    authors_line = format_authors(authors, max_shown=5)
+    authors_line = format_authors(authors, max_shown=4)
 
-    # Abstract (5 sentences)
+    # Clean abstract display
     abstract_display = _truncate_abstract(abstract, max_sentences=5)
 
-    # Source line
-    source_parts = [f"**Source:** {source}"]
+    # Source & metrics
+    source_tag = f"📡 **{source}**"
     if hf_upvotes > 0:
-        source_parts.append(f"🔥 **{hf_upvotes} HF upvotes**")
+        source_tag += f" &nbsp;•&nbsp; 🔥 **{hf_upvotes} HF Upvotes**"
 
-    # Semantic Scholar link
-    ss_url = f"https://api.semanticscholar.org/graph/v1/paper/arXiv:{arxiv_id}" if arxiv_id else "#"
     hf_papers_url = f"https://huggingface.co/papers/{arxiv_id}" if arxiv_id else "#"
 
     lines = [
-        f"### Paper {index} — {title}",
-        "",
-        f"> {cat_badges}",
+        f"### {index}. [{title}]({url})",
         "",
     ]
 
-    if status_badges:
-        lines += [f"**{status_badges}**", ""]
-
-    lines += [
-        f"👥 **Authors:** {authors_line}  ",
-        f"📅 **Submitted:** {submitted}  ",
-        f"{'  '.join(source_parts)}",
-        "",
-        "**📝 Abstract:**",
-        f"> {abstract_display}",
-        "",
-    ]
+    all_chips = []
+    if status_chips:
+        all_chips.append(status_chips)
+    if cat_chips:
+        all_chips.append(cat_chips)
+    if all_chips:
+        lines += [" &nbsp; ".join(all_chips), ""]
 
     if why_it_matters:
         lines += [
-            "**💡 Why it matters:**",
-            f"> _{why_it_matters}_",
+            "> 💡 **Why It Matters**  ",
+            f"> {why_it_matters}",
             "",
         ]
 
     lines += [
-        f"**🔗 Links:** [arXiv]({url}) · [PDF]({pdf_url}) · [HF Papers]({hf_papers_url})",
+        f"- 👥 **Authors:** {authors_line}",
+        f"- 📅 **Date:** {submitted} &nbsp;•&nbsp; {source_tag}",
+        f"- 🔗 **Links:** [arXiv Abstract]({url}) &nbsp;|&nbsp; [PDF Direct]({pdf_url}) &nbsp;|&nbsp; [HF Community]({hf_papers_url})",
+        "",
+        "<details>",
+        "<summary><b>📖 Abstract (click to expand)</b></summary>",
+        "",
+        f"> {abstract_display}",
+        "",
+        "</details>",
         "",
         "---",
         "",

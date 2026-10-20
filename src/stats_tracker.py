@@ -9,7 +9,8 @@ from datetime import datetime, timezone
 from collections import Counter
 
 
-STATS_FILE = os.path.join(os.path.dirname(__file__), "stats", "stats.json")
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATS_FILE = os.path.join(ROOT_DIR, "stats", "stats.json")
 
 
 def load_stats() -> dict:

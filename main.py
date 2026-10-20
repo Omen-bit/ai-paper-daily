@@ -20,13 +20,13 @@ import os
 import sys
 from datetime import datetime, timezone
 
-from fetcher import fetch_all_papers
-from classifier import classify_papers, get_all_category_slugs, get_category_display
-from scorer import score_and_rank_papers
-from groq_summarizer import summarize_papers
-from renderer import render_digest, save_digest, render_category_page
-from readme_updater import update_readme
-from stats_tracker import update_stats, load_stats
+from src.fetcher import fetch_all_papers
+from src.classifier import classify_papers, get_all_category_slugs, get_category_display
+from src.scorer import score_and_rank_papers
+from src.groq_summarizer import summarize_papers
+from src.renderer import render_digest, save_digest, render_category_page
+from src.readme_updater import update_readme
+from src.stats_tracker import update_stats, load_stats
 
 
 CATEGORIES_DIR = os.path.join(os.path.dirname(__file__), "categories")
