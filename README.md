@@ -38,14 +38,14 @@
 **Authors:** Tianqi Liu, Hanfei Zhao, Qifeng Liang et al.  
 **Links:** [arXiv Paper](https://arxiv.org/abs/2610.26855) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.26855) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.26855)  
 
-#### 2. [VLA-Rolling: Fewer Denoising Steps, Better Control via Adaptive Action Reuse](https://arxiv.org/abs/2610.25043)
+#### 2. [Painting Change Map as guidance for generating painting processes](https://arxiv.org/abs/2610.25369)
 `🔥 Trending on HF` `📖 Survey / Review` `🔖 Other ML`
 
 > 💡 **Abstract highlight:**  
-> We show that this discarded tail retains transferable denoising progress: action-tail initialization can match or outperform a native 10-step Gaussian baseline using fewer denoising steps.
+> Digital art generation has undergone a massive paradigm shift, moving from static image synthesis to dynamic video generation that can mimic the human painting process.
 
-**Authors:** Sicheng He, Yi Pan, Qiuting Yu et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.25043) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.25043) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.25043)  
+**Authors:** Markus Pobitzer, Chang Liu, Niccolò Biondi et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.25369) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.25369) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.25369)  
 
 **[Read the full digest with abstracts](digests/2026-10-21.md)**
 <!-- TODAY_END -->
