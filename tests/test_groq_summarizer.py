@@ -111,3 +111,22 @@ def test_get_summary_fallback_on_client_error():
         text, source = get_summary(paper)
         assert source == "heuristic"
         assert len(text) > 0
+
+
+def test_get_summary_auth_error_stops_chain():
+    paper = {
+        "title": "Scaling Efficient Transformers",
+        "abstract": "We present an architecture that reduces compute by half.",
+    }
+
+    mock_client = MagicMock()
+    mock_client.models.list.side_effect = Exception("401 Unauthorized: Invalid API Key")
+
+    with patch("groq_summarizer._get_client", return_value=mock_client), \
+         patch("groq_summarizer._get_api_key", return_value="bad_key"), \
+         patch("groq_summarizer._active_models", None), \
+         patch("groq_summarizer._auth_failed", False):
+        text, source = get_summary(paper)
+        assert source == "heuristic"
+        assert len(text) > 0
+

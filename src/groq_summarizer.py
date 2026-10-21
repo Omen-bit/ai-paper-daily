@@ -36,6 +36,7 @@ _STRIP_PREFIXES = [
 
 _groq_client = None
 _active_models: Optional[list] = None  # resolved at first call
+_auth_failed = False
 
 
 def _get_api_key() -> str:
@@ -60,6 +61,7 @@ def _resolve_active_models() -> list:
     Call client.models.list() once and keep only models from GROQ_MODELS_PREFERRED
     that appear in the returned list. Falls back to the static chain on any error.
     """
+    global _auth_failed
     try:
         client = _get_client()
         available = {m.id for m in client.models.list().data}
@@ -69,6 +71,11 @@ def _resolve_active_models() -> list:
             return resolved
         print("  [groq] None of the preferred models found; using static chain")
     except Exception as exc:
+        error_str = str(exc)
+        if _is_auth_error(error_str):
+            print(f"  [groq] Auth error during models.list(): {error_str[:120]}")
+            _auth_failed = True
+            raise
         print(f"  [groq] models.list() failed ({exc}); using static chain")
     return list(GROQ_MODELS_PREFERRED)
 
@@ -220,10 +227,13 @@ def get_summary(paper: dict) -> tuple[str, str]:
     Returns (text, source) where source is "groq:<model>" or "heuristic".
     Tries active Groq models in order, falls back to heuristic if all fail.
     """
-    global _active_models
+    global _active_models, _auth_failed
 
     title = paper.get("title", "")
     abstract = paper.get("abstract", "")
+
+    if _auth_failed:
+        return _heuristic_summary(abstract), "heuristic"
 
     api_key = _get_api_key()
     if not api_key:
@@ -235,6 +245,9 @@ def get_summary(paper: dict) -> tuple[str, str]:
         try:
             _active_models = _resolve_active_models()
         except Exception as exc:
+            if _auth_failed:
+                print("  [groq] Stopping Groq pipeline due to auth error")
+                return _heuristic_summary(abstract), "heuristic"
             print(f"  [groq] Could not initialise client: {exc}")
             return _heuristic_summary(abstract), "heuristic"
 
@@ -244,6 +257,7 @@ def get_summary(paper: dict) -> tuple[str, str]:
         raw_text, finish_reason = _call_groq(model, title, abstract)
 
         if finish_reason == "auth_error":
+            _auth_failed = True
             print("  [groq] Stopping model chain due to auth error.")
             break
 
