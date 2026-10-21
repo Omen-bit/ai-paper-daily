@@ -1,8 +1,13 @@
 """
 fetcher.py
 Fetches AI/ML papers from arXiv and HuggingFace Papers.
+Retries on transient errors with exponential backoff.
+Strips arXiv version suffixes (v1, v2) before deduplication.
 """
 
+import re
+import sys
+import time
 import requests
 import feedparser
 from datetime import datetime, timedelta, timezone
@@ -21,12 +26,49 @@ ARXIV_CATEGORIES = [
 ]
 
 ARXIV_API_BASE = "http://export.arxiv.org/api/query"
+REQUEST_TIMEOUT = 15
+USER_AGENT = "ai-paper-daily/1.0 (https://github.com/Omen-bit/ai-paper-daily)"
+RETRY_DELAYS = [2, 4, 8]  # seconds between attempts 1, 2, 3
+
+_TRANSIENT_ERRORS = ("timeout", "Timeout", "ConnectionError", "503", "502", "500", "429")
+
+
+def _strip_version(arxiv_id: str) -> str:
+    """Remove version suffix from arXiv ID: '2301.00234v2' -> '2301.00234'."""
+    return re.sub(r"v\d+$", "", arxiv_id.strip())
+
+
+def _is_transient(error_str: str) -> bool:
+    return any(t in error_str for t in _TRANSIENT_ERRORS)
+
+
+def _fetch_with_retry(fetch_fn, source_name: str):
+    """
+    Call fetch_fn() up to 3 times with exponential backoff on transient errors.
+    Returns the result of fetch_fn() on success, or None on all-fail.
+    """
+    last_error = None
+    for attempt, delay in enumerate(RETRY_DELAYS, 1):
+        try:
+            return fetch_fn()
+        except Exception as exc:
+            error_str = str(exc)
+            last_error = error_str
+            if _is_transient(error_str) and attempt < len(RETRY_DELAYS):
+                print(f"  [{source_name}] Attempt {attempt} failed ({error_str[:60]}), retrying in {delay}s...")
+                time.sleep(delay)
+            else:
+                print(f"  [{source_name}] Attempt {attempt} failed: {error_str[:100]}")
+                break
+    print(f"  [{source_name}] All retries exhausted. Last error: {last_error[:120]}")
+    return None
 
 
 def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = 48) -> list[dict]:
     """
     Fetch recent papers from arXiv across all tracked categories.
     Uses a 48-hour lookback window to handle timezone differences and weekends.
+    Strips version suffixes from arXiv IDs before returning.
     """
     query = "+OR+".join([f"cat:{cat}" for cat in ARXIV_CATEGORIES])
     url = (
@@ -35,12 +77,23 @@ def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = 48) -> list
         f"&max_results={max_results}"
     )
 
-    print(f"📡 Fetching arXiv papers from {len(ARXIV_CATEGORIES)} categories...")
+    print(f"  [arxiv] Fetching from {len(ARXIV_CATEGORIES)} categories (last {lookback_hours}h)...")
 
-    try:
-        feed = feedparser.parse(url)
-    except Exception as e:
-        print(f"❌ arXiv fetch error: {e}")
+    def _do_fetch():
+        # feedparser does its own HTTP; wrap in requests first to get retry on transport errors
+        resp = requests.get(
+            url,
+            timeout=REQUEST_TIMEOUT,
+            headers={"User-Agent": USER_AGENT},
+        )
+        if resp.status_code == 429:
+            raise Exception(f"429 rate limited by arXiv")
+        if resp.status_code >= 500:
+            raise Exception(f"{resp.status_code} server error from arXiv")
+        return feedparser.parse(resp.text)
+
+    feed = _fetch_with_retry(_do_fetch, "arxiv")
+    if feed is None:
         return []
 
     cutoff = datetime.now(timezone.utc) - timedelta(hours=lookback_hours)
@@ -48,14 +101,13 @@ def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = 48) -> list
 
     for entry in feed.entries:
         try:
-            # Parse submission date
             submitted_dt = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
             if submitted_dt < cutoff:
                 continue
 
-            arxiv_id = entry.id.split("/abs/")[-1]
+            raw_id = entry.id.split("/abs/")[-1]
+            arxiv_id = _strip_version(raw_id)
 
-            # Clean up abstract (remove extra whitespace/newlines)
             abstract = " ".join(entry.summary.replace("\n", " ").split())
             title = " ".join(entry.title.replace("\n", " ").split())
 
@@ -74,11 +126,11 @@ def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = 48) -> list
             }
             papers.append(paper)
 
-        except Exception as e:
-            print(f"⚠️ Skipping entry due to parse error: {e}")
+        except Exception as exc:
+            print(f"  [arxiv] Skipping entry due to parse error: {exc}")
             continue
 
-    print(f"✅ arXiv: fetched {len(papers)} papers from last {lookback_hours}h")
+    print(f"  [arxiv] {len(papers)} papers fetched from last {lookback_hours}h")
     return papers
 
 
@@ -86,30 +138,47 @@ def fetch_hf_papers() -> list[dict]:
     """
     Fetch trending papers from HuggingFace Papers daily endpoint.
     HF papers are community-curated and represent the most talked-about research.
+    Strips version suffixes from arXiv IDs before returning.
     """
-    print("📡 Fetching HuggingFace Papers trending feed...")
+    print("  [hf] Fetching HuggingFace trending feed...")
 
-    try:
-        url = "https://huggingface.co/api/daily_papers"
-        resp = requests.get(url, timeout=20, headers={"User-Agent": "ai-paper-daily/1.0"})
+    def _do_fetch():
+        resp = requests.get(
+            "https://huggingface.co/api/daily_papers",
+            timeout=REQUEST_TIMEOUT,
+            headers={"User-Agent": USER_AGENT},
+        )
+        if resp.status_code == 429:
+            raise Exception("429 rate limited by HuggingFace")
+        if resp.status_code >= 500:
+            raise Exception(f"{resp.status_code} server error from HuggingFace")
         resp.raise_for_status()
-        data = resp.json()
+        return resp.json()
 
-        papers = []
-        for item in data:
+    data = _fetch_with_retry(_do_fetch, "hf")
+    if data is None:
+        return []
+
+    papers = []
+    for item in data:
+        try:
             paper_info = item.get("paper", {})
-            arxiv_id = paper_info.get("id", "").strip()
-            if not arxiv_id:
+            raw_id = paper_info.get("id", "").strip()
+            if not raw_id:
                 continue
+            arxiv_id = _strip_version(raw_id)
 
             title = paper_info.get("title", "").strip()
             abstract = " ".join(paper_info.get("summary", "").replace("\n", " ").split())
             authors = [a.get("name", "") for a in paper_info.get("authors", []) if a.get("name")]
 
-            # Parse submitted date
             published_raw = item.get("publishedAt", "") or paper_info.get("publishedAt", "")
             try:
-                submitted_dt = dateparser.parse(published_raw).replace(tzinfo=timezone.utc) if published_raw else datetime.now(timezone.utc)
+                submitted_dt = (
+                    dateparser.parse(published_raw).replace(tzinfo=timezone.utc)
+                    if published_raw
+                    else datetime.now(timezone.utc)
+                )
             except Exception:
                 submitted_dt = datetime.now(timezone.utc)
 
@@ -130,30 +199,37 @@ def fetch_hf_papers() -> list[dict]:
             if paper["title"] and paper["abstract"]:
                 papers.append(paper)
 
-        print(f"✅ HuggingFace: fetched {len(papers)} trending papers")
-        return papers
+        except Exception as exc:
+            print(f"  [hf] Skipping item due to parse error: {exc}")
+            continue
 
-    except Exception as e:
-        print(f"⚠️ HuggingFace fetch failed: {e}")
-        return []
+    print(f"  [hf] {len(papers)} trending papers fetched")
+    return papers
 
 
 def fetch_all_papers(max_arxiv: int = 150) -> list[dict]:
     """
-    Fetch from both sources, deduplicate by arXiv ID, and return unified list.
-    HuggingFace papers are boosted (higher hf_upvotes signal).
+    Fetch from both sources, deduplicate by arXiv ID (version-stripped), return unified list.
+    If both sources fail, exit with a non-zero status so Actions shows red.
     """
     arxiv_papers = fetch_arxiv_papers(max_results=max_arxiv)
     hf_papers = fetch_hf_papers()
 
-    # Build a dict keyed by arxiv ID for deduplication
+    if not arxiv_papers and not hf_papers:
+        print("  [fetch] ERROR: Both arXiv and HuggingFace fetches failed. Exiting.")
+        sys.exit(1)
+
+    if not arxiv_papers:
+        print("  [fetch] WARNING: arXiv fetch failed; continuing with HuggingFace only.")
+    if not hf_papers:
+        print("  [fetch] WARNING: HuggingFace fetch failed; continuing with arXiv only.")
+
+    # Deduplicate by version-stripped arXiv ID
     paper_map: dict[str, dict] = {}
 
-    # Add arXiv papers first
     for p in arxiv_papers:
         paper_map[p["id"]] = p
 
-    # Merge HF papers — if already present, update with HF upvotes + source tag
     for p in hf_papers:
         pid = p["id"]
         if pid in paper_map:
@@ -163,5 +239,5 @@ def fetch_all_papers(max_arxiv: int = 150) -> list[dict]:
             paper_map[pid] = p
 
     result = list(paper_map.values())
-    print(f"\n📚 Total unique papers after deduplication: {len(result)}")
+    print(f"  [fetch] {len(result)} unique papers after deduplication")
     return result
