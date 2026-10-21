@@ -95,6 +95,7 @@ def _parse_digest_file(filepath: str) -> list[dict]:
     blocks = re.split(r"\n#{3,4}\s+\d+\.\s+\[", text)[1:]
     papers = []
     for block in blocks:
+        block = block.split("\n---\n")[0]
         first_line = block.split("\n")[0]
         title_part = first_line.split("](")[0]
         title = re.sub(

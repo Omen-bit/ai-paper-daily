@@ -7,9 +7,7 @@
     "2026-10-20": 2
   },
   "papers_by_category": {
-    "llms": 2,
-    "generative-ai": 2,
-    "reasoning-agents": 2,
+    "reasoning-agents": 1,
     "ml-theory": 1
   },
   "top_authors": {
@@ -57,8 +55,6 @@
             "MohammadHossein Rezaei"
           ],
           "categories": [
-            "llms",
-            "generative-ai",
             "reasoning-agents"
           ]
         },
@@ -73,9 +69,6 @@
             "Luyang Niu"
           ],
           "categories": [
-            "llms",
-            "generative-ai",
-            "reasoning-agents",
             "ml-theory"
           ]
         }
