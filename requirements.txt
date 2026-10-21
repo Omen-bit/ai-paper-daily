@@ -1,5 +1,5 @@
 feedparser==6.0.11
 requests==2.32.3
-groq
-httpx
+groq==0.11.0
+httpx==0.28.1
 python-dateutil==2.9.0

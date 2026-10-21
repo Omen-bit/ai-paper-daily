@@ -1,4 +1,4 @@
-# 📊 ML Theory & Optimization — All Papers
+# 📊 ML Theory & Optimization - All Papers
 
 > All papers tracked in the **ML Theory & Optimization** category, newest first.
 > Auto-updated daily by [ai-paper-daily](../README.md).

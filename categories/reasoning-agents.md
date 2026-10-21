@@ -1,4 +1,4 @@
-# 🧠 Reasoning & Agents — All Papers
+# 🧠 Reasoning & Agents - All Papers
 
 > All papers tracked in the **Reasoning & Agents** category, newest first.
 > Auto-updated daily by [ai-paper-daily](../README.md).

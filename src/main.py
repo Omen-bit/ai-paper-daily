@@ -20,6 +20,12 @@ import os
 import sys
 from datetime import datetime, timezone
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # Resolve project root & src paths
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SRC_DIR)
@@ -48,7 +54,7 @@ def update_category_pages(selected_papers: list[dict], all_existing_stats: dict)
     """
     os.makedirs(CATEGORIES_DIR, exist_ok=True)
 
-    # Collect papers per category (from today only — we rebuild incrementally)
+    # Collect papers per category (from today only - we rebuild incrementally)
     # For full category pages, we track paper data in a separate file per category
     for paper in selected_papers:
         for cat in paper.get("categories", []):
@@ -138,7 +144,7 @@ def run() -> None:
     all_papers = fetch_all_papers(max_arxiv=150)
 
     if not all_papers:
-        print("\n⚠️ No papers fetched today (arXiv may not have published yet — common on weekends).")
+        print("\n⚠️ No papers fetched today (arXiv may not have published yet - common on weekends).")
         print("💡 Creating a 'no digest today' placeholder...")
         _create_placeholder(date_str)
         return
@@ -187,7 +193,7 @@ def _create_placeholder(date_str: str) -> None:
     """Create a minimal placeholder file for days with no arXiv submissions."""
     import os
     os.makedirs("digests", exist_ok=True)
-    content = f"""# 🧠 AI Paper Daily — {date_str}
+    content = f"""# 🧠 AI Paper Daily - {date_str}
 
 > ℹ️ **No new papers available today.**
 > arXiv typically does not publish papers on weekends and holidays.

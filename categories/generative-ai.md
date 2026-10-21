@@ -1,4 +1,4 @@
-# 🎨 Generative AI & Diffusion — All Papers
+# 🎨 Generative AI & Diffusion - All Papers
 
 > All papers tracked in the **Generative AI & Diffusion** category, newest first.
 > Auto-updated daily by [ai-paper-daily](../README.md).

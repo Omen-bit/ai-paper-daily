@@ -121,7 +121,7 @@ def render_digest(papers: list[dict], date_str: str, stats: dict) -> str:
     cat_summary = " · ".join([f"{c['emoji']} {c['name']}" for c in today_cats.values()])
 
     lines = [
-        f"# 🧠 AI Paper Daily — {weekday}, {date_str}",
+        f"# 🧠 AI Paper Daily - {weekday}, {date_str}",
         "",
         f"> **{len(papers)} top paper{'s' if len(papers) != 1 else ''} curated** from arXiv & HuggingFace Papers  ",
         f"> 📊 Digest #{total_digests:,} · {total_tracked:,} papers tracked since launch",
@@ -198,7 +198,7 @@ def save_digest(content: str, date_str: str) -> str:
 def render_category_page(slug: str, emoji: str, name: str, all_papers: list[dict]) -> str:
     """Render a category landing page with all papers ever tracked for that category."""
     lines = [
-        f"# {emoji} {name} — All Papers",
+        f"# {emoji} {name} - All Papers",
         "",
         f"> All papers tracked in the **{name}** category, newest first.",
         f"> Auto-updated daily by [ai-paper-daily](../README.md).",

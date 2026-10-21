@@ -1,4 +1,4 @@
-# 🤖 LLMs & Language Models — All Papers
+# 🤖 LLMs & Language Models - All Papers
 
 > All papers tracked in the **LLMs & Language Models** category, newest first.
 > Auto-updated daily by [ai-paper-daily](../README.md).

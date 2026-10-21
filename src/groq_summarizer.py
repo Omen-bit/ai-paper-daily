@@ -128,7 +128,11 @@ def _call_groq(model: str, title: str, abstract: str) -> tuple[Optional[str], st
     Retries once on 429, timeout, or 5xx.
     Returns (None, "auth_error") if an auth error is detected so callers stop looping.
     """
-    client = _get_client()
+    try:
+        client = _get_client()
+    except Exception as exc:
+        print(f"  [groq] Failed to get client ({exc})")
+        return None, ""
     abstract_truncated = _truncate_abstract(abstract)
 
     user_message = (
