@@ -2,22 +2,23 @@
 
 <div align="center">
 
-> **Autonomous AI & Machine Learning Research Intelligence.**  
-> Curating the top 2 breakthrough papers every morning — with "Why It Matters" executive summaries, heuristic scoring, and automatic GitHub publishing.
+> **Autonomous AI & Machine Learning Research Intelligence.**
+> Curating the top 2 breakthrough papers every morning, with "Why It Matters" summaries, heuristic scoring, and automatic GitHub publishing.
 
 [![Daily Digest](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml)
+[![Tests](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/tests.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/tests.yml)
 ![Papers Tracked](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_papers&label=Papers%20Curated&color=7c3aed)
 ![Digests](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_digests&label=Daily%20Editions&color=10b981)
 ![Schedule](https://img.shields.io/badge/schedule-daily%2006%3A30%20UTC-orange)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 
-[**🔥 Today's Picks**](#-todays-featured-papers) &nbsp;•&nbsp;
-[**🏷️ Categories**](#-browse-by-category) &nbsp;•&nbsp;
-[**📁 Archive**](#-digest-archive) &nbsp;•&nbsp;
-[**📊 Analytics**](#-project-insights) &nbsp;•&nbsp;
-[**🛠️ Architecture**](#-system-architecture) &nbsp;•&nbsp;
-[**⚙️ Setup**](#-quick-start)
+[**Today's Picks**](#-todays-featured-papers) &nbsp;•&nbsp;
+[**Categories**](#-browse-by-category) &nbsp;•&nbsp;
+[**Archive**](#-digest-archive) &nbsp;•&nbsp;
+[**Analytics**](#-analytics--coverage) &nbsp;•&nbsp;
+[**Architecture**](#-system-architecture) &nbsp;•&nbsp;
+[**Setup**](#-quick-start-fork--run)
 
 ---
 
@@ -26,27 +27,27 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### 📅 Today's Featured Papers — [Tuesday, October 20, 2026](digests/2026-10-20.md)
+### Tuesday, October 20, 2026 -- [2026-10-20](digests/2026-10-20.md)
 
 #### 1. [Evidence-First Agentic Verification](https://arxiv.org/abs/2610.17724)
 `⭐ Top Pick` `🔥 Trending on HF` `🧠 Reasoning & Agents` `🤖 LLMs & Language Models`
 
-> 💡 **Why It Matters:**  
+> **Why It Matters:**
 > Introduces Sauron, an evidence-first agentic verifier that inspects state and execution traces to ensure claims are verified before being used as RL rewards, preventing misleading optimization signals.
 
-👥 **Authors:** Reza Sanayei, Razvan-Gabriel Dumitru, Sunjie Hou et al.  
-🔗 **Links:** [📄 arXiv Paper](https://arxiv.org/abs/2610.17724) &nbsp;•&nbsp; [📥 Direct PDF](https://arxiv.org/pdf/2610.17724) &nbsp;•&nbsp; [🤗 Community Discussion](https://huggingface.co/papers/2610.17724)  
+**Authors:** Reza Sanayei, Razvan-Gabriel Dumitru, Sunjie Hou et al.
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.17724) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.17724) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.17724)
 
 #### 2. [Where is Physical RSI capability from? An Observational Scaling Law of LLM-as-policy](https://arxiv.org/abs/2610.26848)
 `🔥 Trending on HF` `🔀 Interdisciplinary` `📊 ML Theory & Optimization` `🤖 LLMs & Language Models`
 
-> 💡 **Why It Matters:**  
+> **Why It Matters:**
 > Proposes PhysRSI-eval, a five-axis framework to quantify recursive self-improvement in physical environments and formulates the Physical Barrel Hypothesis for LLM agent policies.
 
-👥 **Authors:** Zekai Li, Jiayi Yu, Jinlu Zhang et al.  
-🔗 **Links:** [📄 arXiv Paper](https://arxiv.org/abs/2610.26848) &nbsp;•&nbsp; [📥 Direct PDF](https://arxiv.org/pdf/2610.26848) &nbsp;•&nbsp; [🤗 Community Discussion](https://huggingface.co/papers/2610.26848)  
+**Authors:** Zekai Li, Jiayi Yu, Jinlu Zhang et al.
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.26848) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.26848) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.26848)
 
-👉 **[Read the Full Markdown Digest with Abstracts →](digests/2026-10-20.md)**
+**[Read the full digest with abstracts](digests/2026-10-20.md)**
 <!-- TODAY_END -->
 
 ---
@@ -55,23 +56,22 @@
 
 Explore past curated papers categorized by research subfield:
 
-| 🤖 Models & Architecture | 🎯 Applied Intelligence | 🔬 Theory & Systems |
+| Models & Architecture | Applied Intelligence | Theory & Systems |
 | :--- | :--- | :--- |
 | [🤖 **LLMs & Language Models**](categories/llms.md) | [🧠 **Reasoning & Agents**](categories/reasoning-agents.md) | [📊 **ML Theory & Scaling**](categories/ml-theory.md) |
 | [🎨 **Generative AI & Diffusion**](categories/generative-ai.md) | [🤝 **RLHF & Alignment**](categories/alignment.md) | [📱 **Efficient AI & Quantization**](categories/efficient-ai.md) |
-| [👁️ **Computer Vision**](categories/computer-vision.md) | [💻 **Code & Software AI**](categories/code-ai.md) | [🔒 **AI Safety & Alignment**](categories/safety-privacy.md) |
-| [🌐 **Multimodal Systems**](categories/multimodal.md) | [🏥 **AI for Science & Health**](categories/ai-science.md) | [🎵 **Audio & Speech**](categories/audio-speech.md) |
+| [👁️ **Computer Vision**](categories/computer-vision.md) | [💻 **Code & Software AI**](categories/code-ai.md) | [🔒 **AI Safety & Privacy**](categories/safety-privacy.md) |
+| [🌐 **Multimodal AI**](categories/multimodal.md) | [🏥 **AI for Science & Health**](categories/ai-science.md) | [🎵 **Audio & Speech**](categories/audio-speech.md) |
+| [🔖 **Other ML**](categories/other-ml.md) | | |
 
 ---
 
 ## 📁 Digest Archive
 
 <!-- ARCHIVE_START -->
-### 📁 Digest Archive
-
-| Date | Papers | Top Category Covered | Digest Link |
+| Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
-| **2026-10-20** | `2` | Reasoning & Agents | [📄 Read Digest →](digests/2026-10-20.md) |
+| **2026-10-20** | `2` | Reasoning & Agents | [Read digest](digests/2026-10-20.md) |
 <!-- ARCHIVE_END -->
 
 ---
@@ -79,42 +79,38 @@ Explore past curated papers categorized by research subfield:
 ## 📊 Analytics & Coverage
 
 <!-- STATS_START -->
-### 📊 Project Insights
-
 | Metric | Value |
 | :--- | :--- |
-| 📄 **Total Research Papers Curated** | **4** |
-| 📅 **Total Daily Editions Published** | **2** |
-| 🗓️ **Tracking Since** | `2026-10-20` |
-| 🔄 **Last Pipeline Execution** | `2026-10-20` |
+| Papers curated | **2** |
+| Daily editions | **1** |
+| Tracking since | `2026-10-20` |
+| Last run | `2026-10-20` |
 
-**🏆 Most Active Research Categories:**
+**Most active categories:**
 
-- 🧠 **Reasoning & Agents**: `4` papers
-- 🤖 **LLMs & Language Models**: `4` papers
-- 🎨 **Generative AI & Diffusion**: `2` papers
-- 📊 **ML Theory & Optimization**: `2` papers
+- 🧠 **Reasoning & Agents**: `2` papers
+- 🤖 **LLMs & Language Models**: `2` papers
 <!-- STATS_END -->
 
 ---
 
 ## 🛠️ System Architecture
 
-Every morning at **06:30 UTC (12:00 IST)**, GitHub Actions wakes up a serverless runner and executes the pipeline:
+Every morning at **06:30 UTC (12:00 IST)**, GitHub Actions runs the pipeline:
 
 ```mermaid
 flowchart LR
-    A[📡 arXiv API<br/>7 ML Categories] --> C[🏷️ Keyword<br/>Classifier]
-    B[🤗 Hugging Face<br/>Trending Feed] --> C
-    C --> D[⚡ Heuristic<br/>Scorer]
-    D --> E[🏆 Top 2<br/>Selection]
-    E --> F[🤖 Groq LLM<br/>Summary Chain]
-    F --> G[📝 Render<br/>Markdown]
-    G --> H[🚀 Git Commit<br/>& Push]
+    A[arXiv API<br/>7 ML Categories] --> C[Keyword<br/>Classifier]
+    B[HuggingFace<br/>Trending Feed] --> C
+    C --> D[Heuristic<br/>Scorer]
+    D --> E[Top 2<br/>Selection]
+    E --> F[Groq LLM<br/>Summary Chain]
+    F --> G[Render<br/>Markdown]
+    G --> H[Git Commit<br/>and Push]
 ```
 
-### ⚡ Ranking Signals
-- **Community Momentum:** HuggingFace upvotes, community bookmark velocity.
+### Ranking Signals
+- **Community Momentum:** HuggingFace upvotes and community bookmark velocity.
 - **Novelty Detection:** Title/Abstract keyword markers (*breakthrough, SOTA, novel, introduce*).
 - **Interdisciplinary Cross-over:** Multi-category convergence (e.g. LLMs + Robotics).
 - **Synthesis Impact:** Comprehensive surveys, position papers, and landmark benchmarks.
@@ -128,11 +124,13 @@ Want to run this automated digest for your own profile?
 1. **Fork this repository** to your GitHub account.
 2. **Obtain a free Groq API key** from [console.groq.com](https://console.groq.com) (free tier includes 30 RPM).
 3. **Save your secret**:
-   - Go to your repo: `Settings → Secrets and variables → Actions`
+   - Go to your repo: `Settings > Secrets and variables > Actions`
    - Add a new secret named `GROQ_API_KEY`
 4. **Trigger workflow manually**:
-   - Navigate to `Actions → 🧠 Daily AI Paper Digest → Run workflow`
-5. That's it! GitHub Actions will run every single morning automatically and record green commits on your heatmap.
+   - Navigate to `Actions > Daily AI Paper Digest > Run workflow`
+5. That's it! GitHub Actions will run every morning automatically.
+
+For local runs, copy `.env.example` to `.env`, fill in your key, and run `python src/main.py`.
 
 ---
 
@@ -141,20 +139,24 @@ Want to run this automated digest for your own profile?
 ```text
 ai-paper-daily/
 ├── .github/workflows/
-│   └── daily-digest.yml      # Automated 06:30 UTC daily runner
-├── src/                      # 100% of pipeline code lives here
-│   ├── main.py               # Pipeline orchestrator & entrypoint
+│   ├── daily-digest.yml      # Automated 06:30 UTC daily runner
+│   └── tests.yml             # Runs pytest on push and pull request
+├── src/                      # All pipeline code
+│   ├── main.py               # Pipeline orchestrator and entrypoint
 │   ├── classifier.py         # 12-category research classifier
-│   ├── fetcher.py            # arXiv & HuggingFace API scraper
+│   ├── fetcher.py            # arXiv and HuggingFace API fetcher
 │   ├── groq_summarizer.py    # LLM summarizer with fallback chain
 │   ├── readme_updater.py     # Live README section manager
-│   ├── renderer.py           # Markdown digest & category builder
-│   ├── scorer.py             # Heuristic scoring & status badges
+│   ├── renderer.py           # Markdown digest and category builder
+│   ├── scorer.py             # Heuristic scoring and status badges
 │   └── stats_tracker.py      # Cumulative JSON analytics manager
+├── tests/                    # Pytest test suite
 ├── digests/                  # Published daily edition markdown files
 ├── categories/               # Dedicated archive per research field
 ├── stats/                    # stats.json persistent dataset
-├── requirements.txt          # Python dependencies
+├── requirements.txt          # Runtime dependencies (pinned)
+├── requirements-dev.txt      # Dev/test dependencies
+├── .env.example              # Template for local environment variables
 └── README.md                 # Public project dashboard
 ```
 

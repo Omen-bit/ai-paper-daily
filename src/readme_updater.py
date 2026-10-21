@@ -2,16 +2,20 @@
 readme_updater.py
 Dynamically updates README.md with the latest digest info, archive table, and stats.
 Uses HTML comment markers to identify and replace specific sections.
+Headings live OUTSIDE the sentinel markers in README.md.
+The updater writes only content (no heading) between the markers.
 """
 
 import os
 import re
+import sys
 from datetime import datetime
+
 try:
-    from .stats_tracker import get_top_categories, get_recent_digests
+    from .stats_tracker import get_top_categories, get_recent_digests, scan_digests_folder
     from .classifier import get_category_display
 except (ImportError, ValueError):
-    from stats_tracker import get_top_categories, get_recent_digests
+    from stats_tracker import get_top_categories, get_recent_digests, scan_digests_folder
     from classifier import get_category_display
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,8 +30,18 @@ MARKERS = {
 
 
 def _replace_section(content: str, key: str, new_body: str) -> str:
-    """Replace the content between a pair of markers."""
+    """
+    Replace content between a pair of markers.
+    Exits with a non-zero status and a clear message if either marker is missing.
+    """
     start_marker, end_marker = MARKERS[key]
+    if start_marker not in content:
+        print(f"  [readme] ERROR: Start marker '{start_marker}' not found in README.md")
+        sys.exit(1)
+    if end_marker not in content:
+        print(f"  [readme] ERROR: End marker '{end_marker}' not found in README.md")
+        sys.exit(1)
+
     pattern = re.compile(
         rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
         re.DOTALL,
@@ -35,17 +49,21 @@ def _replace_section(content: str, key: str, new_body: str) -> str:
     replacement = f"{start_marker}\n{new_body}\n{end_marker}"
     updated, count = pattern.subn(replacement, content)
     if count == 0:
-        print(f"⚠️ Marker pair for '{key}' not found in README — skipping section update")
+        print(f"  [readme] ERROR: Could not replace section '{key}' despite markers being present")
+        sys.exit(1)
     return updated
 
 
 def _render_today_section(papers: list[dict], date_str: str) -> str:
-    """Render the 'Today's Papers' section for README with a sleek, card-like format."""
+    """
+    Render the 'Today's Papers' section content for README.
+    Heading lives outside the markers in README.md, so no heading is written here.
+    """
     weekday = datetime.strptime(date_str, "%Y-%m-%d").strftime("%A, %B %d, %Y")
     digest_link = f"digests/{date_str}.md"
 
     lines = [
-        f"### 📅 Today's Featured Papers — [{weekday}]({digest_link})",
+        f"### {weekday} -- [{date_str}]({digest_link})",
         "",
     ]
 
@@ -60,17 +78,15 @@ def _render_today_section(papers: list[dict], date_str: str) -> str:
         arxiv_id = paper.get("id", "")
         hf_upvotes = paper.get("hf_upvotes", 0)
 
-        # Build clean chips
         chips = []
         for b in badges[:2]:
             chips.append(f"`{b[0]} {b[1]}`")
         for c in categories[:2]:
             chips.append(f"`{c['emoji']} {c['name']}`")
         if hf_upvotes > 0:
-            chips.append(f"`🔥 {hf_upvotes} upvotes`")
+            chips.append(f"`{hf_upvotes} HF upvotes`")
         chips_str = " ".join(chips)
 
-        # Authors string (first 3 + et al.)
         if authors:
             auth_str = ", ".join(authors[:3])
             if len(authors) > 3:
@@ -79,10 +95,10 @@ def _render_today_section(papers: list[dict], date_str: str) -> str:
             auth_str = "Various Authors"
 
         hf_link = f"https://huggingface.co/papers/{arxiv_id}" if arxiv_id else None
-        links_list = [f"[📄 arXiv Paper]({url})", f"[📥 Direct PDF]({pdf_url})"]
+        links_list = [f"[arXiv Paper]({url})", f"[Direct PDF]({pdf_url})"]
         if hf_link:
-            links_list.append(f"[🤗 Community Discussion]({hf_link})")
-        links_str = " &nbsp;•&nbsp; ".join(links_list)
+            links_list.append(f"[HF Community]({hf_link})")
+        links_str = " &nbsp;|&nbsp; ".join(links_list)
 
         lines.append(f"#### {i}. [{title}]({url})")
         if chips_str:
@@ -90,55 +106,91 @@ def _render_today_section(papers: list[dict], date_str: str) -> str:
         if why:
             source = paper.get("summary_source", "groq")
             label = "Abstract highlight" if source == "heuristic" else "Why It Matters"
-            lines.append(f"> 💡 **{label}:**  \n> {why}\n")
-        lines.append(f"👥 **Authors:** {auth_str}  ")
-        lines.append(f"🔗 **Links:** {links_str}  \n")
+            lines.append(f"> **{label}:**  \n> {why}\n")
+        lines.append(f"**Authors:** {auth_str}  ")
+        lines.append(f"**Links:** {links_str}  \n")
 
-    lines.append(f"👉 **[Read the Full Markdown Digest with Abstracts →]({digest_link})**")
+    lines.append(f"**[Read the full digest with abstracts]({digest_link})**")
     return "\n".join(lines)
 
 
-def _render_archive_section(recent_digests: list[dict]) -> str:
-    """Render the archive table in a compact, scannable format."""
+def _build_archive_rows(stats: dict) -> list[dict]:
+    """
+    Build the archive row list from two sources of truth merged together:
+    1. Scan digests/ on disk to know which dates exist.
+    2. Use stats["digests"] log to get paper count and top category per date.
+    Newest first. Placeholder days (no papers) are listed with a marker.
+    """
+    disk_entries = scan_digests_folder()  # [{"date": ..., "is_placeholder": bool}]
+    stats_log = {d["date"]: d for d in stats.get("digests", [])}
+
+    rows = []
+    for entry in disk_entries:
+        date = entry["date"]
+        if entry["is_placeholder"]:
+            rows.append({
+                "date": date,
+                "paper_count": 0,
+                "top_category": "No papers",
+                "is_placeholder": True,
+            })
+        else:
+            log = stats_log.get(date, {})
+            rows.append({
+                "date": date,
+                "paper_count": log.get("paper_count", "?"),
+                "top_category": log.get("top_category", "Unknown"),
+                "is_placeholder": False,
+            })
+
+    # Sort newest first (disk scan already does this, but be explicit)
+    rows.sort(key=lambda x: x["date"], reverse=True)
+    return rows
+
+
+def _render_archive_section(stats: dict) -> str:
+    """
+    Render the archive table content. Heading lives outside the markers.
+    Shows at most 30 rows; links to digests/ folder for the rest.
+    """
+    all_rows = _build_archive_rows(stats)
+
     lines = [
-        "### 📁 Digest Archive",
-        "",
-        "| Date | Papers | Top Category Covered | Digest Link |",
+        "| Date | Papers | Top Category | Digest |",
         "| :--- | :---: | :--- | :--- |",
     ]
 
-    for entry in recent_digests[:15]:
-        date = entry.get("date", "")
-        count = entry.get("paper_count", 0)
-        top_cat = entry.get("top_category", "—")
-        link = f"[📄 Read Digest →](digests/{date}.md)"
-        lines.append(f"| **{date}** | `{count}` | {top_cat} | {link} |")
-
-    if not recent_digests:
-        lines.append("| — | — | — | *No digests archived yet* |")
-
-    if len(recent_digests) > 15:
-        lines.append("\n<details><summary><b>View Older Digests</b></summary>\n")
-        lines.append("| Date | Papers | Top Category Covered | Digest Link |")
-        lines.append("| :--- | :---: | :--- | :--- |")
-        for entry in recent_digests[15:50]:
-            date = entry.get("date", "")
-            count = entry.get("paper_count", 0)
-            top_cat = entry.get("top_category", "—")
-            link = f"[📄 Read Digest →](digests/{date}.md)"
+    shown = all_rows[:30]
+    for row in shown:
+        date = row["date"]
+        count = row["paper_count"]
+        top_cat = row["top_category"]
+        if row.get("is_placeholder"):
+            link = f"[{date}](digests/{date}.md)"
+            lines.append(f"| {date} | `0` | *(no papers)* | {link} |")
+        else:
+            link = f"[Read digest](digests/{date}.md)"
             lines.append(f"| **{date}** | `{count}` | {top_cat} | {link} |")
-        lines.append("\n</details>")
+
+    if not shown:
+        lines.append("| -- | -- | -- | *No digests yet* |")
+
+    if len(all_rows) > 30:
+        lines.append(
+            f"\n*Showing latest 30 of {len(all_rows)} digests. "
+            f"[Browse all in digests/](digests/)*"
+        )
 
     return "\n".join(lines)
 
 
 def _render_stats_section(stats: dict) -> str:
-    """Render the stats summary section cleanly."""
+    """Render the stats summary section content. Heading lives outside the markers."""
     total_papers = stats.get("total_papers", 0)
     total_digests = stats.get("total_digests", 0)
-    first_digest = stats.get("first_digest", "—")
-    last_updated = stats.get("last_updated", "—")
-    if last_updated and last_updated != "—":
+    first_digest = stats.get("first_digest", "unknown")
+    last_updated = stats.get("last_updated", "unknown")
+    if last_updated and last_updated != "unknown":
         try:
             last_updated = last_updated[:10]
         except Exception:
@@ -147,16 +199,14 @@ def _render_stats_section(stats: dict) -> str:
     top_cats = get_top_categories(stats, top_n=5)
 
     lines = [
-        "### 📊 Project Insights",
-        "",
         "| Metric | Value |",
         "| :--- | :--- |",
-        f"| 📄 **Total Research Papers Curated** | **{total_papers:,}** |",
-        f"| 📅 **Total Daily Editions Published** | **{total_digests:,}** |",
-        f"| 🗓️ **Tracking Since** | `{first_digest}` |",
-        f"| 🔄 **Last Pipeline Execution** | `{last_updated}` |",
+        f"| Papers curated | **{total_papers:,}** |",
+        f"| Daily editions | **{total_digests:,}** |",
+        f"| Tracking since | `{first_digest}` |",
+        f"| Last run | `{last_updated}` |",
         "",
-        "**🏆 Most Active Research Categories:**",
+        "**Most active categories:**",
         "",
     ]
 
@@ -177,19 +227,17 @@ def _render_stats_section(stats: dict) -> str:
 def update_readme(papers: list[dict], date_str: str, stats: dict) -> None:
     """Update all dynamic sections of README.md."""
     if not os.path.exists(README_PATH):
-        print(f"⚠️ README.md not found at {README_PATH}")
-        return
+        print(f"  [readme] ERROR: README.md not found at {README_PATH}")
+        sys.exit(1)
 
     with open(README_PATH, "r", encoding="utf-8") as f:
         content = f.read()
 
-    recent_digests = get_recent_digests(stats)
-
     content = _replace_section(content, "today", _render_today_section(papers, date_str))
-    content = _replace_section(content, "archive", _render_archive_section(recent_digests))
+    content = _replace_section(content, "archive", _render_archive_section(stats))
     content = _replace_section(content, "stats", _render_stats_section(stats))
 
     with open(README_PATH, "w", encoding="utf-8") as f:
         f.write(content)
 
-    print(f"✅ README.md updated successfully")
+    print("  [readme] README.md updated successfully")
