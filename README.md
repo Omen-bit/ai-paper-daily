@@ -32,29 +32,19 @@
 #### 1. [Evidence-First Agentic Verification](https://arxiv.org/abs/2610.17724)
 `⭐ Top Pick` `🔥 Trending on HF` `🧠 Reasoning & Agents` `🤖 LLMs & Language Models`
 
-<<<<<<< HEAD
-> **Why It Matters:**
-> Introduces Sauron, an evidence-first agentic verifier that inspects state and execution traces to ensure claims are verified before being used as RL rewards, preventing misleading optimization signals.
-=======
 > 💡 **Why It Matters:**  
-> We introduce Sauron, an evidence-first agentic verifier that investigates both state and trace and relies on a claim only after independently validating it against its source.
->>>>>>> 0e23053e6a40ac7d742604784f44bdd31101a1ab
+> Introduces Sauron, an evidence-first agentic verifier that inspects state and execution traces to ensure claims are verified before being used as RL rewards, preventing misleading optimization signals.
 
-**Authors:** Reza Sanayei, Razvan-Gabriel Dumitru, Sunjie Hou et al.
+**Authors:** Reza Sanayei, Razvan-Gabriel Dumitru, Sunjie Hou et al.  
 **Links:** [arXiv Paper](https://arxiv.org/abs/2610.17724) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.17724) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.17724)
 
 #### 2. [Where is Physical RSI capability from? An Observational Scaling Law of LLM-as-policy](https://arxiv.org/abs/2610.26848)
 `🔥 Trending on HF` `🔀 Interdisciplinary` `📊 ML Theory & Optimization` `🤖 LLMs & Language Models`
 
-<<<<<<< HEAD
-> **Why It Matters:**
-> Proposes PhysRSI-eval, a five-axis framework to quantify recursive self-improvement in physical environments and formulates the Physical Barrel Hypothesis for LLM agent policies.
-=======
 > 💡 **Why It Matters:**  
-> We introduce PhysRSI-eval to quantify physical RSI through a five-axis metric: First-Attempt Performance, Efficiency, Success, Budget and Improvement from failure.
->>>>>>> 0e23053e6a40ac7d742604784f44bdd31101a1ab
+> Proposes PhysRSI-eval, a five-axis framework to quantify recursive self-improvement in physical environments and formulates the Physical Barrel Hypothesis for LLM agent policies.
 
-**Authors:** Zekai Li, Jiayi Yu, Jinlu Zhang et al.
+**Authors:** Zekai Li, Jiayi Yu, Jinlu Zhang et al.  
 **Links:** [arXiv Paper](https://arxiv.org/abs/2610.26848) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.26848) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.26848)
 
 **[Read the full digest with abstracts](digests/2026-10-20.md)**
@@ -91,29 +81,17 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-<<<<<<< HEAD
 | Papers curated | **2** |
 | Daily editions | **1** |
 | Tracking since | `2026-10-20` |
 | Last run | `2026-10-20` |
-=======
-| 📄 **Total Research Papers Curated** | **6** |
-| 📅 **Total Daily Editions Published** | **3** |
-| 🗓️ **Tracking Since** | `2026-10-20` |
-| 🔄 **Last Pipeline Execution** | `2026-10-20` |
->>>>>>> 0e23053e6a40ac7d742604784f44bdd31101a1ab
 
 **Most active categories:**
 
-<<<<<<< HEAD
 - 🧠 **Reasoning & Agents**: `2` papers
 - 🤖 **LLMs & Language Models**: `2` papers
-=======
-- 🧠 **Reasoning & Agents**: `6` papers
-- 🤖 **LLMs & Language Models**: `6` papers
-- 🎨 **Generative AI & Diffusion**: `3` papers
-- 📊 **ML Theory & Optimization**: `3` papers
->>>>>>> 0e23053e6a40ac7d742604784f44bdd31101a1ab
+- 🎨 **Generative AI & Diffusion**: `1` papers
+- 📊 **ML Theory & Optimization**: `1` papers
 <!-- STATS_END -->
 
 ---
@@ -124,13 +102,13 @@ Every morning at **06:30 UTC (12:00 IST)**, GitHub Actions runs the pipeline:
 
 ```mermaid
 flowchart LR
-    A[arXiv API<br/>7 ML Categories] --> C[Keyword<br/>Classifier]
-    B[HuggingFace<br/>Trending Feed] --> C
-    C --> D[Heuristic<br/>Scorer]
-    D --> E[Top 2<br/>Selection]
-    E --> F[Groq LLM<br/>Summary Chain]
-    F --> G[Render<br/>Markdown]
-    G --> H[Git Commit<br/>and Push]
+    A["arXiv API<br/>7 ML Categories"] --> C["Keyword<br/>Classifier"]
+    B["HuggingFace<br/>Trending Feed"] --> C
+    C --> D["Heuristic<br/>Scorer"]
+    D --> E["Top 2<br/>Selection"]
+    E --> F["Groq LLM<br/>Summary Chain"]
+    F --> G["Render<br/>Markdown"]
+    G --> H["Git Commit<br/>and Push"]
 ```
 
 ### Ranking Signals
@@ -154,7 +132,41 @@ Want to run this automated digest for your own profile?
    - Navigate to `Actions > Daily AI Paper Digest > Run workflow`
 5. That's it! GitHub Actions will run every morning automatically.
 
-For local runs, copy `.env.example` to `.env`, fill in your key, and run `python src/main.py`.
+### Local Development & Execution
+
+To test or run the pipeline on your machine:
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Omen-bit/ai-paper-daily.git
+   cd ai-paper-daily
+   ```
+2. **Install runtime dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configure local environment (optional)**:
+   ```bash
+   cp .env.example .env
+   ```
+   Add your `GROQ_API_KEY` inside `.env`. If not set, the pipeline automatically falls back to abstract heuristics.
+4. **Run the pipeline**:
+   ```bash
+   python src/main.py
+   ```
+
+### Running Tests & Contributing
+
+Before opening a pull request, verify that all unit tests pass:
+
+1. **Install development and testing dependencies**:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+2. **Execute test suite**:
+   ```bash
+   pytest tests/ -v
+   ```
 
 ---
 
@@ -163,7 +175,7 @@ For local runs, copy `.env.example` to `.env`, fill in your key, and run `python
 ```text
 ai-paper-daily/
 ├── .github/workflows/
-│   ├── daily-digest.yml      # Automated 06:30 UTC daily runner
+│   ├── daily-digest.yml      # Automated 06:30 UTC daily runner with race-condition prevention
 │   └── tests.yml             # Runs pytest on push and pull request
 ├── src/                      # All pipeline code
 │   ├── main.py               # Pipeline orchestrator and entrypoint
@@ -173,7 +185,7 @@ ai-paper-daily/
 │   ├── readme_updater.py     # Live README section manager
 │   ├── renderer.py           # Markdown digest and category builder
 │   ├── scorer.py             # Heuristic scoring and status badges
-│   └── stats_tracker.py      # Cumulative JSON analytics manager
+│   └── stats_tracker.py      # Cumulative JSON analytics manager with auto-reconciliation
 ├── tests/                    # Pytest test suite
 ├── digests/                  # Published daily edition markdown files
 ├── categories/               # Dedicated archive per research field
@@ -181,6 +193,7 @@ ai-paper-daily/
 ├── requirements.txt          # Runtime dependencies (pinned)
 ├── requirements-dev.txt      # Dev/test dependencies
 ├── .env.example              # Template for local environment variables
+├── LICENSE                   # MIT License
 └── README.md                 # Public project dashboard
 ```
 

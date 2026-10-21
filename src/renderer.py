@@ -77,7 +77,7 @@ def _render_paper_entry(paper: dict, index: int, is_only: bool = False) -> str:
         else:
             label = "Why It Matters"
         lines += [
-            f"> 💡 **{label}**  ",
+            f"> 💡 **{label}:**  ",
             f"> {why_it_matters}",
             "",
         ]

@@ -17,22 +17,30 @@ DIGESTS_DIR = os.path.join(ROOT_DIR, "digests")
 
 
 def load_stats() -> dict:
-    """Load existing stats or return a fresh skeleton."""
+    """Load existing stats or return a fresh skeleton reconciled from digests folder."""
+    stats = None
     if os.path.exists(STATS_FILE):
-        with open(STATS_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(STATS_FILE, "r", encoding="utf-8") as f:
+                stats = json.load(f)
+        except Exception as exc:
+            print(f"  [stats] Warning: Could not parse {STATS_FILE} ({exc}); rebuilding from digests.")
+            stats = None
 
-    return {
-        "total_papers": 0,
-        "total_digests": 0,
-        "first_digest": None,
-        "last_updated": None,
-        "papers_by_date": {},
-        "papers_by_category": {},
-        "top_authors": {},
-        "top_keywords": {},
-        "digests": [],
-    }
+    if not stats or not isinstance(stats, dict):
+        stats = {
+            "total_papers": 0,
+            "total_digests": 0,
+            "first_digest": None,
+            "last_updated": None,
+            "papers_by_date": {},
+            "papers_by_category": {},
+            "top_authors": {},
+            "top_keywords": {},
+            "digests": [],
+        }
+
+    return reconcile_from_disk(stats)
 
 
 def save_stats(stats: dict) -> None:
@@ -66,13 +74,13 @@ def extract_keywords(papers: list[dict], top_n: int = 20) -> list[str]:
 def _reconcile_totals(stats: dict) -> dict:
     """
     Recompute total_papers, total_digests, first_digest, and papers_by_date
-    from the digest log so they are always consistent with what is stored.
+    from the digest log so they are always consistent with what is stored on disk.
     Running this on every update makes the pipeline idempotent.
     """
     digests = stats.get("digests", [])
-    stats["total_digests"] = len(digests)
+    valid_editions = [d for d in digests if d.get("paper_count", 0) > 0]
+    stats["total_digests"] = len(valid_editions)
     stats["total_papers"] = sum(d.get("paper_count", 0) for d in digests)
-    # Rebuild papers_by_date from the log
     stats["papers_by_date"] = {
         d["date"]: d.get("paper_count", 0)
         for d in digests
@@ -80,7 +88,59 @@ def _reconcile_totals(stats: dict) -> dict:
     if digests:
         sorted_dates = sorted(d["date"] for d in digests)
         stats["first_digest"] = sorted_dates[0]
+    else:
+        stats["first_digest"] = None
     return stats
+
+
+def reconcile_from_disk(stats: dict) -> dict:
+    """
+    Dynamically recalculate digest entries and aggregate counts
+    directly from the contents of the digests/ directory.
+    Prevents corrupted or clobbered counts in stats.json if a file sync anomaly happens.
+    """
+    if not os.path.exists(DIGESTS_DIR):
+        return _reconcile_totals(stats)
+
+    disk_entries = scan_digests_folder()
+    disk_dates = {e["date"] for e in disk_entries}
+
+    paper_heading_regex = re.compile(r"^#{3,4}\s+\d+\.\s+\[", re.MULTILINE)
+
+    # Filter out any digests from stats that do not actually exist on disk
+    existing_digests = [d for d in stats.get("digests", []) if d.get("date") in disk_dates]
+    digests_by_date = {d["date"]: d for d in existing_digests}
+
+    for disk_entry in disk_entries:
+        date_str = disk_entry["date"]
+        is_placeholder = disk_entry["is_placeholder"]
+        filepath = os.path.join(DIGESTS_DIR, f"{date_str}.md")
+
+        actual_paper_count = 0
+        if not is_placeholder and os.path.exists(filepath):
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    file_text = f.read()
+                actual_paper_count = len(paper_heading_regex.findall(file_text))
+            except Exception:
+                actual_paper_count = 0
+
+        if date_str in digests_by_date:
+            digests_by_date[date_str]["paper_count"] = actual_paper_count
+        else:
+            new_entry = {
+                "date": date_str,
+                "paper_count": actual_paper_count,
+                "top_category": "General",
+                "categories_covered": [],
+            }
+            existing_digests.append(new_entry)
+            digests_by_date[date_str] = new_entry
+
+    existing_digests.sort(key=lambda x: x["date"], reverse=True)
+    stats["digests"] = existing_digests
+
+    return _reconcile_totals(stats)
 
 
 def update_stats(papers: list[dict], date_str: str) -> dict:

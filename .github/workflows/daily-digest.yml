@@ -57,6 +57,19 @@ jobs:
           else
             DATE=$(date -u +'%Y-%m-%d')
             git commit -m "📄 Daily digest: ${DATE} - AI Paper Daily"
-            git push
+
+            # Securely rebase on latest upstream to prevent race conditions
+            MAX_RETRIES=3
+            COUNT=0
+            until git push origin main; do
+              COUNT=$((COUNT + 1))
+              if [ $COUNT -ge $MAX_RETRIES ]; then
+                echo "❌ Push failed after $MAX_RETRIES attempts."
+                exit 1
+              fi
+              echo "⚠️ Upstream changes detected. Pulling with rebase and retrying ($COUNT/$MAX_RETRIES)..."
+              git pull --rebase origin main
+              sleep 2
+            done
             echo "✅ Changes pushed successfully."
           fi

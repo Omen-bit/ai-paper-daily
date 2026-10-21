@@ -106,7 +106,7 @@ def _render_today_section(papers: list[dict], date_str: str) -> str:
         if why:
             source = paper.get("summary_source", "groq")
             label = "Abstract highlight" if source == "heuristic" else "Why It Matters"
-            lines.append(f"> **{label}:**  \n> {why}\n")
+            lines.append(f"> 💡 **{label}:**  \n> {why}\n")
         lines.append(f"**Authors:** {auth_str}  ")
         lines.append(f"**Links:** {links_str}  \n")
 
