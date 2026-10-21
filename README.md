@@ -27,27 +27,27 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Tuesday, October 20, 2026 -- [2026-10-20](digests/2026-10-20.md)
+### Wednesday, October 21, 2026 -- [2026-10-21](digests/2026-10-21.md)
 
-#### 1. [Evidence-First Agentic Verification](https://arxiv.org/abs/2610.17724)
-`⭐ Top Pick` `🔥 Trending on HF` `🧠 Reasoning & Agents` `🤖 LLMs & Language Models`
+#### 1. [Ropedia W0: Scaling Loco-Manipulation World Models across Embodiments with Human Experience](https://arxiv.org/abs/2610.26855)
+`⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML`
 
-> 💡 **Why It Matters:**  
-> Introduces Sauron, an evidence-first agentic verifier that inspects state and execution traces to ensure claims are verified before being used as RL rewards, preventing misleading optimization signals.
+> 💡 **Abstract highlight:**  
+> We present Ropedia W0, the first egocentric loco-manipulation world foundation model spanning humans and robots with diverse embodiments.
 
-**Authors:** Reza Sanayei, Razvan-Gabriel Dumitru, Sunjie Hou et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.17724) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.17724) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.17724)
+**Authors:** Tianqi Liu, Hanfei Zhao, Qifeng Liang et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.26855) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.26855) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.26855)  
 
-#### 2. [Where is Physical RSI capability from? An Observational Scaling Law of LLM-as-policy](https://arxiv.org/abs/2610.26848)
-`🔥 Trending on HF` `🔀 Interdisciplinary` `📊 ML Theory & Optimization` `🤖 LLMs & Language Models`
+#### 2. [VLA-Rolling: Fewer Denoising Steps, Better Control via Adaptive Action Reuse](https://arxiv.org/abs/2610.25043)
+`🔥 Trending on HF` `📖 Survey / Review` `🔖 Other ML`
 
-> 💡 **Why It Matters:**  
-> Proposes PhysRSI-eval, a five-axis framework to quantify recursive self-improvement in physical environments and formulates the Physical Barrel Hypothesis for LLM agent policies.
+> 💡 **Abstract highlight:**  
+> We show that this discarded tail retains transferable denoising progress: action-tail initialization can match or outperform a native 10-step Gaussian baseline using fewer denoising steps.
 
-**Authors:** Zekai Li, Jiayi Yu, Jinlu Zhang et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.26848) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.26848) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.26848)
+**Authors:** Sicheng He, Yi Pan, Qiuting Yu et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.25043) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.25043) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.25043)  
 
-**[Read the full digest with abstracts](digests/2026-10-20.md)**
+**[Read the full digest with abstracts](digests/2026-10-21.md)**
 <!-- TODAY_END -->
 
 ---
@@ -71,6 +71,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
+| **2026-10-21** | `2` | Other ML | [Read digest](digests/2026-10-21.md) |
 | **2026-10-20** | `2` | Reasoning & Agents | [Read digest](digests/2026-10-20.md) |
 <!-- ARCHIVE_END -->
 
@@ -81,16 +82,15 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-| Papers curated | **2** |
-| Daily editions | **1** |
+| Papers curated | **4** |
+| Daily editions | **2** |
 | Tracking since | `2026-10-20` |
-| Last run | `2026-10-20` |
+| Last run | `2026-10-21` |
 
 **Most active categories:**
 
-- 🧠 **Reasoning & Agents**: `2` papers
-- 🤖 **LLMs & Language Models**: `2` papers
-- 🎨 **Generative AI & Diffusion**: `1` papers
+- 🔖 **Other ML**: `2` papers
+- 🧠 **Reasoning & Agents**: `1` papers
 - 📊 **ML Theory & Optimization**: `1` papers
 <!-- STATS_END -->
 
