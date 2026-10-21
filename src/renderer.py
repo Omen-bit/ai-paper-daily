@@ -71,8 +71,13 @@ def _render_paper_entry(paper: dict, index: int, is_only: bool = False) -> str:
         lines += [" &nbsp; ".join(all_chips), ""]
 
     if why_it_matters:
+        source = paper.get("summary_source", "groq")
+        if source == "heuristic":
+            label = "Abstract highlight"
+        else:
+            label = "Why It Matters"
         lines += [
-            "> 💡 **Why It Matters**  ",
+            f"> 💡 **{label}**  ",
             f"> {why_it_matters}",
             "",
         ]
