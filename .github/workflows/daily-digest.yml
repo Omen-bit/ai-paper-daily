@@ -2,9 +2,9 @@ name: 🧠 Daily AI Paper Digest
 
 on:
   schedule:
-    # Runs every day at 06:30 UTC (12:00 IST)
-    # arXiv submissions are usually available by 06:00 UTC
-    - cron: "30 6 * * *"
+    # Runs every day at 18:30 UTC (00:00 IST / midnight)
+    # arXiv submissions are usually available by this time
+    - cron: "30 18 * * *"
 
   # Allows manual trigger from the GitHub Actions UI anytime
   workflow_dispatch:
