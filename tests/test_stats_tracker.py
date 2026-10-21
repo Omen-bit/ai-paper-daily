@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from stats_tracker import load_stats, reconcile_from_disk, _reconcile_totals
+from stats_tracker import load_stats, reconcile_from_disk, _reconcile_totals, update_stats
 
 
 def test_reconcile_totals():
@@ -61,3 +61,45 @@ def test_load_stats_corrupted_json_recovery(tmp_path):
         assert isinstance(recovered, dict)
         assert recovered["total_papers"] == 0
         assert recovered["total_digests"] == 0
+
+
+def test_update_stats_idempotence(tmp_path):
+    # Verify that running update_stats multiple times on the same date gives identical stats
+    stats_file = os.path.join(tmp_path, "stats.json")
+    papers = [
+        {
+            "id": "2610.00001",
+            "title": "Novel Reasoning Architecture",
+            "authors": ["Alice"],
+            "categories": [{"slug": "reasoning-agents"}],
+        },
+        {
+            "id": "2610.00002",
+            "title": "Efficient Scaling Theory",
+            "authors": ["Bob"],
+            "categories": [{"slug": "ml-theory"}],
+        },
+    ]
+
+    with patch("stats_tracker.STATS_FILE", stats_file), \
+         patch("stats_tracker.DIGESTS_DIR", str(tmp_path)):
+        # Run 1
+        res1 = update_stats(papers, "2026-10-21")
+        # Run 2 on same date
+        res2 = update_stats(papers, "2026-10-21")
+        # Run 3 on same date
+        res3 = update_stats(papers, "2026-10-21")
+
+        assert res1["total_papers"] == 2
+        assert res2["total_papers"] == 2
+        assert res3["total_papers"] == 2
+
+        assert res1["total_digests"] == 1
+        assert res2["total_digests"] == 1
+        assert res3["total_digests"] == 1
+
+        assert res3["papers_by_category"]["reasoning-agents"] == 1
+        assert res3["papers_by_category"]["ml-theory"] == 1
+        assert res3["top_authors"]["Alice"] == 1
+        assert res3["top_authors"]["Bob"] == 1
+

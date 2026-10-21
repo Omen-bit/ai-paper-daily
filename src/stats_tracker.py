@@ -40,7 +40,9 @@ def load_stats() -> dict:
             "digests": [],
         }
 
-    return reconcile_from_disk(stats)
+    stats = reconcile_from_disk(stats)
+    save_stats(stats)
+    return stats
 
 
 def save_stats(stats: dict) -> None:
@@ -71,41 +73,149 @@ def extract_keywords(papers: list[dict], top_n: int = 20) -> list[str]:
     return [kw for kw, _ in counter.most_common(top_n)]
 
 
-def _reconcile_totals(stats: dict) -> dict:
+def _parse_digest_file(filepath: str) -> list[dict]:
+    """Parse paper records (id, title, authors, categories) from a digest markdown file."""
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            text = f.read()
+    except Exception:
+        return []
+
+    if "no new papers" in text.lower():
+        return []
+
+    try:
+        from classifier import CATEGORIES
+    except ImportError:
+        try:
+            from .classifier import CATEGORIES
+        except ImportError:
+            CATEGORIES = []
+
+    blocks = re.split(r"\n#{3,4}\s+\d+\.\s+\[", text)[1:]
+    papers = []
+    for block in blocks:
+        first_line = block.split("\n")[0]
+        title_part = first_line.split("](")[0]
+        title = re.sub(
+            r"^[\U0001F300-\U0001FFFF\u2600-\u26FF\u2700-\u27BF⭐🔥💡📖🔀\s]+", "", title_part
+        ).strip()
+        url = first_line.split("](")[1].rstrip(")") if "](" in first_line else ""
+
+        arxiv_id = ""
+        if "/abs/" in url:
+            arxiv_id = url.split("/abs/")[-1]
+        elif "/papers/" in url:
+            arxiv_id = url.split("/papers/")[-1]
+
+        # Extract categories from category chips in block
+        paper_cats = []
+        for cat in CATEGORIES:
+            emoji, name, slug = cat[0], cat[1], cat[2]
+            if name in block:
+                paper_cats.append(slug)
+
+        # Extract authors
+        authors = []
+        auth_match = re.search(r"Authors:\*\*\s*(.+)", block)
+        if auth_match:
+            raw = auth_match.group(1).split("*+")[0].replace("et al.", "").strip("., *")
+            authors = [a.strip() for a in raw.split(",") if a.strip()]
+
+        papers.append({
+            "id": arxiv_id,
+            "title": title,
+            "url": url,
+            "authors": authors,
+            "categories": paper_cats,
+        })
+
+    return papers
+
+
+def _recompute_all(stats: dict) -> dict:
     """
-    Recompute total_papers, total_digests, first_digest, and papers_by_date
-    from the digest log so they are always consistent with what is stored on disk.
-    Running this on every update makes the pipeline idempotent.
+    Recompute all totals and distributions from stored data across all digests.
+    Deduplicates papers by date and paper ID so multiple runs on the same date
+    cannot inflate counters or corrupt statistics.
     """
     digests = stats.get("digests", [])
+
+    unique_papers = {}
+    papers_by_date = Counter()
+
+    for d in digests:
+        date = d.get("date", "")
+        for p in d.get("papers", []):
+            pid = p.get("id") or p.get("title", "")
+            key = (date, pid)
+            if key not in unique_papers:
+                unique_papers[key] = p
+                papers_by_date[date] += 1
+
+    # Fallback for digests where full paper records were not yet stored
+    for d in digests:
+        date = d.get("date", "")
+        if date not in papers_by_date and d.get("paper_count", 0) > 0:
+            papers_by_date[date] = d.get("paper_count", 0)
+
+    # Recompute category counts and author counts strictly from unique papers
+    if unique_papers:
+        cat_counts = Counter()
+        author_counts = Counter()
+        stopwords = {
+            "a", "an", "the", "of", "in", "for", "on", "with", "and", "or",
+            "to", "is", "are", "via", "from", "by", "at", "as", "be", "its",
+            "we", "our", "new", "using", "based", "large", "model", "models",
+            "learning", "neural", "deep", "language", "approach", "method",
+            "towards", "through", "toward", "can", "that", "this", "into"
+        }
+        keyword_counts = Counter()
+
+        for p in unique_papers.values():
+            for c in p.get("categories", []):
+                slug = c if isinstance(c, str) else c.get("slug", "unknown")
+                cat_counts[slug] += 1
+            for author in p.get("authors", []):
+                author_counts[author] += 1
+            for word in p.get("title", "").lower().split():
+                word = word.strip(".,():;'\"")
+                if len(word) > 3 and word not in stopwords:
+                    keyword_counts[word] += 1
+
+        stats["papers_by_category"] = dict(cat_counts)
+        stats["top_authors"] = dict(author_counts)
+        stats["top_keywords"] = dict(keyword_counts)
+
     valid_editions = [d for d in digests if d.get("paper_count", 0) > 0]
     stats["total_digests"] = len(valid_editions)
-    stats["total_papers"] = sum(d.get("paper_count", 0) for d in digests)
-    stats["papers_by_date"] = {
-        d["date"]: d.get("paper_count", 0)
-        for d in digests
-    }
+    stats["total_papers"] = sum(papers_by_date.values())
+    stats["papers_by_date"] = dict(papers_by_date)
+
     if digests:
         sorted_dates = sorted(d["date"] for d in digests)
         stats["first_digest"] = sorted_dates[0]
     else:
         stats["first_digest"] = None
+
     return stats
+
+
+# Alias for backwards compatibility
+_reconcile_totals = _recompute_all
 
 
 def reconcile_from_disk(stats: dict) -> dict:
     """
-    Dynamically recalculate digest entries and aggregate counts
-    directly from the contents of the digests/ directory.
-    Prevents corrupted or clobbered counts in stats.json if a file sync anomaly happens.
+    Dynamically reconcile stats.json against the digests/ folder.
+    Removes phantom digests, parses missing/corrupted entries from disk,
+    and repairs all aggregate totals.
     """
     if not os.path.exists(DIGESTS_DIR):
-        return _reconcile_totals(stats)
+        return _recompute_all(stats)
 
     disk_entries = scan_digests_folder()
     disk_dates = {e["date"] for e in disk_entries}
-
-    paper_heading_regex = re.compile(r"^#{3,4}\s+\d+\.\s+\[", re.MULTILINE)
 
     # Filter out any digests from stats that do not actually exist on disk
     existing_digests = [d for d in stats.get("digests", []) if d.get("date") in disk_dates]
@@ -116,23 +226,25 @@ def reconcile_from_disk(stats: dict) -> dict:
         is_placeholder = disk_entry["is_placeholder"]
         filepath = os.path.join(DIGESTS_DIR, f"{date_str}.md")
 
-        actual_paper_count = 0
-        if not is_placeholder and os.path.exists(filepath):
-            try:
-                with open(filepath, "r", encoding="utf-8") as f:
-                    file_text = f.read()
-                actual_paper_count = len(paper_heading_regex.findall(file_text))
-            except Exception:
-                actual_paper_count = 0
+        if is_placeholder:
+            actual_count = 0
+            papers = []
+        else:
+            papers = _parse_digest_file(filepath)
+            actual_count = len(papers)
 
         if date_str in digests_by_date:
-            digests_by_date[date_str]["paper_count"] = actual_paper_count
+            entry = digests_by_date[date_str]
+            entry["paper_count"] = actual_count
+            if papers:
+                entry["papers"] = papers
         else:
             new_entry = {
                 "date": date_str,
-                "paper_count": actual_paper_count,
+                "paper_count": actual_count,
                 "top_category": "General",
                 "categories_covered": [],
+                "papers": papers,
             }
             existing_digests.append(new_entry)
             digests_by_date[date_str] = new_entry
@@ -140,7 +252,7 @@ def reconcile_from_disk(stats: dict) -> dict:
     existing_digests.sort(key=lambda x: x["date"], reverse=True)
     stats["digests"] = existing_digests
 
-    return _reconcile_totals(stats)
+    return _recompute_all(stats)
 
 
 def update_stats(papers: list[dict], date_str: str) -> dict:
@@ -171,32 +283,18 @@ def update_stats(papers: list[dict], date_str: str) -> dict:
         top_cat_slug,
     )
 
-    # Update rolling papers_by_category (cumulative across all time)
-    for slug, count in category_counts.items():
-        # Remove the previous contribution from today if re-running
-        prev_entry = next(
-            (d for d in stats.get("digests", []) if d["date"] == date_str), None
-        )
-        if prev_entry:
-            prev_cats = Counter(
-                {c: 1 for c in prev_entry.get("categories_covered", [])}
-            )
-            # Subtract the previous today contribution if present
-            pass  # category accumulation is rebuilt below
-
-        stats["papers_by_category"][slug] = (
-            stats["papers_by_category"].get(slug, 0) + count
-        )
-
-    # Authors
-    for paper in papers:
-        for author in paper.get("authors", []):
-            stats["top_authors"][author] = stats["top_authors"].get(author, 0) + 1
-
-    # Keywords from titles
-    keywords = extract_keywords(papers)
-    for kw in keywords:
-        stats["top_keywords"][kw] = stats["top_keywords"].get(kw, 0) + 1
+    paper_records = [
+        {
+            "id": p.get("id", ""),
+            "title": p.get("title", ""),
+            "authors": p.get("authors", []),
+            "categories": [
+                c.get("slug") if isinstance(c, dict) else c
+                for c in p.get("categories", [])
+            ],
+        }
+        for p in papers
+    ]
 
     # Digest log entry (idempotent: replace row for same date)
     digest_entry = {
@@ -204,13 +302,14 @@ def update_stats(papers: list[dict], date_str: str) -> dict:
         "paper_count": len(papers),
         "top_category": top_cat_name,
         "categories_covered": list(category_counts.keys()),
+        "papers": paper_records,
     }
     stats["digests"] = [d for d in stats.get("digests", []) if d["date"] != date_str]
     stats["digests"].append(digest_entry)
     stats["digests"].sort(key=lambda x: x["date"], reverse=True)
 
-    # Reconcile totals from the log so double-runs cannot inflate counters
-    stats = _reconcile_totals(stats)
+    # Recompute all totals, categories, authors, and keywords from stored data
+    stats = _recompute_all(stats)
     stats["last_updated"] = now
 
     save_stats(stats)

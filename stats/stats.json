@@ -7,9 +7,9 @@
     "2026-10-20": 2
   },
   "papers_by_category": {
-    "reasoning-agents": 2,
     "llms": 2,
-    "generative-ai": 1,
+    "generative-ai": 2,
+    "reasoning-agents": 2,
     "ml-theory": 1
   },
   "top_authors": {
@@ -17,23 +17,10 @@
     "Razvan-Gabriel Dumitru": 1,
     "Sunjie Hou": 1,
     "MohammadHossein Rezaei": 1,
-    "Haris Riaz": 1,
-    "Robert Vacareanu": 1,
-    "Minglai Yang": 1,
-    "Ying Liu": 1,
-    "Mihai Surdeanu": 1,
-    "Daniel Yue Zhang": 1,
     "Zekai Li": 1,
     "Jiayi Yu": 1,
     "Jinlu Zhang": 1,
-    "Luyang Niu": 1,
-    "Zekun Qi": 1,
-    "Jun Zheng": 1,
-    "Xuchuan Chen": 1,
-    "Dairu Liu": 1,
-    "Yintianrun Zhang": 1,
-    "He Wang": 1,
-    "Li Yi": 1
+    "Luyang Niu": 1
   },
   "top_keywords": {
     "evidence-first": 1,
@@ -57,6 +44,41 @@
         "llms",
         "generative-ai",
         "ml-theory"
+      ],
+      "papers": [
+        {
+          "id": "2610.17724",
+          "title": "Evidence-First Agentic Verification",
+          "url": "https://arxiv.org/abs/2610.17724",
+          "authors": [
+            "Reza Sanayei",
+            "Razvan-Gabriel Dumitru",
+            "Sunjie Hou",
+            "MohammadHossein Rezaei"
+          ],
+          "categories": [
+            "llms",
+            "generative-ai",
+            "reasoning-agents"
+          ]
+        },
+        {
+          "id": "2610.26848",
+          "title": "Where is Physical RSI capability from? An Observational Scaling Law of LLM-as-policy",
+          "url": "https://arxiv.org/abs/2610.26848",
+          "authors": [
+            "Zekai Li",
+            "Jiayi Yu",
+            "Jinlu Zhang",
+            "Luyang Niu"
+          ],
+          "categories": [
+            "llms",
+            "generative-ai",
+            "reasoning-agents",
+            "ml-theory"
+          ]
+        }
       ]
     }
   ]
