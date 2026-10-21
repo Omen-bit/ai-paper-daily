@@ -1,9 +1,15 @@
 {
+<<<<<<< HEAD
   "total_papers": 2,
   "total_digests": 1,
+=======
+  "total_papers": 6,
+  "total_digests": 3,
+>>>>>>> 0e23053e6a40ac7d742604784f44bdd31101a1ab
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-20T18:59:24.574692+00:00",
+  "last_updated": "2026-10-20T19:31:56.148937+00:00",
   "papers_by_date": {
+<<<<<<< HEAD
     "2026-10-20": 2
   },
   "papers_by_category": {
@@ -46,6 +52,50 @@
     "observational": 1,
     "scaling": 1,
     "llm-as-policy": 1
+=======
+    "2026-10-20": 6
+  },
+  "papers_by_category": {
+    "reasoning-agents": 6,
+    "llms": 6,
+    "generative-ai": 3,
+    "ml-theory": 3
+  },
+  "top_authors": {
+    "Reza Sanayei": 3,
+    "Razvan-Gabriel Dumitru": 3,
+    "Sunjie Hou": 3,
+    "MohammadHossein Rezaei": 3,
+    "Haris Riaz": 3,
+    "Robert Vacareanu": 3,
+    "Minglai Yang": 3,
+    "Ying Liu": 3,
+    "Mihai Surdeanu": 3,
+    "Daniel Yue Zhang": 3,
+    "Zekai Li": 3,
+    "Jiayi Yu": 3,
+    "Jinlu Zhang": 3,
+    "Luyang Niu": 3,
+    "Zekun Qi": 3,
+    "Jun Zheng": 3,
+    "Xuchuan Chen": 3,
+    "Dairu Liu": 3,
+    "Yintianrun Zhang": 3,
+    "He Wang": 3,
+    "Li Yi": 3
+  },
+  "top_keywords": {
+    "evidence-first": 3,
+    "agentic": 3,
+    "verification": 3,
+    "where": 3,
+    "physical": 3,
+    "capability": 3,
+    "from?": 3,
+    "observational": 3,
+    "scaling": 3,
+    "llm-as-policy": 3
+>>>>>>> 0e23053e6a40ac7d742604784f44bdd31101a1ab
   },
   "digests": [
     {
