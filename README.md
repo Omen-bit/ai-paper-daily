@@ -6,7 +6,6 @@
 > Curating the top 2 breakthrough papers every morning, with "Why It Matters" summaries, heuristic scoring, and automatic GitHub publishing.
 
 [![Daily Digest](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml)
-[![Tests](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/tests.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/tests.yml)
 ![Papers Tracked](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_papers&label=Papers%20Curated&color=7c3aed)
 ![Digests](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_digests&label=Daily%20Editions&color=10b981)
 ![Schedule](https://img.shields.io/badge/schedule-daily%2000%3A00%20IST%20%2F%2018%3A30%20UTC-orange)
@@ -156,19 +155,6 @@ To test or run the pipeline on your machine:
    python src/main.py
    ```
 
-### Running Tests & Contributing
-
-Before opening a pull request, verify that all unit tests pass:
-
-1. **Install development and testing dependencies**:
-   ```bash
-   pip install -r requirements-dev.txt
-   ```
-2. **Execute test suite**:
-   ```bash
-   pytest tests/ -v
-   ```
-
 ---
 
 ## 📂 Repository Layout
@@ -176,8 +162,7 @@ Before opening a pull request, verify that all unit tests pass:
 ```text
 ai-paper-daily/
 ├── .github/workflows/
-│   ├── daily-digest.yml      # Automated 18:30 UTC (00:00 IST) daily runner with race-condition prevention
-│   └── tests.yml             # Runs pytest on push and pull request
+│   └── daily-digest.yml      # Automated 18:30 UTC (00:00 IST) daily runner
 ├── src/                      # All pipeline code
 │   ├── main.py               # Pipeline orchestrator and entrypoint
 │   ├── classifier.py         # 12-category research classifier
@@ -186,14 +171,11 @@ ai-paper-daily/
 │   ├── readme_updater.py     # Live README section manager
 │   ├── renderer.py           # Markdown digest and category builder
 │   ├── scorer.py             # Heuristic scoring and status badges
-│   └── stats_tracker.py      # Cumulative JSON analytics manager with auto-reconciliation
-├── tests/                    # Pytest test suite
+│   └── stats_tracker.py      # Cumulative JSON analytics manager
 ├── digests/                  # Published daily edition markdown files
 ├── categories/               # Dedicated archive per research field
-├── stats/                    # stats.json persistent dataset
+├── stats/                    # stats.json + last_run.txt
 ├── requirements.txt          # Runtime dependencies (pinned)
-├── requirements-dev.txt      # Dev/test dependencies
-├── .env.example              # Template for local environment variables
 ├── LICENSE                   # MIT License
 └── README.md                 # Public project dashboard
 ```
