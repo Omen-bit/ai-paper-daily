@@ -2,7 +2,7 @@ name: 🧠 Daily AI Paper Digest
 
 on:
   schedule:
-    # Runs every day at 18:30 UTC (00:00 IST / midnight)
+    # Runs every day at 18:30 UTC = 00:00 IST (midnight India Standard Time)
     # arXiv submissions are usually available by this time
     - cron: "30 18 * * *"
 
@@ -43,7 +43,17 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python src/main.py
 
-      # -- 5. Commit & push all changes --------------------------------------
+      # -- 5. Always write a last-run timestamp (guarantees a commit exists) --
+      - name: 🕐 Write last-run timestamp
+        run: |
+          mkdir -p stats
+          DATE=$(date -u +'%Y-%m-%d')
+          TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo "last_run=${TIMESTAMP}" > stats/last_run.txt
+          echo "last_date=${DATE}" >> stats/last_run.txt
+          echo "✅ Timestamp written: ${TIMESTAMP}"
+
+      # -- 6. Commit & push all changes --------------------------------------
       - name: 📤 Commit and push changes
         run: |
           git config --global user.name "Omen-bit"
@@ -51,25 +61,30 @@ jobs:
 
           git add -A
 
-          # Only commit if there are actual changes
-          if git diff --staged --quiet; then
-            echo "ℹ️ No changes to commit today."
-          else
-            DATE=$(date -u +'%Y-%m-%d')
-            git commit -m "📄 Daily digest: ${DATE} - AI Paper Daily"
+          DATE=$(date -u +'%Y-%m-%d')
 
-            # Securely rebase on latest upstream to prevent race conditions
-            MAX_RETRIES=3
-            COUNT=0
-            until git push origin main; do
-              COUNT=$((COUNT + 1))
-              if [ $COUNT -ge $MAX_RETRIES ]; then
-                echo "❌ Push failed after $MAX_RETRIES attempts."
-                exit 1
-              fi
-              echo "⚠️ Upstream changes detected. Pulling with rebase and retrying ($COUNT/$MAX_RETRIES)..."
-              git pull --rebase origin main
-              sleep 2
-            done
-            echo "✅ Changes pushed successfully."
+          # Always commit — even if only the timestamp changed
+          if git diff --staged --quiet; then
+            echo "ℹ️ No file changes detected — forcing timestamp commit for heatmap."
+            TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            echo "last_run=${TIMESTAMP}" > stats/last_run.txt
+            echo "last_date=${DATE}" >> stats/last_run.txt
+            git add stats/last_run.txt
           fi
+
+          git commit -m "📄 Daily digest: ${DATE} - AI Paper Daily"
+
+          # Securely rebase on latest upstream to prevent race conditions
+          MAX_RETRIES=3
+          COUNT=0
+          until git push origin main; do
+            COUNT=$((COUNT + 1))
+            if [ $COUNT -ge $MAX_RETRIES ]; then
+              echo "❌ Push failed after $MAX_RETRIES attempts."
+              exit 1
+            fi
+            echo "⚠️ Upstream changes detected. Pulling with rebase and retrying ($COUNT/$MAX_RETRIES)..."
+            git pull --rebase origin main
+            sleep 2
+          done
+          echo "✅ Changes pushed successfully."

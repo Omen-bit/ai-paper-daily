@@ -191,8 +191,8 @@ def run() -> None:
 
 def _create_placeholder(date_str: str) -> None:
     """Create a minimal placeholder file for days with no arXiv submissions."""
-    import os
-    os.makedirs("digests", exist_ok=True)
+    digests_dir = os.path.join(ROOT_DIR, "digests")
+    os.makedirs(digests_dir, exist_ok=True)
     content = f"""# 🧠 AI Paper Daily - {date_str}
 
 > ℹ️ **No new papers available today.**
@@ -201,7 +201,7 @@ def _create_placeholder(date_str: str) -> None:
 
 [⬅️ Back to README](../README.md)
 """
-    filepath = os.path.join("digests", f"{date_str}.md")
+    filepath = os.path.join(digests_dir, f"{date_str}.md")
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"📄 Placeholder created: {filepath}")
