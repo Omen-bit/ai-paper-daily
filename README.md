@@ -3,7 +3,7 @@
 <div align="center">
 
 > **Autonomous AI & Machine Learning Research Intelligence.**
-> Curating the top 2 breakthrough papers every morning, with "Why It Matters" summaries, heuristic scoring, and automatic GitHub publishing.
+> Curating the top 2 breakthrough papers daily at midnight IST, with "Why It Matters" summaries, heuristic scoring, and automatic GitHub publishing.
 
 [![Daily Digest](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml)
 ![Papers Tracked](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_papers&label=Papers%20Curated&color=7c3aed)
@@ -17,7 +17,7 @@
 [**Archive**](#-digest-archive) &nbsp;•&nbsp;
 [**Analytics**](#-analytics--coverage) &nbsp;•&nbsp;
 [**Architecture**](#-system-architecture) &nbsp;•&nbsp;
-[**Setup**](#-quick-start-fork--run)
+[**Repository Layout**](#-repository-layout)
 
 ---
 
@@ -116,44 +116,6 @@ flowchart LR
 - **Novelty Detection:** Title/Abstract keyword markers (*breakthrough, SOTA, novel, introduce*).
 - **Interdisciplinary Cross-over:** Multi-category convergence (e.g. LLMs + Robotics).
 - **Synthesis Impact:** Comprehensive surveys, position papers, and landmark benchmarks.
-
----
-
-## ⚙️ Quick Start (Fork & Run)
-
-Want to run this automated digest for your own profile?
-
-1. **Fork this repository** to your GitHub account.
-2. **Obtain a free Groq API key** from [console.groq.com](https://console.groq.com) (free tier includes 30 RPM).
-3. **Save your secret**:
-   - Go to your repo: `Settings > Secrets and variables > Actions`
-   - Add a new secret named `GROQ_API_KEY`
-4. **Trigger workflow manually**:
-   - Navigate to `Actions > Daily AI Paper Digest > Run workflow`
-5. That's it! GitHub Actions will run every night at midnight IST automatically.
-
-### Local Development & Execution
-
-To test or run the pipeline on your machine:
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Omen-bit/ai-paper-daily.git
-   cd ai-paper-daily
-   ```
-2. **Install runtime dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Configure local environment (optional)**:
-   ```bash
-   cp .env.example .env
-   ```
-   Add your `GROQ_API_KEY` inside `.env`. If not set, the pipeline automatically falls back to abstract heuristics.
-4. **Run the pipeline**:
-   ```bash
-   python src/main.py
-   ```
 
 ---
 
