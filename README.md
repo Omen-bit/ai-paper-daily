@@ -9,7 +9,7 @@
 [![Tests](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/tests.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/tests.yml)
 ![Papers Tracked](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_papers&label=Papers%20Curated&color=7c3aed)
 ![Digests](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_digests&label=Daily%20Editions&color=10b981)
-![Schedule](https://img.shields.io/badge/schedule-daily%2006%3A30%20UTC-orange)
+![Schedule](https://img.shields.io/badge/schedule-daily%2000%3A00%20IST%20%2F%2018%3A30%20UTC-orange)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 
@@ -99,7 +99,7 @@ Explore past curated papers categorized by research subfield:
 
 ## 🛠️ System Architecture
 
-Every morning at **06:30 UTC (12:00 IST)**, GitHub Actions runs the pipeline:
+Every night at **18:30 UTC (00:00 IST / midnight)**, GitHub Actions runs the pipeline:
 
 ```mermaid
 flowchart LR
@@ -176,7 +176,7 @@ Before opening a pull request, verify that all unit tests pass:
 ```text
 ai-paper-daily/
 ├── .github/workflows/
-│   ├── daily-digest.yml      # Automated 06:30 UTC daily runner with race-condition prevention
+│   ├── daily-digest.yml      # Automated 18:30 UTC (00:00 IST) daily runner with race-condition prevention
 │   └── tests.yml             # Runs pytest on push and pull request
 ├── src/                      # All pipeline code
 │   ├── main.py               # Pipeline orchestrator and entrypoint
