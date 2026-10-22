@@ -27,27 +27,27 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Wednesday, October 21, 2026 -- [2026-10-21](digests/2026-10-21.md)
+### Thursday, October 22, 2026 -- [2026-10-22](digests/2026-10-22.md)
 
-#### 1. [Ropedia W0: Scaling Loco-Manipulation World Models across Embodiments with Human Experience](https://arxiv.org/abs/2610.26855)
+#### 1. [Socratic Skill Learning: Interleaving Teaching and Practice for Transferable Agent Skills](https://arxiv.org/abs/2610.17860)
 `⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML`
 
 > 💡 **Abstract highlight:**  
-> We present Ropedia W0, the first egocentric loco-manipulation world foundation model spanning humans and robots with diverse embodiments.
+> We introduce Socratic Skill Learning (SSL), which interleaves expert teaching with Student practice.
 
-**Authors:** Tianqi Liu, Hanfei Zhao, Qifeng Liang et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.26855) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.26855) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.26855)  
+**Authors:** Letian Zhu, Han Li, Yifan Yao et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.17860) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.17860) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.17860)  
 
-#### 2. [Painting Change Map as guidance for generating painting processes](https://arxiv.org/abs/2610.25369)
+#### 2. [Think Harder Where It Matters: Item-Level Adaptive Recursion for Sequential Recommendation](https://arxiv.org/abs/2610.30128)
 `🔥 Trending on HF` `📖 Survey / Review` `🔖 Other ML`
 
 > 💡 **Abstract highlight:**  
-> Digital art generation has undergone a massive paradigm shift, moving from static image synthesis to dynamic video generation that can mimic the human painting process.
+> Existing sequential recommenders usually allocate a fixed computational budget to every item in a user's interaction history, regardless of the item's contribution to the final prediction.
 
-**Authors:** Markus Pobitzer, Chang Liu, Niccolò Biondi et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.25369) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.25369) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.25369)  
+**Authors:** Zhanshuo Cao, Jiakai Tang, Yuqi Zhou et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.30128) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.30128) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.30128)  
 
-**[Read the full digest with abstracts](digests/2026-10-21.md)**
+**[Read the full digest with abstracts](digests/2026-10-22.md)**
 <!-- TODAY_END -->
 
 ---
@@ -71,6 +71,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
+| **2026-10-22** | `2` | Other ML | [Read digest](digests/2026-10-22.md) |
 | **2026-10-21** | `2` | Other ML | [Read digest](digests/2026-10-21.md) |
 | **2026-10-20** | `2` | Reasoning & Agents | [Read digest](digests/2026-10-20.md) |
 <!-- ARCHIVE_END -->
@@ -82,14 +83,14 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-| Papers curated | **4** |
-| Daily editions | **2** |
+| Papers curated | **6** |
+| Daily editions | **3** |
 | Tracking since | `2026-10-20` |
-| Last run | `2026-10-21` |
+| Last run | `2026-10-22` |
 
 **Most active categories:**
 
-- 🔖 **Other ML**: `2` papers
+- 🔖 **Other ML**: `4` papers
 - 🧠 **Reasoning & Agents**: `1` papers
 - 📊 **ML Theory & Optimization**: `1` papers
 <!-- STATS_END -->

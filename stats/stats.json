@@ -1,33 +1,40 @@
 {
-  "total_papers": 4,
-  "total_digests": 2,
+  "total_papers": 6,
+  "total_digests": 3,
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-21T21:52:19.620681+00:00",
+  "last_updated": "2026-10-22T17:15:18.097354+00:00",
   "papers_by_date": {
+    "2026-10-22": 2,
     "2026-10-21": 2,
     "2026-10-20": 2
   },
   "papers_by_category": {
-    "other-ml": 2,
+    "other-ml": 4,
     "reasoning-agents": 1,
     "ml-theory": 1
   },
   "top_authors": {
+    "Letian Zhu": 1,
+    "Han Li": 1,
+    "Yifan Yao": 1,
+    "Xinping Lei": 1,
+    "Xinyu Che": 1,
+    "Jiahao Wang": 1,
+    "Dianyi Wang": 1,
+    "Yucheng Fu": 1,
+    "Jiakai Wang": 1,
+    "Zhiqi Bai": 1,
+    "Wenbo Su": 1,
+    "Jiaheng Liu": 1,
+    "Zhanshuo Cao": 1,
+    "Jiakai Tang": 1,
+    "Yuqi Zhou": 1,
+    "Sunhao Dai": 1,
+    "Jun Xu": 1,
     "Tianqi Liu": 1,
     "Hanfei Zhao": 1,
     "Qifeng Liang": 1,
     "Hui En Pang": 1,
-    "Jiarui Xu": 1,
-    "Sayang Mu": 1,
-    "Penghao Qiu": 1,
-    "YingSheng Zhang": 1,
-    "Jun Wang": 1,
-    "Ziang Cao": 1,
-    "Mingze Sun": 1,
-    "Yukang Cao": 1,
-    "Fangzhou Hong": 1,
-    "Zhaoxi Chen": 1,
-    "Ziwei Liu": 1,
     "Markus Pobitzer": 1,
     "Chang Liu": 1,
     "Niccolò Biondi": 1,
@@ -42,6 +49,23 @@
     "Luyang Niu": 1
   },
   "top_keywords": {
+    "socratic": 1,
+    "skill": 1,
+    "interleaving": 1,
+    "teaching": 1,
+    "practice": 1,
+    "transferable": 1,
+    "agent": 1,
+    "skills": 1,
+    "think": 1,
+    "harder": 1,
+    "where": 2,
+    "matters": 1,
+    "item-level": 1,
+    "adaptive": 1,
+    "recursion": 1,
+    "sequential": 1,
+    "recommendation": 1,
     "ropedia": 1,
     "scaling": 2,
     "loco-manipulation": 1,
@@ -58,7 +82,6 @@
     "evidence-first": 1,
     "agentic": 1,
     "verification": 1,
-    "where": 1,
     "physical": 1,
     "capability": 1,
     "from?": 1,
@@ -66,6 +89,51 @@
     "llm-as-policy": 1
   },
   "digests": [
+    {
+      "date": "2026-10-22",
+      "paper_count": 2,
+      "top_category": "Other ML",
+      "categories_covered": [
+        "other-ml"
+      ],
+      "papers": [
+        {
+          "id": "2610.17860",
+          "title": "Socratic Skill Learning: Interleaving Teaching and Practice for Transferable Agent Skills",
+          "authors": [
+            "Letian Zhu",
+            "Han Li",
+            "Yifan Yao",
+            "Xinping Lei",
+            "Xinyu Che",
+            "Jiahao Wang",
+            "Dianyi Wang",
+            "Yucheng Fu",
+            "Jiakai Wang",
+            "Zhiqi Bai",
+            "Wenbo Su",
+            "Jiaheng Liu"
+          ],
+          "categories": [
+            "other-ml"
+          ]
+        },
+        {
+          "id": "2610.30128",
+          "title": "Think Harder Where It Matters: Item-Level Adaptive Recursion for Sequential Recommendation",
+          "authors": [
+            "Zhanshuo Cao",
+            "Jiakai Tang",
+            "Yuqi Zhou",
+            "Sunhao Dai",
+            "Jun Xu"
+          ],
+          "categories": [
+            "other-ml"
+          ]
+        }
+      ]
+    },
     {
       "date": "2026-10-21",
       "paper_count": 2,
@@ -77,22 +145,12 @@
         {
           "id": "2610.26855",
           "title": "Ropedia W0: Scaling Loco-Manipulation World Models across Embodiments with Human Experience",
+          "url": "https://arxiv.org/abs/2610.26855",
           "authors": [
             "Tianqi Liu",
             "Hanfei Zhao",
             "Qifeng Liang",
-            "Hui En Pang",
-            "Jiarui Xu",
-            "Sayang Mu",
-            "Penghao Qiu",
-            "YingSheng Zhang",
-            "Jun Wang",
-            "Ziang Cao",
-            "Mingze Sun",
-            "Yukang Cao",
-            "Fangzhou Hong",
-            "Zhaoxi Chen",
-            "Ziwei Liu"
+            "Hui En Pang"
           ],
           "categories": [
             "other-ml"
@@ -101,6 +159,7 @@
         {
           "id": "2610.25369",
           "title": "Painting Change Map as guidance for generating painting processes",
+          "url": "https://arxiv.org/abs/2610.25369",
           "authors": [
             "Markus Pobitzer",
             "Chang Liu",
