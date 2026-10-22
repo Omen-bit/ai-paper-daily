@@ -27,7 +27,7 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Thursday, October 22, 2026 -- [2026-10-22](digests/2026-10-22.md)
+### Thursday, October 22, 2026 · [2026-10-22](digests/2026-10-22.md)
 
 #### 1. [Socratic Skill Learning: Interleaving Teaching and Practice for Transferable Agent Skills](https://arxiv.org/abs/2610.17860)
 `⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML`
@@ -131,7 +131,7 @@ Want to run this automated digest for your own profile?
    - Add a new secret named `GROQ_API_KEY`
 4. **Trigger workflow manually**:
    - Navigate to `Actions > Daily AI Paper Digest > Run workflow`
-5. That's it! GitHub Actions will run every morning automatically.
+5. That's it! GitHub Actions will run every night at midnight IST automatically.
 
 ### Local Development & Execution
 

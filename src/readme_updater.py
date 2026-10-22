@@ -63,7 +63,7 @@ def _render_today_section(papers: list[dict], date_str: str) -> str:
     digest_link = f"digests/{date_str}.md"
 
     lines = [
-        f"### {weekday} -- [{date_str}]({digest_link})",
+        f"### {weekday} · [{date_str}]({digest_link})",
         "",
     ]
 
@@ -102,13 +102,17 @@ def _render_today_section(papers: list[dict], date_str: str) -> str:
 
         lines.append(f"#### {i}. [{title}]({url})")
         if chips_str:
-            lines.append(f"{chips_str}\n")
+            lines.append(chips_str)
+            lines.append("")
         if why:
             source = paper.get("summary_source", "groq")
             label = "Abstract highlight" if source == "heuristic" else "Why It Matters"
-            lines.append(f"> 💡 **{label}:**  \n> {why}\n")
+            lines.append(f"> 💡 **{label}:**  ")
+            lines.append(f"> {why}")
+            lines.append("")
         lines.append(f"**Authors:** {auth_str}  ")
-        lines.append(f"**Links:** {links_str}  \n")
+        lines.append(f"**Links:** {links_str}  ")
+        lines.append("")
 
     lines.append(f"**[Read the full digest with abstracts]({digest_link})**")
     return "\n".join(lines)
@@ -212,11 +216,12 @@ def _render_stats_section(stats: dict) -> str:
 
     for slug, count in top_cats:
         disp = get_category_display(slug)
+        paper_word = "paper" if count == 1 else "papers"
         if disp:
             emoji, name = disp
-            lines.append(f"- {emoji} **{name}**: `{count}` papers")
+            lines.append(f"- {emoji} **{name}**: `{count}` {paper_word}")
         else:
-            lines.append(f"- **{slug}**: `{count}` papers")
+            lines.append(f"- **{slug}**: `{count}` {paper_word}")
 
     if not top_cats:
         lines.append("- *No data tracked yet*")
