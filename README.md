@@ -90,8 +90,8 @@ Explore past curated papers categorized by research subfield:
 **Most active categories:**
 
 - 🔖 **Other ML**: `4` papers
-- 🧠 **Reasoning & Agents**: `1` papers
-- 📊 **ML Theory & Optimization**: `1` papers
+- 🧠 **Reasoning & Agents**: `1` paper
+- 📊 **ML Theory & Optimization**: `1` paper
 <!-- STATS_END -->
 
 ---
