@@ -1,36 +1,45 @@
 {
-  "total_papers": 6,
-  "total_digests": 3,
+  "total_papers": 8,
+  "total_digests": 4,
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-22T21:47:52.099253+00:00",
+  "last_updated": "2026-10-23T14:42:21.878840+00:00",
   "papers_by_date": {
+    "2026-10-23": 2,
     "2026-10-22": 2,
     "2026-10-21": 2,
     "2026-10-20": 2
   },
   "papers_by_category": {
-    "other-ml": 4,
+    "other-ml": 6,
     "reasoning-agents": 1,
     "ml-theory": 1
   },
   "top_authors": {
+    "Wen Xue": 1,
+    "Yong Liu": 1,
+    "Xueheng Li": 1,
+    "Si Wu": 1,
+    "Yong Xu": 1,
+    "Yipeng Sun": 1,
+    "Yan Li": 1,
+    "Simiu Gu": 1,
+    "Tengju Ru": 1,
+    "Weitong Lian": 1,
+    "Zecong Tang": 1,
+    "Zhiheng Liu": 1,
+    "Lingyi Meng": 1,
+    "Haoran Li": 1,
+    "Kaixuan Wang": 1,
+    "Bohao Li": 1,
+    "Xihui Liu": 1,
     "Letian Zhu": 1,
     "Han Li": 1,
     "Yifan Yao": 1,
     "Xinping Lei": 1,
-    "Xinyu Che": 1,
-    "Jiahao Wang": 1,
-    "Dianyi Wang": 1,
-    "Yucheng Fu": 1,
-    "Jiakai Wang": 1,
-    "Zhiqi Bai": 1,
-    "Wenbo Su": 1,
-    "Jiaheng Liu": 1,
     "Zhanshuo Cao": 1,
     "Jiakai Tang": 1,
     "Yuqi Zhou": 1,
     "Sunhao Dai": 1,
-    "Jun Xu": 1,
     "Tianqi Liu": 1,
     "Hanfei Zhao": 1,
     "Qifeng Liang": 1,
@@ -49,6 +58,21 @@
     "Luyang Niu": 1
   },
   "top_keywords": {
+    "editing": 1,
+    "images": 1,
+    "reusable": 1,
+    "layers": 1,
+    "compositional": 1,
+    "edit-prior": 1,
+    "distillation": 1,
+    "what": 1,
+    "generation": 1,
+    "knows": 1,
+    "unlocking": 1,
+    "fine-grained": 1,
+    "understanding": 1,
+    "unified": 1,
+    "multimodal": 1,
     "socratic": 1,
     "skill": 1,
     "interleaving": 1,
@@ -90,6 +114,51 @@
   },
   "digests": [
     {
+      "date": "2026-10-23",
+      "paper_count": 2,
+      "top_category": "Other ML",
+      "categories_covered": [
+        "other-ml"
+      ],
+      "papers": [
+        {
+          "id": "2610.24738",
+          "title": "Editing Images into Reusable Layers via Compositional Edit-Prior Distillation",
+          "authors": [
+            "Wen Xue",
+            "Yong Liu",
+            "Xueheng Li",
+            "Si Wu",
+            "Yong Xu",
+            "Yipeng Sun",
+            "Yan Li",
+            "Simiu Gu"
+          ],
+          "categories": [
+            "other-ml"
+          ]
+        },
+        {
+          "id": "2610.23987",
+          "title": "What Generation Knows: Unlocking Fine-Grained Understanding in Unified Multimodal Models",
+          "authors": [
+            "Tengju Ru",
+            "Weitong Lian",
+            "Zecong Tang",
+            "Zhiheng Liu",
+            "Lingyi Meng",
+            "Haoran Li",
+            "Kaixuan Wang",
+            "Bohao Li",
+            "Xihui Liu"
+          ],
+          "categories": [
+            "other-ml"
+          ]
+        }
+      ]
+    },
+    {
       "date": "2026-10-22",
       "paper_count": 2,
       "top_category": "Other ML",
@@ -100,19 +169,12 @@
         {
           "id": "2610.17860",
           "title": "Socratic Skill Learning: Interleaving Teaching and Practice for Transferable Agent Skills",
+          "url": "https://arxiv.org/abs/2610.17860",
           "authors": [
             "Letian Zhu",
             "Han Li",
             "Yifan Yao",
-            "Xinping Lei",
-            "Xinyu Che",
-            "Jiahao Wang",
-            "Dianyi Wang",
-            "Yucheng Fu",
-            "Jiakai Wang",
-            "Zhiqi Bai",
-            "Wenbo Su",
-            "Jiaheng Liu"
+            "Xinping Lei"
           ],
           "categories": [
             "other-ml"
@@ -121,12 +183,12 @@
         {
           "id": "2610.30128",
           "title": "Think Harder Where It Matters: Item-Level Adaptive Recursion for Sequential Recommendation",
+          "url": "https://arxiv.org/abs/2610.30128",
           "authors": [
             "Zhanshuo Cao",
             "Jiakai Tang",
             "Yuqi Zhou",
-            "Sunhao Dai",
-            "Jun Xu"
+            "Sunhao Dai"
           ],
           "categories": [
             "other-ml"

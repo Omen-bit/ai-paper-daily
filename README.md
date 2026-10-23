@@ -26,27 +26,27 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Thursday, October 22, 2026 · [2026-10-22](digests/2026-10-22.md)
+### Friday, October 23, 2026 · [2026-10-23](digests/2026-10-23.md)
 
-#### 1. [Socratic Skill Learning: Interleaving Teaching and Practice for Transferable Agent Skills](https://arxiv.org/abs/2610.17860)
+#### 1. [Editing Images into Reusable Layers via Compositional Edit-Prior Distillation](https://arxiv.org/abs/2610.24738)
 `⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML`
 
 > 💡 **Abstract highlight:**  
-> We introduce Socratic Skill Learning (SSL), which interleaves expert teaching with Student practice.
+> To this end, we introduce LayerEditor, a unified framework that couples instruction-guided image editing with controllable generation of reusable RGBA layers.
 
-**Authors:** Letian Zhu, Han Li, Yifan Yao et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.17860) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.17860) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.17860)  
+**Authors:** Wen Xue, Yong Liu, Xueheng Li et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.24738) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.24738) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.24738)  
 
-#### 2. [Think Harder Where It Matters: Item-Level Adaptive Recursion for Sequential Recommendation](https://arxiv.org/abs/2610.30128)
+#### 2. [What Generation Knows: Unlocking Fine-Grained Understanding in Unified Multimodal Models](https://arxiv.org/abs/2610.23987)
 `🔥 Trending on HF` `📖 Survey / Review` `🔖 Other ML`
 
 > 💡 **Abstract highlight:**  
-> Existing sequential recommenders usually allocate a fixed computational budget to every item in a user's interaction history, regardless of the item's contribution to the final prediction.
+> However, existing generation-assisted understanding methods mainly rely on generative supervision or explicit generation and have not systematically explored direct use of native generation-side repre
 
-**Authors:** Zhanshuo Cao, Jiakai Tang, Yuqi Zhou et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.30128) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.30128) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.30128)  
+**Authors:** Tengju Ru, Weitong Lian, Zecong Tang et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.23987) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.23987) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.23987)  
 
-**[Read the full digest with abstracts](digests/2026-10-22.md)**
+**[Read the full digest with abstracts](digests/2026-10-23.md)**
 <!-- TODAY_END -->
 
 ---
@@ -70,6 +70,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
+| **2026-10-23** | `2` | Other ML | [Read digest](digests/2026-10-23.md) |
 | **2026-10-22** | `2` | Other ML | [Read digest](digests/2026-10-22.md) |
 | **2026-10-21** | `2` | Other ML | [Read digest](digests/2026-10-21.md) |
 | **2026-10-20** | `2` | Reasoning & Agents | [Read digest](digests/2026-10-20.md) |
@@ -82,14 +83,14 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-| Papers curated | **6** |
-| Daily editions | **3** |
+| Papers curated | **8** |
+| Daily editions | **4** |
 | Tracking since | `2026-10-20` |
-| Last run | `2026-10-22` |
+| Last run | `2026-10-23` |
 
 **Most active categories:**
 
-- 🔖 **Other ML**: `4` papers
+- 🔖 **Other ML**: `6` papers
 - 🧠 **Reasoning & Agents**: `1` paper
 - 📊 **ML Theory & Optimization**: `1` paper
 <!-- STATS_END -->
