@@ -3,12 +3,12 @@
 <div align="center">
 
 > **Autonomous AI & Machine Learning Research Intelligence.**
-> Curating the top 2 breakthrough papers daily at midnight IST, with "Why It Matters" summaries, heuristic scoring, and automatic GitHub publishing.
+> Curating the top 2 breakthrough papers daily at 07:00 AM IST, with "Why It Matters" summaries, heuristic scoring, and automatic GitHub publishing.
 
 [![Daily Digest](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml)
 ![Papers Tracked](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_papers&label=Papers%20Curated&color=7c3aed)
 ![Digests](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_digests&label=Daily%20Editions&color=10b981)
-![Schedule](https://img.shields.io/badge/schedule-daily%2000%3A00%20IST%20%2F%2018%3A30%20UTC-orange)
+![Schedule](https://img.shields.io/badge/schedule-daily%2007%3A00%20IST%20%2F%2001%3A30%20UTC-orange)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 
@@ -99,7 +99,7 @@ Explore past curated papers categorized by research subfield:
 
 ## 🛠️ System Architecture
 
-Every night at **18:30 UTC (00:00 IST / midnight)**, GitHub Actions runs the pipeline:
+Every morning at **01:30 UTC (07:00 AM IST)**, GitHub Actions runs the pipeline:
 
 ```mermaid
 flowchart LR
@@ -125,7 +125,7 @@ flowchart LR
 ```text
 ai-paper-daily/
 ├── .github/workflows/
-│   └── daily-digest.yml      # Automated 18:30 UTC (00:00 IST) daily runner
+│   └── daily-digest.yml      # Automated 01:30 UTC (07:00 AM IST) daily runner
 ├── src/                      # All pipeline code
 │   ├── main.py               # Pipeline orchestrator and entrypoint
 │   ├── classifier.py         # 12-category research classifier

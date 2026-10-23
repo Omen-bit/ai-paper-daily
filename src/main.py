@@ -18,7 +18,7 @@ if sys.stdout.encoding != 'utf-8':
 
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 try:
     from dotenv import load_dotenv
@@ -135,7 +135,9 @@ def _load_category_papers(cat_file: str) -> list[dict]:
 
 def run() -> None:
     """Main pipeline execution."""
-    date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # Use IST (UTC+5:30) date so digest dates match local calendar days
+    ist_tz = timezone(timedelta(hours=5, minutes=30))
+    date_str = datetime.now(ist_tz).strftime("%Y-%m-%d")
     print(f"\n{'='*60}")
     print(f"[AI Paper Daily] Running for {date_str}")
     print(f"{'='*60}\n")
