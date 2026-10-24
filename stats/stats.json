@@ -1,32 +1,33 @@
 {
-  "total_papers": 8,
-  "total_digests": 4,
+  "total_papers": 10,
+  "total_digests": 5,
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-23T14:42:21.878840+00:00",
+  "last_updated": "2026-10-24T06:08:27.183463+00:00",
   "papers_by_date": {
+    "2026-10-24": 2,
     "2026-10-23": 2,
     "2026-10-22": 2,
     "2026-10-21": 2,
     "2026-10-20": 2
   },
   "papers_by_category": {
-    "other-ml": 6,
+    "other-ml": 8,
     "reasoning-agents": 1,
     "ml-theory": 1
   },
   "top_authors": {
-    "Wen Xue": 1,
-    "Yong Liu": 1,
-    "Xueheng Li": 1,
-    "Si Wu": 1,
+    "Wen Xue": 2,
+    "Yong Liu": 2,
+    "Xueheng Li": 2,
+    "Si Wu": 2,
     "Yong Xu": 1,
     "Yipeng Sun": 1,
     "Yan Li": 1,
     "Simiu Gu": 1,
-    "Tengju Ru": 1,
-    "Weitong Lian": 1,
-    "Zecong Tang": 1,
-    "Zhiheng Liu": 1,
+    "Tengju Ru": 2,
+    "Weitong Lian": 2,
+    "Zecong Tang": 2,
+    "Zhiheng Liu": 2,
     "Lingyi Meng": 1,
     "Haoran Li": 1,
     "Kaixuan Wang": 1,
@@ -58,21 +59,21 @@
     "Luyang Niu": 1
   },
   "top_keywords": {
-    "editing": 1,
-    "images": 1,
-    "reusable": 1,
-    "layers": 1,
-    "compositional": 1,
-    "edit-prior": 1,
-    "distillation": 1,
-    "what": 1,
-    "generation": 1,
-    "knows": 1,
-    "unlocking": 1,
-    "fine-grained": 1,
-    "understanding": 1,
-    "unified": 1,
-    "multimodal": 1,
+    "editing": 2,
+    "images": 2,
+    "reusable": 2,
+    "layers": 2,
+    "compositional": 2,
+    "edit-prior": 2,
+    "distillation": 2,
+    "what": 2,
+    "generation": 2,
+    "knows": 2,
+    "unlocking": 2,
+    "fine-grained": 2,
+    "understanding": 2,
+    "unified": 2,
+    "multimodal": 2,
     "socratic": 1,
     "skill": 1,
     "interleaving": 1,
@@ -114,7 +115,7 @@
   },
   "digests": [
     {
-      "date": "2026-10-23",
+      "date": "2026-10-24",
       "paper_count": 2,
       "top_category": "Other ML",
       "categories_covered": [
@@ -151,6 +152,44 @@
             "Kaixuan Wang",
             "Bohao Li",
             "Xihui Liu"
+          ],
+          "categories": [
+            "other-ml"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-10-23",
+      "paper_count": 2,
+      "top_category": "Other ML",
+      "categories_covered": [
+        "other-ml"
+      ],
+      "papers": [
+        {
+          "id": "2610.24738",
+          "title": "Editing Images into Reusable Layers via Compositional Edit-Prior Distillation",
+          "url": "https://arxiv.org/abs/2610.24738",
+          "authors": [
+            "Wen Xue",
+            "Yong Liu",
+            "Xueheng Li",
+            "Si Wu"
+          ],
+          "categories": [
+            "other-ml"
+          ]
+        },
+        {
+          "id": "2610.23987",
+          "title": "What Generation Knows: Unlocking Fine-Grained Understanding in Unified Multimodal Models",
+          "url": "https://arxiv.org/abs/2610.23987",
+          "authors": [
+            "Tengju Ru",
+            "Weitong Lian",
+            "Zecong Tang",
+            "Zhiheng Liu"
           ],
           "categories": [
             "other-ml"
