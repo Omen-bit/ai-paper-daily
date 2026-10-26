@@ -26,7 +26,7 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Sunday, October 25, 2026 · [2026-10-25](digests/2026-10-25.md)
+### Monday, October 26, 2026 · [2026-10-26](digests/2026-10-26.md)
 
 #### 1. [Editing Images into Reusable Layers via Compositional Edit-Prior Distillation](https://arxiv.org/abs/2610.24738)
 `⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML`
@@ -37,16 +37,16 @@
 **Authors:** Wen Xue, Yong Liu, Xueheng Li et al.  
 **Links:** [arXiv Paper](https://arxiv.org/abs/2610.24738) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.24738) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.24738)  
 
-#### 2. [What Generation Knows: Unlocking Fine-Grained Understanding in Unified Multimodal Models](https://arxiv.org/abs/2610.23987)
+#### 2. [UserArena: Benchmarking Interactive User Simulation for Long-Horizon Shopping Agents](https://arxiv.org/abs/2610.30932)
 `🔥 Trending on HF` `📖 Survey / Review` `🔖 Other ML`
 
 > 💡 **Abstract highlight:**  
-> However, existing generation-assisted understanding methods mainly rely on generative supervision or explicit generation and have not systematically explored direct use of native generation-side repre
+> Developing and evaluating such policies requires faithful recommendation world models that capture both the interactive shopping environment and users' behavioral responses over long interactions.
 
-**Authors:** Tengju Ru, Weitong Lian, Zecong Tang et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.23987) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.23987) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.23987)  
+**Authors:** Jujia Zhao, Jiakai Tang, Jing Yu et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.30932) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.30932) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.30932)  
 
-**[Read the full digest with abstracts](digests/2026-10-25.md)**
+**[Read the full digest with abstracts](digests/2026-10-26.md)**
 <!-- TODAY_END -->
 
 ---
@@ -70,6 +70,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
+| **2026-10-26** | `2` | Other ML | [Read digest](digests/2026-10-26.md) |
 | **2026-10-25** | `2` | Other ML | [Read digest](digests/2026-10-25.md) |
 | **2026-10-24** | `2` | Other ML | [Read digest](digests/2026-10-24.md) |
 | **2026-10-23** | `2` | Other ML | [Read digest](digests/2026-10-23.md) |
@@ -85,14 +86,14 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-| Papers curated | **12** |
-| Daily editions | **6** |
+| Papers curated | **14** |
+| Daily editions | **7** |
 | Tracking since | `2026-10-20` |
-| Last run | `2026-10-25` |
+| Last run | `2026-10-26` |
 
 **Most active categories:**
 
-- 🔖 **Other ML**: `10` papers
+- 🔖 **Other ML**: `12` papers
 - 🧠 **Reasoning & Agents**: `1` paper
 - 📊 **ML Theory & Optimization**: `1` paper
 <!-- STATS_END -->
