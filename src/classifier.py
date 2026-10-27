@@ -16,7 +16,7 @@ from typing import Optional
 
 
 # Minimum score a category must reach to be assigned to a paper.
-MIN_CATEGORY_SCORE = 3
+MIN_CATEGORY_SCORE = 2
 
 # Category definitions: (emoji, display_name, slug, specific_keywords, broad_keywords)
 # specific_keywords score 3 (title) / 1 (abstract)
@@ -168,8 +168,18 @@ CATEGORIES = [
 
 
 def _normalize(text: str) -> str:
-    """Lowercase and remove special characters for matching."""
-    return re.sub(r"[^a-z0-9 ]", " ", text.lower())
+    """Lowercase and replace hyphens/special characters with spaces for matching."""
+    return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
+
+
+def _match_kw(kw: str, text: str) -> bool:
+    """Match keyword using whole-word/phrase boundaries with plural tolerance."""
+    norm_kw = _normalize(kw)
+    if not norm_kw:
+        return False
+    # Use word boundary search with optional plural endings so e.g. "model" matches "models"
+    pattern = rf"\b{re.escape(norm_kw)}(?:s|es)?\b"
+    return bool(re.search(pattern, text))
 
 
 def classify_paper(paper: dict, top_n: int = 3) -> list[dict]:
@@ -181,7 +191,6 @@ def classify_paper(paper: dict, top_n: int = 3) -> list[dict]:
     """
     title_norm = _normalize(paper.get("title", ""))
     abstract_norm = _normalize(paper.get("abstract", ""))
-    full_text = f"{title_norm} {abstract_norm}"
     arxiv_cats = " ".join(paper.get("arxiv_categories", [])).lower()
 
     matched = []
@@ -193,15 +202,16 @@ def classify_paper(paper: dict, top_n: int = 3) -> list[dict]:
 
         # Specific keywords: 3 pts in title, 1 pt in abstract
         for kw in specific_kws:
-            if kw in title_norm:
+            if _match_kw(kw, title_norm):
                 score += 3
-            elif kw in abstract_norm:
+            elif _match_kw(kw, abstract_norm):
                 score += 1
 
-        # Broad/generic keywords: 1 pt in title only (0 in abstract)
+        # Broad/generic keywords: 1 pt auxiliary signal if matched in title or abstract (capped at 1)
         for kw in broad_kws:
-            if kw in title_norm:
+            if _match_kw(kw, title_norm) or _match_kw(kw, abstract_norm):
                 score += 1
+                break
 
         # arXiv category bonus: at most 2 pts total, and capped so it cannot
         # alone push a category over MIN_CATEGORY_SCORE.

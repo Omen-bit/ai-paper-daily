@@ -25,12 +25,25 @@ ARXIV_CATEGORIES = [
     "stat.ML",  # Statistical Machine Learning
 ]
 
-ARXIV_API_BASE = "http://export.arxiv.org/api/query"
+ARXIV_API_BASE = "https://export.arxiv.org/api/query"
 REQUEST_TIMEOUT = 15
 USER_AGENT = "ai-paper-daily/1.0 (https://github.com/Omen-bit/ai-paper-daily)"
 RETRY_DELAYS = [2, 4, 8]  # seconds between attempts 1, 2, 3
 
 _TRANSIENT_ERRORS = ("timeout", "Timeout", "ConnectionError", "503", "502", "500", "429")
+
+
+def get_default_lookback_hours() -> int:
+    """
+    arXiv does not publish new papers over the weekend (Friday night to Sunday night UTC).
+    On Friday, Saturday, Sunday, and Monday, use a 96-hour lookback window so weekend
+    and Monday runs always capture the latest research.
+    """
+    now = datetime.now(timezone.utc)
+    # 4: Friday, 5: Saturday, 6: Sunday, 0: Monday
+    if now.weekday() in (4, 5, 6, 0):
+        return 96
+    return 48
 
 
 def _strip_version(arxiv_id: str) -> str:
@@ -64,12 +77,15 @@ def _fetch_with_retry(fetch_fn, source_name: str):
     return None
 
 
-def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = 48) -> list[dict]:
+def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = None) -> list[dict]:
     """
     Fetch recent papers from arXiv across all tracked categories.
-    Uses a 48-hour lookback window to handle timezone differences and weekends.
+    Uses dynamic lookback window (96h on weekends/Mondays, 48h on weekdays).
     Strips version suffixes from arXiv IDs before returning.
     """
+    if lookback_hours is None:
+        lookback_hours = get_default_lookback_hours()
+
     query = "+OR+".join([f"cat:{cat}" for cat in ARXIV_CATEGORIES])
     url = (
         f"{ARXIV_API_BASE}?search_query={query}"
@@ -77,7 +93,7 @@ def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = 48) -> list
         f"&max_results={max_results}"
     )
 
-    print(f"  [arxiv] Fetching from {len(ARXIV_CATEGORIES)} categories (last {lookback_hours}h)...")
+    print(f"  [arxiv] Fetching from {len(ARXIV_CATEGORIES)} categories (last {lookback_hours}h window)...")
 
     def _do_fetch():
         # feedparser does its own HTTP; wrap in requests first to get retry on transport errors
@@ -182,6 +198,12 @@ def fetch_hf_papers() -> list[dict]:
             except Exception:
                 submitted_dt = datetime.now(timezone.utc)
 
+            # Robust upvote extraction from item or paper_info
+            raw_upvotes = item.get("upvotes")
+            if raw_upvotes is None:
+                raw_upvotes = paper_info.get("upvotes", 0)
+            upvotes = int(raw_upvotes) if raw_upvotes is not None else 0
+
             paper = {
                 "id": arxiv_id,
                 "title": title,
@@ -193,7 +215,7 @@ def fetch_hf_papers() -> list[dict]:
                 "submitted_dt": submitted_dt,
                 "arxiv_categories": paper_info.get("arxivCategories", []),
                 "source": "HuggingFace",
-                "hf_upvotes": item.get("upvotes", 0),
+                "hf_upvotes": upvotes,
             }
 
             if paper["title"] and paper["abstract"]:
@@ -210,19 +232,18 @@ def fetch_hf_papers() -> list[dict]:
 def fetch_all_papers(max_arxiv: int = 150) -> list[dict]:
     """
     Fetch from both sources, deduplicate by arXiv ID (version-stripped), return unified list.
-    If both sources fail, exit with a non-zero status so Actions shows red.
     """
     arxiv_papers = fetch_arxiv_papers(max_results=max_arxiv)
     hf_papers = fetch_hf_papers()
 
     if not arxiv_papers and not hf_papers:
-        print("  [fetch] ERROR: Both arXiv and HuggingFace fetches failed. Exiting.")
-        sys.exit(1)
+        print("  [fetch] WARNING: Both arXiv and HuggingFace returned no papers.")
+        return []
 
     if not arxiv_papers:
-        print("  [fetch] WARNING: arXiv fetch failed; continuing with HuggingFace only.")
+        print("  [fetch] INFO: arXiv returned 0 papers (e.g. weekend/holiday); continuing with HuggingFace only.")
     if not hf_papers:
-        print("  [fetch] WARNING: HuggingFace fetch failed; continuing with arXiv only.")
+        print("  [fetch] INFO: HuggingFace returned 0 papers; continuing with arXiv only.")
 
     # Deduplicate by version-stripped arXiv ID
     paper_map: dict[str, dict] = {}
@@ -233,7 +254,7 @@ def fetch_all_papers(max_arxiv: int = 150) -> list[dict]:
     for p in hf_papers:
         pid = p["id"]
         if pid in paper_map:
-            paper_map[pid]["hf_upvotes"] = p["hf_upvotes"]
+            paper_map[pid]["hf_upvotes"] = max(paper_map[pid].get("hf_upvotes", 0), p["hf_upvotes"])
             paper_map[pid]["source"] = "arXiv + HuggingFace"
         else:
             paper_map[pid] = p

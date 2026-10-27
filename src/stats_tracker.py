@@ -293,6 +293,10 @@ def update_stats(papers: list[dict], date_str: str) -> dict:
                 c.get("slug") if isinstance(c, dict) else c
                 for c in p.get("categories", [])
             ],
+            "badges": p.get("badges", []),
+            "url": p.get("url", f"https://arxiv.org/abs/{p.get('id', '')}"),
+            "pdf_url": p.get("pdf_url", f"https://arxiv.org/pdf/{p.get('id', '')}"),
+            "submitted": p.get("submitted", date_str),
         }
         for p in papers
     ]

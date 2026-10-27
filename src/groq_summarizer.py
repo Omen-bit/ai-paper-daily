@@ -215,10 +215,14 @@ def _heuristic_summary(abstract: str) -> str:
             summary = sentence.strip()
             if not summary.endswith("."):
                 summary += "."
-            return summary[:200]
+            if len(summary) > 200:
+                summary = summary[:197].rsplit(" ", 1)[0] + "..."
+            return summary
     # Final fallback: first sentence
     first = sentences[0].strip()
-    return (first[:197] + "...") if len(first) > 200 else first
+    if len(first) > 200:
+        return first[:197].rsplit(" ", 1)[0] + "..."
+    return first
 
 
 def get_summary(paper: dict) -> tuple[str, str]:

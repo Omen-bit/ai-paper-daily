@@ -58,6 +58,7 @@ def _render_paper_entry(paper: dict, index: int, is_only: bool = False) -> str:
     hf_papers_url = f"https://huggingface.co/papers/{arxiv_id}" if arxiv_id else "#"
 
     lines = [
+        f'<a id="paper-{index}"></a>',
         f"### {index}. [{title}]({url})",
         "",
     ]
@@ -140,7 +141,7 @@ def render_digest(papers: list[dict], date_str: str, stats: dict) -> str:
         if len(paper.get("title", "")) > 65:
             title_short += "…"
         badge_emojis = " ".join([b[0] for b in paper.get("badges", [])])
-        lines.append(f"{i}. [{badge_emojis} {title_short}](#paper-{i}--{_anchor(paper.get('title', ''))})")
+        lines.append(f"{i}. [{badge_emojis} {title_short}](#paper-{i})")
 
     lines += [
         "",
@@ -207,22 +208,30 @@ def render_category_page(slug: str, emoji: str, name: str, all_papers: list[dict
         "",
         f"**Total papers:** {len(all_papers)}",
         "",
-        "| Date | Title | Authors | Links |",
-        "|------|-------|---------|-------|",
     ]
 
-    for paper in sorted(all_papers, key=lambda x: x.get("submitted", ""), reverse=True):
-        title = paper.get("title", "Untitled")
-        url = paper.get("url", "#")
-        pdf_url = paper.get("pdf_url", "#")
-        date = paper.get("submitted", "")
-        authors = format_authors(paper.get("authors", []), max_shown=2)
-        badges_str = " ".join([b[0] for b in paper.get("badges", [])])
+    if not all_papers:
+        lines += [
+            "*No papers curated yet in this category. Check back soon!*",
+            "",
+        ]
+    else:
+        lines += [
+            "| Date | Title | Authors | Links |",
+            "|------|-------|---------|-------|",
+        ]
+        for paper in sorted(all_papers, key=lambda x: x.get("submitted", ""), reverse=True):
+            title = paper.get("title", "Untitled")
+            url = paper.get("url", "#")
+            pdf_url = paper.get("pdf_url", "#")
+            date = paper.get("submitted", "")
+            authors = format_authors(paper.get("authors", []), max_shown=2)
+            badges_str = " ".join([b[0] for b in paper.get("badges", [])])
 
-        title_cell = f"[{badges_str} {title[:55]}{'…' if len(title) > 55 else ''}]({url})"
-        links_cell = f"[arXiv]({url}) · [PDF]({pdf_url})"
+            title_cell = f"[{badges_str} {title[:55]}{'…' if len(title) > 55 else ''}]({url})"
+            links_cell = f"[arXiv]({url}) · [PDF]({pdf_url})"
 
-        lines.append(f"| {date} | {title_cell} | {authors} | {links_cell} |")
+            lines.append(f"| {date} | {title_cell} | {authors} | {links_cell} |")
 
     lines += [
         "",

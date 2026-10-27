@@ -20,20 +20,25 @@ TOP_INSTITUTIONS = [
 
 # Keywords that signal novelty or significance
 NOVELTY_KEYWORDS = [
-    "novel", "new", "first", "state-of-the-art", "state of the art", "sota",
-    "outperform", "surpass", "exceed", "breakthrough", "superior", "improved",
+    "novel", "new", "first", "state-of-the-art", "sota",
+    "outperform", "surpass", "exceed", "breakthrough", "superior",
     "advances", "propose", "introducing", "we present", "we introduce",
-    "we propose", "significant", "substantially"
+    "we propose"
 ]
 
-SURVEY_KEYWORDS = [
-    "survey", "review", "overview", "benchmark", "comprehensive study",
-    "systematic", "literature review", "tutorial", "position paper"
+SURVEY_TITLE_PATTERNS = [
+    r"\bsurvey\b", r"\breview\b", r"\boverview\b", r"\btutorial\b",
+    r"\bposition paper\b", r"\bbenchmark\b"
+]
+
+SURVEY_ABSTRACT_PATTERNS = [
+    r"\bliterature review\b", r"\bsystematic review\b", r"\bsystematic survey\b",
+    r"\bcomprehensive survey\b", r"\bcomprehensive review\b", r"\bposition paper\b"
 ]
 
 EFFICIENCY_KEYWORDS = [
     "efficient", "faster", "lightweight", "compress", "distill", "prune",
-    "reduce cost", "inference speed", "fewer parameters", "low-resource"
+    "reduce cost", "inference speed", "fewer parameters", "low resource"
 ]
 
 
@@ -41,14 +46,32 @@ def _normalize(text: str) -> str:
     return text.lower()
 
 
+def _has_word(text: str, kw: str) -> bool:
+    """Check if keyword exists in text as complete word/phrase."""
+    clean_kw = kw.replace("-", " ")
+    clean_text = text.replace("-", " ")
+    return bool(re.search(rf"\b{re.escape(clean_kw)}\b", clean_text))
+
+
 def _detect_institutions(authors_str: str) -> list[str]:
-    """Detect known top-tier institutions from author affiliations string."""
+    """Detect known top-tier institutions from author affiliations/names string."""
     normalized = _normalize(authors_str)
     found = []
     for inst in TOP_INSTITUTIONS:
-        if inst in normalized:
+        if bool(re.search(rf"\b{re.escape(inst)}\b", normalized)):
             found.append(inst.title())
     return found
+
+
+def _is_survey_or_review(title_lower: str, abstract_lower: str) -> bool:
+    """Accurately identify survey/review papers without false positives on empirical papers."""
+    for pattern in SURVEY_TITLE_PATTERNS:
+        if re.search(pattern, title_lower):
+            return True
+    for pattern in SURVEY_ABSTRACT_PATTERNS:
+        if re.search(pattern, abstract_lower):
+            return True
+    return False
 
 
 def score_paper(paper: dict) -> dict:
@@ -80,22 +103,25 @@ def score_paper(paper: dict) -> dict:
         score += 10
         badges.append(("🔥", "Trending on HF"))
 
-    # --- Signal 2: Novelty keywords in title ---
-    novelty_count = sum(1 for kw in NOVELTY_KEYWORDS if kw in title_lower)
-    score += novelty_count * 4
+    # --- Signal 2: Novelty keywords in title (word-boundary matched) ---
+    novelty_title_count = sum(1 for kw in NOVELTY_KEYWORDS if _has_word(title_lower, kw))
+    score += novelty_title_count * 4
 
     # --- Signal 3: Novelty keywords in abstract ---
-    abstract_novelty = sum(1 for kw in NOVELTY_KEYWORDS if kw in abstract_lower)
-    score += min(abstract_novelty * 1, 8)  # cap at 8
+    novelty_abstract_count = sum(1 for kw in NOVELTY_KEYWORDS if _has_word(abstract_lower, kw))
+    score += min(novelty_abstract_count * 1, 8)  # cap at 8
 
-    # --- Signal 4: Source from HF (already handled above) ---
-
-    # --- Signal 5: Author count (collaboration signal) ---
+    # --- Signal 4: Author count (collaboration signal) ---
     num_authors = len(authors)
     if num_authors >= 8:
         score += 5  # Large collaboration
     elif num_authors >= 4:
         score += 3
+
+    # --- Signal 5: Top Institutions bonus ---
+    detected_insts = _detect_institutions(" ".join(authors))
+    if detected_insts:
+        score += min(len(detected_insts) * 3, 6)
 
     # --- Signal 6: Cross-category paper (interdisciplinary) ---
     categories = paper.get("categories", [])
@@ -105,13 +131,13 @@ def score_paper(paper: dict) -> dict:
     elif len(categories) == 2:
         score += 2
 
-    # --- Signal 7: Survey/review bonus ---
-    if any(kw in full_text for kw in SURVEY_KEYWORDS):
+    # --- Signal 7: Survey/review detection ---
+    if _is_survey_or_review(title_lower, abstract_lower):
         score += 6
         badges.append(("📖", "Survey / Review"))
 
     # --- Signal 8: Efficiency / resource-saving angle ---
-    if any(kw in full_text for kw in EFFICIENCY_KEYWORDS):
+    if any(_has_word(full_text, kw) for kw in EFFICIENCY_KEYWORDS):
         score += 3
 
     # --- Signal 9: Abstract quality (length as proxy for detail) ---
@@ -122,7 +148,7 @@ def score_paper(paper: dict) -> dict:
         score += 1
 
     # --- Assign qualitative badges ---
-    if novelty_count >= 2 or abstract_novelty >= 3:
+    if novelty_title_count >= 1 or novelty_abstract_count >= 3:
         badges.append(("💡", "Novel Method"))
 
     # Assign final composite badges (only top 3 badges)

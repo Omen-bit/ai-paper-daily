@@ -49,88 +49,45 @@ TOP_N_PAPERS = 2  # Number of papers to feature per day
 
 def update_category_pages(selected_papers: list[dict], all_existing_stats: dict) -> None:
     """
-    Update category landing pages by appending today's papers.
-    Loads existing paper data from stats to rebuild tables.
+    Update category landing pages for all categories using stats as source of truth.
+    Pre-seeds all 12 categories so no dashboard links return 404.
     """
     os.makedirs(CATEGORIES_DIR, exist_ok=True)
+    all_slugs = get_all_category_slugs()
 
-    # Collect papers per category (from today only - we rebuild incrementally)
-    # For full category pages, we track paper data in a separate file per category
+    # Map slug -> list of paper dicts
+    papers_by_category: dict[str, list[dict]] = {slug: [] for slug in all_slugs}
+    seen_ids_per_cat: dict[str, set[str]] = {slug: set() for slug in all_slugs}
+
+    # 1. Gather all past papers from stats.json digests
+    for digest in all_existing_stats.get("digests", []):
+        for p in digest.get("papers", []):
+            pid = p.get("id") or p.get("title")
+            for cat in p.get("categories", []):
+                slug = cat if isinstance(cat, str) else cat.get("slug")
+                if slug in papers_by_category and pid not in seen_ids_per_cat[slug]:
+                    seen_ids_per_cat[slug].add(pid)
+                    papers_by_category[slug].append(p)
+
+    # 2. Add today's selected papers
     for paper in selected_papers:
+        pid = paper.get("id") or paper.get("title")
         for cat in paper.get("categories", []):
-            slug = cat["slug"]
-            cat_file = os.path.join(CATEGORIES_DIR, f"{slug}.md")
+            slug = cat if isinstance(cat, str) else cat.get("slug")
+            if slug in papers_by_category and pid not in seen_ids_per_cat[slug]:
+                seen_ids_per_cat[slug].add(pid)
+                papers_by_category[slug].append(paper)
 
-            # Load existing category page papers list (parse table rows)
-            existing_papers = _load_category_papers(cat_file)
+    # 3. Render every category page
+    for slug, cat_papers in papers_by_category.items():
+        cat_file = os.path.join(CATEGORIES_DIR, f"{slug}.md")
+        disp = get_category_display(slug)
+        emoji, name = disp if disp else ("📄", slug.replace("-", " ").title())
+        content = render_category_page(slug, emoji, name, cat_papers)
+        with open(cat_file, "w", encoding="utf-8") as f:
+            f.write(content)
 
-            # Add today's paper if not already there
-            paper_ids = {p["id"] for p in existing_papers}
-            if paper["id"] not in paper_ids:
-                existing_papers.append(paper)
-
-            # Render and save
-            emoji, name = get_category_display(slug) or ("📄", slug.title())
-            content = render_category_page(slug, emoji, name, existing_papers)
-            with open(cat_file, "w", encoding="utf-8") as f:
-                f.write(content)
-
-    print(f"✅ Category pages updated in {CATEGORIES_DIR}")
-
-
-def _load_category_papers(cat_file: str) -> list[dict]:
-    """
-    Parse existing papers from a category page table.
-    Returns list of minimal paper dicts for reconstruction.
-    """
-    if not os.path.exists(cat_file):
-        return []
-
-    papers = []
-    with open(cat_file, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-
-    # Find table rows (skip header and separator)
-    in_table = False
-    for line in lines:
-        line = line.strip()
-        if line.startswith("| Date |"):
-            in_table = True
-            continue
-        if in_table and line.startswith("|---"):
-            continue
-        if in_table and line.startswith("|") and line.endswith("|"):
-            parts = [p.strip() for p in line.split("|")[1:-1]]
-            if len(parts) >= 3:
-                # Parse: Date | Title (linked) | Authors | Links
-                date = parts[0]
-
-                # Extract URL and title from markdown link: [... title](url)
-                import re
-                link_match = re.search(r"\[(.+?)\]\((.+?)\)", parts[1])
-                if link_match:
-                    raw_title = link_match.group(1)
-                    url = link_match.group(2)
-                    # Remove badge emojis from title start
-                    title = re.sub(r"^[\U0001F300-\U0001FFFF\u2600-\u26FF\u2700-\u27BF⭐🔥💡📖🔀\s]+", "", raw_title).strip()
-                    arxiv_id = url.split("/abs/")[-1] if "/abs/" in url else ""
-
-                    papers.append({
-                        "id": arxiv_id,
-                        "title": title,
-                        "authors": [parts[2]] if len(parts) > 2 else [],
-                        "abstract": "",
-                        "url": url,
-                        "pdf_url": url.replace("/abs/", "/pdf/"),
-                        "submitted": date,
-                        "categories": [],
-                        "badges": [],
-                        "source": "arXiv",
-                    })
-        elif in_table and not line.startswith("|"):
-            in_table = False
-
-    return papers
+    print(f"✅ All {len(all_slugs)} category pages updated/pre-seeded in {CATEGORIES_DIR}")
 
 
 def run() -> None:
@@ -142,6 +99,14 @@ def run() -> None:
     print(f"[AI Paper Daily] Running for {date_str}")
     print(f"{'='*60}\n")
 
+    # Load stats to check recently featured paper IDs (prevent duplicates on weekend/lookback)
+    current_stats = load_stats()
+    recent_paper_ids = set()
+    for d in current_stats.get("digests", [])[:7]:
+        for p in d.get("papers", []):
+            if p.get("id"):
+                recent_paper_ids.add(p["id"])
+
     # --- Step 1: Fetch papers ---
     all_papers = fetch_all_papers(max_arxiv=150)
 
@@ -150,6 +115,14 @@ def run() -> None:
         print("💡 Creating a 'no digest today' placeholder...")
         _create_placeholder(date_str)
         return
+
+    # Filter out recently featured papers to ensure fresh picks, especially on weekends
+    fresh_papers = [p for p in all_papers if p["id"] not in recent_paper_ids]
+    if fresh_papers:
+        all_papers = fresh_papers
+        print(f"  [pipeline] {len(all_papers)} fresh (unfeatured in last 7 days) candidate papers available.")
+    else:
+        print("  [pipeline] Notice: All fetched papers were recently featured; keeping entire candidate pool.")
 
     # --- Step 2: Classify ---
     print("\n🏷️ Classifying papers into categories...")

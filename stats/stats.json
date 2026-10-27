@@ -24,18 +24,10 @@
     "Xinyi Chen": 1,
     "Hongbo Wang": 1,
     "Jiayuan Lu": 1,
-    "Jianhang Li": 1,
-    "Minghuan Tan": 1,
-    "Yuan Lin": 1,
-    "Min Yang": 1,
     "Arman Zarei": 1,
     "Sayan Nag": 1,
     "Bryan Wang": 1,
     "Franck Dernoncourt": 1,
-    "Varun Manjunatha": 1,
-    "Nedim Lipka": 1,
-    "Soheil Feizi": 1,
-    "Samyadeep Basu": 1,
     "Wen Xue": 4,
     "Yong Liu": 4,
     "Xueheng Li": 4,
@@ -163,15 +155,12 @@
         {
           "id": "2610.33503",
           "title": "Novel or Not? PatEx-Gym: Agentic Prior-Art Search for Novelty Assessment in Patent Examination",
+          "url": "https://arxiv.org/abs/2610.33503",
           "authors": [
             "Qiyao Wang",
             "Xinyi Chen",
             "Hongbo Wang",
-            "Jiayuan Lu",
-            "Jianhang Li",
-            "Minghuan Tan",
-            "Yuan Lin",
-            "Min Yang"
+            "Jiayuan Lu"
           ],
           "categories": [
             "other-ml"
@@ -180,15 +169,12 @@
         {
           "id": "2610.14253",
           "title": "SliderEdit++: Improved Slider Trajectories in Instruction-Based Image Editing",
+          "url": "https://arxiv.org/abs/2610.14253",
           "authors": [
             "Arman Zarei",
             "Sayan Nag",
             "Bryan Wang",
-            "Franck Dernoncourt",
-            "Varun Manjunatha",
-            "Nedim Lipka",
-            "Soheil Feizi",
-            "Samyadeep Basu"
+            "Franck Dernoncourt"
           ],
           "categories": [
             "generative-ai"
