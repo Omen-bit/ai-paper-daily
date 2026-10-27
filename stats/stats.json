@@ -1,9 +1,10 @@
 {
-  "total_papers": 14,
-  "total_digests": 7,
+  "total_papers": 16,
+  "total_digests": 8,
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-26T06:38:37.071460+00:00",
+  "last_updated": "2026-10-27T06:33:37.898391+00:00",
   "papers_by_date": {
+    "2026-10-27": 2,
     "2026-10-26": 2,
     "2026-10-25": 2,
     "2026-10-24": 2,
@@ -13,28 +14,36 @@
     "2026-10-20": 2
   },
   "papers_by_category": {
-    "other-ml": 12,
+    "other-ml": 13,
+    "generative-ai": 1,
     "reasoning-agents": 1,
     "ml-theory": 1
   },
   "top_authors": {
+    "Qiyao Wang": 1,
+    "Xinyi Chen": 1,
+    "Hongbo Wang": 1,
+    "Jiayuan Lu": 1,
+    "Jianhang Li": 1,
+    "Minghuan Tan": 1,
+    "Yuan Lin": 1,
+    "Min Yang": 1,
+    "Arman Zarei": 1,
+    "Sayan Nag": 1,
+    "Bryan Wang": 1,
+    "Franck Dernoncourt": 1,
+    "Varun Manjunatha": 1,
+    "Nedim Lipka": 1,
+    "Soheil Feizi": 1,
+    "Samyadeep Basu": 1,
     "Wen Xue": 4,
     "Yong Liu": 4,
     "Xueheng Li": 4,
     "Si Wu": 4,
-    "Yong Xu": 1,
-    "Yipeng Sun": 1,
-    "Yan Li": 1,
-    "Simiu Gu": 1,
     "Jujia Zhao": 1,
     "Jiakai Tang": 2,
     "Jing Yu": 1,
     "Wen Chen": 1,
-    "Jian Wu": 1,
-    "Han Zhu": 1,
-    "Fei Sun": 1,
-    "Suzan Verberne": 1,
-    "Zhaochun Ren": 1,
     "Tengju Ru": 3,
     "Weitong Lian": 3,
     "Zecong Tang": 3,
@@ -64,7 +73,23 @@
     "Luyang Niu": 1
   },
   "top_keywords": {
-    "editing": 4,
+    "novel": 1,
+    "not?": 1,
+    "patex-gym": 1,
+    "agentic": 2,
+    "prior-art": 1,
+    "search": 1,
+    "novelty": 1,
+    "assessment": 1,
+    "patent": 1,
+    "examination": 1,
+    "slideredit++": 1,
+    "improved": 1,
+    "slider": 1,
+    "trajectories": 1,
+    "instruction-based": 1,
+    "image": 1,
+    "editing": 5,
     "images": 4,
     "reusable": 4,
     "layers": 4,
@@ -118,7 +143,6 @@
     "generating": 1,
     "processes": 1,
     "evidence-first": 1,
-    "agentic": 1,
     "verification": 1,
     "physical": 1,
     "capability": 1,
@@ -127,6 +151,51 @@
     "llm-as-policy": 1
   },
   "digests": [
+    {
+      "date": "2026-10-27",
+      "paper_count": 2,
+      "top_category": "Other ML",
+      "categories_covered": [
+        "other-ml",
+        "generative-ai"
+      ],
+      "papers": [
+        {
+          "id": "2610.33503",
+          "title": "Novel or Not? PatEx-Gym: Agentic Prior-Art Search for Novelty Assessment in Patent Examination",
+          "authors": [
+            "Qiyao Wang",
+            "Xinyi Chen",
+            "Hongbo Wang",
+            "Jiayuan Lu",
+            "Jianhang Li",
+            "Minghuan Tan",
+            "Yuan Lin",
+            "Min Yang"
+          ],
+          "categories": [
+            "other-ml"
+          ]
+        },
+        {
+          "id": "2610.14253",
+          "title": "SliderEdit++: Improved Slider Trajectories in Instruction-Based Image Editing",
+          "authors": [
+            "Arman Zarei",
+            "Sayan Nag",
+            "Bryan Wang",
+            "Franck Dernoncourt",
+            "Varun Manjunatha",
+            "Nedim Lipka",
+            "Soheil Feizi",
+            "Samyadeep Basu"
+          ],
+          "categories": [
+            "generative-ai"
+          ]
+        }
+      ]
+    },
     {
       "date": "2026-10-26",
       "paper_count": 2,
@@ -138,15 +207,12 @@
         {
           "id": "2610.24738",
           "title": "Editing Images into Reusable Layers via Compositional Edit-Prior Distillation",
+          "url": "https://arxiv.org/abs/2610.24738",
           "authors": [
             "Wen Xue",
             "Yong Liu",
             "Xueheng Li",
-            "Si Wu",
-            "Yong Xu",
-            "Yipeng Sun",
-            "Yan Li",
-            "Simiu Gu"
+            "Si Wu"
           ],
           "categories": [
             "other-ml"
@@ -155,16 +221,12 @@
         {
           "id": "2610.30932",
           "title": "UserArena: Benchmarking Interactive User Simulation for Long-Horizon Shopping Agents",
+          "url": "https://arxiv.org/abs/2610.30932",
           "authors": [
             "Jujia Zhao",
             "Jiakai Tang",
             "Jing Yu",
-            "Wen Chen",
-            "Jian Wu",
-            "Han Zhu",
-            "Fei Sun",
-            "Suzan Verberne",
-            "Zhaochun Ren"
+            "Wen Chen"
           ],
           "categories": [
             "other-ml"
