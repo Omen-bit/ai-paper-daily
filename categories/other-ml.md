@@ -5,10 +5,11 @@
 
 ---
 
-**Total papers:** 8
+**Total papers:** 9
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
+| 2026-10-26 | [🔥 Hy-Nomas: Towards Free-form Interactive World Generatio…](https://arxiv.org/abs/2610.36729) | Qiaoling Chen, Jiaxiang Cheng *+36 more* | [arXiv](https://arxiv.org/abs/2610.36729) · [PDF](https://arxiv.org/pdf/2610.36729) |
 |  | [ Novel or Not? PatEx-Gym: Agentic Prior-Art Search for N…](https://arxiv.org/abs/2610.33503) | Qiyao Wang, Xinyi Chen *+2 more* | [arXiv](https://arxiv.org/abs/2610.33503) · [PDF](#) |
 |  | [ Editing Images into Reusable Layers via Compositional E…](https://arxiv.org/abs/2610.24738) | Wen Xue, Yong Liu *+2 more* | [arXiv](https://arxiv.org/abs/2610.24738) · [PDF](#) |
 |  | [ UserArena: Benchmarking Interactive User Simulation for…](https://arxiv.org/abs/2610.30932) | Jujia Zhao, Jiakai Tang *+2 more* | [arXiv](https://arxiv.org/abs/2610.30932) · [PDF](#) |

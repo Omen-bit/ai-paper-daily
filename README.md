@@ -26,27 +26,27 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Tuesday, October 27, 2026 · [2026-10-27](digests/2026-10-27.md)
+### Wednesday, October 28, 2026 · [2026-10-28](digests/2026-10-28.md)
 
-#### 1. [Novel or Not? PatEx-Gym: Agentic Prior-Art Search for Novelty Assessment in Patent Examination](https://arxiv.org/abs/2610.33503)
-`⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML`
-
-> 💡 **Abstract highlight:**  
-> We present PatEx-Gym, the first framework for developing and evaluating agents for patent examination, which integrates three components.
-
-**Authors:** Qiyao Wang, Xinyi Chen, Hongbo Wang et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.33503) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.33503) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.33503)  
-
-#### 2. [SliderEdit++: Improved Slider Trajectories in Instruction-Based Image Editing](https://arxiv.org/abs/2610.14253)
-`🔥 Trending on HF` `📖 Survey / Review` `🎨 Generative AI & Diffusion`
+#### 1. [PDRVLA: A Vision-Language-Action Model with Physical Dynamics Representations](https://arxiv.org/abs/2610.37381)
+`⭐ Top Pick` `🔥 Trending on HF` `🎨 Generative AI & Diffusion` `👁️ Computer Vision` `61 HF upvotes`
 
 > 💡 **Abstract highlight:**  
-> To systematically study these limitations, we introduce SlideBench, a comprehensive benchmark for continuous image editing spanning diverse editing categories and equipped with a unified suite of metr
+> Video world models can capture scene dynamics, yet generating future videos introduces high latency into the control loop.
 
-**Authors:** Arman Zarei, Sayan Nag, Bryan Wang et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.14253) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.14253) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.14253)  
+**Authors:** Hanqing Wang, Zhaotian Cai, Ruichuan An et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.37381) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.37381) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.37381)  
 
-**[Read the full digest with abstracts](digests/2026-10-27.md)**
+#### 2. [Hy-Nomas: Towards Free-form Interactive World Generation](https://arxiv.org/abs/2610.36729)
+`🔥 Trending on HF` `🔖 Other ML` `79 HF upvotes`
+
+> 💡 **Abstract highlight:**  
+> We present Hy-Nomas, a video world model with an 8B diffusion backbone that supports free-form text instructions and continuous camera control across multiple interaction turns.
+
+**Authors:** Qiaoling Chen, Jiaxiang Cheng, Xueqing Deng et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.36729) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.36729) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.36729)  
+
+**[Read the full digest with abstracts](digests/2026-10-28.md)**
 <!-- TODAY_END -->
 
 ---
@@ -70,6 +70,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
+| **2026-10-28** | `2` | Generative AI & Diffusion | [Read digest](digests/2026-10-28.md) |
 | **2026-10-27** | `2` | Other ML | [Read digest](digests/2026-10-27.md) |
 | **2026-10-26** | `2` | Other ML | [Read digest](digests/2026-10-26.md) |
 | **2026-10-25** | `2` | Other ML | [Read digest](digests/2026-10-25.md) |
@@ -87,16 +88,17 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-| Papers curated | **16** |
-| Daily editions | **8** |
+| Papers curated | **18** |
+| Daily editions | **9** |
 | Tracking since | `2026-10-20` |
-| Last run | `2026-10-27` |
+| Last run | `2026-10-28` |
 
 **Most active categories:**
 
-- 🔖 **Other ML**: `13` papers
-- 🎨 **Generative AI & Diffusion**: `1` paper
-- 🧠 **Reasoning & Agents**: `1` paper
+- 🔖 **Other ML**: `14` papers
+- 🎨 **Generative AI & Diffusion**: `2` papers
+- 🧠 **Reasoning & Agents**: `2` papers
+- 👁️ **Computer Vision**: `1` paper
 - 📊 **ML Theory & Optimization**: `1` paper
 <!-- STATS_END -->
 
