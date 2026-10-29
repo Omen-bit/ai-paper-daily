@@ -9,7 +9,7 @@
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
-| 2026-10-27 | [⭐ 🔥 🔀 PDRVLA: A Vision-Language-Action Model with Physical Dy…](https://arxiv.org/abs/2610.37381) | Hanqing Wang, Zhaotian Cai *+13 more* | [arXiv](https://arxiv.org/abs/2610.37381) · [PDF](https://arxiv.org/pdf/2610.37381) |
+|  | [ PDRVLA: A Vision-Language-Action Model with Physical Dy…](https://arxiv.org/abs/2610.37381) | Hanqing Wang, Zhaotian Cai *+2 more* | [arXiv](https://arxiv.org/abs/2610.37381) · [PDF](#) |
 
 ---
 

@@ -1,9 +1,10 @@
 {
-  "total_papers": 18,
-  "total_digests": 9,
+  "total_papers": 20,
+  "total_digests": 10,
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-28T07:02:40.253854+00:00",
+  "last_updated": "2026-10-29T07:25:00.873942+00:00",
   "papers_by_date": {
+    "2026-10-29": 2,
     "2026-10-28": 2,
     "2026-10-27": 2,
     "2026-10-26": 2,
@@ -15,66 +16,55 @@
     "2026-10-20": 2
   },
   "papers_by_category": {
-    "generative-ai": 2,
+    "ai-science": 1,
+    "llms": 2,
+    "generative-ai": 3,
+    "multimodal": 1,
     "computer-vision": 1,
     "reasoning-agents": 2,
     "other-ml": 14,
     "ml-theory": 1
   },
   "top_authors": {
+    "Yepeng Liu": 1,
+    "Shengmai Chen": 1,
+    "Xuandong Zhao": 1,
+    "Chengzhi Liu": 1,
+    "Dawn Song": 1,
+    "Xin Eric Wang": 1,
+    "Yuheng Bu": 1,
+    "Muxi Diao": 1,
+    "Wenbin Xu": 1,
+    "Lele Yang": 1,
+    "Xuyang Ma": 1,
+    "Yuzhe Chen": 1,
+    "Jiankang Chen": 1,
+    "Kaiyu Jiang": 1,
+    "Changyi Liu": 1,
+    "Haoyu Zhang": 1,
+    "Hongyi Fu": 1,
+    "Jianxiong Wang": 1,
+    "Tianke Zhang": 1,
+    "Haonan Fan": 1,
+    "Yingxin Li": 1,
+    "Bingyi Li": 1,
+    "Xu Wang": 1,
+    "Xuanyu Zheng": 1,
+    "Bin Wen": 1,
+    "Tingting Gao": 1,
+    "Han Li": 2,
+    "Wentao Zhang": 1,
+    "Weiran Xu": 1,
+    "Kongming Liang": 1,
+    "Zhanyu Ma": 1,
     "Hanqing Wang": 1,
     "Zhaotian Cai": 1,
     "Ruichuan An": 1,
     "Bohan Zeng": 1,
-    "Tao Zhang": 1,
-    "Yilin Chen": 1,
-    "Xu Jiang": 1,
-    "Kaiquan Chen": 1,
-    "Chongyang Wu": 1,
-    "Haoran Li": 1,
-    "Fan Yang": 1,
-    "Mingan Lin": 1,
-    "Wentao Zhang": 1,
-    "Zenan Zhou": 1,
-    "Youzheng Wu": 1,
     "Qiaoling Chen": 1,
     "Jiaxiang Cheng": 1,
     "Xueqing Deng": 1,
     "Tiankai Hang": 1,
-    "Ji Hou": 1,
-    "Jiaqi Li": 1,
-    "Yifan Liu": 1,
-    "Tao Lu": 1,
-    "Junshu Tang": 1,
-    "Yu Tang": 1,
-    "Yao Teng": 1,
-    "Yu Tian": 1,
-    "Heng Wang": 1,
-    "Weizhi Wang": 1,
-    "Xiyao Wang": 1,
-    "Xilun Wu": 1,
-    "Mingyu Yang": 1,
-    "Yangbin Yu": 1,
-    "Rui Zhao": 1,
-    "Longjun Cao": 1,
-    "Linghao Chen": 1,
-    "Haoyi Duan": 1,
-    "Jiaming Han": 1,
-    "Mingji Han": 1,
-    "Enhua Jiang": 1,
-    "Shunkai Li": 1,
-    "Yanzhe Liang": 1,
-    "Qinwei Ma": 1,
-    "Cong Wang": 1,
-    "Lei Wang": 1,
-    "Bing Wu": 1,
-    "Ke Xing": 1,
-    "Ray Ying": 1,
-    "Zhentao Yu": 1,
-    "Key Zhang": 1,
-    "Yuan Zhou": 1,
-    "Zhengguang Zhou": 1,
-    "Kai Zou": 1,
     "Qiyao Wang": 1,
     "Xinyi Chen": 1,
     "Hongbo Wang": 1,
@@ -96,7 +86,6 @@
     "Zecong Tang": 3,
     "Zhiheng Liu": 3,
     "Letian Zhu": 1,
-    "Han Li": 1,
     "Yifan Yao": 1,
     "Xinping Lei": 1,
     "Zhanshuo Cao": 1,
@@ -120,6 +109,20 @@
     "Luyang Niu": 1
   },
   "top_keywords": {
+    "test-time": 2,
+    "memory": 1,
+    "evolution": 1,
+    "outperform": 1,
+    "training": 1,
+    "scientific": 1,
+    "discovery?": 1,
+    "vibevideobench": 1,
+    "evaluating": 1,
+    "multimodal": 4,
+    "agents": 2,
+    "code-driven": 1,
+    "video": 1,
+    "generation": 5,
     "pdrvla": 1,
     "vision-language-action": 1,
     "physical": 2,
@@ -129,7 +132,6 @@
     "free-form": 1,
     "interactive": 2,
     "world": 2,
-    "generation": 4,
     "novel": 1,
     "not?": 1,
     "patex-gym": 1,
@@ -159,14 +161,12 @@
     "simulation": 1,
     "long-horizon": 1,
     "shopping": 1,
-    "agents": 1,
     "what": 3,
     "knows": 3,
     "unlocking": 3,
     "fine-grained": 3,
     "understanding": 3,
     "unified": 3,
-    "multimodal": 3,
     "socratic": 1,
     "skill": 1,
     "interleaving": 1,
@@ -205,6 +205,101 @@
   },
   "digests": [
     {
+      "date": "2026-10-29",
+      "paper_count": 2,
+      "top_category": "LLMs & Language Models",
+      "categories_covered": [
+        "ai-science",
+        "llms",
+        "generative-ai",
+        "multimodal"
+      ],
+      "papers": [
+        {
+          "id": "2610.32046",
+          "title": "Can Test-Time Memory Evolution Outperform Test-Time Training for Scientific Discovery?",
+          "authors": [
+            "Yepeng Liu",
+            "Shengmai Chen",
+            "Xuandong Zhao",
+            "Chengzhi Liu",
+            "Dawn Song",
+            "Xin Eric Wang",
+            "Yuheng Bu"
+          ],
+          "categories": [
+            "ai-science",
+            "llms"
+          ],
+          "badges": [
+            [
+              "⭐",
+              "Top Pick"
+            ],
+            [
+              "🔥",
+              "Trending on HF"
+            ],
+            [
+              "💡",
+              "Novel Method"
+            ]
+          ],
+          "url": "https://arxiv.org/abs/2610.32046",
+          "pdf_url": "https://arxiv.org/pdf/2610.32046",
+          "submitted": "2026-10-22"
+        },
+        {
+          "id": "2610.35864",
+          "title": "VibeVideoBench: Evaluating Multimodal Agents on Code-Driven Video Generation",
+          "authors": [
+            "Muxi Diao",
+            "Wenbin Xu",
+            "Lele Yang",
+            "Xuyang Ma",
+            "Yuzhe Chen",
+            "Jiankang Chen",
+            "Kaiyu Jiang",
+            "Changyi Liu",
+            "Haoyu Zhang",
+            "Hongyi Fu",
+            "Jianxiong Wang",
+            "Tianke Zhang",
+            "Haonan Fan",
+            "Yingxin Li",
+            "Bingyi Li",
+            "Xu Wang",
+            "Xuanyu Zheng",
+            "Bin Wen",
+            "Tingting Gao",
+            "Han Li",
+            "Wentao Zhang",
+            "Weiran Xu",
+            "Kongming Liang",
+            "Zhanyu Ma"
+          ],
+          "categories": [
+            "generative-ai",
+            "llms",
+            "multimodal"
+          ],
+          "badges": [
+            [
+              "🔥",
+              "Trending on HF"
+            ],
+            [
+              "🔀",
+              "Interdisciplinary"
+            ]
+          ],
+          "url": "https://arxiv.org/abs/2610.35864",
+          "pdf_url": "https://arxiv.org/pdf/2610.35864",
+          "submitted": "2026-10-26"
+        }
+      ]
+    },
+    {
       "date": "2026-10-28",
       "paper_count": 2,
       "top_category": "Generative AI & Diffusion",
@@ -218,101 +313,32 @@
         {
           "id": "2610.37381",
           "title": "PDRVLA: A Vision-Language-Action Model with Physical Dynamics Representations",
+          "url": "https://arxiv.org/abs/2610.37381",
           "authors": [
             "Hanqing Wang",
             "Zhaotian Cai",
             "Ruichuan An",
-            "Bohan Zeng",
-            "Tao Zhang",
-            "Yilin Chen",
-            "Xu Jiang",
-            "Kaiquan Chen",
-            "Chongyang Wu",
-            "Haoran Li",
-            "Fan Yang",
-            "Mingan Lin",
-            "Wentao Zhang",
-            "Zenan Zhou",
-            "Youzheng Wu"
+            "Bohan Zeng"
           ],
           "categories": [
             "generative-ai",
             "computer-vision",
             "reasoning-agents"
-          ],
-          "badges": [
-            [
-              "⭐",
-              "Top Pick"
-            ],
-            [
-              "🔥",
-              "Trending on HF"
-            ],
-            [
-              "🔀",
-              "Interdisciplinary"
-            ]
-          ],
-          "url": "https://arxiv.org/abs/2610.37381",
-          "pdf_url": "https://arxiv.org/pdf/2610.37381",
-          "submitted": "2026-10-27"
+          ]
         },
         {
           "id": "2610.36729",
           "title": "Hy-Nomas: Towards Free-form Interactive World Generation",
+          "url": "https://arxiv.org/abs/2610.36729",
           "authors": [
             "Qiaoling Chen",
             "Jiaxiang Cheng",
             "Xueqing Deng",
-            "Tiankai Hang",
-            "Ji Hou",
-            "Jiaqi Li",
-            "Yifan Liu",
-            "Tao Lu",
-            "Junshu Tang",
-            "Yu Tang",
-            "Yao Teng",
-            "Yu Tian",
-            "Heng Wang",
-            "Weizhi Wang",
-            "Xiyao Wang",
-            "Xilun Wu",
-            "Mingyu Yang",
-            "Yangbin Yu",
-            "Rui Zhao",
-            "Longjun Cao",
-            "Linghao Chen",
-            "Haoyi Duan",
-            "Jiaming Han",
-            "Mingji Han",
-            "Enhua Jiang",
-            "Shunkai Li",
-            "Yanzhe Liang",
-            "Qinwei Ma",
-            "Cong Wang",
-            "Lei Wang",
-            "Bing Wu",
-            "Ke Xing",
-            "Ray Ying",
-            "Zhentao Yu",
-            "Key Zhang",
-            "Yuan Zhou",
-            "Zhengguang Zhou",
-            "Kai Zou"
+            "Tiankai Hang"
           ],
           "categories": [
             "other-ml"
-          ],
-          "badges": [
-            [
-              "🔥",
-              "Trending on HF"
-            ]
-          ],
-          "url": "https://arxiv.org/abs/2610.36729",
-          "pdf_url": "https://arxiv.org/pdf/2610.36729",
-          "submitted": "2026-10-26"
+          ]
         }
       ]
     },

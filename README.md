@@ -26,27 +26,27 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Wednesday, October 28, 2026 · [2026-10-28](digests/2026-10-28.md)
+### Thursday, October 29, 2026 · [2026-10-29](digests/2026-10-29.md)
 
-#### 1. [PDRVLA: A Vision-Language-Action Model with Physical Dynamics Representations](https://arxiv.org/abs/2610.37381)
-`⭐ Top Pick` `🔥 Trending on HF` `🎨 Generative AI & Diffusion` `👁️ Computer Vision` `61 HF upvotes`
-
-> 💡 **Abstract highlight:**  
-> Video world models can capture scene dynamics, yet generating future videos introduces high latency into the control loop.
-
-**Authors:** Hanqing Wang, Zhaotian Cai, Ruichuan An et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.37381) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.37381) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.37381)  
-
-#### 2. [Hy-Nomas: Towards Free-form Interactive World Generation](https://arxiv.org/abs/2610.36729)
-`🔥 Trending on HF` `🔖 Other ML` `79 HF upvotes`
+#### 1. [Can Test-Time Memory Evolution Outperform Test-Time Training for Scientific Discovery?](https://arxiv.org/abs/2610.32046)
+`⭐ Top Pick` `🔥 Trending on HF` `🏥 AI for Science & Healthcare` `🤖 LLMs & Language Models` `119 HF upvotes`
 
 > 💡 **Abstract highlight:**  
-> We present Hy-Nomas, a video world model with an 8B diffusion backbone that supports free-form text instructions and continuous camera control across multiple interaction turns.
+> However, TTT introduces additional computational cost for online weight updates during the discovery process, making computational efficiency an important consideration when scaling to larger models.
 
-**Authors:** Qiaoling Chen, Jiaxiang Cheng, Xueqing Deng et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.36729) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.36729) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.36729)  
+**Authors:** Yepeng Liu, Shengmai Chen, Xuandong Zhao et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.32046) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.32046) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.32046)  
 
-**[Read the full digest with abstracts](digests/2026-10-28.md)**
+#### 2. [VibeVideoBench: Evaluating Multimodal Agents on Code-Driven Video Generation](https://arxiv.org/abs/2610.35864)
+`🔥 Trending on HF` `🔀 Interdisciplinary` `🎨 Generative AI & Diffusion` `🤖 LLMs & Language Models` `173 HF upvotes`
+
+> 💡 **Abstract highlight:**  
+> We introduce VibeVideoBench, a benchmark for evaluating agents on code-driven video generation.
+
+**Authors:** Muxi Diao, Wenbin Xu, Lele Yang et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.35864) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.35864) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.35864)  
+
+**[Read the full digest with abstracts](digests/2026-10-29.md)**
 <!-- TODAY_END -->
 
 ---
@@ -70,6 +70,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
+| **2026-10-29** | `2` | LLMs & Language Models | [Read digest](digests/2026-10-29.md) |
 | **2026-10-28** | `2` | Generative AI & Diffusion | [Read digest](digests/2026-10-28.md) |
 | **2026-10-27** | `2` | Other ML | [Read digest](digests/2026-10-27.md) |
 | **2026-10-26** | `2` | Other ML | [Read digest](digests/2026-10-26.md) |
@@ -88,18 +89,18 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-| Papers curated | **18** |
-| Daily editions | **9** |
+| Papers curated | **20** |
+| Daily editions | **10** |
 | Tracking since | `2026-10-20` |
-| Last run | `2026-10-28` |
+| Last run | `2026-10-29` |
 
 **Most active categories:**
 
 - 🔖 **Other ML**: `14` papers
-- 🎨 **Generative AI & Diffusion**: `2` papers
+- 🎨 **Generative AI & Diffusion**: `3` papers
+- 🤖 **LLMs & Language Models**: `2` papers
 - 🧠 **Reasoning & Agents**: `2` papers
-- 👁️ **Computer Vision**: `1` paper
-- 📊 **ML Theory & Optimization**: `1` paper
+- 🏥 **AI for Science & Healthcare**: `1` paper
 <!-- STATS_END -->
 
 ---
