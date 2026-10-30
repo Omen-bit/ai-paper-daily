@@ -9,7 +9,7 @@
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
-| 2026-10-26 | [🔥 🔀 VibeVideoBench: Evaluating Multimodal Agents on Code-Dr…](https://arxiv.org/abs/2610.35864) | Muxi Diao, Wenbin Xu *+22 more* | [arXiv](https://arxiv.org/abs/2610.35864) · [PDF](https://arxiv.org/pdf/2610.35864) |
+|  | [ VibeVideoBench: Evaluating Multimodal Agents on Code-Dr…](https://arxiv.org/abs/2610.35864) | Muxi Diao, Wenbin Xu *+2 more* | [arXiv](https://arxiv.org/abs/2610.35864) · [PDF](#) |
 |  | [ PDRVLA: A Vision-Language-Action Model with Physical Dy…](https://arxiv.org/abs/2610.37381) | Hanqing Wang, Zhaotian Cai *+2 more* | [arXiv](https://arxiv.org/abs/2610.37381) · [PDF](#) |
 |  | [ SliderEdit++: Improved Slider Trajectories in Instructi…](https://arxiv.org/abs/2610.14253) | Arman Zarei, Sayan Nag *+2 more* | [arXiv](https://arxiv.org/abs/2610.14253) · [PDF](#) |
 

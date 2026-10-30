@@ -5,10 +5,11 @@
 
 ---
 
-**Total papers:** 9
+**Total papers:** 10
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
+| 2026-10-20 | [⭐ 🔥 📖 💡 Your Benchmark Is an Empirical Measure Over Difficulty](https://arxiv.org/abs/2610.29927) | Yifan Sun, Naicheng Yu *+3 more* | [arXiv](https://arxiv.org/abs/2610.29927) · [PDF](https://arxiv.org/pdf/2610.29927) |
 |  | [ Hy-Nomas: Towards Free-form Interactive World Generatio…](https://arxiv.org/abs/2610.36729) | Qiaoling Chen, Jiaxiang Cheng *+2 more* | [arXiv](https://arxiv.org/abs/2610.36729) · [PDF](#) |
 |  | [ Novel or Not? PatEx-Gym: Agentic Prior-Art Search for N…](https://arxiv.org/abs/2610.33503) | Qiyao Wang, Xinyi Chen *+2 more* | [arXiv](https://arxiv.org/abs/2610.33503) · [PDF](#) |
 |  | [ Editing Images into Reusable Layers via Compositional E…](https://arxiv.org/abs/2610.24738) | Wen Xue, Yong Liu *+2 more* | [arXiv](https://arxiv.org/abs/2610.24738) · [PDF](#) |

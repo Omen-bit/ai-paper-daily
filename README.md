@@ -26,27 +26,27 @@
 ## 🔥 Today's Featured Papers
 
 <!-- TODAY_START -->
-### Thursday, October 29, 2026 · [2026-10-29](digests/2026-10-29.md)
+### Friday, October 30, 2026 · [2026-10-30](digests/2026-10-30.md)
 
-#### 1. [Can Test-Time Memory Evolution Outperform Test-Time Training for Scientific Discovery?](https://arxiv.org/abs/2610.32046)
-`⭐ Top Pick` `🔥 Trending on HF` `🏥 AI for Science & Healthcare` `🤖 LLMs & Language Models` `119 HF upvotes`
-
-> 💡 **Abstract highlight:**  
-> However, TTT introduces additional computational cost for online weight updates during the discovery process, making computational efficiency an important consideration when scaling to larger models.
-
-**Authors:** Yepeng Liu, Shengmai Chen, Xuandong Zhao et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.32046) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.32046) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.32046)  
-
-#### 2. [VibeVideoBench: Evaluating Multimodal Agents on Code-Driven Video Generation](https://arxiv.org/abs/2610.35864)
-`🔥 Trending on HF` `🔀 Interdisciplinary` `🎨 Generative AI & Diffusion` `🤖 LLMs & Language Models` `173 HF upvotes`
+#### 1. [Your Benchmark Is an Empirical Measure Over Difficulty](https://arxiv.org/abs/2610.29927)
+`⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML` `136 HF upvotes`
 
 > 💡 **Abstract highlight:**  
-> We introduce VibeVideoBench, a benchmark for evaluating agents on code-driven video generation.
+> In this work, we develop this measure-based view of benchmark evaluation.
 
-**Authors:** Muxi Diao, Wenbin Xu, Lele Yang et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.35864) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.35864) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.35864)  
+**Authors:** Yifan Sun, Naicheng Yu, Jiawen Gong et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.29927) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.29927) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.29927)  
 
-**[Read the full digest with abstracts](digests/2026-10-29.md)**
+#### 2. [Efficient Streaming Audio-Visual Target Speaker Extraction for Real-World Acoustic Scenes](https://arxiv.org/abs/2610.32749)
+`🔥 Trending on HF` `💡 Novel Method` `🤖 LLMs & Language Models` `152 HF upvotes`
+
+> 💡 **Abstract highlight:**  
+> Streaming audio-visual target speaker extraction (AVTSE) is essential for latency-sensitive applications.
+
+**Authors:** Wendi Sang, Kai Li, Yifan Li et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.32749) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.32749) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.32749)  
+
+**[Read the full digest with abstracts](digests/2026-10-30.md)**
 <!-- TODAY_END -->
 
 ---
@@ -70,6 +70,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
+| **2026-10-30** | `2` | Other ML | [Read digest](digests/2026-10-30.md) |
 | **2026-10-29** | `2` | LLMs & Language Models | [Read digest](digests/2026-10-29.md) |
 | **2026-10-28** | `2` | Generative AI & Diffusion | [Read digest](digests/2026-10-28.md) |
 | **2026-10-27** | `2` | Other ML | [Read digest](digests/2026-10-27.md) |
@@ -89,16 +90,16 @@ Explore past curated papers categorized by research subfield:
 <!-- STATS_START -->
 | Metric | Value |
 | :--- | :--- |
-| Papers curated | **20** |
-| Daily editions | **10** |
+| Papers curated | **22** |
+| Daily editions | **11** |
 | Tracking since | `2026-10-20` |
-| Last run | `2026-10-29` |
+| Last run | `2026-10-30` |
 
 **Most active categories:**
 
-- 🔖 **Other ML**: `14` papers
+- 🔖 **Other ML**: `15` papers
+- 🤖 **LLMs & Language Models**: `3` papers
 - 🎨 **Generative AI & Diffusion**: `3` papers
-- 🤖 **LLMs & Language Models**: `2` papers
 - 🧠 **Reasoning & Agents**: `2` papers
 - 🏥 **AI for Science & Healthcare**: `1` paper
 <!-- STATS_END -->

@@ -1,9 +1,10 @@
 {
-  "total_papers": 20,
-  "total_digests": 10,
+  "total_papers": 22,
+  "total_digests": 11,
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-29T07:25:00.873942+00:00",
+  "last_updated": "2026-10-30T07:27:44.003078+00:00",
   "papers_by_date": {
+    "2026-10-30": 2,
     "2026-10-29": 2,
     "2026-10-28": 2,
     "2026-10-27": 2,
@@ -16,47 +17,34 @@
     "2026-10-20": 2
   },
   "papers_by_category": {
+    "other-ml": 15,
+    "llms": 3,
     "ai-science": 1,
-    "llms": 2,
     "generative-ai": 3,
     "multimodal": 1,
     "computer-vision": 1,
     "reasoning-agents": 2,
-    "other-ml": 14,
     "ml-theory": 1
   },
   "top_authors": {
+    "Yifan Sun": 1,
+    "Naicheng Yu": 1,
+    "Jiawen Gong": 1,
+    "Jingyan Shen": 1,
+    "Huan Zhang": 1,
+    "Wendi Sang": 1,
+    "Kai Li": 1,
+    "Yifan Li": 1,
+    "Jianqiang Huang": 1,
+    "Xiaolin Hu": 1,
     "Yepeng Liu": 1,
     "Shengmai Chen": 1,
     "Xuandong Zhao": 1,
     "Chengzhi Liu": 1,
-    "Dawn Song": 1,
-    "Xin Eric Wang": 1,
-    "Yuheng Bu": 1,
     "Muxi Diao": 1,
     "Wenbin Xu": 1,
     "Lele Yang": 1,
     "Xuyang Ma": 1,
-    "Yuzhe Chen": 1,
-    "Jiankang Chen": 1,
-    "Kaiyu Jiang": 1,
-    "Changyi Liu": 1,
-    "Haoyu Zhang": 1,
-    "Hongyi Fu": 1,
-    "Jianxiong Wang": 1,
-    "Tianke Zhang": 1,
-    "Haonan Fan": 1,
-    "Yingxin Li": 1,
-    "Bingyi Li": 1,
-    "Xu Wang": 1,
-    "Xuanyu Zheng": 1,
-    "Bin Wen": 1,
-    "Tingting Gao": 1,
-    "Han Li": 2,
-    "Wentao Zhang": 1,
-    "Weiran Xu": 1,
-    "Kongming Liang": 1,
-    "Zhanyu Ma": 1,
     "Hanqing Wang": 1,
     "Zhaotian Cai": 1,
     "Ruichuan An": 1,
@@ -86,6 +74,7 @@
     "Zecong Tang": 3,
     "Zhiheng Liu": 3,
     "Letian Zhu": 1,
+    "Han Li": 1,
     "Yifan Yao": 1,
     "Xinping Lei": 1,
     "Zhanshuo Cao": 1,
@@ -109,6 +98,21 @@
     "Luyang Niu": 1
   },
   "top_keywords": {
+    "your": 1,
+    "benchmark": 1,
+    "empirical": 1,
+    "measure": 1,
+    "over": 1,
+    "difficulty": 1,
+    "efficient": 1,
+    "streaming": 1,
+    "audio-visual": 1,
+    "target": 1,
+    "speaker": 1,
+    "extraction": 1,
+    "real-world": 1,
+    "acoustic": 1,
+    "scenes": 1,
     "test-time": 2,
     "memory": 1,
     "evolution": 1,
@@ -205,6 +209,79 @@
   },
   "digests": [
     {
+      "date": "2026-10-30",
+      "paper_count": 2,
+      "top_category": "Other ML",
+      "categories_covered": [
+        "other-ml",
+        "llms"
+      ],
+      "papers": [
+        {
+          "id": "2610.29927",
+          "title": "Your Benchmark Is an Empirical Measure Over Difficulty",
+          "authors": [
+            "Yifan Sun",
+            "Naicheng Yu",
+            "Jiawen Gong",
+            "Jingyan Shen",
+            "Huan Zhang"
+          ],
+          "categories": [
+            "other-ml"
+          ],
+          "badges": [
+            [
+              "⭐",
+              "Top Pick"
+            ],
+            [
+              "🔥",
+              "Trending on HF"
+            ],
+            [
+              "📖",
+              "Survey / Review"
+            ],
+            [
+              "💡",
+              "Novel Method"
+            ]
+          ],
+          "url": "https://arxiv.org/abs/2610.29927",
+          "pdf_url": "https://arxiv.org/pdf/2610.29927",
+          "submitted": "2026-10-20"
+        },
+        {
+          "id": "2610.32749",
+          "title": "Efficient Streaming Audio-Visual Target Speaker Extraction for Real-World Acoustic Scenes",
+          "authors": [
+            "Wendi Sang",
+            "Kai Li",
+            "Yifan Li",
+            "Jianqiang Huang",
+            "Xiaolin Hu"
+          ],
+          "categories": [
+            "llms"
+          ],
+          "badges": [
+            [
+              "🔥",
+              "Trending on HF"
+            ],
+            [
+              "💡",
+              "Novel Method"
+            ]
+          ],
+          "url": "https://arxiv.org/abs/2610.32749",
+          "pdf_url": "https://arxiv.org/pdf/2610.32749",
+          "submitted": "2026-10-22"
+        }
+      ]
+    },
+    {
       "date": "2026-10-29",
       "paper_count": 2,
       "top_category": "LLMs & Language Models",
@@ -218,84 +295,33 @@
         {
           "id": "2610.32046",
           "title": "Can Test-Time Memory Evolution Outperform Test-Time Training for Scientific Discovery?",
+          "url": "https://arxiv.org/abs/2610.32046",
           "authors": [
             "Yepeng Liu",
             "Shengmai Chen",
             "Xuandong Zhao",
-            "Chengzhi Liu",
-            "Dawn Song",
-            "Xin Eric Wang",
-            "Yuheng Bu"
+            "Chengzhi Liu"
           ],
           "categories": [
-            "ai-science",
-            "llms"
-          ],
-          "badges": [
-            [
-              "⭐",
-              "Top Pick"
-            ],
-            [
-              "🔥",
-              "Trending on HF"
-            ],
-            [
-              "💡",
-              "Novel Method"
-            ]
-          ],
-          "url": "https://arxiv.org/abs/2610.32046",
-          "pdf_url": "https://arxiv.org/pdf/2610.32046",
-          "submitted": "2026-10-22"
+            "llms",
+            "ai-science"
+          ]
         },
         {
           "id": "2610.35864",
           "title": "VibeVideoBench: Evaluating Multimodal Agents on Code-Driven Video Generation",
+          "url": "https://arxiv.org/abs/2610.35864",
           "authors": [
             "Muxi Diao",
             "Wenbin Xu",
             "Lele Yang",
-            "Xuyang Ma",
-            "Yuzhe Chen",
-            "Jiankang Chen",
-            "Kaiyu Jiang",
-            "Changyi Liu",
-            "Haoyu Zhang",
-            "Hongyi Fu",
-            "Jianxiong Wang",
-            "Tianke Zhang",
-            "Haonan Fan",
-            "Yingxin Li",
-            "Bingyi Li",
-            "Xu Wang",
-            "Xuanyu Zheng",
-            "Bin Wen",
-            "Tingting Gao",
-            "Han Li",
-            "Wentao Zhang",
-            "Weiran Xu",
-            "Kongming Liang",
-            "Zhanyu Ma"
+            "Xuyang Ma"
           ],
           "categories": [
-            "generative-ai",
             "llms",
+            "generative-ai",
             "multimodal"
-          ],
-          "badges": [
-            [
-              "🔥",
-              "Trending on HF"
-            ],
-            [
-              "🔀",
-              "Interdisciplinary"
-            ]
-          ],
-          "url": "https://arxiv.org/abs/2610.35864",
-          "pdf_url": "https://arxiv.org/pdf/2610.35864",
-          "submitted": "2026-10-26"
+          ]
         }
       ]
     },
