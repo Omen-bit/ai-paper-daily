@@ -8,7 +8,7 @@
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 import { db, guard, json, sameSecret, underLimit } from "../_shared/http.ts";
 import { groq, hasGroq } from "../_shared/groq.ts";
-import { ASK_PROMPT, askInput, cleanQuestion, parseAnswer } from "../_shared/ask.ts";
+import { ASK_PROMPT, askInput, cleanQuestion, DETAILS_HEADING, paperDetails, parseAnswer } from "../_shared/ask.ts";
 import {
   FULL_PROMPT, fullInput, htmlUrl, type Passage, parseArxivHtml, parseFullAnswer, searchText, toPassages, usable,
 } from "../_shared/fulltext.ts";
@@ -81,11 +81,12 @@ Deno.serve(async (req) => {
     return json(req, { error: "You've asked a lot in the last hour. Try again in a little while." }, 429);
   }
 
-  const { data: paper, error } = await db.from("papers").select("title, abstract").eq("id", id).maybeSingle();
+  const { data: paper, error } = await db.from("papers").select("title, abstract, authors, submitted").eq("id", id).maybeSingle();
   if (error || !paper || !paper.abstract) {
     return json(req, { error: "This paper isn't in our database yet. Try again tomorrow." }, 404);
   }
   const previous = body.previous && typeof body.previous === "object" ? body.previous : undefined;
+  const details = paperDetails(paper);
 
   // 1. From the full paper, when we can read it
   if ((await ensureFullText(id)) === "ready") {
@@ -96,6 +97,7 @@ Deno.serve(async (req) => {
     if (hits && hits.length) {
       const passages: Passage[] = [
         { heading: "Abstract", body: paper.abstract },
+        { heading: DETAILS_HEADING, body: details || "No author or date details." },
         ...(hits as Passage[]).map((h) => ({ heading: h.heading, body: h.body })),
       ];
       const answer = parseFullAnswer(await groq(FULL_PROMPT, fullInput(paper.title, passages, question, previous), 500, 0.1, 30000), passages);
@@ -104,7 +106,9 @@ Deno.serve(async (req) => {
   }
 
   // 2. From the abstract only
-  const answer = parseAnswer(await groq(ASK_PROMPT, askInput(paper.title, paper.abstract, question, previous), 400, 0.1, 30000), paper.abstract);
+  const raw = await groq(ASK_PROMPT, askInput(paper.title, paper.abstract, question, previous, details), 400, 0.1, 30000);
+  const answer = parseAnswer(raw, `${details}\n${paper.abstract}`);
   if (!answer) return json(req, { error: "Couldn't answer that right now. Try asking it another way." }, 502);
-  return json(req, { ...answer, section: answer.quote ? "Abstract" : null, mode: "abstract" });
+  const section = !answer.quote ? null : details.includes(answer.quote) ? DETAILS_HEADING : "Abstract";
+  return json(req, { ...answer, section, mode: "abstract" });
 });

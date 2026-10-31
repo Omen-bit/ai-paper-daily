@@ -119,7 +119,7 @@ export function usable(passages: Passage[]): boolean {
 // ---------------------------------------------------------------------------
 
 export const FULL_PROMPT = `You answer questions about one AI research paper for a developer.
-You get the paper's title, its abstract as passage 0, and numbered passages from the full paper.
+You get the paper's title, its abstract as passage 0, a note on who wrote it and when as passage 1, and numbered passages from the full paper.
 Return one JSON object: {"answerable": true or false, "answer": "...", "passage": number, "quote": "..."}
 "answer": plain words, at most 90 words. Explain jargon briefly. Use only facts, numbers and names found in the passages.
 "passage": the number of the passage that best supports the answer.

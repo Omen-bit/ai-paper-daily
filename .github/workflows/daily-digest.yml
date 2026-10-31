@@ -1,122 +1,82 @@
-name: 🧠 Daily AI Paper Digest
+name: Daily edition
 
+# Every morning: fetch and pick the papers, write their notes, sync the database,
+# then build the website and publish it to GitHub Pages.
 on:
   schedule:
-    # Runs every day at 01:30 UTC = 07:00 AM IST (morning India Standard Time)
-    # arXiv publishes daily submissions at 00:00 UTC (05:30 AM IST)
-    # This guarantees fresh papers and perfect UTC+IST calendar day alignment
-    - cron: "30 1 * * *"
-
-  # Allows manual trigger from the GitHub Actions UI anytime
+    - cron: "30 1 * * *" # 01:30 UTC = 07:00 IST, after arXiv's daily release
   workflow_dispatch:
 
+concurrency:
+  group: daily-edition
+  cancel-in-progress: false
+
 jobs:
-  generate-digest:
-    name: Fetch, Classify & Commit Daily Digest
+  edition:
+    name: Build today's edition
     runs-on: ubuntu-latest
     env:
       TZ: "Asia/Kolkata"
-
     permissions:
-      contents: write # Required to push commits
-      pages: write # Required to publish the website
-      id-token: write # Required by actions/deploy-pages
-
+      contents: write # commit data/
+      pages: write # publish the website
+      id-token: write # required by actions/deploy-pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # -- 1. Checkout the repository --------------------------------------
-      - name: 📥 Checkout repository
+      - name: Check out
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Full history needed for accurate git log
 
-      # -- 2. Set up Python -------------------------------------------------
-      - name: 🐍 Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
 
-      # -- 3. Install dependencies ------------------------------------------
-      - name: 📦 Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      # -- 4. Run the main pipeline -----------------------------------------
-      - name: 🚀 Run AI Paper Daily pipeline
+      - name: Pick today's papers
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODELS: ${{ vars.GROQ_MODELS }}
         run: python src/main.py
 
-      # -- 4a. Send the day's papers to Supabase for search (never fails the run)
-      - name: 🔎 Sync papers to Supabase
-        continue-on-error: true
+      - name: Sync to Supabase
+        continue-on-error: true # the site still builds if Supabase is down
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           SYNC_SECRET: ${{ secrets.SYNC_SECRET }}
         run: python src/supabase_sync.py
 
-      # -- 4b. Build the website from data/ ---------------------------------
-      - name: 🌐 Build website
+      - name: Build the website
         run: python src/site_builder.py
 
-      # -- 5. Always write a last-run timestamp (guarantees a commit exists) --
-      - name: 🕐 Write last-run timestamp
+      - name: Commit the day's data
         run: |
-          mkdir -p stats
-          DATE=$(date +'%Y-%m-%d')
-          TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          echo "last_run=${TIMESTAMP}" > stats/last_run.txt
-          echo "last_date=${DATE}" >> stats/last_run.txt
-          echo "✅ Timestamp written: ${TIMESTAMP} (${DATE})"
-
-      # -- 6. Commit & push all changes --------------------------------------
-      - name: 📤 Commit and push changes
-        run: |
-          git config --global user.name "Omen-bit"
-          git config --global user.email "darshanchougule821@gmail.com"
-
-          git add -A
-
-          DATE=$(date +'%Y-%m-%d')
-
-          # Always commit — even if only the timestamp changed
+          git config user.name "Omen-bit"
+          git config user.email "darshanchougule821@gmail.com"
+          git add data
           if git diff --staged --quiet; then
-            echo "ℹ️ No file changes detected — forcing timestamp commit for heatmap."
-            TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-            echo "last_run=${TIMESTAMP}" > stats/last_run.txt
-            echo "last_date=${DATE}" >> stats/last_run.txt
-            git add stats/last_run.txt
+            echo "No new data today."
+            exit 0
           fi
-
-          git commit -m "📄 Daily digest: ${DATE} - AI Paper Daily"
-
-          # Securely rebase on latest upstream to prevent race conditions
-          MAX_RETRIES=3
-          COUNT=0
-          until git push origin main; do
-            COUNT=$((COUNT + 1))
-            if [ $COUNT -ge $MAX_RETRIES ]; then
-              echo "❌ Push failed after $MAX_RETRIES attempts."
-              exit 1
-            fi
-            echo "⚠️ Upstream changes detected. Pulling with rebase and retrying ($COUNT/$MAX_RETRIES)..."
-            git pull --rebase origin main
-            sleep 2
+          git commit -m "data: edition for $(date +'%Y-%m-%d')"
+          for attempt in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push origin main && exit 0
+            echo "Push failed, retrying ($attempt/3)..."
+            sleep 5
           done
-          echo "✅ Changes pushed successfully."
+          exit 1
 
-      # -- 7. Publish the website to GitHub Pages ---------------------------
-      - name: 📦 Upload website
+      - name: Upload the website
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
-      - name: 🚀 Deploy to GitHub Pages
+      - name: Publish to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

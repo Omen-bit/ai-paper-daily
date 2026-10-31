@@ -20,7 +20,7 @@ SCHEMA_VERSION = 1
 
 
 def _category_slugs(categories: list) -> list[str]:
-    """Categories arrive as classifier dicts or as bare slugs (from stats.json)."""
+    """Categories arrive as classifier dicts or as bare slugs (from older records)."""
     return [c["slug"] if isinstance(c, dict) else c for c in categories or []]
 
 
@@ -100,34 +100,14 @@ def save_day(all_papers: list[dict], selected: list[dict], date_str: str,
     return path
 
 
-def backfill_from_stats(stats: dict, data_dir: str = DATA_DIR) -> int:
-    """
-    Create daily files for past digests that predate the paper store.
-    Only the featured papers are known for those days. Existing files are kept.
-    """
-    created = 0
-    for digest in stats.get("digests", []):
-        date_str = digest.get("date")
-        papers = digest.get("papers", [])
-        if not date_str or not papers:
-            continue
-        path = os.path.join(data_dir, "daily", f"{date_str}.json")
-        if os.path.exists(path):
-            continue
-        records = [to_record(p, date_str, True) for p in papers if p.get("id")]
-        _write_json(path, {
-            "schema_version": SCHEMA_VERSION,
-            "date": date_str,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-            "featured": [r["id"] for r in records],
-            "papers": records,
-            "backfilled": True,
-        })
-        created += 1
-    if created:
-        rebuild_index(data_dir)
-        print(f"  [store] Backfilled {created} past days from stats.json")
-    return created
+def recent_featured(days: int = 7, data_dir: str = DATA_DIR) -> set[str]:
+    """Ids of the papers featured in the last few editions, so they aren't picked again."""
+    path = os.path.join(data_dir, "index.json")
+    if not os.path.exists(path):
+        return set()
+    with open(path, encoding="utf-8") as f:
+        index = json.load(f)
+    return {pid for day in index.get("days", [])[:days] for pid in day.get("featured", [])}
 
 
 def rebuild_index(data_dir: str = DATA_DIR) -> dict:

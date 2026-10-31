@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     if (candidates.length) {
       const ids = candidates.map((c) => c.id);
       const { data: rows } = await db.from("papers").select("id, abstract").in("id", ids);
-      const abstracts = new Map((rows ?? []).map((r: { id: string; abstract: string }) => [r.id, r.abstract]));
+      const abstracts = new Map<string, string>((rows ?? []).map((r: { id: string; abstract: string }) => [r.id, r.abstract] as [string, string]));
       const notes = await fullTextNotes(ids);
       candidates.forEach((c) => {
         c.abstract = abstracts.get(c.id) ?? "";

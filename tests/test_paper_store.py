@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from paper_store import to_record, save_day, backfill_from_stats, rebuild_index
+from paper_store import to_record, save_day, recent_featured, rebuild_index
 
 
 def _paper(pid, score=10.0, **extra):
@@ -64,17 +64,13 @@ def test_save_day_orders_featured_first_then_score(tmp_path):
     assert latest["date"] == "2026-10-31"
 
 
-def test_backfill_creates_missing_days_only(tmp_path):
-    stats = {"digests": [
-        {"date": "2026-10-30", "papers": [{"id": "x1", "title": "X", "categories": ["llms"],
-                                            "badges": [["⭐", "Top Pick"]]}]},
-        {"date": "2026-10-29", "papers": []},  # placeholder day, skipped
-    ]}
-    assert backfill_from_stats(stats, data_dir=str(tmp_path)) == 1
-    assert backfill_from_stats(stats, data_dir=str(tmp_path)) == 0  # idempotent
-    day = json.loads((tmp_path / "daily" / "2026-10-30.json").read_text(encoding="utf-8"))
-    assert day["backfilled"] is True
-    assert day["papers"][0]["badges"] == ["Top Pick"]
+def test_recent_featured_reads_the_last_editions(tmp_path):
+    assert recent_featured(data_dir=str(tmp_path)) == set()
+    for i, day in enumerate(["2026-10-29", "2026-10-30", "2026-10-31"]):
+        p = {"id": f"2610.{i}", "title": "T", "abstract": "A", "categories": ["llms"], "score": 1.0}
+        save_day([p], [p], day, data_dir=str(tmp_path))
+    assert recent_featured(days=2, data_dir=str(tmp_path)) == {"2610.2", "2610.1"}
+    assert recent_featured(data_dir=str(tmp_path)) == {"2610.0", "2610.1", "2610.2"}
 
 
 def test_index_counts_unique_papers_newest_first(tmp_path):

@@ -1,268 +1,243 @@
-# 🧠 AI Papers Daily
-
 <div align="center">
 
-**The best new AI paper each day, plus the one everyone is reading, explained so you can build with it.**
+<a href="https://omen-bit.github.io/ai-paper-daily/">
+  <img src="docs/logo.svg" alt="AI Papers Daily logo" width="72" height="72">
+</a>
 
-### [Open the site →](https://omen-bit.github.io/ai-paper-daily/)
+<h1>AI Papers Daily</h1>
 
-[![Daily Digest](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml)
-[![Supabase functions](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/supabase-functions.yml/badge.svg)](https://github.com/Omen-bit/ai-paper-daily/actions/workflows/supabase-functions.yml)
-![Papers Tracked](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_papers&label=Papers%20Curated&color=7c3aed)
-![Digests](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/Omen-bit/ai-paper-daily/main/stats/stats.json&query=$.total_digests&label=Daily%20Editions&color=10b981)
-![Schedule](https://img.shields.io/badge/new%20edition-07%3A00%20IST%20%2F%2001%3A30%20UTC-orange)
-![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
-![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+<p><strong>The best new AI paper each day, plus the one everyone is reading,<br>explained so you can build with it.</strong></p>
 
-[**What's inside**](#-whats-inside) &nbsp;•&nbsp;
-[**Today's picks**](#-todays-featured-papers) &nbsp;•&nbsp;
-[**Archive**](#-digest-archive) &nbsp;•&nbsp;
-[**How it works**](#-how-it-works) &nbsp;•&nbsp;
-[**Run your own**](#-run-your-own) &nbsp;•&nbsp;
-[**Repository layout**](#-repository-layout)
+<p>
+  <a href="https://omen-bit.github.io/ai-paper-daily/"><img src="https://img.shields.io/badge/live%20site-omen--bit.github.io-ff4f00?style=flat-square" alt="Live site"></a>
+  <a href="https://github.com/Omen-bit/ai-paper-daily/actions/workflows/daily-digest.yml"><img src="https://img.shields.io/github/actions/workflow/status/Omen-bit/ai-paper-daily/daily-digest.yml?branch=main&label=daily%20edition&style=flat-square" alt="Daily edition"></a>
+  <a href="https://github.com/Omen-bit/ai-paper-daily/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Omen-bit/ai-paper-daily/tests.yml?branch=main&label=tests&style=flat-square" alt="Tests"></a>
+  <a href="https://github.com/Omen-bit/ai-paper-daily/actions/workflows/supabase-functions.yml"><img src="https://img.shields.io/github/actions/workflow/status/Omen-bit/ai-paper-daily/supabase-functions.yml?branch=main&label=functions&style=flat-square" alt="Supabase functions"></a>
+  <img src="https://img.shields.io/badge/python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python 3.11+">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license"></a>
+</p>
 
-<img src="docs/screenshots/home.png" alt="The AI Papers Daily home page with today's pick and the trending paper" width="860">
+<p>
+  <a href="https://omen-bit.github.io/ai-paper-daily/"><strong>Open the site</strong></a>
+  &nbsp;&middot;&nbsp;
+  <a href="#features">Features</a>
+  &nbsp;&middot;&nbsp;
+  <a href="#how-it-works">How it works</a>
+  &nbsp;&middot;&nbsp;
+  <a href="#run-it-yourself">Run it yourself</a>
+</p>
 
----
+<br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
+  <img src="docs/screenshots/home.png" alt="The AI Papers Daily home page with today's pick and the trending paper" width="900">
+</picture>
 
 </div>
 
-Every morning the pipeline reads everything new on arXiv and Hugging Face Daily Papers, scores it, and publishes a small edition: **one top pick** chosen by our score and **one trending paper** the community is upvoting (or, once enough people read on the site, the **most read** paper of the week). Each pick gets plain-language notes: what's new, the key result, why it matters, and what you'd need to try it.
+<br>
 
-Around those daily picks sits a database of about a year of AI papers (8,000+), searchable by meaning.
+## About
 
-## ✨ What's inside
+Hundreds of AI papers land on arXiv every day. Most people never get past the titles.
 
-| | Feature | What it does |
-| :---: | :--- | :--- |
-| ⭐ | **Today's picks** | The best new paper by our score, plus the trending or most-read one. Notes in three depths: 10 seconds, 1 minute, and "build with it". |
-| 💬 | **Ask this paper** | Ask a question beside the text and get an answer from the full paper, with the section and sentence it relies on. The first question on a paper reads it from arXiv (a few seconds); after that answers are instant. Select any sentence and press **Ask** to ask about it. |
-| 🧭 | **Project Scout** | Describe what you want to build in plain words. Scout searches the whole database from several angles and returns a short reading plan: start here, build on these, read later. |
-| 🎯 | **For you** | Recommendations from the papers you opened, worked out in your browser. No account needed. |
-| 📈 | **Trends** | A year of AI research in charts: topic share by month, rising and falling topics, words on the rise, how much research ships code, and how your reading compares with the field. |
-| 🔎 | **Search by meaning** | Search all papers by idea, not just keywords ("run a model on a phone" finds quantization papers). |
-| 🔖 | **Reading tools** | Save papers, highlight and take notes, cite in BibTeX, focus mode, reading streaks. All stored in your browser. |
+AI Papers Daily reads all of them every morning and publishes a small edition: **one top pick** chosen by a scoring model, and **one trending paper** the community is upvoting on Hugging Face. Each pick comes with plain-language notes at three depths, from a ten-second summary to what you would need to build with it.
+
+Behind the daily picks sits a searchable library of about a year of AI research, more than 8,000 papers, that you can search by meaning, question directly, and plan projects from.
+
+> [!NOTE]
+> Notes and answers are generated from the papers by a language model. Check the paper itself before relying on a claim.
+
+## Features
 
 <table>
-<tr>
-<td width="62%"><img src="docs/screenshots/paper.png" alt="A paper page with notes in three depths and the Ask this paper panel beside the text"></td>
-<td width="38%"><img src="docs/screenshots/mobile.png" alt="The home page on a phone"></td>
-</tr>
-<tr>
-<td colspan="2"><img src="docs/screenshots/scout.png" alt="Project Scout: describe a project and get a reading plan"></td>
-</tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Today's picks</h3>
+      The best new paper by score, plus the trending or most-read one. Notes in three depths: ten seconds, one minute, and "build with it". Each card shows when the paper actually came out.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Ask this paper</h3>
+      Ask a question beside the text and get an answer from the full paper, with the section and the exact sentence it relies on. Select any sentence and press <b>Ask</b> to ask about it.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>Project Scout</h3>
+      Describe what you want to build in plain words. Scout searches the library from several angles and returns an honest reading plan: start here, build on these, go further.
+    </td>
+    <td valign="top">
+      <h3>Trends</h3>
+      A year of AI research in charts: the technologies to watch, topic share month by month, momentum by topic, words on the rise, and how your reading compares with the field.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>Search by meaning</h3>
+      Search by idea, not keyword. "Run a model on a phone" finds quantization and distillation papers even when they never use those words.
+    </td>
+    <td valign="top">
+      <h3>For you and reading tools</h3>
+      Recommendations from what you have opened, plus saves, highlights, notes, BibTeX citations and reading streaks. Everything stays in your browser, with no account.
+    </td>
+  </tr>
 </table>
 
-> The papers, notes and answers are generated from public abstracts. Always check the paper itself before relying on a claim.
+<table>
+  <tr>
+    <td width="72%"><img src="docs/screenshots/paper.png" alt="A paper page with reading progress, notes and the Ask this paper button"></td>
+    <td width="28%"><img src="docs/screenshots/mobile.png" alt="The home page on a phone"></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/screenshots/scout.png" alt="Project Scout: describe a project and get a reading plan"></td>
+  </tr>
+</table>
 
----
+## How it works
 
-## 🔥 Today's Featured Papers
-
-<!-- TODAY_START -->
-### Saturday, October 31, 2026 · [2026-10-31](digests/2026-10-31.md)
-
-#### 1. [Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs](https://arxiv.org/abs/2610.36671)
-`⭐ Top Pick` `🔥 Trending on HF` `🌐 Multimodal AI` `🤖 LLMs & Language Models` `97 HF upvotes`
-
-> 💡 **Why It Matters:**  
-> Efficiently utilizing visual information in Diffusion VLMs.
-
-**Authors:** Donghyeon Cho, Joowon Kim, Seungho Shin et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.36671) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.36671) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.36671)  
-
-#### 2. [Intrinsic Distribution Matching](https://arxiv.org/abs/2610.39633)
-`🔥 Trending` `🔥 Trending on HF` `🎨 Generative AI & Diffusion` `📱 Efficient AI & Edge` `243 HF upvotes`
-
-> 💡 **Why It Matters:**  
-> Helps builders improve text-to-image generation quality.
-
-**Authors:** Deyuan Liu, Yansen Han, Kaiwen Zheng et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.39633) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.39633) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.39633)  
-
-**[Read the full digest with abstracts](digests/2026-10-31.md)**
-<!-- TODAY_END -->
-
----
-
-## 🏷️ Browse by Category
-
-Explore past curated papers categorized by research subfield:
-
-| Models & Architecture | Applied Intelligence | Theory & Systems |
-| :--- | :--- | :--- |
-| [🤖 **LLMs & Language Models**](categories/llms.md) | [🧠 **Reasoning & Agents**](categories/reasoning-agents.md) | [📊 **ML Theory & Scaling**](categories/ml-theory.md) |
-| [🎨 **Generative AI & Diffusion**](categories/generative-ai.md) | [🤝 **RLHF & Alignment**](categories/alignment.md) | [📱 **Efficient AI & Quantization**](categories/efficient-ai.md) |
-| [👁️ **Computer Vision**](categories/computer-vision.md) | [💻 **Code & Software AI**](categories/code-ai.md) | [🔒 **AI Safety & Privacy**](categories/safety-privacy.md) |
-| [🌐 **Multimodal AI**](categories/multimodal.md) | [🏥 **AI for Science & Health**](categories/ai-science.md) | [🎵 **Audio & Speech**](categories/audio-speech.md) |
-| [🔖 **Other ML**](categories/other-ml.md) | | |
-
----
-
-## 📁 Digest Archive
-
-<!-- ARCHIVE_START -->
-| Date | Papers | Top Category | Digest |
-| :--- | :---: | :--- | :--- |
-| **2026-10-31** | `2` | Multimodal AI | [Read digest](digests/2026-10-31.md) |
-| **2026-10-30** | `2` | Other ML | [Read digest](digests/2026-10-30.md) |
-| **2026-10-29** | `2` | LLMs & Language Models | [Read digest](digests/2026-10-29.md) |
-| **2026-10-28** | `2` | Generative AI & Diffusion | [Read digest](digests/2026-10-28.md) |
-| **2026-10-27** | `2` | Other ML | [Read digest](digests/2026-10-27.md) |
-| **2026-10-26** | `2` | Other ML | [Read digest](digests/2026-10-26.md) |
-| **2026-10-25** | `2` | Other ML | [Read digest](digests/2026-10-25.md) |
-| **2026-10-24** | `2` | Other ML | [Read digest](digests/2026-10-24.md) |
-| **2026-10-23** | `2` | Other ML | [Read digest](digests/2026-10-23.md) |
-| **2026-10-22** | `2` | Other ML | [Read digest](digests/2026-10-22.md) |
-| **2026-10-21** | `2` | Other ML | [Read digest](digests/2026-10-21.md) |
-| **2026-10-20** | `2` | Reasoning & Agents | [Read digest](digests/2026-10-20.md) |
-<!-- ARCHIVE_END -->
-
----
-
-## 📊 Analytics & Coverage
-
-<!-- STATS_START -->
-| Metric | Value |
-| :--- | :--- |
-| Papers curated | **24** |
-| Daily editions | **12** |
-| Tracking since | `2026-10-20` |
-| Last run | `2026-10-31` |
-
-**Most active categories:**
-
-- 🔖 **Other ML**: `15` papers
-- 🤖 **LLMs & Language Models**: `4` papers
-- 🎨 **Generative AI & Diffusion**: `4` papers
-- 🌐 **Multimodal AI**: `2` papers
-- 👁️ **Computer Vision**: `2` papers
-<!-- STATS_END -->
-
----
-
-## 🛠️ How it works
-
-Every morning at **01:30 UTC (07:00 AM IST)**, GitHub Actions runs the daily pipeline and publishes the site to GitHub Pages:
+Every morning at 01:30 UTC (07:00 IST) a GitHub Actions workflow builds the day's edition and publishes the site to GitHub Pages.
 
 ```mermaid
 flowchart LR
-    A["arXiv API<br/>ML categories"] --> C["Classifier<br/>13 research topics"]
+    A["arXiv<br/>ML categories"] --> C["Classify<br/>13 research topics"]
     B["Hugging Face<br/>Daily Papers"] --> C
-    C --> D["Scorer<br/>today's pick + trending"]
-    D --> E["Curator<br/>Groq LLM notes"]
+    C --> D["Score<br/>top pick + trending"]
+    D --> E["Write notes<br/>Groq"]
     E --> F[("data/<br/>daily JSON")]
-    F --> G["Supabase sync<br/>upload + embed"]
+    F --> G["Sync + embed"]
     G --> H[("Supabase<br/>Postgres + pgvector")]
-    H --> I["Export<br/>year of papers, most read"]
-    F --> J["Site builder"]
-    I --> J
+    F --> J["Build site"]
+    H --> J
     J --> K["GitHub Pages"]
-    F --> L["README, digests,<br/>categories, stats"]
 ```
 
-The live features run as **Supabase Edge Functions**, called straight from the static site:
+The site itself is static. Its live features call **Supabase Edge Functions** directly from the browser:
 
-| Function | Used by | What it does |
-| :--- | :--- | :--- |
-| `embed` | Daily sync | Turns each paper into a vector with `gte-small` |
-| `search` | Search box, All papers | Finds papers by meaning |
-| `recommend` | For you | Finds papers close to what you've read |
-| `scout` | Project Scout | Plans searches with Groq, matches papers, orders them into a reading plan |
-| `ask` | Ask this paper | Reads the full paper from arXiv's HTML version the first time, saves it in sections, then answers from the best-matching sections and quotes the sentence it used |
+| Function | Powers | What it does |
+| :-- | :-- | :-- |
+| `search` | Search, All papers | Finds papers by meaning with vector search |
+| `recommend` | For you | Finds papers close to the ones you have read |
+| `scout` | Project Scout | Plans several searches with an LLM, matches papers and orders them into a reading plan |
+| `ask` | Ask this paper | Reads the full paper from arXiv once, stores it in sections, then answers from the best-matching sections and quotes its source |
 | `track` | Most read | Counts anonymous views and "worth it" votes |
+| `embed` | Daily sync | Turns each paper into a `gte-small` vector (pipeline only) |
 
-Every public function has a per-visitor hourly limit, and `embed` only accepts the pipeline's `SYNC_SECRET`. If Groq is unavailable, Scout falls back to plain search; Ask needs Groq. Saved full texts nobody has asked about for 30 days are removed by the daily run, and today's picks are read in advance.
+<details>
+<summary><strong>How papers are ranked</strong></summary>
+<br>
 
-### Ranking signals
-- **Community momentum:** Hugging Face upvotes. The most-upvoted paper of the day becomes **Trending**.
-- **Novelty:** title and abstract markers (*novel, introduce, state of the art*).
-- **Cross-over:** papers that span several research topics.
-- **Builder value:** released code, surveys, benchmarks and position papers.
-- **Readers:** once the site has enough views, the week's **most read** paper is shown next to the pick.
+- **Community momentum.** Hugging Face upvotes. The most upvoted paper of the day becomes Trending.
+- **Novelty.** Signals in the title and abstract that the paper introduces something new.
+- **Cross-over.** Papers that span several research topics.
+- **Builder value.** Released code, benchmarks, surveys and position papers.
+- **Readers.** Once the site has enough views, the week's most read paper takes the second slot.
 
----
+Papers featured in the last seven editions are not picked again.
+</details>
 
-## 🚀 Run your own
+<details>
+<summary><strong>Limits and safety</strong></summary>
+<br>
 
-1. **Fork the repo** and enable GitHub Pages with *Source: GitHub Actions*.
-2. **Get a free [Groq](https://console.groq.com) API key** for the Curator notes.
-3. **Create a [Supabase](https://supabase.com) project** and run `supabase/schema.sql` in its SQL editor. Running it again later is safe.
-4. **Add these GitHub secrets** (Settings → Secrets and variables → Actions):
+- Every public function has a per-visitor hourly limit.
+- `embed` only accepts calls carrying the pipeline's `SYNC_SECRET`.
+- If the LLM is unavailable, Scout falls back to plain search.
+- Stored full texts that nobody has asked about for 30 days are removed by the daily run.
+</details>
+
+## Tech stack
+
+| Layer | Built with |
+| :-- | :-- |
+| Pipeline | Python 3.11, arXiv API, Hugging Face Daily Papers |
+| Language model | [Groq](https://groq.com) running `gpt-oss-120b`, with `gpt-oss-20b` as fallback |
+| Database and search | [Supabase](https://supabase.com) Postgres, pgvector, Edge Functions (Deno, TypeScript) |
+| Website | Static HTML, CSS and vanilla JavaScript, hand-drawn SVG charts |
+| Hosting and automation | GitHub Pages, GitHub Actions |
+
+## Run it yourself
+
+<details>
+<summary><strong>Deploy your own copy</strong></summary>
+<br>
+
+1. Fork the repository and set GitHub Pages to **Source: GitHub Actions**.
+2. Get a free API key from the [Groq console](https://console.groq.com).
+3. Create a [Supabase](https://supabase.com) project and run `supabase/schema.sql` in its SQL editor. Running it again later is safe.
+4. Add these repository secrets under **Settings > Secrets and variables > Actions**:
 
    | Secret | Where it comes from |
-   | :--- | :--- |
+   | :-- | :-- |
    | `GROQ_API_KEY` | Groq console |
-   | `SUPABASE_URL` | Supabase → Project settings → API |
-   | `SUPABASE_SECRET_KEY` | Supabase → Project settings → API keys (secret key) |
+   | `SUPABASE_URL` | Supabase > Project settings > API |
+   | `SUPABASE_SECRET_KEY` | Supabase > Project settings > API keys |
    | `SUPABASE_PROJECT_REF` | The id in your Supabase project URL |
-   | `SUPABASE_ACCESS_TOKEN` | Supabase → Account → Access tokens |
+   | `SUPABASE_ACCESS_TOKEN` | Supabase > Account > Access tokens |
    | `SYNC_SECRET` | Any long random string |
 
-5. **Add the same `GROQ_API_KEY` and `SYNC_SECRET` as Supabase secrets** (Edge Functions → Secrets) so Scout and Ask can call Groq and only the pipeline can call `embed`.
-6. **Run the workflows:**
+5. Add `GROQ_API_KEY` and `SYNC_SECRET` as Supabase secrets too (**Edge Functions > Secrets**).
+6. Run **Deploy Supabase functions**, then **Full sync to Supabase** once to load a year of papers. After that, **Daily edition** runs every morning by itself.
 
-   | Workflow | When it runs | What it does |
-   | :--- | :--- | :--- |
-   | `daily-digest.yml` | Every day at 01:30 UTC, or by hand | Fetch, score, write notes, sync to Supabase, build and deploy the site |
-   | `supabase-functions.yml` | On every push that changes `supabase/functions/` | Deploys the Edge Functions |
-   | `supabase-sync.yml` | By hand, once after setup | Loads about a year of past Hugging Face papers and embeds them all |
+Without Supabase the daily edition and site still work; search, Scout, Ask, For you and Most read need it.
 
-Without Supabase the daily digest and site still work. Search, Scout, Ask, For you and Most read need it.
+To use different Groq models, set a `GROQ_MODELS` repository variable (or Supabase secret) to a comma-separated list, best first.
+</details>
 
-**Run locally:**
+<details>
+<summary><strong>Develop locally</strong></summary>
+<br>
 
 ```bash
-pip install -r requirements.txt
-python src/main.py            # needs GROQ_API_KEY in .env for notes
-python src/site_builder.py    # builds the site into site/
-python -m pytest              # Python tests
-node --experimental-strip-types --test supabase/tests/scout.test.ts supabase/tests/ask.test.ts
+cp .env.example .env                  # add your GROQ_API_KEY
+pip install -r requirements-dev.txt
+
+python src/main.py                    # pick today's papers into data/
+python src/site_builder.py            # build the site into site/
+python -m http.server -d site 8000    # preview at http://localhost:8000
+
+python -m pytest                                              # Python tests
+node --experimental-strip-types --test supabase/tests/*.test.ts  # function tests
 ```
+</details>
 
----
-
-## 📂 Repository layout
+## Project structure
 
 ```text
 ai-paper-daily/
 ├── .github/workflows/
-│   ├── daily-digest.yml        # Daily run: pipeline, Supabase sync, site deploy
-│   ├── supabase-functions.yml  # Deploys the Edge Functions
-│   └── supabase-sync.yml       # One-time full sync and history backfill
+│   ├── daily-digest.yml        Daily edition: pick, sync, build, deploy
+│   ├── supabase-functions.yml  Deploys the Edge Functions
+│   ├── supabase-sync.yml       One-time full sync and history backfill
+│   └── tests.yml               Python and TypeScript tests on every push
 ├── src/
-│   ├── main.py                 # Pipeline entry point
-│   ├── fetcher.py              # arXiv and Hugging Face fetcher
-│   ├── classifier.py           # Research topic classifier
-│   ├── scorer.py               # Scoring, today's pick and trending
-│   ├── curator.py              # Groq notes: what's new, key result, how to try it
-│   ├── groq_summarizer.py      # Short "why it matters" lines with model fallback
-│   ├── paper_store.py          # Daily JSON records in data/
-│   ├── supabase_sync.py        # Upload, embed, and export the year of papers
-│   ├── trends.py               # Trend maths and SVG charts
-│   ├── site_builder.py         # Builds the static site
-│   ├── site_assets/            # CSS, JavaScript, fonts
-│   ├── renderer.py             # Markdown digests and category pages
-│   ├── readme_updater.py       # Keeps the live sections of this README current
-│   └── stats_tracker.py        # stats.json analytics
+│   ├── main.py                 Pipeline entry point
+│   ├── fetcher.py              arXiv and Hugging Face fetcher
+│   ├── classifier.py           Research topic classifier
+│   ├── scorer.py               Scoring: top pick and trending
+│   ├── curator.py              Notes for each pick
+│   ├── groq_summarizer.py      Groq client with model fallback
+│   ├── paper_store.py          Daily JSON records in data/
+│   ├── supabase_sync.py        Upload, embed and export papers
+│   ├── trends.py               Trend maths and SVG charts
+│   ├── tech_trends.py          Technologies to watch
+│   ├── technologies.py         Technology catalogue
+│   ├── site_builder.py         Static site generator
+│   └── site_assets/            CSS, JavaScript and fonts
 ├── supabase/
-│   ├── schema.sql              # Tables, vector search, rate limits, view counts
-│   ├── config.toml             # Function settings
-│   ├── functions/              # embed, search, recommend, scout, ask, track (+ _shared)
-│   └── tests/                  # Scout and Ask tests
-├── tests/                      # Python tests
-├── data/                       # Daily paper records (JSON)
-├── digests/                    # Daily editions in Markdown
-├── categories/                 # One page per research topic
-├── stats/                      # stats.json + last_run.txt
-├── docs/screenshots/           # Images used in this README
-└── requirements.txt
+│   ├── schema.sql              Tables, vector search, rate limits
+│   ├── functions/              search, recommend, scout, ask, track, embed
+│   └── tests/                  Edge Function tests
+├── tests/                      Python tests
+├── data/                       Daily editions as JSON, updated by the workflow
+└── docs/                       Logo and screenshots
 ```
 
----
+## License
+
+Released under the [MIT License](LICENSE).
 
 <div align="center">
-
-*Built with Python · Data from [arXiv](https://arxiv.org) and [Hugging Face](https://huggingface.co) · Notes by [Groq](https://groq.com) · Search by [Supabase](https://supabase.com) · Hosted on [GitHub Pages](https://pages.github.com)*
-
+<br>
+<sub>Data from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face</a>. Thank you to arXiv for use of its open access interoperability.</sub>
 </div>
