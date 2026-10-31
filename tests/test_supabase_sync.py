@@ -156,3 +156,25 @@ def test_save_most_read_writes_counts(tmp_path):
     assert sync.save_most_read(cfg, str(tmp_path), MostReadSession()) == 1
     data = json.load(open(tmp_path / "most_read.json", encoding="utf-8"))
     assert data["papers"] == [{"id": "2610.1", "views": 31, "useful": 4, "not_useful": 0}]
+
+
+def test_export_papers_pages_through_the_table(tmp_path):
+    import json
+
+    class PagedSession:
+        def __init__(self):
+            self.offsets = []
+
+        def get(self, url, headers=None, params=None, timeout=None):
+            assert url.endswith("/rest/v1/papers") and "abstract" not in params["select"]
+            self.offsets.append(params["offset"])
+            n = 1000 if params["offset"] == 0 else 2
+            r = FakeResponse(200, [{"id": f"{params['offset'] + i}"} for i in range(n)])
+            r.raise_for_status = lambda: None
+            return r
+
+    session = PagedSession()
+    cfg = {"url": "https://x.supabase.co", "key": "k", "secret": "s"}
+    assert sync.export_papers(cfg, str(tmp_path), session) == 1002
+    assert session.offsets == [0, 1000]
+    assert len(json.load(open(tmp_path / "papers.json", encoding="utf-8"))["papers"]) == 1002

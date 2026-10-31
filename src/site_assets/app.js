@@ -191,7 +191,8 @@
         var topic = (p.categories && p.categories[0]) || "other-ml";
         var local = onSite[p.id];
         var href = local ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
-        var date = p.first_seen ? new Date(p.first_seen + "T00:00:00") : null;
+        var when = p.submitted || p.first_seen;
+        var date = when ? new Date(String(when).slice(0, 10) + "T00:00:00") : null;
         var meta = (date ? date.getDate() + " " + MONTHS[date.getMonth()] : "") +
           (p.code_url ? '<span class="sep"></span>Code available' : "") +
           (local ? "" : '<span class="sep"></span>On Hugging Face');
@@ -822,9 +823,13 @@
   var names = {};
   Array.prototype.forEach.call(cat.options, function (o) { if (o.value) names[o.value] = o.textContent; });
 
+  // "Oct 31", or "4 Mar 2025" for another year
+  var thisYear = String(new Date().getFullYear());
   function shortDate(iso) {
     var p = (iso || "").split("-");
-    return p.length === 3 ? MONTHS[Number(p[1]) - 1] + " " + Number(p[2]) : iso;
+    if (p.length !== 3) return iso;
+    return p[0] === thisYear ? MONTHS[Number(p[1]) - 1] + " " + Number(p[2])
+                             : Number(p[2]) + " " + MONTHS[Number(p[1]) - 1] + " " + p[0];
   }
 
   // Same markup as paper_row() in site_builder.py. Papers from the search
@@ -840,7 +845,7 @@
       '<span class="row-date">' + esc(shortDate(p.d)) + "</span>" +
       '<span class="row-title"><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></span>" +
       '<span class="row-authors">' + esc(authors) + "</span>" +
-      '<div class="badges">' + badges + (local ? "" : '<span class="meta-text">Archive</span>') + "</div></li>";
+      '<div class="badges">' + badges + (local ? "" : '<span class="meta-text">On Hugging Face</span>') + "</div></li>";
   }
 
   // A search function result in the short form row() expects
@@ -848,7 +853,7 @@
     var authors = r.authors || [];
     return { i: r.id, t: r.title, a: authors.slice(0, 3), n: authors.length,
              c: (r.categories && r.categories.length) ? r.categories : ["other-ml"],
-             d: r.first_seen || "", s: 0, f: r.featured ? 1 : 0 };
+             d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: r.featured ? 1 : 0 };
   }
 
   function render(reset) {
@@ -951,7 +956,7 @@
     .then(function (r) { return r.json(); })
     .then(function (data) {
       all = data;
-      all.forEach(function (p) { onSite[p.i] = true; });
+      all.forEach(function (p) { if (!p.x) onSite[p.i] = true; });
       apply();
     })
     .catch(function () {

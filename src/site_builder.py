@@ -27,6 +27,9 @@ from classifier import CATEGORIES
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SITE_DIR = os.path.join(ROOT_DIR, "site")
+# Written by supabase_sync.py on each run, not committed: the year of papers in
+# the database and our readers' most read list
+EXPORT_DIR = os.path.join(ROOT_DIR, "build", "supabase")
 ASSETS_DIR = os.path.join(SRC_DIR, "site_assets")
 
 SITE_NAME = "AI Papers Daily"
@@ -90,12 +93,20 @@ def long_date(iso: str) -> str:
 
 
 def nice_date(iso: str, with_year: bool = True) -> str:
-    """'2026-10-31' -> '31 Oct 2026' (or 'Oct 31' without the year)."""
+    """'2026-10-31' -> '31 Oct 2026', or 'Oct 31' without the year (the year
+    is still shown when it isn't the current one)."""
     try:
-        d = date.fromisoformat(iso)
+        d = date.fromisoformat(str(iso)[:10])
     except (TypeError, ValueError):
         return iso or ""
-    return f"{d.day} {d:%b %Y}" if with_year else f"{d:%b} {d.day}"
+    if with_year or d.year != date.today().year:
+        return f"{d.day} {d:%b %Y}"
+    return f"{d:%b} {d.day}"
+
+
+def published(rec: dict) -> str:
+    """When the paper came out on arXiv; the day we first saw it if unknown."""
+    return (rec.get("submitted") or rec.get("first_seen") or "")[:10]
 
 
 # ---------------------------------------------------------------------------
@@ -316,7 +327,7 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
 
 def paper_row(rec: dict, root: str) -> str:
     return f"""<li class="row" data-id="{esc(rec['id'])}">
-  <span class="row-date">{esc(nice_date(rec.get('first_seen', ''), with_year=False))}</span>
+  <span class="row-date">{esc(nice_date(published(rec), with_year=False))}</span>
   <span class="row-title"><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></span>
   <span class="row-authors">{esc(format_authors(rec.get('authors', []), 3))}</span>
   {badges(rec, root)}
@@ -419,13 +430,33 @@ def topic_pulse(days: list[dict], limit: int = 6) -> str:
 MIN_MOST_READ_VIEWS = 20
 
 
-def load_most_read(data_dir: str) -> list[dict]:
-    """Our readers' most viewed papers of the last week, written by supabase_sync.py."""
+def _load_export(export_dir: str, name: str) -> list[dict]:
     try:
-        with open(os.path.join(data_dir, "most_read.json"), encoding="utf-8") as f:
-            return [p for p in json.load(f).get("papers", []) if p.get("id")]
+        with open(os.path.join(export_dir, name), encoding="utf-8") as f:
+            return [p for p in json.load(f).get("papers", []) if isinstance(p, dict) and p.get("id")]
     except (OSError, ValueError, AttributeError):
         return []
+
+
+def load_most_read(export_dir: str = EXPORT_DIR) -> list[dict]:
+    """Our readers' most viewed papers of the last week, written by supabase_sync.py."""
+    return _load_export(export_dir, "most_read.json")
+
+
+def load_archive(export_dir: str = EXPORT_DIR) -> list[dict]:
+    """Every paper in the database (about a year), written by supabase_sync.py."""
+    return _load_export(export_dir, "papers.json")
+
+
+def archive_compact(row: dict) -> dict:
+    """A database paper with no page on this site, in the papers.json short form."""
+    authors = row.get("authors") or []
+    return {
+        "i": row["id"], "t": row.get("title") or row["id"], "a": authors[:3], "n": len(authors),
+        "c": row.get("categories") or ["other-ml"],
+        "d": (row.get("submitted") or row.get("first_seen") or "")[:10],
+        "s": 0, "f": 0, "x": 1,
+    }
 
 
 def most_read_list(most_read: list[dict], papers: dict, limit: int = 5) -> str:
@@ -720,7 +751,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         layer("l-check", "Check", "Check yourself",
               f'<div class="check"><h2>Could you explain it to a friend?</h2><p class="check-q">{esc(notes["check_question"])}</p>{answer_html}</div>')
 
-    facts = [("Submitted", nice_date(rec.get("submitted", ""))), ("Added", nice_date(rec.get("first_seen", "")))]
+    facts = [("Published", nice_date(published(rec)))]
     if rec.get("featured_on"):
         facts.append(("Top pick on", f'<a href="../day/{esc(rec["featured_on"])}.html">{esc(nice_date(rec["featured_on"]))}</a>'))
     if rec.get("hf_upvotes"):
@@ -865,7 +896,7 @@ def compact(rec: dict) -> dict:
         "a": rec.get("authors", [])[:3],
         "n": len(rec.get("authors", [])),
         "c": rec.get("categories") or ["other-ml"],
-        "d": rec.get("first_seen", ""),
+        "d": published(rec),
         "s": rec.get("score") or 0,
         "f": (2 if rec.get("slot") == "trending" else 1) if rec.get("featured") else 0,
     }
@@ -881,7 +912,7 @@ def _write(path: str, content: str) -> None:
         f.write(content)
 
 
-def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR) -> int:
+def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: str = EXPORT_DIR) -> int:
     """Rebuild site_dir from scratch. Returns the number of paper pages written."""
     global EDITION
     days = load_days(data_dir)
@@ -892,7 +923,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR) -> int:
         shutil.rmtree(site_dir)
     shutil.copytree(ASSETS_DIR, os.path.join(site_dir, "assets"))
 
-    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(data_dir)))
+    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir)))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())
     _write(os.path.join(site_dir, "scout.html"), build_scout_page())
     _write(os.path.join(site_dir, "archive.html"), build_archive(days, papers))
@@ -925,10 +956,12 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR) -> int:
                            papers.get(prev_id), papers.get(next_id),
                            papers.get(next_pick.get(rec["id"])), picks_of.get(rec["id"], [])))
 
-    listing = sorted(papers.values(), key=lambda r: (r.get("first_seen", ""), r.get("score") or 0),
-                     reverse=True)
+    # Papers with a page here, plus the rest of the database's year (linking to Hugging Face)
+    listing = [compact(r) for r in papers.values()]
+    listing += [archive_compact(r) for r in load_archive(export_dir) if r["id"] not in papers]
+    listing.sort(key=lambda p: (p["d"], p["s"]), reverse=True)
     _write(os.path.join(site_dir, "data", "papers.json"),
-           json.dumps([compact(r) for r in listing], ensure_ascii=False, separators=(",", ":")))
+           json.dumps(listing, ensure_ascii=False, separators=(",", ":")))
     # Which papers have a page here; other "For you" results link to Hugging Face
     _write(os.path.join(site_dir, "data", "ids.json"),
            json.dumps(sorted(papers), separators=(",", ":")))

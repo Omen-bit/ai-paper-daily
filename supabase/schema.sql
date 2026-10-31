@@ -50,16 +50,18 @@ create trigger papers_touch before insert or update on public.papers
   for each row execute function public.papers_touch();
 
 -- Search by meaning: nearest papers to a query vector
+-- (dropped first so a changed result list can be applied by rerunning this file)
+drop function if exists public.match_papers(extensions.vector, int, date);
 create or replace function public.match_papers(
   query_embedding extensions.vector(384),
   match_count int default 20,
   since date default null
 ) returns table (
-  id text, title text, authors text[], categories text[], first_seen date,
+  id text, title text, authors text[], categories text[], submitted date, first_seen date,
   featured boolean, code_url text, similarity float
 )
 language sql stable set search_path = '' as $$
-  select p.id, p.title, p.authors, p.categories, p.first_seen, p.featured, p.code_url,
+  select p.id, p.title, p.authors, p.categories, p.submitted, p.first_seen, p.featured, p.code_url,
          1 - (p.embedding operator(extensions.<=>) query_embedding) as similarity
   from public.papers p
   where p.embedding is not null and (since is null or p.first_seen >= since)
@@ -68,12 +70,13 @@ language sql stable set search_path = '' as $$
 $$;
 
 -- For you: papers close to the average of what this browser has read
+drop function if exists public.recommend_papers(text[], int, date);
 create or replace function public.recommend_papers(
   read_ids text[],
   match_count int default 12,
   since date default (current_date - 30)
 ) returns table (
-  id text, title text, authors text[], categories text[], first_seen date,
+  id text, title text, authors text[], categories text[], submitted date, first_seen date,
   featured boolean, code_url text, similarity float
 )
 language sql stable set search_path = '' as $$
@@ -82,7 +85,7 @@ language sql stable set search_path = '' as $$
     from public.papers
     where id = any(read_ids[1:50]) and embedding is not null
   )
-  select p.id, p.title, p.authors, p.categories, p.first_seen, p.featured, p.code_url,
+  select p.id, p.title, p.authors, p.categories, p.submitted, p.first_seen, p.featured, p.code_url,
          1 - (p.embedding operator(extensions.<=>) taste.v) as similarity
   from public.papers p, taste
   where taste.v is not null and p.embedding is not null

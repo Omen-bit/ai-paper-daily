@@ -25,7 +25,7 @@ SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from site_builder import load_days, merge_papers, DATA_DIR  # noqa: E402
+from site_builder import load_days, merge_papers, DATA_DIR, EXPORT_DIR  # noqa: E402
 from fetcher import fetch_hf_papers_for_date  # noqa: E402
 from classifier import classify_papers  # noqa: E402
 from curator import find_code_url  # noqa: E402
@@ -175,7 +175,38 @@ def sync(everything: bool = False, data_dir: str = DATA_DIR, session=requests, b
 MOST_READ_DAYS = 7
 
 
-def save_most_read(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
+def _write_export(out_dir: str, name: str, papers: list[dict]) -> None:
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, name), "w", encoding="utf-8") as f:
+        json.dump({"updated": date.today().isoformat(), "papers": papers}, f, ensure_ascii=False,
+                  separators=(",", ":"))
+
+
+EXPORT_PAGE = 1000
+EXPORT_FIELDS = "id,title,authors,categories,submitted,first_seen,code_url,hf_upvotes,featured"
+
+
+def export_papers(cfg: dict, out_dir: str = EXPORT_DIR, session=requests) -> int:
+    """
+    Write build/supabase/papers.json: every paper in the database, without
+    abstracts or vectors. The website lists them and draws the Trends charts.
+    """
+    papers, offset = [], 0
+    while True:
+        resp = session.get(f"{cfg['url']}/rest/v1/papers", headers=_headers(cfg["key"]), timeout=TIMEOUT,
+                           params={"select": EXPORT_FIELDS, "order": "id", "limit": EXPORT_PAGE, "offset": offset})
+        resp.raise_for_status()
+        page = resp.json() or []
+        papers.extend(page)
+        if len(page) < EXPORT_PAGE:
+            break
+        offset += EXPORT_PAGE
+    _write_export(out_dir, "papers.json", papers)
+    print(f"[supabase] Exported {len(papers)} papers for the website.")
+    return len(papers)
+
+
+def save_most_read(cfg: dict, out_dir: str = EXPORT_DIR, session=requests) -> int:
     """
     Write data/most_read.json: our own readers' most viewed papers of the last
     week, from the anonymous counts. The website reads it for "Most read".
@@ -185,9 +216,7 @@ def save_most_read(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int
     resp.raise_for_status()
     papers = [{"id": r["paper_id"], "views": int(r["views"] or 0), "useful": int(r["useful"] or 0),
                "not_useful": int(r["not_useful"] or 0)} for r in resp.json() or []]
-    os.makedirs(data_dir, exist_ok=True)
-    with open(os.path.join(data_dir, "most_read.json"), "w", encoding="utf-8") as f:
-        json.dump({"days": MOST_READ_DAYS, "updated": date.today().isoformat(), "papers": papers}, f, indent=1)
+    _write_export(out_dir, "most_read.json", papers)
     print(f"[supabase] Most read: {len(papers)} papers with views in the last {MOST_READ_DAYS} days.")
     return len(papers)
 
@@ -200,10 +229,11 @@ def main() -> int:
         sync(everything="--all" in sys.argv or days > 0, backfill_days=days)
         cfg = _config()
         if cfg:
-            try:
-                save_most_read(cfg)
-            except Exception as exc:  # the counts table may not exist yet
-                print(f"[supabase] Most read skipped: {exc}")
+            for step in (export_papers, save_most_read):
+                try:
+                    step(cfg)
+                except Exception as exc:  # e.g. the counts table may not exist yet
+                    print(f"[supabase] {step.__name__} skipped: {exc}")
     except Exception as exc:  # never fail the daily run because of search
         print(f"[supabase] Sync failed: {exc}")
         if os.environ.get("GITHUB_ACTIONS") == "true":

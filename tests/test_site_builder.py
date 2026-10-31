@@ -176,24 +176,44 @@ def test_paper_page_has_ask_box(tmp_path):
 
 def test_most_read_takes_second_slot_once_readers_are_enough(tmp_path):
     data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    export_dir = str(tmp_path / "export")
     a, b = _paper("2610.1", 9, slot="pick"), _paper("2610.2", 3, slot="trending", hf_upvotes=9)
     others = [_paper(f"2610.{n}", 1, title=f"Other {n}") for n in range(3, 7)]
     save_day([a, b] + others, [a, b], "2026-10-31", data_dir=data_dir)
 
     def most_read(views):
-        with open(os.path.join(data_dir, "most_read.json"), "w", encoding="utf-8") as f:
+        os.makedirs(export_dir, exist_ok=True)
+        with open(os.path.join(export_dir, "most_read.json"), "w", encoding="utf-8") as f:
             json.dump({"papers": [{"id": "2610.5", "views": views}, {"id": "2610.4", "views": 5},
                                   {"id": "2610.3", "views": 4}]}, f)
 
     most_read(8)  # too few readers: Trending stays
-    build_site(data_dir, site_dir)
+    build_site(data_dir, site_dir, export_dir)
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
     assert "Trending" in home and "Most read this week" in home and "8 readers" in home
 
     most_read(25)
-    build_site(data_dir, site_dir)
+    build_site(data_dir, site_dir, export_dir)
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
     assert ">Most read<" in home and "25 readers this week" in home
     assert 'data-picks="2610.1 2610.5"' in home
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
     assert 'data-feedback="2610.1"' in page and 'data-vote="useful"' in page
+
+
+def test_published_dates_and_database_archive(tmp_path):
+    data_dir, site_dir, export_dir = str(tmp_path / "data"), str(tmp_path / "site"), str(tmp_path / "export")
+    save_day([_paper("2610.1", submitted="2026-10-28")], [], "2026-10-31", data_dir=data_dir)
+    os.makedirs(export_dir)
+    with open(os.path.join(export_dir, "papers.json"), "w", encoding="utf-8") as f:
+        json.dump({"papers": [
+            {"id": "2610.1", "title": "Dup", "submitted": "2026-10-28"},
+            {"id": "2503.7", "title": "Older", "authors": ["A", "B", "C", "D"], "categories": ["llms"],
+             "submitted": "2025-03-04", "first_seen": "2025-03-05"}]}, f)
+    build_site(data_dir, site_dir, export_dir)
+    listing = json.load(open(os.path.join(site_dir, "data", "papers.json"), encoding="utf-8"))
+    assert [(p["i"], p["d"], p.get("x", 0)) for p in listing] == [("2610.1", "2026-10-28", 0), ("2503.7", "2025-03-04", 1)]
+    assert listing[1]["n"] == 4 and len(listing[1]["a"]) == 3
+    page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    assert "<dt>Published</dt><dd>28 Oct 2026</dd>" in page
+    assert not os.path.exists(os.path.join(site_dir, "paper", "2503.7.html"))
