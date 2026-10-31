@@ -28,23 +28,23 @@
 <!-- TODAY_START -->
 ### Saturday, October 31, 2026 · [2026-10-31](digests/2026-10-31.md)
 
-#### 1. [Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs](https://arxiv.org/abs/2610.36671)
-`⭐ Top Pick` `🔥 Trending on HF` `🌐 Multimodal AI` `🤖 LLMs & Language Models` `94 HF upvotes`
+#### 1. [Youtu-Parsing-Omni: One Encoder, One Schema, All Modalities](https://arxiv.org/abs/2610.39301)
+`⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML` `139 HF upvotes`
 
 > 💡 **Why It Matters:**  
-> LOWN cuts diffusion VLM decoding costs by 65% by skipping image processing when predictions are stable, retaining 99.6% accuracy without retraining.
+> The paper demonstrates the effectiveness of unifying modalities for improved parsing performance.
 
-**Authors:** Donghyeon Cho, Joowon Kim, Seungho Shin et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.36671) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.36671) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.36671)  
+**Authors:** Yunhang Shen, Zhangquan Chen, Xiaotian Li et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.39301) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.39301) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.39301)  
 
-#### 2. [Intrinsic Distribution Matching](https://arxiv.org/abs/2610.39633)
-`🔥 Trending on HF` `🎨 Generative AI & Diffusion` `📱 Efficient AI & Edge` `239 HF upvotes`
+#### 2. [L3G-World: Real-Time Infinite World Generation with Latent 3D Gaussian Memory](https://arxiv.org/abs/2610.40614)
+`🔥 Trending on HF` `💡 Novel Method` `🎨 Generative AI & Diffusion` `👁️ Computer Vision` `37 HF upvotes`
 
 > 💡 **Why It Matters:**  
-> Intrinsic Distribution Matching improves text-to-image generation by matching generator's EMA features with Gaussian moments, yielding state-of-the-art results on LongText-Bench without requiring additional encoders.
+> Real-time world generation is enabled with improved efficiency.
 
-**Authors:** Deyuan Liu, Yansen Han, Kaiwen Zheng et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.39633) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.39633) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.39633)  
+**Authors:** Jinhyeok Choi, JoungBin Lee, Jongmin Lee et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.40614) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.40614) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.40614)  
 
 **[Read the full digest with abstracts](digests/2026-10-31.md)**
 <!-- TODAY_END -->
@@ -70,7 +70,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
-| **2026-10-31** | `2` | Multimodal AI | [Read digest](digests/2026-10-31.md) |
+| **2026-10-31** | `2` | Other ML | [Read digest](digests/2026-10-31.md) |
 | **2026-10-30** | `2` | Other ML | [Read digest](digests/2026-10-30.md) |
 | **2026-10-29** | `2` | LLMs & Language Models | [Read digest](digests/2026-10-29.md) |
 | **2026-10-28** | `2` | Generative AI & Diffusion | [Read digest](digests/2026-10-28.md) |
@@ -98,11 +98,11 @@ Explore past curated papers categorized by research subfield:
 
 **Most active categories:**
 
-- 🔖 **Other ML**: `15` papers
-- 🤖 **LLMs & Language Models**: `4` papers
+- 🔖 **Other ML**: `16` papers
 - 🎨 **Generative AI & Diffusion**: `4` papers
-- 🌐 **Multimodal AI**: `2` papers
+- 🤖 **LLMs & Language Models**: `3` papers
 - 👁️ **Computer Vision**: `2` papers
+- 🧠 **Reasoning & Agents**: `2` papers
 <!-- STATS_END -->
 
 ---
