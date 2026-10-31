@@ -235,7 +235,7 @@
 
     // Remember the visit (powers the streak, Continue reading and, later, For you)
     reads = reads.filter(function (h) { return h.id !== id; });
-    reads.unshift({ id: id, t: title, at: Date.now() });
+    reads.unshift({ id: id, t: title, at: Date.now(), c: (article.getAttribute("data-topics") || "").split(" ").filter(Boolean) });
     store("apd.history", reads.slice(0, 500));
     readIds[id] = true;
 
@@ -407,7 +407,8 @@
       var pop = document.createElement("div");
       pop.className = "sel-pop";
       pop.hidden = true;
-      pop.innerHTML = '<button type="button" class="sel-hl" data-act="hl">Highlight</button><button type="button" data-act="note">Add note</button><button type="button" data-act="copy">Copy</button>';
+      pop.innerHTML = '<button type="button" class="sel-hl" data-act="hl">Highlight</button><button type="button" data-act="note">Add note</button><button type="button" data-act="copy">Copy</button>' +
+        (document.querySelector("[data-ask]") ? '<button type="button" class="sel-ask" data-act="ask">Ask</button>' : "");
       prose.parentNode.appendChild(pop);
       var picked = "";
       var hidePop = function () { pop.hidden = true; };
@@ -428,6 +429,10 @@
       pop.addEventListener("click", function (e) {
         var act = e.target.getAttribute("data-act");
         if (act === "copy" && navigator.clipboard) navigator.clipboard.writeText(picked);
+        if (act === "ask" && window.apdAsk) {
+          var quote = picked.length > 220 ? picked.slice(0, 217) + "…" : picked;
+          window.apdAsk("Explain this part in plain words: “" + quote + "”");
+        }
         if (act === "hl" || act === "note") {
           var note = act === "note" ? (window.prompt("Your note on this passage") || "") : "";
           if (act === "note" && !note) return hidePop();
@@ -490,6 +495,7 @@
       turn.innerHTML = '<p class="ask-q">' + esc(question) + '</p><div class="ask-a is-loading"><span class="pixbar pixbar-run" aria-hidden="true">' +
         new Array(7).join("<i></i>") + '</span><span class="sr-only">Reading the abstract…</span></div>';
       askLog.appendChild(turn);
+      askLog.scrollTop = askLog.scrollHeight;
       askInput.value = "";
       askBtn.disabled = true;
       fetch(ask.getAttribute("data-url"), {
@@ -513,6 +519,7 @@
         var qb = box.querySelector(".ask-quote");
         if (qb) qb.addEventListener("click", function () { showInAbstract(d.quote); });
         lastTurn = d.answerable ? { q: question, a: d.answer } : null;
+        askLog.scrollTop = askLog.scrollHeight;
       }).catch(function () {
         var box = turn.querySelector(".ask-a");
         box.classList.remove("is-loading");
@@ -520,6 +527,24 @@
         box.textContent = "Couldn't reach the server. Check your connection and try again.";
       }).then(function () { askBtn.disabled = false; });
     };
+
+    // On smaller screens the panel is a sheet behind the "Ask this paper" button
+    var askFab = document.querySelector("[data-ask-open]");
+    var openAsk = function (focus) {
+      ask.classList.add("is-open");
+      if (askFab) askFab.setAttribute("aria-expanded", "true");
+      if (focus) askInput.focus();
+    };
+    var closeAsk = function () {
+      ask.classList.remove("is-open");
+      if (askFab) { askFab.setAttribute("aria-expanded", "false"); askFab.focus(); }
+    };
+    if (askFab) askFab.addEventListener("click", function () { openAsk(true); });
+    ask.querySelector("[data-ask-close]").addEventListener("click", closeAsk);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && ask.classList.contains("is-open")) closeAsk();
+    });
+    window.apdAsk = function (question) { openAsk(false); askQuestion(question); };
 
     askForm.addEventListener("submit", function (e) { e.preventDefault(); askQuestion(askInput.value); });
     askInput.addEventListener("input", function () { askErr.hidden = true; });
@@ -577,6 +602,37 @@
   }
   Array.prototype.forEach.call(document.querySelectorAll("[data-feedback]"), wireFeedback);
 
+  // ---- Trends: you vs the field, from this browser's reading history ----
+  var youField = document.querySelector("[data-you-field]");
+  if (youField) {
+    var mine = {}, counted = 0;
+    reads.forEach(function (h) {
+      if (!h.c || !h.c.length) return;
+      counted++;
+      h.c.forEach(function (c) { mine[c] = (mine[c] || 0) + 1 / h.c.length; });
+    });
+    if (counted >= 3) {
+      var field = {}, ynames = {};
+      try { field = JSON.parse(youField.getAttribute("data-field")) || {}; } catch (e) { /* none */ }
+      try { ynames = JSON.parse(youField.getAttribute("data-names")) || {}; } catch (e) { /* slugs */ }
+      var topics = Object.keys(mine).concat(Object.keys(field)).filter(function (t, i, a) { return a.indexOf(t) === i; });
+      topics = topics.map(function (t) { return { t: t, you: (mine[t] || 0) / counted, field: field[t] || 0 }; })
+        .sort(function (a, b) { return (b.you + b.field) - (a.you + a.field); }).slice(0, 6);
+      var max = Math.max.apply(null, topics.map(function (x) { return Math.max(x.you, x.field); })) || 1;
+      var pctTxt = function (v) { return Math.round(v * 100) + "%"; };
+      youField.querySelector("[data-you-chart]").innerHTML =
+        '<p class="you-key"><span><i class="k-you"></i>You, ' + counted + " papers</span><span><i class=\"k-field\"></i>The field</span></p>" +
+        '<ol class="you-bars">' + topics.map(function (x) {
+          return '<li><span class="topic t-' + esc(x.t) + '"><span class="dot"></span>' + esc(ynames[x.t] || x.t) + "</span>" +
+            '<span class="bars" aria-label="You ' + pctTxt(x.you) + ", the field " + pctTxt(x.field) + '">' +
+            '<span class="bar-row"><span class="bar-you" style="width:' + (x.you / max * 85).toFixed(1) + '%"></span>' + pctTxt(x.you) + "</span>" +
+            '<span class="bar-row"><span class="bar-field" style="width:' + (x.field / max * 85).toFixed(1) + '%"></span>' + pctTxt(x.field) + "</span></span></li>";
+        }).join("") + "</ol>";
+      youField.querySelector("[data-you-chart]").hidden = false;
+      youField.querySelector("[data-you-empty]").hidden = true;
+    }
+  }
+
   // ---- Lists built from this browser's history or saved papers ----
   function storedRow(item, verb, removable) {
     return '<li class="row" data-id="' + esc(item.id) + '">' +
@@ -589,7 +645,7 @@
   var cont = document.querySelector("[data-continue]");
   if (cont && reads.length) {
     cont.querySelector("[data-continue-list]").innerHTML =
-      reads.slice(0, 4).map(function (h) { return storedRow(h, "Opened", false); }).join("");
+      reads.slice(0, 3).map(function (h) { return storedRow(h, "Opened", false); }).join("");
     cont.hidden = false;
   }
 
@@ -844,8 +900,8 @@
     return '<li class="row' + (readIds[p.i] ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
       '<span class="row-date">' + esc(shortDate(p.d)) + "</span>" +
       '<span class="row-title"><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></span>" +
-      '<span class="row-authors">' + esc(authors) + "</span>" +
-      '<div class="badges">' + badges + (local ? "" : '<span class="meta-text">On Hugging Face</span>') + "</div></li>";
+      '<span class="row-authors">' + esc(authors) + (local ? "" : '<span class="sep"></span><span class="ext">Hugging Face ↗</span>') + "</span>" +
+      '<div class="badges">' + badges + "</div></li>";
   }
 
   // A search function result in the short form row() expects

@@ -183,7 +183,7 @@ def _write_export(out_dir: str, name: str, papers: list[dict]) -> None:
 
 
 EXPORT_PAGE = 1000
-EXPORT_FIELDS = "id,title,authors,categories,submitted,first_seen,code_url,hf_upvotes,featured"
+EXPORT_FIELDS = "id,title,authors,categories,submitted,first_seen,code_url,hf_upvotes,featured,source"
 
 
 def export_papers(cfg: dict, out_dir: str = EXPORT_DIR, session=requests) -> int:

@@ -217,3 +217,29 @@ def test_published_dates_and_database_archive(tmp_path):
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
     assert "<dt>Published</dt><dd>28 Oct 2026</dd>" in page
     assert not os.path.exists(os.path.join(site_dir, "paper", "2503.7.html"))
+
+
+def test_trends_page_is_built_and_linked(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [], "2026-10-31", data_dir=data_dir)
+    export_dir = tmp_path / "export"
+    export_dir.mkdir()
+    rows = [{"id": f"25{i:05d}", "title": "T", "categories": ["llms"], "first_seen": f"2026-{m:02d}-10"}
+            for i, m in enumerate([8] * 70 + [9] * 70 + [10] * 70)]
+    (export_dir / "papers.json").write_text(json.dumps({"papers": rows}), encoding="utf-8")
+    build_site(data_dir, site_dir, str(export_dir))
+    page = open(os.path.join(site_dir, "trends.html"), encoding="utf-8").read()
+    assert "<h1>Trends</h1>" in page and "Topic share, month by month" in page
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert 'href="trends.html"' in home and 'href="archive.html"' not in home.split("</nav>")[0]
+    archive = open(os.path.join(site_dir, "archive.html"), encoding="utf-8").read()
+    assert 'class="tabs"' in archive
+
+
+def test_trends_page_waits_for_three_months_of_history(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    papers = [_paper(f"2610.{i}", first_seen="2026-10-10") for i in range(40)]
+    save_day(papers, [], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir, str(tmp_path / "none"))
+    page = open(os.path.join(site_dir, "trends.html"), encoding="utf-8").read()
+    assert "three months" in page and "Topic share" not in page

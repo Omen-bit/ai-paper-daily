@@ -16,7 +16,7 @@ import json
 import os
 import shutil
 import sys
-from datetime import date
+from datetime import date, timedelta
 
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SRC_DIR)
@@ -24,6 +24,7 @@ if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
 from classifier import CATEGORIES
+import trends
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SITE_DIR = os.path.join(ROOT_DIR, "site")
@@ -35,7 +36,7 @@ ASSETS_DIR = os.path.join(SRC_DIR, "site_assets")
 SITE_NAME = "AI Papers Daily"
 TAGLINE = ("We read every new AI paper on arXiv and Hugging Face, choose the ones you can "
            "build something with, and explain why they matter in plain language.")
-MORE_FROM_TODAY = 10  # non-featured papers shown on the home page
+MORE_FROM_TODAY = 6  # non-featured papers shown on the home page
 
 CATEGORY_NAMES = {slug: name for _, name, slug, _, _ in CATEGORIES}
 CATEGORY_NAMES["other-ml"] = "Other ML"
@@ -204,7 +205,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
       {nav("index.html", "Today", "today")}
       {nav("papers.html", '<span class="nav-long">All papers</span><span class="nav-short">Papers</span>', "papers")}
       {nav("scout.html", "Scout", "scout")}
-      {nav("archive.html", "Archive", "archive")}
+      {nav("trends.html", "Trends", "trends")}
       {nav("saved.html", "Saved", "saved", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
     <div class="header-actions">
@@ -354,74 +355,6 @@ def section_head(title: str, sub: str = "", link: str = "") -> str:
 # Charts (plain SVG, drawn here so the page needs no chart library)
 # ---------------------------------------------------------------------------
 
-def volume_chart(days: list[dict], span: int, cls: str) -> str:
-    """Papers per day as bars, with gridlines, a 7-day average line and a value on hover or focus."""
-    data = list(reversed(days[:span]))
-    if not data:
-        return ""
-    W, H, L, B, T = (1040, 230, 36, 26, 40) if span > 14 else (520, 220, 30, 26, 40)
-    counts = [len(d.get("papers", [])) for d in data]
-    top = max(counts) or 1
-    step = 50 if top > 100 else 20 if top > 40 else 10 if top > 20 else 5
-    mx = -(-top // step) * step
-    y = lambda v: T + (H - T - B) * (1 - v / mx)
-    bw = (W - L) / len(data)
-    lines = range(0, mx + 1, step)
-    grid = "".join(f'<line x1="{L}" x2="{W}" y1="{y(v):.1f}" y2="{y(v):.1f}"/>'
-                   f'<text x="{L - 8}" y="{y(v) + 4:.1f}" text-anchor="end">{v}</text>' for v in lines)
-    bars = []
-    for i, (d, n) in enumerate(zip(data, counts)):
-        x = L + i * bw + 2
-        h = (H - T - B) * n / mx
-        label = f"{n} on {nice_date(d['date'], with_year=False)}"
-        tx = min(max(x - 40, L), W - 100)
-        today_cls = " is-today" if i == len(data) - 1 else ""
-        bars.append(f'<g class="vbar{today_cls}" tabindex="0" aria-label="{esc(label)}">'
-                    f'<rect class="bar" x="{x:.1f}" y="{y(n):.1f}" width="{max(bw - 4, 2):.1f}" height="{h:.1f}" rx="2"/>'
-                    f'<rect class="hit" x="{L + i * bw:.1f}" y="{T}" width="{bw:.1f}" height="{H - T - B}"/>'
-                    f'<g class="tip"><rect x="{tx:.1f}" y="{y(n) - 34:.1f}" width="100" height="26" rx="6"/>'
-                    f'<text x="{tx + 50:.1f}" y="{y(n) - 17:.1f}" text-anchor="middle">{esc(label)}</text></g></g>')
-    every = 7 if len(data) > 14 else 4
-    xlab = "".join(f'<text x="{L + i * bw + bw / 2:.1f}" y="{H - 6}" text-anchor="middle">{esc(nice_date(d["date"], with_year=False))}</text>'
-                   for i, d in enumerate(data) if i % every == 0)
-    avg = [sum(counts[max(0, i - 6):i + 1]) / len(counts[max(0, i - 6):i + 1]) for i in range(len(counts))]
-    line = " ".join(f"{L + i * bw + bw / 2:.1f},{y(a):.1f}" for i, a in enumerate(avg))
-    return (f'<svg class="vchart {cls}" viewBox="0 0 {W} {H}" role="img" aria-label="New papers per day for the last {len(data)} editions">'
-            f'<g class="grid">{grid}</g><g>{"".join(bars)}</g><polyline class="avg" points="{line}"/><g class="xlab">{xlab}</g></svg>')
-
-
-def topic_pulse(days: list[dict], limit: int = 6) -> str:
-    """Topics like a watchlist: papers in the last 7 editions, change on the 7 before, 14-day mini columns."""
-    recent, before = days[:7], days[7:14]
-
-    def count(span):
-        c: dict[str, int] = {}
-        for d in span:
-            for p in d.get("papers", []):
-                for slug in p.get("categories") or ["other-ml"]:
-                    c[slug] = c.get(slug, 0) + 1
-        return c
-
-    now, prev = count(recent), count(before)
-    daily = [count([d]) for d in reversed(days[:14])]
-    rows = []
-    for slug, n in sorted(now.items(), key=lambda kv: -kv[1])[:limit]:
-        series = [d.get(slug, 0) for d in daily]
-        mx = max(series) or 1
-        cols = "".join(f'<i style="height:{max(8, v / mx * 100):.0f}%"></i>' for v in series)
-        if before and prev.get(slug):
-            change = round((n - prev[slug]) / prev[slug] * 100)
-            kind = "up" if change > 2 else "down" if change < -2 else "flat"
-            mark = {"up": "▲", "down": "▼", "flat": "■"}[kind]
-            change_html = f'<span class="pulse-ch {kind}">{mark} {abs(change)}%</span>'
-        else:
-            change_html = '<span class="pulse-ch flat">new</span>'
-        rows.append(f'<li class="t-{esc(slug)}"><a href="papers.html?cat={esc(slug)}">'
-                    f'<span class="pulse-name"><span class="dot"></span>{esc(category_name(slug))}</span>'
-                    f'<span class="mini" aria-hidden="true">{cols}</span><span class="pulse-n">{n}</span>{change_html}</a></li>')
-    return f'<ul class="pulse">{"".join(rows)}</ul>'
-
-
 # ---------------------------------------------------------------------------
 # Pages
 # ---------------------------------------------------------------------------
@@ -469,8 +402,37 @@ def most_read_list(most_read: list[dict], papers: dict, limit: int = 5) -> str:
       <ol class="card pad most-read">{items}</ol></div>"""
 
 
-def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = None) -> str:
+def trends_teaser(rows: list[dict]) -> str:
+    """One card on the home page that points to the Trends page with its headline facts."""
+    months = trends.last_months(rows, 12)
+    if len(rows) < 30 or len(months) < 4:
+        return ""
+    moves = [m for m in trends.movers(rows, months) if m["enough"]]
+    if not moves:
+        return ""
+    up, down = moves[0], moves[-1]
+    code = trends.code_share(rows, months)[-1]
+    name = lambda t: esc(category_name(t))
+    facts = [
+        f'<li><span class="pulse-ch up">{trends.pts(up["delta"])}</span><span><b>{name(up["topic"])}</b> is rising fastest, now {trends.pct(up["now"], 1)} of papers.</span></li>',
+        f'<li><span class="pulse-ch down">{trends.pts(down["delta"])}</span><span><b>{name(down["topic"])}</b> is falling the most.</span></li>',
+        f'<li><span class="pulse-ch flat">{trends.pct(code[1])}</span><span>of papers in {trends._month_label(code[0], True)} link to code.</span></li>',
+    ]
+    return f"""<section class="block">
+  {section_head("Trends", "The last 3 months against the 9 before")}
+  <a class="card teaser" href="trends.html">
+    <ul class="teaser-facts">{"".join(facts)}</ul>
+    <div class="teaser-chart"><span class="topic t-{esc(up["topic"])}"><span class="dot"></span>{name(up["topic"])}, 12 months</span>
+      {trends._spark(up["line"], w=300, h=64, cls="spark teaser-spark", lo=0)}</div>
+    <span class="teaser-go">See all trends →</span>
+  </a>
+</section>"""
+
+
+def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = None,
+                trend_rows: list[dict] | None = None) -> str:
     most_read = most_read or []
+    trend_rows = trend_rows if trend_rows is not None else trends.trend_rows([], papers)[0]
     if not days:
         body = '<section class="hero"><div><h1>No papers yet.</h1><p class="lead">The first edition arrives tomorrow morning.</p></div></section>'
         return page(SITE_NAME, body, active="today")
@@ -496,21 +458,8 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
     <ol class="list list-home">{rows}</ol>
   </div>"""
 
-    week = sum(len(d.get("papers", [])) for d in days[:7])
-    busiest = max(len(d.get("papers", [])) for d in days[:28])
-    picked = sum(len(d.get("featured", [])) for d in days[:7]) or 1
-    chart = ""
-    if len(days) >= 2:
-        chart = f"""<section class="block">
-  {section_head("The field, daily", "New AI papers per edition. Hover or tab to a bar for its count.")}
-  <div class="card pad chart-card">
-    <div>{volume_chart(days, 28, "vchart-long")}{volume_chart(days, 14, "vchart-short")}
-      <div class="chart-key"><span><i></i>Latest edition</span><span><i class="k-avg"></i>7-day average</span></div></div>
-    <dl class="chart-facts"><div><dt>Last 7 editions</dt><dd>{week}</dd></div><div><dt>Busiest day</dt><dd>{busiest}</dd></div><div><dt>We pick</dt><dd>1 in {max(1, round(week / picked))}</dd></div></dl>
-  </div>
-</section>"""
+    chart = trends_teaser(trend_rows)
 
-    pulse_sub = "Papers in the last 7 editions, change on the 7 before" if len(days) >= 14 else "Papers in the last 7 editions"
     body = f"""<section class="hero">
   <div>
     <h1>Papers worth<br>building on.</h1>
@@ -532,11 +481,10 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   <ol class="foryou" data-foryou-list aria-busy="true">{'<li class="foryou-item skeleton" aria-hidden="true"></li>' * 3}</ol>
 </section>
 <section class="split">
-  {more or '<div></div>'}
+  <div class="split-main">{more}{most_read_list(most_read, papers)}</div>
   <aside class="block side">
-    {section_head("Topic pulse", pulse_sub)}
-    <div class="card pad">{topic_pulse(days)}</div>
-    {most_read_list(most_read, papers)}
+    {section_head("Topic pulse", "Share of this week’s papers, against the 4 weeks before", '<a class="more" href="trends.html">All trends</a>')}
+    <div class="card pad">{trends.pulse_rows(trends.weekly_pulse(trend_rows), CATEGORY_NAMES)}</div>
     <div class="block" data-continue hidden>
       {section_head("Continue reading")}
       <ul class="list" data-continue-list></ul>
@@ -556,10 +504,17 @@ RECOMMEND_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/recommend
 SKELETON_ROWS = '<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>' * 6
 
 
+def papers_tabs(current: str, root: str = "") -> str:
+    """All papers and the day-by-day archive are two views of the same papers."""
+    tab = lambda href, label, key: (f'<a href="{root}{href}"{" aria-current=page" if key == current else ""}>{label}</a>')
+    return f'<nav class="tabs" aria-label="Papers views">{tab("papers.html", "All papers", "papers")}{tab("archive.html", "By day", "archive")}</nav>'
+
+
 def build_papers_page() -> str:
     options = "".join(f'<option value="{esc(slug)}">{esc(name)}</option>'
                       for slug, name in CATEGORY_NAMES.items())
     body = f"""<section class="page-head">
+  {papers_tabs("papers")}
   <h1>All papers</h1>
   <p>Every paper we have tracked, newest first. Search by title or author, or turn on Search by meaning to find papers about an idea in your own words.</p>
 </section>
@@ -630,6 +585,76 @@ def build_scout_page() -> str:
                 description="Describe your project and get a reading plan of AI papers, in order.")
 
 
+def build_trends_page(rows: list[dict], source: str, n_all: int) -> str:
+    months = trends.last_months(rows, 12)
+    if len(rows) < 30 or len(months) < 3:
+        body = """<section class="page-head"><h1>Trends</h1>
+  <p>Trends need at least three months of papers. They appear here once the history has loaded.</p></section>"""
+        return page("Trends", body, active="trends")
+    names = CATEGORY_NAMES
+    per = trends.topic_counts(rows, months)
+    top = trends.top_topics(per, 5)
+    moves = trends.movers(rows, months)
+    end = max(r["day"] for r in rows)
+    last30 = sum(1 for r in rows if r["day"] > (date.fromisoformat(end) - timedelta(days=30)).isoformat())
+    code = trends.code_share(rows, months)
+    rising = next((m for m in moves if m["enough"] and m["delta"] > 0), None)
+    tiles = [
+        ("Papers in a year", f"{len(rows):,}", f"of {n_all:,} in our database" if n_all > len(rows) else "in our database"),
+        ("Last 30 days", f"{last30:,}", "new papers"),
+        ("Share code", trends.pct(code[-1][1]), f"in {trends._month_label(code[-1][0], True)}"),
+        ("Rising fastest", esc(names.get(rising["topic"], rising["topic"])) if rising else "—",
+         trends.pts(rising["delta"]) + " in 3 months" if rising else "Needs more history"),
+    ]
+    tiles_html = "".join(f'<div class="stat"><span class="label">{k}</span><strong{' class="stat-text"' if len(v) > 8 else ''}>{v}</strong><span>{s}</span></div>'
+                         for k, v, s in tiles)
+    words = trends.rising_words(rows, months)
+    field = trends.field_shares_json(rows, months)
+    first, last = trends._month_label(months[0], True), trends._month_label(months[-1], True)
+    body = f"""<section class="page-head">
+  <h1>Trends</h1>
+  <p>What AI research is about right now, from {len(rows):,} {esc(source)}, {first} to {last}. Updated every morning.</p>
+</section>
+<div class="stats">{tiles_html}</div>
+
+<section class="block">
+  {section_head("Topic share, month by month", "Each band is a topic’s share of that month’s papers. Hover or tab through the months.")}
+  <div class="card pad chart-box">{trends.share_area(per, months, top, names)}
+    <details class="table-view"><summary>Show as a table</summary>{trends.share_table(per, months, top, names)}</details></div>
+</section>
+
+<section class="block">
+  {section_head("Rising and falling", "Share in the last 3 months, change against the 9 months before. Each line has its own scale.")}
+  {trends.mover_cards(moves, names, months)}
+</section>
+
+<section class="split split-even">
+  <div class="block">
+    {section_head("Words on the rise", "Title words used much more in the last 3 months than before")}
+    <div class="card pad">{trends.word_rows(words, months)}</div>
+  </div>
+  <div class="block">
+    {section_head("You vs the field", "Topics of the papers you opened here, against the last 3 months")}
+    <div class="card pad" data-you-field data-field='{esc(field)}' data-names="{esc(json.dumps(names))}">
+      <p class="empty-note" data-you-empty>Open a few papers and this chart shows how your reading compares with what’s being published. It uses this browser’s history only.</p>
+      <div data-you-chart hidden></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  {section_head("The year in papers", "Papers per day. Stronger colour means a busier day.")}
+  <div class="card pad">{trends.calendar(trends.daily_counts(rows), end)}</div>
+</section>
+
+<section class="block">
+  {section_head("How many papers share code", "Share of each month’s papers that link to a code repository")}
+  <div class="card pad chart-box">{trends.code_chart(code)}</div>
+</section>"""
+    return page("Trends", body, active="trends",
+                description="What AI research is about right now: topic shares, rising topics and words, and code availability.")
+
+
 def build_archive(days: list[dict], papers: dict) -> str:
     rows = []
     for day in days:
@@ -641,11 +666,12 @@ def build_archive(days: list[dict], papers: dict) -> str:
   <div class="badges"><span class="meta-text">{len(day.get('papers', []))} papers</span></div>
 </li>""")
     body = f"""<section class="page-head">
+  {papers_tabs("archive")}
   <h1>Every edition</h1>
   <p>{len(days)} days of papers, newest first. Each day lists its top picks and everything else we found.</p>
 </section>
 <ul class="list">{''.join(rows)}</ul>"""
-    return page("Archive", body, active="archive")
+    return page("Archive", body, active="papers")
 
 
 def build_day(day: dict, papers: dict) -> str:
@@ -664,7 +690,7 @@ def build_day(day: dict, papers: dict) -> str:
 </section>
 <section class="block">{section_head("Picks that day")}<div class="picks">{cards}</div></section>
 {rest_html}"""
-    return page(nice_date(day["date"]), body, root="../", active="archive")
+    return page(nice_date(day["date"]), body, root="../", active="papers")
 
 
 def bibtex(rec: dict) -> str:
@@ -731,19 +757,24 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     if abstract:
         layer("l-abstract", f"{reading_minutes(abstract)} min", "Abstract",
               f'<div class="prose" data-prose><h2>Abstract<span>Select any sentence to highlight it or add a note</span></h2>{abstract_html(abstract)}</div>')
+    ask_panel = ask_fab = ""
     if abstract:
+        # Beside the text while reading on wide screens; a sheet behind a button on smaller ones
         chips = "".join(f'<button class="qchip" type="button" data-ask-suggest>{q}</button>' for q in ASK_SUGGESTIONS)
-        layer("l-ask", "Ask", "Ask this paper", f"""<div class="ask" data-ask data-url="{ASK_URL}">
-  <h2>Ask this paper<span>Answers come only from the abstract, with the sentence they rely on</span></h2>
-  <ol class="ask-log" data-ask-log aria-live="polite"></ol>
-  <div class="ask-suggest">{chips}</div>
-  <form class="ask-form" data-ask-form>
-    <label class="sr-only" for="ask-q">Your question about this paper</label>
-    <input class="input" id="ask-q" maxlength="300" autocomplete="off" placeholder="e.g. What hardware does it need?">
-    <button class="btn btn-primary" type="submit">Ask</button>
-  </form>
-  <p class="field-error" data-ask-error role="alert" hidden></p>
-</div>""")
+        ask_panel = f"""<section class="ask ask-panel" id="ask" data-ask data-url="{ASK_URL}" aria-labelledby="ask-title">
+      <div class="ask-head"><h2 id="ask-title">Ask this paper</h2>
+        <button class="icon-button ask-close" type="button" data-ask-close aria-label="Close questions">×</button></div>
+      <p class="ask-sub">Answers come only from the abstract, with the sentence they rely on. Or select any sentence and press Ask.</p>
+      <ol class="ask-log" data-ask-log aria-live="polite"></ol>
+      <div class="ask-suggest">{chips}</div>
+      <form class="ask-form" data-ask-form>
+        <label class="sr-only" for="ask-q">Your question about this paper</label>
+        <input class="input" id="ask-q" maxlength="300" autocomplete="off" placeholder="Ask anything about it">
+        <button class="btn btn-primary" type="submit">Ask</button>
+      </form>
+      <p class="field-error" data-ask-error role="alert" hidden></p>
+    </section>"""
+        ask_fab = '<button class="ask-fab" type="button" data-ask-open aria-controls="ask" aria-expanded="false">Ask this paper</button>'
     if notes.get("check_question"):
         answer = notes.get("check_answer")
         answer_html = (f'<p class="check-a" data-check-answer hidden>{esc(answer)}</p>'
@@ -777,7 +808,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
 
     related_html = ""
     if related:
-        related_html = f'<div class="card pad"><span class="label">Read next, same idea</span><ol class="nextlist">{"".join(related_item(r, "../") for r in related)}</ol></div>'
+        related_html = (f'<section class="read-next"><h2 class="label">Read next, same idea</h2>'
+                        f'<ol class="nextlist nextlist-grid">{"".join(related_item(r, "../") for r in related)}</ol></section>')
 
     kicker = f'<span class="pick-n">{esc(slot_label(rec))}</span>' if rec.get("featured") else ""
     topic = (rec.get("categories") or ["other-ml"])[0]
@@ -790,28 +822,38 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     <a class="crumbs" href="../papers.html">{icon("back", 15)} All papers</a>
     <div class="rail-box"><span class="label">Your progress</span><span class="pixbar" data-pixbar>{'<i></i>' * 8}</span><span class="rail-small" data-left>About {minutes} min to read</span></div>
     <nav class="toc" aria-label="Sections">{"".join(toc)}</nav>
+    <div class="rail-notes" data-notes><span class="label">Your notes</span>
+      <p class="rail-small" data-notes-empty>Select text in the abstract to highlight it or add a note. They stay in this browser.</p>
+      <ol class="note-list" data-notes-list></ol></div>
     <div class="rail-actions">
       <button class="btn btn-outline btn-sm" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>
-      <details class="cite">
-        <summary class="btn btn-outline btn-sm">{icon("quote", 15)}<span>Cite</span></summary>
-        <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
+      <details class="tools">
+        <summary class="btn btn-outline btn-sm"><span>More tools</span></summary>
+        <div class="tools-menu">
+          <details class="cite">
+            <summary class="btn btn-outline btn-sm">{icon("quote", 15)}<span>Cite</span></summary>
+            <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
+          </details>
+          <button class="btn btn-outline btn-sm" type="button" data-share>{icon("share", 15)}<span>Share</span></button>
+          <button class="btn btn-outline btn-sm" type="button" data-focus>Focus mode <kbd>F</kbd></button>
+          <div class="text-size" role="group" aria-label="Text size"><button type="button" data-size="-1" aria-label="Make text smaller">A</button><button type="button" data-size="1" aria-label="Make text larger">A</button></div>
+        </div>
       </details>
-      <button class="btn btn-outline btn-sm" type="button" data-share>{icon("share", 15)}<span>Share</span></button>
-      <button class="btn btn-outline btn-sm" type="button" data-focus>Focus mode <kbd>F</kbd></button>
-      <div class="text-size" role="group" aria-label="Text size"><button type="button" data-size="-1" aria-label="Make text smaller">A</button><button type="button" data-size="1" aria-label="Make text larger">A</button></div>
     </div>
   </aside>
-  <article class="paper" data-paper-id="{esc(rec['id'])}" data-title="{title}">
+  <article class="paper" data-paper-id="{esc(rec['id'])}" data-title="{title}" data-topics="{esc(' '.join(rec.get('categories') or ['other-ml']))}">
     <p class="paper-kicker">{kicker}<span>arXiv <span class="mono">{esc(rec['id'])}</span></span></p>
     <h1>{title}</h1>
     <p class="byline">{esc(', '.join(rec.get('authors', [])))}</p>
     <div class="paper-meta">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}<span class="mins">{minutes} min read</span>{f'<a class="code-link" href="{esc(rec["code_url"])}" rel="noopener">&lt;/&gt; Code</a>' if rec.get("code_url") else ""}</div>
     {"".join(layers)}
-    <dl class="facts">{facts_html}</dl>
-    <div class="actions">
-      <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>{code_btn}
-      <a class="btn btn-outline" href="{esc(rec.get('pdf_url'))}" rel="noopener">{icon("file", 15)} Open PDF</a>
-      <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">View on Hugging Face {icon("external", 15)}</a>
+    <div class="source">
+      <dl class="facts">{facts_html}</dl>
+      <div class="actions">
+        <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>{code_btn}
+        <a class="text-link" href="{esc(rec.get('pdf_url'))}" rel="noopener">PDF</a>
+        <a class="text-link" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">Hugging Face</a>
+      </div>
     </div>
     <div class="feedback" data-feedback="{esc(rec['id'])}">
       <span data-feedback-q>Was this paper worth your time?</span>
@@ -819,15 +861,14 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       <button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not for me</button>
     </div>
     {done}
+    {related_html}
     {pager}
   </article>
-  <aside class="margin" aria-label="Notes and related papers">
-    <div class="card pad" data-notes><span class="label">Your notes</span>
-      <p class="rail-small" data-notes-empty>Select text in the abstract to highlight it. Highlights and notes stay in this browser.</p>
-      <ol class="note-list" data-notes-list></ol></div>
-    {related_html}
+  <aside class="margin" aria-label="Ask this paper">
+    {ask_panel}
   </aside>
-</div>"""
+</div>
+{ask_fab}"""
     desc = notes.get("tldr") or summary or abstract[:160]
     return page(rec["title"], body, root="../", description=desc)
 
@@ -923,7 +964,10 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
         shutil.rmtree(site_dir)
     shutil.copytree(ASSETS_DIR, os.path.join(site_dir, "assets"))
 
-    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir)))
+    archive = load_archive(export_dir)
+    rows, source = trends.trend_rows(archive, papers)
+    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows))
+    _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers)))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())
     _write(os.path.join(site_dir, "scout.html"), build_scout_page())
     _write(os.path.join(site_dir, "archive.html"), build_archive(days, papers))
@@ -958,7 +1002,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
 
     # Papers with a page here, plus the rest of the database's year (linking to Hugging Face)
     listing = [compact(r) for r in papers.values()]
-    listing += [archive_compact(r) for r in load_archive(export_dir) if r["id"] not in papers]
+    listing += [archive_compact(r) for r in archive if r["id"] not in papers]
     listing.sort(key=lambda p: (p["d"], p["s"]), reverse=True)
     _write(os.path.join(site_dir, "data", "papers.json"),
            json.dumps(listing, ensure_ascii=False, separators=(",", ":")))
