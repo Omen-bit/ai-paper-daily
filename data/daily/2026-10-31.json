@@ -1,138 +1,123 @@
 {
  "schema_version": 1,
  "date": "2026-10-31",
- "generated_at": "2026-10-31T13:14:40.470537+00:00",
+ "generated_at": "2026-10-31T13:51:37.174589+00:00",
  "featured": [
-  "2610.39301",
-  "2610.40614"
+  "2610.36671",
+  "2610.39633"
  ],
  "papers": [
   {
-   "id": "2610.39301",
-   "title": "Youtu-Parsing-Omni: One Encoder, One Schema, All Modalities",
+   "id": "2610.36671",
+   "title": "Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs",
    "authors": [
-    "Yunhang Shen",
-    "Zhangquan Chen",
-    "Xiaotian Li",
-    "Zhongpeng Cai",
-    "Qing Zhou",
-    "Zekai Zhang",
-    "Kun Zhang",
-    "Zezhong Wu",
-    "Jian Hu",
-    "Haihan Gao",
-    "Heting Gao",
-    "Xin Li",
-    "Yinsong Liu",
-    "Deqian Jiang",
-    "Di Yin",
-    "Haoyu Cao",
-    "Xing Sun",
-    "Bing Liu",
-    "Yanqiu Qu",
-    "Yunfei Wu",
-    "Kun Yin",
-    "Zhixiang Wei",
-    "Yongxiang Hua",
-    "Qianyu Li",
-    "Xiaoxing Hu",
-    "Peiyuan Zhang",
-    "Lijiang Li",
-    "Dong Xu",
-    "Zhenchuan Yang",
-    "Yiliang Jiang"
+    "Donghyeon Cho",
+    "Joowon Kim",
+    "Seungho Shin",
+    "Eunho Yang"
    ],
-   "abstract": "We present Youtu-Parsing-Omni, an omni-modal parser that converts documents, images, audio, and video into structured records grounded in space and time, providing a perception layer for agents that read, locate, and cite evidence across modalities. Its design rests on one encoder for every modality and one schema for every task. Youtu-Omni-Encoder, initialized from a pre-trained language model to strengthen text reading, encodes all modalities with shared weights in a unified space-time coordinate system, and a few fusion layers let video frames attend to concurrent audio, bringing cross-modal fusion and temporal alignment into perception itself. OmniSchema unifies the outputs of all ten parsing tasks, allowing a single self-evolving post-training procedure, OmniSchema-Aware On-Policy Distillation (OSAD), to provide a shared token-role-based objective across tasks. In each round, the model is trained on its own rollouts against token-level targets from a reference-conditioned copy of itself, which is then refreshed with the trained weights, so that the parser and its supervision co-evolve. With a single 5 B-parameter checkpoint, Youtu-Parsing-Omni achieves state-of-the-art performance on OmniDocBench v1.6 (96.96 Overall) and leads all open-weight models on OmniParsingBench (75.08 Avg.), with its advantage concentrated on audio and video. It also achieves the best overall chart-parsing score (95.02) and the highest exact chemical-fingerprint agreement among compared systems, and matches a dedicated optical-music model in character-level transcription of typeset sheet music while staying far ahead of general-purpose systems. Code and model weights are publicly available.",
-   "url": "https://arxiv.org/abs/2610.39301",
-   "pdf_url": "https://arxiv.org/pdf/2610.39301",
-   "submitted": "2026-10-28",
+   "abstract": "Diffusion vision-language models (DVLMs) process their entire input at every denoising step. Since visual tokens make up 89-97% of this input on the benchmarks we study, most of the decoding computation is spent repeatedly processing the same image. Visual token pruning methods partially relieve this burden by removing part of the visual tokens, but they lose the removed information and still process the remaining image at every step. To measure how often the image is actually needed, we compare LLaDA-V's predictions with and without the image at every decoding step and find that removing the image changes a token being unmasked at only 22.8% of steps on average and at as few as 7.9%. We therefore propose LOWN, a decoding method that decides at every step whether to process the image and how many tokens to unmask. LOWN predicts the masked tokens without the image and processes the image only when this prediction disagrees with the last image-conditioned prediction. Agreement certifies the earlier prediction for reuse, and the number of certified tokens sets how many are unmasked in that step. We further observe that the need for the image differs across benchmarks, so LOWN's adaptive decision is needed rather than a fixed schedule. Without training or a tuned threshold, LOWN retains 99.6% of LLaDA-V's score on ten benchmarks at 35.3% of the decoding FLOPs on average. LOWN also generalizes across LLaDA-based DVLMs, composes orthogonally with visual token pruning, and runs under key-value caching for further efficiency gains. Code and project page are available at https://hyeon9698.github.io/LOWN/",
+   "url": "https://arxiv.org/abs/2610.36671",
+   "pdf_url": "https://arxiv.org/pdf/2610.36671",
+   "submitted": "2026-10-26",
    "arxiv_categories": [
-    "cs.CV"
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
    ],
    "categories": [
-    "other-ml"
+    "multimodal",
+    "llms",
+    "computer-vision"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 139,
-   "score": 40,
+   "hf_upvotes": 95,
+   "score": 44,
    "badges": [
     "Top Pick",
-    "Trending on HF"
+    "Trending on HF",
+    "Interdisciplinary"
    ],
    "featured": true,
+   "slot": "pick",
    "summary": {
-    "text": "The paper demonstrates the effectiveness of unifying modalities for improved parsing performance.",
+    "text": "Efficiently utilizing visual information in Diffusion VLMs.",
     "source": "groq:allam-2-7b"
    },
    "curator": {
-    "tldr": "Youtu-Parsing-Omni unifies modalities in a shared space-time coordinate system, achieving state-of-the-art performance on various parsing tasks.",
-    "whats_new": "The paper presents an omni-modal parser that fuses text, images, audio, and video into a single space-time coordinate system.",
-    "key_result": "Youtu-Parsing-Omni achieves state-of-the-art performance on OmniDocBench v1.6, OmniParsingBench, and other parsing tasks.",
-    "why_it_matters": "The paper demonstrates the effectiveness of unifying modalities for improved parsing performance.",
-    "difficulty": "beginner",
-    "difficulty_reason": null,
+    "tldr": "Improving Diffusion VLMs efficiency by processing images only when needed and reducing FLOPs.",
+    "whats_new": "LOWN method for visual routing in Diffusion VLMs based on image agreement.",
+    "key_result": "LOWN reduces decoding FLOPs by 35.3% while retaining 99.6% of LLaDA-V's score on ten benchmarks.",
+    "why_it_matters": "Efficiently utilizing visual information in Diffusion VLMs.",
+    "difficulty": "intermediate",
+    "difficulty_reason": "Understanding Diffusion VLMs and implementing the LOWN method",
     "check_question": null,
     "check_answer": null,
     "build_ideas": [
-     "Develop an AI system that can parse and understand multimodal data (text, images, audio, and video).",
-     "Apply the Youtu-Parsing-Omni model for improved parsing performance across various tasks.",
-     "Use the shared space-time coordinate system to fuse modalities for better understanding of multimodal data."
+     "Adaptive image processing based on prediction agreement.",
+     "Composing with visual token pruning and key-value caching.",
+     "Leveraging the project page and code for further efficiency."
     ]
    },
-   "code_url": null,
+   "code_url": "https://github.com/hyeon9698/LOWN",
    "first_seen": "2026-10-31"
   },
   {
-   "id": "2610.40614",
-   "title": "L3G-World: Real-Time Infinite World Generation with Latent 3D Gaussian Memory",
+   "id": "2610.39633",
+   "title": "Intrinsic Distribution Matching",
    "authors": [
-    "Jinhyeok Choi",
-    "JoungBin Lee",
-    "Jongmin Lee",
-    "Minkyeong Jeon",
-    "Jiyoung Kim",
-    "Kaeun Han",
-    "Yoonjin Yoon",
-    "Seungryong Kim"
+    "Deyuan Liu",
+    "Yansen Han",
+    "Kaiwen Zheng",
+    "Jun Xie",
+    "Jiacheng Liu",
+    "Zhenglin Cheng",
+    "Peng Sun",
+    "Jintao Zhang",
+    "Jianguo Li",
+    "Tao Lin"
    ],
-   "abstract": "Interactive world models generate visual content conditioned on user actions, yet maintaining spatial consistency over long-horizon exploration in real time remains challenging. Existing approaches rely on either temporal context or explicit 3D memory, both of which scale poorly because memory grows with the length of the generated stream. Moreover, explicit 3D memories condition latent video generators by re-encoding RGB renderings, which precludes real-time generation. In this paper, we introduce a Latent 3D Gaussian Memory (L3G) that combines the efficiency of feed-forward reconstruction with a compact, rapidly renderable scene representation. Building on this memory, we propose L3G-World, in which a memory updater and a video diffusion transformer (DiT) alternate autoregressively to generate spatially consistent worlds. The memory updater spawns Gaussians in newly observed regions and refines existing ones, so that the memory grows with scene extent rather than stream length. Each Gaussian further stores a VAE latent feature, allowing the memory to be rendered directly into the DiT's latent space without VAE re-encoding. Experiments show that L3G-World achieves state-of-the-art generation quality and long-horizon spatial consistency, with up to $38.6\\times$ fewer 3D primitives, $3.2\\times$ faster memory updates, and $359\\times$ faster memory rendering relative to the most efficient prior 3D-memory baseline for each metric, enabling real-time world generation at 9 FPS.",
-   "url": "https://arxiv.org/abs/2610.40614",
-   "pdf_url": "https://arxiv.org/pdf/2610.40614",
-   "submitted": "2026-10-29",
+   "abstract": "One-step and few-step text-to-image generation must accurately render the details specified in the prompt despite limited opportunities for refinement. Distribution matching distillation (DMD) uses score differences to bring the generated distribution closer to a reference distribution. Following prior work, we estimate this difference with internal velocity branches, avoiding a separate fake-score network. We ask whether an explicit moment constraint improves this learned score supervision. A decomposition of the reverse-KL field into a Gaussian moment component and a non-Gaussian residual identifies statistics that can be constrained explicitly. We introduce Intrinsic Distribution Matching (IDM), which retains the full DMD correction and matches feature means and per-coordinate standard deviations using the generator's exponential-moving-average (EMA) copy, requiring no external feature encoder. Experiments use full-parameter and low-rank adaptation (LoRA) tuning on Z-Image-Turbo 6B and Qwen-Image 20B. At two network evaluations, IDM reaches 94.25% and 90.20% on Chinese and English LongText-Bench, the highest scores among the compared methods at this budget. Controlled ablations show gains from the added moment loss, while generator EMA features perform competitively with an external DINOv2 encoder across the five reported metrics. Code is available at https://github.com/inclusionAI/IDM.",
+   "url": "https://arxiv.org/abs/2610.39633",
+   "pdf_url": "https://arxiv.org/pdf/2610.39633",
+   "submitted": "2026-10-28",
    "arxiv_categories": [
-    "cs.CV"
+    "cs.CV",
+    "cs.AI"
    ],
    "categories": [
     "generative-ai",
-    "computer-vision"
+    "efficient-ai"
    ],
-   "source": "arXiv + HuggingFace",
-   "hf_upvotes": 37,
-   "score": 39,
+   "source": "HuggingFace",
+   "hf_upvotes": 242,
+   "score": 41,
    "badges": [
-    "Trending on HF",
-    "Novel Method"
+    "Trending",
+    "Trending on HF"
    ],
    "featured": true,
+   "slot": "trending",
    "summary": {
-    "text": "Real-time world generation is enabled with improved efficiency.",
+    "text": "Enhances text-to-image generation performance.",
     "source": "groq:allam-2-7b"
    },
    "curator": {
-    "tldr": "L3G-World generates spatially consistent worlds in real-time with a feed-forward memory and a video diffusion Transformer.",
-    "whats_new": "The paper introduces Latent 3D Gaussian Memory (L3G) for efficient spatially consistent world generation and proposes L3G-World for real-time world generation.",
-    "key_result": "L3G-World achieves state-of-the-art generation quality, faster memory updates, and faster memory rendering.",
-    "why_it_matters": "Real-time world generation is enabled with improved efficiency.",
+    "tldr": "Improves text-to-image generation by matching distribution moments with intrinsic distribution matching (IDM), achieving high scores on LongText-Bench.",
+    "whats_new": "Introduces intrinsic distribution matching for text-to-image generation.",
+    "key_result": "IDM reaches 94.25% and 90.20% on Chinese and English LongText-Bench, outperforming compared methods.",
+    "why_it_matters": "Enhances text-to-image generation performance.",
     "difficulty": "intermediate",
     "difficulty_reason": null,
-    "check_question": null,
-    "check_answer": null,
+    "check_question": "How does intrinsic distribution matching improve text-to-image generation?",
+    "check_answer": "Intrinsic distribution matching improves text-to-image generation by matching distribution moments, leading to higher LongText-Bench scores.",
     "build_ideas": [
-     "Use L3G memory for efficient spatially consistent world generation.",
-     "Apply L3G-World for real-time world generation at 9 FPS."
+     "Apply intrinsic distribution matching for text-to-image generation.",
+     "Experiment with low-rank adaptation (LoRA) tuning on Z-Image-Turbo 6B and Qwen-Image 20B.",
+     "Use generator EMA features instead of external DINOv2 encoder."
     ]
    },
-   "code_url": "https://github.com/cvlab-kaist/L3G-World",
+   "code_url": "https://github.com/inclusionAI/IDM",
    "first_seen": "2026-10-31"
   },
   {
@@ -171,12 +156,13 @@
     "other-ml"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 159,
+   "hf_upvotes": 161,
    "score": 39,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -211,6 +197,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -247,6 +234,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -275,7 +263,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 7,
+   "hf_upvotes": 8,
    "score": 34,
    "badges": [
     "Trending on HF",
@@ -283,6 +271,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -320,12 +309,48 @@
     "llms"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 20,
+   "hf_upvotes": 21,
    "score": 34,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-10-31"
+  },
+  {
+   "id": "2610.40599",
+   "title": "HairDeck: Animation-Ready Stylized Hair Cards from a Single Image",
+   "authors": [
+    "Yuze He",
+    "Yixiang Wei",
+    "Wang Zhao",
+    "Chuhao Chen",
+    "Yanning Zhou",
+    "Yong-Jin Liu"
+   ],
+   "abstract": "The hair of stylized characters in games and avatars is built from hair cards: artist-placed ribbons whose geometry is the visible hair, animated by spring bones. Existing image-based methods produce realistic hair or a single fused mesh, while CHARM, the only generator of stylized hair cards, decodes a hairstyle autoregressively as a long sequence of control points. Observing that a card hairstyle is an unordered set of artist-defined primitives, we propose HairDeck, which generates it as one: each card is a single token, and a set diffusion transformer denoises all cards together. From a single image, HairDeck generates the cards and the spring-bone chains that drive them, yielding an animatable asset that exports to ready-to-use downstream formats. On CHARM's own test set, it lowers Chamfer distance by 44% and card-orientation error by more than half while running 33 times faster, and from single images it outperforms CHARM, image-to-3D pipelines and strand-based methods. Project page: https://hyzcluster.github.io/HairDeck",
+   "url": "https://arxiv.org/abs/2610.40599",
+   "pdf_url": "https://arxiv.org/pdf/2610.40599",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.CV",
+    "cs.GR"
+   ],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "arXiv + HuggingFace",
+   "hf_upvotes": 20,
+   "score": 33,
+   "badges": [
+    "Trending on HF"
+   ],
+   "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -360,13 +385,14 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 32,
+   "hf_upvotes": 33,
    "score": 33,
    "badges": [
     "Trending on HF",
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -400,6 +426,51 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-10-31"
+  },
+  {
+   "id": "2610.35138",
+   "title": "Co-Design Bench: Multimodal Collaborative Coding Evaluation for Agentic Models",
+   "authors": [
+    "Xilin Wei",
+    "Shengyuan Ding",
+    "Xinyu Fang",
+    "Tiancheng Gu",
+    "Yuchi Wang",
+    "Zhixun Li",
+    "Ziyu Liu",
+    "Yuhang Zang",
+    "Weixiang Yu",
+    "Cheng Lu",
+    "Chonggao Sun",
+    "Tong Zhou",
+    "Dahua Lin",
+    "Hang Zhang",
+    "Shuai Bai",
+    "Dayiheng Liu"
+   ],
+   "abstract": "Evaluating human-AI co-design requires testing whether coding agents can translate real users' multimodal requests into working application revisions. We introduce Co-Design Bench, a reference-free benchmark of 273 tasks curated from 37,463 deduplicated queries across 26,314 real user coding sessions. Its two tracks, Multimodal Editing (ME) and Repository Editing (RE), cover localized edits with optional image, audio, video, or document inputs and coordinated repository revisions. Tasks span three capability dimensions: Grounded Understanding, UI Transformation, and Functional Implementation. The tasks pair normalized requests and runnable pre-edit applications with 2,331 hidden expert-authored acceptance criteria. Our judge-then-refute protocol grades criteria using source and browser evidence, challenges positive verdicts with a separate LLM verifier, and audits visual and interaction claims without gold code or target screenshots. Under a shared agentic harness, the strongest of ten model endpoints passes an average of 69.9% of criteria per task but fully satisfies only 26.4% of tasks. All ten endpoints achieve lower criterion completion on repository edits spanning three or four change types than on those spanning one or two. Co-Design Bench provides a testbed for studying the gap between partial requirement satisfaction and complete task success under agentic execution for real-user application revisions.",
+   "url": "https://arxiv.org/abs/2610.35138",
+   "pdf_url": "https://arxiv.org/pdf/2610.35138",
+   "submitted": "2026-10-25",
+   "arxiv_categories": [
+    "cs.AI"
+   ],
+   "categories": [
+    "reasoning-agents"
+   ],
+   "source": "HuggingFace",
+   "hf_upvotes": 20,
+   "score": 31,
+   "badges": [
+    "Trending on HF"
+   ],
+   "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -443,6 +514,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -472,13 +544,14 @@
     "multimodal"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 14,
+   "hf_upvotes": 15,
    "score": 31,
    "badges": [
     "Trending on HF",
     "Survey / Review"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -520,6 +593,7 @@
     "Survey / Review"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -559,6 +633,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -595,6 +670,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -641,6 +717,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -679,6 +756,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -709,46 +787,13 @@
     "multimodal"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 9,
+   "hf_upvotes": 10,
    "score": 28,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-10-31"
-  },
-  {
-   "id": "2610.40599",
-   "title": "HairDeck: Animation-Ready Stylized Hair Cards from a Single Image",
-   "authors": [
-    "Yuze He",
-    "Yixiang Wei",
-    "Wang Zhao",
-    "Chuhao Chen",
-    "Yanning Zhou",
-    "Yong-Jin Liu"
-   ],
-   "abstract": "The hair of stylized characters in games and avatars is built from hair cards: artist-placed ribbons whose geometry is the visible hair, animated by spring bones. Existing image-based methods produce realistic hair or a single fused mesh, while CHARM, the only generator of stylized hair cards, decodes a hairstyle autoregressively as a long sequence of control points. Observing that a card hairstyle is an unordered set of artist-defined primitives, we propose HairDeck, which generates it as one: each card is a single token, and a set diffusion transformer denoises all cards together. From a single image, HairDeck generates the cards and the spring-bone chains that drive them, yielding an animatable asset that exports to ready-to-use downstream formats. On CHARM's own test set, it lowers Chamfer distance by 44% and card-orientation error by more than half while running 33 times faster, and from single images it outperforms CHARM, image-to-3D pipelines and strand-based methods. Project page: https://hyzcluster.github.io/HairDeck",
-   "url": "https://arxiv.org/abs/2610.40599",
-   "pdf_url": "https://arxiv.org/pdf/2610.40599",
-   "submitted": "2026-10-29",
-   "arxiv_categories": [
-    "cs.CV",
-    "cs.GR"
-   ],
-   "categories": [
-    "other-ml"
-   ],
-   "source": "arXiv + HuggingFace",
-   "hf_upvotes": 19,
-   "score": 27,
-   "badges": [
-    "Trending on HF"
-   ],
-   "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -780,6 +825,7 @@
     "Survey / Review"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -811,6 +857,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -845,12 +892,13 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 17,
+   "hf_upvotes": 18,
    "score": 27,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -886,6 +934,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -921,6 +970,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -957,6 +1007,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -991,6 +1042,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1022,6 +1074,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1056,6 +1109,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1095,6 +1149,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1134,49 +1189,7 @@
     "Trending on HF"
    ],
    "featured": false,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-10-31"
-  },
-  {
-   "id": "2610.35138",
-   "title": "Co-Design Bench: Multimodal Collaborative Coding Evaluation for Agentic Models",
-   "authors": [
-    "Xilin Wei",
-    "Shengyuan Ding",
-    "Xinyu Fang",
-    "Tiancheng Gu",
-    "Yuchi Wang",
-    "Zhixun Li",
-    "Ziyu Liu",
-    "Yuhang Zang",
-    "Weixiang Yu",
-    "Cheng Lu",
-    "Chonggao Sun",
-    "Tong Zhou",
-    "Dahua Lin",
-    "Hang Zhang",
-    "Shuai Bai",
-    "Dayiheng Liu"
-   ],
-   "abstract": "Evaluating human-AI co-design requires testing whether coding agents can translate real users' multimodal requests into working application revisions. We introduce Co-Design Bench, a reference-free benchmark of 273 tasks curated from 37,463 deduplicated queries across 26,314 real user coding sessions. Its two tracks, Multimodal Editing (ME) and Repository Editing (RE), cover localized edits with optional image, audio, video, or document inputs and coordinated repository revisions. Tasks span three capability dimensions: Grounded Understanding, UI Transformation, and Functional Implementation. The tasks pair normalized requests and runnable pre-edit applications with 2,331 hidden expert-authored acceptance criteria. Our judge-then-refute protocol grades criteria using source and browser evidence, challenges positive verdicts with a separate LLM verifier, and audits visual and interaction claims without gold code or target screenshots. Under a shared agentic harness, the strongest of ten model endpoints passes an average of 69.9% of criteria per task but fully satisfies only 26.4% of tasks. All ten endpoints achieve lower criterion completion on repository edits spanning three or four change types than on those spanning one or two. Co-Design Bench provides a testbed for studying the gap between partial requirement satisfaction and complete task success under agentic execution for real-user application revisions.",
-   "url": "https://arxiv.org/abs/2610.35138",
-   "pdf_url": "https://arxiv.org/pdf/2610.35138",
-   "submitted": "2026-10-25",
-   "arxiv_categories": [
-    "cs.AI"
-   ],
-   "categories": [
-    "reasoning-agents"
-   ],
-   "source": "HuggingFace",
-   "hf_upvotes": 19,
-   "score": 25,
-   "badges": [
-    "Trending on HF"
-   ],
-   "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1227,12 +1240,13 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 15,
+   "hf_upvotes": 16,
    "score": 25,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1284,6 +1298,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1315,6 +1330,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1352,6 +1368,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1392,6 +1409,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1428,6 +1446,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1455,13 +1474,14 @@
     "generative-ai"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 2,
+   "hf_upvotes": 3,
    "score": 23,
    "badges": [
     "Trending on HF",
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1490,12 +1510,13 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 11,
+   "hf_upvotes": 12,
    "score": 23,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1530,6 +1551,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1564,6 +1586,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1600,6 +1623,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1630,6 +1654,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1660,6 +1685,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1688,6 +1714,7 @@
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1713,12 +1740,13 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 3,
+   "hf_upvotes": 4,
    "score": 19,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1748,6 +1776,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1772,12 +1801,13 @@
     "efficient-ai"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 3,
+   "hf_upvotes": 4,
    "score": 18,
    "badges": [
     "Trending on HF"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1816,6 +1846,7 @@
     "Survey / Review"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1852,6 +1883,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1883,6 +1915,7 @@
     "Survey / Review"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1917,6 +1950,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1952,6 +1986,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -1987,6 +2022,7 @@
    "score": 13,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2032,6 +2068,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2071,6 +2108,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2105,6 +2143,7 @@
     "Survey / Review"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2142,6 +2181,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2180,6 +2220,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2223,6 +2264,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2258,6 +2300,7 @@
    "score": 13,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2301,6 +2344,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2336,6 +2380,7 @@
    "score": 13,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2370,6 +2415,7 @@
    "score": 12,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2413,6 +2459,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2446,6 +2493,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2475,6 +2523,7 @@
     "Survey / Review"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2509,6 +2558,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2543,6 +2593,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2629,6 +2680,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2670,6 +2722,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2709,6 +2762,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2743,6 +2797,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2779,6 +2834,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2813,6 +2869,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2845,6 +2902,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2875,6 +2933,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2911,6 +2970,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2950,6 +3010,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -2984,6 +3045,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3018,6 +3080,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3055,6 +3118,7 @@
    "score": 11,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3091,6 +3155,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3124,6 +3189,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3158,6 +3224,7 @@
    "score": 11,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3195,6 +3262,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3228,6 +3296,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3261,6 +3330,7 @@
    "score": 10,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3302,6 +3372,7 @@
    "score": 10,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3335,6 +3406,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3364,6 +3436,7 @@
    "score": 10,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3394,6 +3467,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3427,6 +3501,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3456,6 +3531,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3489,6 +3565,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3522,6 +3599,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3553,6 +3631,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3592,6 +3671,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3626,6 +3706,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3658,6 +3739,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3698,6 +3780,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3730,6 +3813,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3762,6 +3846,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3795,6 +3880,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3828,6 +3914,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3860,6 +3947,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3892,6 +3980,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3923,6 +4012,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -3954,6 +4044,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4001,6 +4092,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4033,6 +4125,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4064,6 +4157,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4098,6 +4192,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4130,6 +4225,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4162,6 +4258,7 @@
    "score": 9,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4192,6 +4289,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4222,6 +4320,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4252,6 +4351,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4287,6 +4387,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4319,6 +4420,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4350,6 +4452,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4381,6 +4484,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4412,6 +4516,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4446,6 +4551,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4476,6 +4582,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4506,6 +4613,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4539,6 +4647,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4568,6 +4677,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4597,6 +4707,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4627,6 +4738,7 @@
    "score": 8,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4657,6 +4769,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4689,6 +4802,7 @@
     "Interdisciplinary"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4719,6 +4833,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4746,6 +4861,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4780,6 +4896,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4808,6 +4925,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4840,6 +4958,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4872,6 +4991,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4903,6 +5023,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4935,6 +5056,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4966,6 +5088,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -4997,6 +5120,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5026,6 +5150,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5071,6 +5196,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5103,6 +5229,7 @@
    "score": 7,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5135,6 +5262,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5166,6 +5294,7 @@
     "Novel Method"
    ],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5193,6 +5322,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5224,6 +5354,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5250,6 +5381,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5283,6 +5415,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5314,6 +5447,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5345,6 +5479,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5375,6 +5510,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5407,6 +5543,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5440,6 +5577,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5468,6 +5606,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5498,6 +5637,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5530,6 +5670,7 @@
    "score": 6,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5558,6 +5699,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5587,6 +5729,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5615,6 +5758,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5641,6 +5785,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5669,6 +5814,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5698,6 +5844,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5727,6 +5874,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5756,6 +5904,7 @@
    "score": 5,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5782,6 +5931,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5813,6 +5963,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5842,6 +5993,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5870,6 +6022,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5897,6 +6050,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5923,6 +6077,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5952,6 +6107,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -5981,6 +6137,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6012,6 +6169,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6041,6 +6199,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6070,6 +6229,7 @@
    "score": 4,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6098,6 +6258,7 @@
    "score": 3,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6127,6 +6288,7 @@
    "score": 3,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6155,6 +6317,7 @@
    "score": 3,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6183,6 +6346,7 @@
    "score": 3,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6212,6 +6376,7 @@
    "score": 3,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6239,6 +6404,7 @@
    "score": 3,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6267,6 +6433,7 @@
    "score": 2,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6294,6 +6461,7 @@
    "score": 2,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6322,6 +6490,7 @@
    "score": 2,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6351,6 +6520,7 @@
    "score": 2,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6380,6 +6550,7 @@
    "score": 1,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6408,6 +6579,7 @@
    "score": 1,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
@@ -6436,6 +6608,7 @@
    "score": 1,
    "badges": [],
    "featured": false,
+   "slot": null,
    "summary": null,
    "curator": null,
    "code_url": null,
