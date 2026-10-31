@@ -100,3 +100,29 @@ def test_curator_notes_show_on_paper_page_and_card(tmp_path):
     assert 'href="https://github.com/a/b"' in page
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
     assert "In short" in home and "Code available" in home
+
+
+def test_papers_page_offers_search_by_meaning(tmp_path):
+    from site_builder import SEARCH_URL
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.9")], [_paper("2610.9")], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "papers.html"), encoding="utf-8").read()
+    assert 'id="meaning"' in page
+    assert f'data-search-url="{SEARCH_URL}"' in page
+    assert SEARCH_URL.startswith("https://") and SEARCH_URL.endswith("/functions/v1/search")
+
+
+def test_paper_page_has_check_question_and_next_pick(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    notes = {"tldr": "Short take here.", "whats_new": "New bit.", "why_it_matters": "Matters.",
+             "build_ideas": ["Build one.", "Build two."], "difficulty": "beginner",
+             "check_question": "What is <traded> for speed?", "check_answer": "Memory."}
+    a = _paper("2610.1", 9, curator=notes)
+    b = _paper("2610.2", 8)
+    save_day([a, b], [a, b], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    assert "What is &lt;traded&gt; for speed?" in page
+    assert "data-check-answer" in page
+    assert "data-done" in page and "paper/2610.2.html" in page.replace("../", "paper/")

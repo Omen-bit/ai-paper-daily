@@ -52,6 +52,17 @@ def test_parse_notes_drops_bad_optional_fields():
     assert notes["difficulty_reason"] is None
 
 
+def test_check_question_needs_its_answer():
+    good = dict(GOOD, check_question="What does the model trade for speed?",
+                check_answer="It drops the decoder cache to run on a phone.")
+    notes = curator.parse_notes(json.dumps(good))
+    assert notes["check_question"] == good["check_question"]
+    assert notes["check_answer"] == good["check_answer"]
+    lone = curator.parse_notes(json.dumps(dict(good, check_answer=None)))
+    assert lone["check_question"] is None and lone["check_answer"] is None
+    assert curator.parse_notes(json.dumps(GOOD))["check_question"] is None
+
+
 def test_find_code_url_never_invents_links():
     assert curator.find_code_url({"github_repo": "https://github.com/a/b"}) == "https://github.com/a/b"
     assert curator.find_code_url({"abstract": "Code is at https://github.com/x/y."}) == "https://github.com/x/y"

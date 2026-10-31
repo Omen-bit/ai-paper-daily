@@ -28,6 +28,8 @@ LIMITS = {
     "why_it_matters": 40,
     "difficulty_reason": 25,
     "build_idea": 25,
+    "check_question": 30,
+    "check_answer": 40,
 }
 
 SYSTEM_PROMPT = """You are the Curator for AI Papers Daily, a site for people who read AI papers and build projects from them.
@@ -40,6 +42,8 @@ Read the paper's title and abstract and return reading notes as one JSON object 
 "build_ideas": a list of 2 or 3 concrete projects a developer could build with this work, each at most 20 words and starting with a verb.
 "difficulty": one of "beginner", "intermediate", "advanced", for how hard it is to reproduce or use.
 "difficulty_reason": one short phrase, at most 20 words, explaining the difficulty (for example the compute or background needed).
+"check_question": one short question, at most 25 words, that checks whether a reader understood the paper's main idea. Its answer must be in the abstract.
+"check_answer": the answer to check_question in one or two sentences, at most 35 words.
 
 Rules: use only facts from the abstract and never invent numbers, datasets or links. Write in plain language and avoid hype words such as "groundbreaking" or "revolutionary". Return only the JSON object."""
 
@@ -71,7 +75,7 @@ def parse_notes(raw: str) -> Optional[dict]:
     """
     Turn the model's reply into clean notes, or None if it is unusable.
     Required: tldr, whats_new, why_it_matters, 2+ build ideas, a known difficulty.
-    Optional: key_result and difficulty_reason (dropped when they fail checks).
+    Optional: key_result, difficulty_reason and the check question with its answer (dropped when they fail checks).
     """
     if not raw:
         return None
@@ -94,7 +98,12 @@ def parse_notes(raw: str) -> Optional[dict]:
         "why_it_matters": _sentence(data.get("why_it_matters"), LIMITS["why_it_matters"]),
         "difficulty": str(data.get("difficulty", "")).strip().lower(),
         "difficulty_reason": _sentence(data.get("difficulty_reason"), LIMITS["difficulty_reason"]),
+        "check_question": _sentence(data.get("check_question"), LIMITS["check_question"]),
+        "check_answer": _sentence(data.get("check_answer"), LIMITS["check_answer"]),
     }
+    # The question is only useful with its answer, so keep both or neither
+    if not (notes["check_question"] and notes["check_answer"]):
+        notes["check_question"] = notes["check_answer"] = None
     ideas = data.get("build_ideas")
     ideas = ideas if isinstance(ideas, list) else []
     notes["build_ideas"] = [i for i in (_sentence(x, LIMITS["build_idea"]) for x in ideas) if i][:3]
@@ -118,7 +127,7 @@ def _ask(model: str, title: str, abstract: str) -> Optional[str]:
             {"role": "user", "content": f"Title: {title}\n\nAbstract: {gs._truncate_abstract(abstract, 2500)}"},
         ],
         response_format={"type": "json_object"},
-        max_tokens=600,
+        max_tokens=750,
         temperature=0.2,
     )
     choice = response.choices[0]

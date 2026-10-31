@@ -117,5 +117,6 @@ begin
   return n <= max_hits;
 end $$;
 revoke all on function public.hit_rate_limit(text, int, int) from public, anon, authenticated;
+grant execute on function public.hit_rate_limit(text, int, int) to service_role;
 grant execute on function public.match_papers(extensions.vector, int, date) to anon, authenticated;
 grant execute on function public.recommend_papers(text[], int, date) to anon, authenticated;

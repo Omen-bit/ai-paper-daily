@@ -53,23 +53,11 @@ ICONS = {
     "next": '<path d="m9 18 6-6-6-6"/>',
 }
 
-# The logo: a page with a folded corner and its first line highlighted,
-# the way a reader marks the sentence that matters.
-LOGO_SVG = ('<svg class="logo-mark" width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">'
-            '<rect width="32" height="32" rx="9" fill="#ea580c"/>'
-            '<path d="M10 6.5h9l4.5 4.5v13.5a1.5 1.5 0 0 1-1.5 1.5H10a1.5 1.5 0 0 1-1.5-1.5V8a1.5 1.5 0 0 1 1.5-1.5Z" fill="#fff"/>'
-            '<path d="M19 6.5V11h4.5Z" fill="#fdba74"/>'
-            '<rect x="10.75" y="13" width="10.5" height="3.6" rx="1.2" fill="#fed7aa"/>'
-            '<path d="M11.75 14.8h8.5" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>'
-            '<path d="M11.75 19.4h8.5M11.75 22.6h5.5" stroke="#a8a29e" stroke-width="1.5" stroke-linecap="round"/>'
-            '</svg>')
+# The logo: four pixels, two orange and two ink, like a cursor blinking on a page.
 FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>"
-           "<rect width='32' height='32' rx='9' fill='%23ea580c'/>"
-           "<path d='M10 6.5h9l4.5 4.5v13.5a1.5 1.5 0 0 1-1.5 1.5H10a1.5 1.5 0 0 1-1.5-1.5V8a1.5 1.5 0 0 1 1.5-1.5Z' fill='white'/>"
-           "<path d='M19 6.5V11h4.5Z' fill='%23fdba74'/>"
-           "<rect x='10.75' y='13' width='10.5' height='3.6' rx='1.2' fill='%23fed7aa'/>"
-           "<path d='M11.75 14.8h8.5' stroke='%239a3412' stroke-width='1.5' stroke-linecap='round'/>"
-           "<path d='M11.75 19.4h8.5M11.75 22.6h5.5' stroke='%23a8a29e' stroke-width='1.5' stroke-linecap='round'/></svg>")
+           "<rect width='32' height='32' rx='6' fill='%230e0e10'/>"
+           "<rect x='4' y='4' width='12' height='12' fill='%23ff4f00'/><rect x='16' y='16' width='12' height='12' fill='%23ff4f00'/>"
+           "<rect x='16' y='4' width='12' height='12' fill='%23f2f0eb'/><rect x='4' y='16' width='12' height='12' fill='%23f2f0eb'/></svg>")
 
 
 def icon(name: str, size: int = 16, cls: str = "") -> str:
@@ -159,18 +147,23 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
 # Layout
 # ---------------------------------------------------------------------------
 
+# Edition strip shown on every page; set by build_site
+EDITION = ""
+
 # Runs before first paint so a saved dark theme never flashes white
 THEME_SCRIPT = ("<script>try{var t=localStorage.getItem('apd.theme')||(matchMedia('(prefers-color-scheme: dark)')"
                 ".matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}</script>")
 
 
-def page(title: str, body: str, root: str = "", description: str = TAGLINE, active: str = "") -> str:
+def page(title: str, body: str, root: str = "", description: str = TAGLINE, active: str = "",
+         edition: str = "", body_class: str = "") -> str:
     """Wrap body in the shared layout. root is the relative path to the site root."""
+    edition = edition or EDITION
     full_title = f"{title} · {SITE_NAME}" if title != SITE_NAME else f"{SITE_NAME}: research papers worth building on"
 
-    def nav(href, label, key):
+    def nav(href, label, key, extra=""):
         current = ' aria-current="page"' if key == active else ""
-        return f'<a href="{root}{href}"{current}>{label}</a>'
+        return f'<a href="{root}{href}"{current}>{label}{extra}</a>'
 
     return f"""<!doctype html>
 <html lang="en">
@@ -181,42 +174,57 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 <meta name="description" content="{esc(description)}">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(description)}">
-<meta name="theme-color" content="#ea580c">
+<meta name="theme-color" content="#ff4f00">
 {THEME_SCRIPT}
 <link rel="preload" href="{root}assets/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{root}assets/fonts/geist-pixel-square.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{root}assets/style.css">
 <link rel="icon" href="{FAVICON}">
 </head>
-<body>
+<body{f' class="{body_class}"' if body_class else ""}>
 <a class="skip" href="#main">Skip to content</a>
+<div class="ticker" aria-hidden="true"><div class="wrap ticker-in">{edition}<span class="ticker-next" data-next-edition>Updated every morning</span></div></div>
 <header class="site-header">
-  <div class="container">
-    <a class="logo" href="{root}index.html" aria-label="{SITE_NAME}, home">{LOGO_SVG}<span class="logo-text">AI Papers <span>Daily</span></span></a>
-    <nav class="nav">
+  <div class="wrap bar-in">
+    <a class="brand" href="{root}index.html" aria-label="{SITE_NAME}, home"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">AI PAPERS<em>/DAILY</em></span></a>
+    <nav class="nav" aria-label="Main">
       {nav("index.html", "Today", "today")}
       {nav("papers.html", "All papers", "papers")}
       {nav("archive.html", "Archive", "archive")}
-      <a href="{root}saved.html"{' aria-current="page"' if active == "saved" else ""}>Saved<span class="nav-count" data-saved-count hidden></span></a>
+      {nav("saved.html", "Saved", "saved", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
     <div class="header-actions">
-      <a class="search-trigger" href="{root}papers.html" data-search-trigger>{icon("search", 15)}<span>Search papers…</span><kbd>/</kbd></a>
+      <a class="cmdk" href="{root}papers.html" data-search-trigger>{icon("search", 15)}<span>Search papers or an idea</span><kbd>/</kbd></a>
+      <span class="streak" data-streak hidden title="Days in a row you read a paper"></span>
       <button class="icon-button" type="button" data-theme-toggle aria-label="Switch light or dark theme" data-tip="Switch theme">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
     </div>
   </div>
 </header>
-<main class="container" id="main">
+<main class="wrap" id="main">
 {body}
 </main>
 <footer class="site-footer">
-  <div class="container">
-    <p>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.</p>
-    <p>Summaries are written by AI. Always check the paper.</p>
+  <div class="wrap foot-in">
+    <span>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.</span>
+    <span>Summaries are written by AI from the abstract. Check the paper.</span>
   </div>
 </footer>
 <script src="{root}assets/app.js" defer></script>
 </body>
 </html>
 """
+
+
+def ticker(days: list[dict]) -> str:
+    """Edition number and date for the strip at the top of every page."""
+    if not days:
+        return ""
+    d = days[0]["date"]
+    try:
+        stamp = f"{date.fromisoformat(d):%a %d %b %Y}".upper()
+    except ValueError:
+        stamp = d
+    return f'<span>Edition {len(days):03d}</span><span class="ticker-date">{esc(stamp)}</span>'
 
 
 # ---------------------------------------------------------------------------
@@ -232,6 +240,10 @@ def badges(rec: dict, root: str) -> str:
     return f'<div class="badges">{"".join(out)}</div>'
 
 
+def topic_dot(slug: str) -> str:
+    return f'<span class="topic t-{esc(slug)}"><span class="dot"></span>{esc(category_name(slug))}</span>'
+
+
 LEVELS = {"beginner": 1, "intermediate": 2, "advanced": 3}
 
 
@@ -244,26 +256,30 @@ def level_meter(difficulty: str) -> str:
     return f'<span class="level"><span class="level-bars" aria-hidden="true">{bars}</span>{esc(difficulty.capitalize())}</span>'
 
 
+def pick_minutes(rec: dict) -> int:
+    """Rough minutes to read our notes plus the abstract."""
+    notes = rec.get("curator") or {}
+    words = len((rec.get("abstract") or "").split())
+    words += sum(len(str(v).split()) for v in notes.values() if isinstance(v, str))
+    words += sum(len(i.split()) for i in notes.get("build_ideas", []))
+    return max(1, round(words / 200))
+
+
 def featured_card(rec: dict, rank: int, root: str) -> str:
     notes = rec.get("curator") or {}
     if notes.get("tldr"):
-        summary_html = f'<p class="why"><b>In short</b>{esc(notes["tldr"])}</p>'
+        blurb = f'<p class="pick-blurb"><b>In short</b>{esc(notes["tldr"])}</p>'
     else:
         summary = (rec.get("summary") or {}).get("text") or ""
-        summary_html = f'<p class="why"><b>Why it matters</b>{esc(summary)}</p>' if summary else ""
-    extras = level_meter(notes.get("difficulty"))
-    if rec.get("code_url"):
-        extras += f'<span class="has-code">{icon("code", 14)}Code available</span>'
-    extras_html = f'<div class="card-extras">{extras}</div>' if extras else ""
-    label = '<span class="badge badge-pick">Top pick</span>' if rank == 1 else f'<span class="rank">Pick {rank}</span>'
+        blurb = f'<p class="pick-blurb"><b>Why it matters</b>{esc(summary)}</p>' if summary else ""
+    label = "Top pick" if rank == 1 else f"Pick {rank:02d}"
     topic = (rec.get("categories") or ["other-ml"])[0]
-    return f"""<article class="card t-{esc(topic)}">
-  <div class="card-meta">{label}<span class="mono">{esc(rec['id'])}</span></div>
+    code = f'<span class="has-code">{icon("code", 14)}Code available</span>' if rec.get("code_url") else ""
+    return f"""<article class="pick{' is-first' if rank == 1 else ''}" data-id="{esc(rec['id'])}">
+  <header class="pick-top"><span class="pick-n">{label}</span><span class="pick-read" hidden>Read ✓</span></header>
   <h3><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></h3>
-  <p class="authors">{esc(format_authors(rec.get('authors', []), 3))}</p>
-  {summary_html}
-  {extras_html}
-  {badges(dict(rec, featured=False), root)}
+  {blurb}
+  <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
 </article>"""
 
 
@@ -276,9 +292,92 @@ def paper_row(rec: dict, root: str) -> str:
 </li>"""
 
 
+def home_row(rec: dict, n: int) -> str:
+    """A quieter row for the home page: number, title, one topic, authors, quick save."""
+    topic = (rec.get("categories") or ["other-ml"])[0]
+    return f"""<li class="row" data-id="{esc(rec['id'])}">
+  <span class="row-n">{n:02d}</span>
+  <span class="row-title"><a href="paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></span>
+  <span class="row-authors">{topic_dot(topic)}<span class="sep"></span>{esc(format_authors(rec.get('authors', []), 2))}</span>
+  <button class="quick-save" type="button" data-quick-save="{esc(rec['id'])}" data-title="{esc(rec['title'])}" aria-pressed="false" aria-label="Save for later">+</button>
+</li>"""
+
+
 def section_head(title: str, sub: str = "", link: str = "") -> str:
-    sub_html = f"<p>{sub}</p>" if sub else ""
-    return f'<div class="section-head"><div><h2>{title}</h2>{sub_html}</div>{link}</div>'
+    sub_html = f'<span class="sub">{sub}</span>' if sub else ""
+    return f'<div class="block-head"><h2>{title}</h2>{sub_html}{link}</div>'
+
+
+# ---------------------------------------------------------------------------
+# Charts (plain SVG, drawn here so the page needs no chart library)
+# ---------------------------------------------------------------------------
+
+def volume_chart(days: list[dict], span: int, cls: str) -> str:
+    """Papers per day as bars, with gridlines, a 7-day average line and a value on hover or focus."""
+    data = list(reversed(days[:span]))
+    if not data:
+        return ""
+    W, H, L, B, T = (1040, 230, 36, 26, 40) if span > 14 else (520, 220, 30, 26, 40)
+    counts = [len(d.get("papers", [])) for d in data]
+    top = max(counts) or 1
+    step = 50 if top > 100 else 20 if top > 40 else 10 if top > 20 else 5
+    mx = -(-top // step) * step
+    y = lambda v: T + (H - T - B) * (1 - v / mx)
+    bw = (W - L) / len(data)
+    lines = range(0, mx + 1, step)
+    grid = "".join(f'<line x1="{L}" x2="{W}" y1="{y(v):.1f}" y2="{y(v):.1f}"/>'
+                   f'<text x="{L - 8}" y="{y(v) + 4:.1f}" text-anchor="end">{v}</text>' for v in lines)
+    bars = []
+    for i, (d, n) in enumerate(zip(data, counts)):
+        x = L + i * bw + 2
+        h = (H - T - B) * n / mx
+        label = f"{n} on {nice_date(d['date'], with_year=False)}"
+        tx = min(max(x - 40, L), W - 100)
+        today_cls = " is-today" if i == len(data) - 1 else ""
+        bars.append(f'<g class="vbar{today_cls}" tabindex="0" aria-label="{esc(label)}">'
+                    f'<rect class="bar" x="{x:.1f}" y="{y(n):.1f}" width="{max(bw - 4, 2):.1f}" height="{h:.1f}" rx="2"/>'
+                    f'<rect class="hit" x="{L + i * bw:.1f}" y="{T}" width="{bw:.1f}" height="{H - T - B}"/>'
+                    f'<g class="tip"><rect x="{tx:.1f}" y="{y(n) - 34:.1f}" width="100" height="26" rx="6"/>'
+                    f'<text x="{tx + 50:.1f}" y="{y(n) - 17:.1f}" text-anchor="middle">{esc(label)}</text></g></g>')
+    every = 7 if len(data) > 14 else 4
+    xlab = "".join(f'<text x="{L + i * bw + bw / 2:.1f}" y="{H - 6}" text-anchor="middle">{esc(nice_date(d["date"], with_year=False))}</text>'
+                   for i, d in enumerate(data) if i % every == 0)
+    avg = [sum(counts[max(0, i - 6):i + 1]) / len(counts[max(0, i - 6):i + 1]) for i in range(len(counts))]
+    line = " ".join(f"{L + i * bw + bw / 2:.1f},{y(a):.1f}" for i, a in enumerate(avg))
+    return (f'<svg class="vchart {cls}" viewBox="0 0 {W} {H}" role="img" aria-label="New papers per day for the last {len(data)} editions">'
+            f'<g class="grid">{grid}</g><g>{"".join(bars)}</g><polyline class="avg" points="{line}"/><g class="xlab">{xlab}</g></svg>')
+
+
+def topic_pulse(days: list[dict], limit: int = 6) -> str:
+    """Topics like a watchlist: papers in the last 7 editions, change on the 7 before, 14-day mini columns."""
+    recent, before = days[:7], days[7:14]
+
+    def count(span):
+        c: dict[str, int] = {}
+        for d in span:
+            for p in d.get("papers", []):
+                for slug in p.get("categories") or ["other-ml"]:
+                    c[slug] = c.get(slug, 0) + 1
+        return c
+
+    now, prev = count(recent), count(before)
+    daily = [count([d]) for d in reversed(days[:14])]
+    rows = []
+    for slug, n in sorted(now.items(), key=lambda kv: -kv[1])[:limit]:
+        series = [d.get(slug, 0) for d in daily]
+        mx = max(series) or 1
+        cols = "".join(f'<i style="height:{max(8, v / mx * 100):.0f}%"></i>' for v in series)
+        if before and prev.get(slug):
+            change = round((n - prev[slug]) / prev[slug] * 100)
+            kind = "up" if change > 2 else "down" if change < -2 else "flat"
+            mark = {"up": "▲", "down": "▼", "flat": "■"}[kind]
+            change_html = f'<span class="pulse-ch {kind}">{mark} {abs(change)}%</span>'
+        else:
+            change_html = '<span class="pulse-ch flat">new</span>'
+        rows.append(f'<li class="t-{esc(slug)}"><a href="papers.html?cat={esc(slug)}">'
+                    f'<span class="pulse-name"><span class="dot"></span>{esc(category_name(slug))}</span>'
+                    f'<span class="mini" aria-hidden="true">{cols}</span><span class="pulse-n">{n}</span>{change_html}</a></li>')
+    return f'<ul class="pulse">{"".join(rows)}</ul>'
 
 
 # ---------------------------------------------------------------------------
@@ -287,61 +386,75 @@ def section_head(title: str, sub: str = "", link: str = "") -> str:
 
 def build_index(days: list[dict], papers: dict) -> str:
     if not days:
-        body = '<section class="hero"><h1>No papers yet</h1><p class="lead">The first digest arrives tomorrow morning.</p></section>'
+        body = '<section class="hero"><div><h1>No papers yet.</h1><p class="lead">The first edition arrives tomorrow morning.</p></div></section>'
         return page(SITE_NAME, body, active="today")
 
     latest = days[0]
     featured_ids = latest.get("featured", [])
     featured = [papers[i] for i in featured_ids if i in papers]
     others = [papers[p["id"]] for p in latest["papers"] if p["id"] not in featured_ids][:MORE_FROM_TODAY]
-
-    counts: dict[str, int] = {}
-    for rec in papers.values():
-        for c in rec.get("categories") or ["other-ml"]:
-            counts[c] = counts.get(c, 0) + 1
+    n_today = len(latest["papers"])
+    minutes = sum(pick_minutes(r) for r in featured)
 
     cards = "\n".join(featured_card(r, n, "") for n, r in enumerate(featured, 1))
     more = ""
     if others:
-        rows = "\n".join(paper_row(r, "") for r in others)
-        link = (f'<a class="link-arrow" href="day/{esc(latest["date"])}.html">'
-                f'See all {len(latest["papers"])} papers from today</a>')
-        more = f"""<section class="section">
-  {section_head("More from today", "Also new, ranked by our score.", link)}
-  <ul class="list">{rows}</ul>
+        rows = "\n".join(home_row(r, n) for n, r in enumerate(others, len(featured) + 1))
+        link = f'<a class="more" href="day/{esc(latest["date"])}.html">See all {n_today} papers from today</a>'
+        more = f"""<div class="block">
+    {section_head("Also new today", "Ranked by our score", link)}
+    <ol class="list list-home">{rows}</ol>
+  </div>"""
+
+    week = sum(len(d.get("papers", [])) for d in days[:7])
+    busiest = max(len(d.get("papers", [])) for d in days[:28])
+    picked = sum(len(d.get("featured", [])) for d in days[:7]) or 1
+    chart = ""
+    if len(days) >= 2:
+        chart = f"""<section class="block">
+  {section_head("The field, daily", "New AI papers per edition. Hover or tab to a bar for its count.")}
+  <div class="card pad chart-card">
+    <div>{volume_chart(days, 28, "vchart-long")}{volume_chart(days, 14, "vchart-short")}
+      <div class="chart-key"><span><i></i>Latest edition</span><span><i class="k-avg"></i>7-day average</span></div></div>
+    <dl class="chart-facts"><div><dt>Last 7 editions</dt><dd>{week}</dd></div><div><dt>Busiest day</dt><dd>{busiest}</dd></div><div><dt>We pick</dt><dd>1 in {max(1, round(week / picked))}</dd></div></dl>
+  </div>
 </section>"""
 
-    cats = "".join(
-        f'<a class="cat t-{esc(slug)}" href="papers.html?cat={esc(slug)}"><span>{esc(category_name(slug))}</span><span class="count">{n}</span></a>'
-        for slug, n in sorted(counts.items(), key=lambda kv: -kv[1]))
-
-    first = days[-1]["date"]
+    pulse_sub = "Papers in the last 7 editions, change on the 7 before" if len(days) >= 14 else "Papers in the last 7 editions"
     body = f"""<section class="hero">
-  <p class="edition">Edition {len(days)}, {esc(long_date(latest['date']))}</p>
-  <h1>The AI papers worth building on, picked every morning.</h1>
-  <p class="lead">{esc(TAGLINE)}</p>
-  <label class="hero-search-label" for="hero-q">Search papers by title or author</label>
-  <form class="hero-search" action="papers.html" role="search">
-    <label class="input-wrap">{icon("search", 16)}<input class="input input-lg" id="hero-q" name="q" type="search" placeholder="e.g. diffusion, Llama, retrieval"></label>
-    <button class="btn btn-primary btn-lg">Search papers</button>
-  </form>
-  <p class="hero-note">{len(papers)} papers tracked across {len(counts)} topics since {esc(nice_date(first))}. <a href="papers.html">Browse all papers</a></p>
+  <div>
+    <h1>Papers worth<br>building on.</h1>
+    <p class="lead">Two AI papers a day, picked from everything new on arXiv and Hugging Face, and explained so you can build with them.</p>
+  </div>
+  <div class="daily card" data-daily data-picks="{esc(' '.join(r['id'] for r in featured))}" data-minutes="{minutes}">
+    <div class="ring" data-ring style="--p:0"><span class="ring-n" data-ring-n>0/{len(featured)}</span></div>
+    <div class="daily-copy"><span class="label">Today’s reading</span><strong data-daily-title>{len(featured)} picks today.</strong>
+      <span data-daily-sub>About {minutes} minutes to read both.</span>
+      <span class="week" data-week aria-hidden="true"></span></div>
+  </div>
 </section>
-<section class="section" data-continue hidden>
-  {section_head("Continue reading", "Papers you opened recently, newest first.")}
-  <ul class="list" data-continue-list></ul>
+<section class="block" id="today">
+  {section_head("Today’s picks", f"Chosen from {n_today} new papers")}
+  <div class="picks">{cards}</div>
 </section>
-<section class="section" id="today">
-  {section_head("Today's picks", f"Chosen from {len(latest['papers'])} new papers.")}
-  <div class="grid">{cards}</div>
+<section class="split">
+  {more or '<div></div>'}
+  <aside class="block side">
+    {section_head("Topic pulse", pulse_sub)}
+    <div class="card pad">{topic_pulse(days)}</div>
+    <div class="block" data-continue hidden>
+      {section_head("Continue reading")}
+      <ul class="list" data-continue-list></ul>
+    </div>
+  </aside>
 </section>
-{more}
-<section class="section">
-  {section_head("Browse by topic", "Every paper we have tracked, grouped by what it is about.")}
-  <div class="cats">{cats}</div>
-</section>"""
-    return page(SITE_NAME, body, active="today")
+{chart}"""
+    return page(SITE_NAME, body, active="today", edition=ticker(days))
 
+
+# The search function in Supabase (supabase/functions/search). Public by design:
+# it only answers this site and is rate limited per visitor.
+SEARCH_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/search"
 
 SKELETON_ROWS = '<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>' * 6
 
@@ -351,7 +464,7 @@ def build_papers_page() -> str:
                       for slug, name in CATEGORY_NAMES.items())
     body = f"""<section class="page-head">
   <h1>All papers</h1>
-  <p>Every paper we have tracked, newest first. Search by title or author, or narrow it down by topic.</p>
+  <p>Every paper we have tracked, newest first. Search by title or author, or turn on Search by meaning to find papers about an idea in your own words.</p>
 </section>
 <div class="toolbar">
   <div class="field field-grow"><label class="field-label" for="q">Search</label>
@@ -361,9 +474,10 @@ def build_papers_page() -> str:
   <div class="field"><label class="field-label" for="sort">Sort by</label>
     <select class="select" id="sort"><option value="new">Newest first</option><option value="score">Highest score</option></select></div>
   <label class="toggle"><input id="feat" type="checkbox"> Top picks only</label>
+  <label class="toggle toggle-meaning"><input id="meaning" type="checkbox"> Search by meaning</label>
 </div>
 <div class="result-meta"><span id="count">Loading papers…</span></div>
-<ul class="list" id="results" aria-busy="true">{SKELETON_ROWS}</ul>
+<ul class="list" id="results" aria-busy="true" data-search-url="{SEARCH_URL}">{SKELETON_ROWS}</ul>
 <div class="center"><button class="btn btn-outline" id="more" type="button" hidden>Show more</button></div>
 <noscript><p class="empty">Turn on JavaScript to search, or browse the <a href="archive.html">archive</a>.</p></noscript>"""
     return page("All papers", body, active="papers")
@@ -395,13 +509,13 @@ def build_day(day: dict, papers: dict) -> str:
     rest_html = ""
     if rest:
         rows = "\n".join(paper_row(r, "../") for r in rest)
-        rest_html = f'<section class="section">{section_head("Everything else", f"{len(rest)} more papers from this day.")}<ul class="list">{rows}</ul></section>'
+        rest_html = f'<section class="block">{section_head("Everything else", f"{len(rest)} more papers from this day")}<ul class="list">{rows}</ul></section>'
     body = f"""<section class="page-head">
   <a class="crumbs" href="../archive.html">{icon("back", 15)} Archive</a>
   <h1>{esc(nice_date(day['date']))}</h1>
   <p>{len(day['papers'])} papers that day.</p>
 </section>
-<section class="section">{section_head("Top picks")}<div class="grid">{cards}</div></section>
+<section class="block">{section_head("Top picks")}<div class="picks">{cards}</div></section>
 {rest_html}"""
     return page(nice_date(day["date"]), body, root="../", active="archive")
 
@@ -431,52 +545,51 @@ def abstract_html(abstract: str) -> str:
     cut = text.find(". ")
     if 40 < cut < 400:
         lede, rest = text[:cut + 1], text[cut + 2:]
-        return f'<p><span class="lede">{esc(lede)}</span> {esc(rest)}</p>'
-    return f"<p>{esc(text)}</p>"
+        return f'<p data-highlightable><span class="lede">{esc(lede)}</span> {esc(rest)}</p>'
+    return f"<p data-highlightable>{esc(text)}</p>"
 
 
-def mini_row(rec: dict, root: str) -> str:
-    return f"""<li class="row" data-id="{esc(rec['id'])}">
-  <span class="row-title"><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></span>
-  <span class="row-authors">{esc(format_authors(rec.get('authors', []), 3))}</span>
-  {badges(rec, root)}
-</li>"""
+def related_item(rec: dict, root: str) -> str:
+    topic = (rec.get("categories") or ["other-ml"])[0]
+    return (f'<li><a href="{root}paper/{esc(rec["id"])}.html">{esc(rec["title"])}</a>'
+            f'<span class="t-{esc(topic)}"><span class="dot"></span>{esc(category_name(topic))}</span></li>')
 
 
-def curator_notes(notes: dict) -> str:
-    """The Curator's reading notes for a top pick."""
-    rows = [("What's new", notes.get("whats_new")), ("Key result", notes.get("key_result")),
-            ("Why it matters", notes.get("why_it_matters"))]
-    grid = "".join(f"<div><dt>{k}</dt><dd>{esc(v)}</dd></div>" for k, v in rows if v)
-    ideas = "".join(f"<li>{esc(i)}</li>" for i in notes.get("build_ideas", []))
-    reason = notes.get("difficulty_reason")
-    level = level_meter(notes.get("difficulty"))
-    level_html = f'<p class="notes-level">{level}{f"<span>{esc(reason)}</span>" if reason else ""}</p>' if level else ""
-    return f"""<section class="notes" aria-labelledby="notes-title">
-    <h2 class="notes-label" id="notes-title">Curator's notes</h2>
-    <p class="notes-tldr">{esc(notes["tldr"])}</p>
-    <dl class="notes-grid">{grid}</dl>
-    <div class="notes-build"><h3>What you could build</h3><ul>{ideas}</ul></div>
-    {level_html}
-    <p class="notes-foot">Written by AI from the abstract. Check the paper before you rely on a detail.</p>
-  </section>"""
-
-
-def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dict = None) -> str:
+def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dict = None,
+                next_pick: dict = None, day_picks: list[str] = ()) -> str:
+    notes = rec.get("curator") or {}
     summary = (rec.get("summary") or {}).get("text")
-    notes = rec.get("curator")
-    if notes and notes.get("tldr"):
-        summary_html = curator_notes(notes)
-    else:
-        summary_html = (f'<div class="callout"><span class="callout-label">Why it matters</span><p>{esc(summary)}</p></div>'
-                        if summary else "")
-    code_html = (f'\n    <a class="btn btn-outline" href="{esc(rec["code_url"])}" rel="noopener">{icon("code", 15)} View the code</a>'
-                 if rec.get("code_url") else "")
-    abstract = rec.get("abstract")
-    abstract_block = ""
+    abstract = rec.get("abstract") or ""
+    layers, toc = [], []
+
+    def layer(key, tag, label, inner, first=False):
+        toc.append(f'<a href="#{key}" data-toc="{key}">{label}</a>')
+        layers.append(f'<section class="layer{" layer-first" if first else ""}" id="{key}" data-layer>'
+                      f'<span class="layer-tag">{tag}</span>{inner}</section>')
+
+    short = notes.get("tldr") or summary
+    if short:
+        layer("l-short", "10 sec", "In 10 seconds", f'<p class="tldr">{esc(short)}</p>', first=True)
+    if notes.get("tldr"):
+        rows = [("What's new", notes.get("whats_new"), False), ("Key result", notes.get("key_result"), True),
+                ("Why it matters", notes.get("why_it_matters"), False)]
+        grid = "".join(f"<div><dt>{k}</dt><dd>{f'<mark>{esc(v)}</mark>' if hl else esc(v)}</dd></div>"
+                       for k, v, hl in rows if v)
+        layer("l-minute", "1 min", "In 1 minute", f"<h2>Curator's notes</h2><dl class=\"facts3\">{grid}</dl>")
+        ideas = "".join(f"<li><span>{i + 1:02d}</span>{esc(x)}</li>" for i, x in enumerate(notes.get("build_ideas", [])))
+        reason = notes.get("difficulty_reason")
+        level = level_meter(notes.get("difficulty"))
+        level_html = f'<p class="level-note">{level}{f"<span>{esc(reason)}</span>" if reason else ""}</p>' if level else ""
+        layer("l-build", "Build", "Build with it", f"<h2>What you could build</h2><ol class=\"ideas\">{ideas}</ol>{level_html}")
     if abstract:
-        abstract_block = (f'<div class="prose"><h2>Abstract <span>{reading_minutes(abstract)} min read</span></h2>'
-                          f'{abstract_html(abstract)}</div>')
+        layer("l-abstract", f"{reading_minutes(abstract)} min", "Abstract",
+              f'<div class="prose" data-prose><h2>Abstract<span>Select any sentence to highlight it or add a note</span></h2>{abstract_html(abstract)}</div>')
+    if notes.get("check_question"):
+        answer = notes.get("check_answer")
+        answer_html = (f'<p class="check-a" data-check-answer hidden>{esc(answer)}</p>'
+                       f'<div class="check-actions"><button class="btn btn-primary" type="button" data-check-show>Show the answer</button></div>') if answer else ""
+        layer("l-check", "Check", "Check yourself",
+              f'<div class="check"><h2>Could you explain it to a friend?</h2><p class="check-q">{esc(notes["check_question"])}</p>{answer_html}</div>')
 
     facts = [("Submitted", nice_date(rec.get("submitted", ""))), ("Added", nice_date(rec.get("first_seen", "")))]
     if rec.get("featured_on"):
@@ -485,15 +598,15 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         facts.append(("HF upvotes", str(rec["hf_upvotes"])))
     facts.append(("Authors", str(len(rec.get("authors", [])))))
     facts_html = "".join(f"<div><dt>{k}</dt><dd>{v if k == 'Top pick on' else esc(v)}</dd></div>" for k, v in facts)
+    code_btn = (f'<a class="btn btn-outline" href="{esc(rec["code_url"])}" rel="noopener">{icon("code", 15)} View the code</a>'
+                if rec.get("code_url") else "")
 
-    related_html = ""
-    if related:
-        rows = "\n".join(mini_row(r, "../") for r in related)
-        related_html = f"""<section class="section related">
-  {section_head("Read next", "Papers on the same ideas, picked by topic and wording.")}
-  <ul class="list">{rows}</ul>
-</section>"""
-
+    done = ""
+    if next_pick:
+        done = f"""<section class="done-card" data-done data-picks="{esc(' '.join(day_picks))}">
+    <div><span class="label">Edition progress</span><strong data-done-title>{len(day_picks)} picks in this edition.</strong><span data-done-sub>Read both to keep your streak going.</span></div>
+    <a class="next-card" href="{esc(next_pick['id'])}.html"><span class="label">Next pick</span>{esc(next_pick['title'])} →</a>
+  </section>"""
     pager = ""
     if prev or nxt:
         prev_html = (f'<a class="pager-link" href="{esc(prev["id"])}.html" rel="prev"><span>Previous paper</span>{esc(prev["title"])}</a>'
@@ -502,36 +615,55 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
                      if nxt else "<span></span>")
         pager = f'<nav class="pager" aria-label="More papers from the same day">{prev_html}{next_html}</nav>'
 
+    related_html = ""
+    if related:
+        related_html = f'<div class="card pad"><span class="label">Read next, same idea</span><ol class="nextlist">{"".join(related_item(r, "../") for r in related)}</ol></div>'
+
+    kicker = '<span class="pick-n">Top pick</span>' if rec.get("featured") else ""
+    topic = (rec.get("categories") or ["other-ml"])[0]
+    minutes = pick_minutes(rec)
     title = esc(rec["title"])
     body = f"""<div class="progress" aria-hidden="true"><span data-progress></span></div>
-<article class="paper" data-paper-id="{esc(rec['id'])}" data-title="{title}">
-  <div class="crumbs"><a href="../papers.html">{icon("back", 15)} All papers</a><span>/</span><span>arXiv <span class="mono">{esc(rec['id'])}</span></span></div>
-  <h1>{title}</h1>
-  <p class="authors">{esc(', '.join(rec.get('authors', [])))}</p>
-  {badges(rec, '../')}
-  <div class="reader-tools">
-    <button class="btn btn-outline btn-sm" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>
-    <button class="btn btn-outline btn-sm" type="button" data-share>{icon("share", 15)}<span>Share</span></button>
-    <details class="cite">
-      <summary class="btn btn-outline btn-sm">{icon("quote", 15)}<span>Cite</span></summary>
-      <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
-    </details>
-    <div class="text-size" role="group" aria-label="Text size">
-      <button type="button" data-size="-1" aria-label="Make text smaller" data-tip="Smaller text">A</button><button type="button" data-size="1" aria-label="Make text larger" data-tip="Larger text">A</button>
+<button class="btn btn-outline btn-sm focus-exit" type="button" data-focus-exit>Exit focus <kbd>Esc</kbd></button>
+<div class="read-grid">
+  <aside class="rail" aria-label="Reading tools">
+    <a class="crumbs" href="../papers.html">{icon("back", 15)} All papers</a>
+    <div class="rail-box"><span class="label">Your progress</span><span class="pixbar" data-pixbar>{'<i></i>' * 8}</span><span class="rail-small" data-left>About {minutes} min to read</span></div>
+    <nav class="toc" aria-label="Sections">{"".join(toc)}</nav>
+    <div class="rail-actions">
+      <button class="btn btn-outline btn-sm" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>
+      <details class="cite">
+        <summary class="btn btn-outline btn-sm">{icon("quote", 15)}<span>Cite</span></summary>
+        <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
+      </details>
+      <button class="btn btn-outline btn-sm" type="button" data-share>{icon("share", 15)}<span>Share</span></button>
+      <button class="btn btn-outline btn-sm" type="button" data-focus>Focus mode <kbd>F</kbd></button>
+      <div class="text-size" role="group" aria-label="Text size"><button type="button" data-size="-1" aria-label="Make text smaller">A</button><button type="button" data-size="1" aria-label="Make text larger">A</button></div>
     </div>
-  </div>
-  {summary_html}
-  {abstract_block}
-  <dl class="facts">{facts_html}</dl>
-  <div class="actions">
-    <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>{code_html}
-    <a class="btn btn-outline" href="{esc(rec.get('pdf_url'))}" rel="noopener">{icon("file", 15)} Open PDF</a>
-    <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">View on Hugging Face {icon("external", 15)}</a>
-  </div>
-  {pager}
-</article>
-{related_html}"""
-    desc = (notes or {}).get("tldr") or summary or (abstract or "")[:160]
+  </aside>
+  <article class="paper" data-paper-id="{esc(rec['id'])}" data-title="{title}">
+    <p class="paper-kicker">{kicker}<span>arXiv <span class="mono">{esc(rec['id'])}</span></span></p>
+    <h1>{title}</h1>
+    <p class="byline">{esc(', '.join(rec.get('authors', [])))}</p>
+    <div class="paper-meta">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}<span class="mins">{minutes} min read</span>{f'<a class="code-link" href="{esc(rec["code_url"])}" rel="noopener">&lt;/&gt; Code</a>' if rec.get("code_url") else ""}</div>
+    {"".join(layers)}
+    <dl class="facts">{facts_html}</dl>
+    <div class="actions">
+      <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>{code_btn}
+      <a class="btn btn-outline" href="{esc(rec.get('pdf_url'))}" rel="noopener">{icon("file", 15)} Open PDF</a>
+      <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">View on Hugging Face {icon("external", 15)}</a>
+    </div>
+    {done}
+    {pager}
+  </article>
+  <aside class="margin" aria-label="Notes and related papers">
+    <div class="card pad" data-notes><span class="label">Your notes</span>
+      <p class="rail-small" data-notes-empty>Select text in the abstract to highlight it. Highlights and notes stay in this browser.</p>
+      <ol class="note-list" data-notes-list></ol></div>
+    {related_html}
+  </aside>
+</div>"""
+    desc = notes.get("tldr") or summary or abstract[:160]
     return page(rec["title"], body, root="../", description=desc)
 
 
@@ -617,8 +749,10 @@ def _write(path: str, content: str) -> None:
 
 def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR) -> int:
     """Rebuild site_dir from scratch. Returns the number of paper pages written."""
+    global EDITION
     days = load_days(data_dir)
     papers = merge_papers(days)
+    EDITION = ticker(days)
 
     if os.path.isdir(site_dir):
         shutil.rmtree(site_dir)
@@ -637,12 +771,24 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR) -> int:
         for n, pid in enumerate(ids):
             neighbours[pid] = (ids[n - 1] if n > 0 else None, ids[n + 1] if n + 1 < len(ids) else None)
 
+    # Each top pick points to the next pick of its edition, so a reader always has one more step
+    next_pick: dict[str, str] = {}
+    picks_of: dict[str, list[str]] = {}
+    for day in days:
+        ids = [i for i in day.get("featured", []) if i in papers]
+        for n, pid in enumerate(ids):
+            if pid not in picks_of:
+                picks_of[pid] = ids
+                if len(ids) > 1:
+                    next_pick[pid] = ids[(n + 1) % len(ids)]
+
     related = related_papers(papers)
     for rec in papers.values():
         prev_id, next_id = neighbours.get(rec["id"], (None, None))
         _write(os.path.join(site_dir, "paper", f"{rec['id']}.html"),
                build_paper(rec, [papers[i] for i in related.get(rec["id"], [])],
-                           papers.get(prev_id), papers.get(next_id)))
+                           papers.get(prev_id), papers.get(next_id),
+                           papers.get(next_pick.get(rec["id"])), picks_of.get(rec["id"], [])))
 
     listing = sorted(papers.values(), key=lambda r: (r.get("first_seen", ""), r.get("score") or 0),
                      reverse=True)

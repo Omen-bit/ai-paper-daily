@@ -4,3 +4,6 @@ project_id = "ai-paper-daily"
 
 [functions.embed]
 verify_jwt = false
+
+[functions.search]
+verify_jwt = false

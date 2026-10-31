@@ -1,4 +1,4 @@
-Fonts in this folder are subset copies of:
-- Geist and Geist Mono by Vercel
-- Newsreader by Production Type
+Fonts in this folder are copies of:
+- Geist, Geist Mono and Geist Pixel (Square) by Vercel
+- Newsreader by Production Type (no longer used by the pages)
 All are licensed under the SIL Open Font License 1.1: https://openfontlicense.org
