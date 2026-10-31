@@ -32,6 +32,7 @@ from site_builder import load_days, merge_papers, DATA_DIR, EXPORT_DIR  # noqa: 
 from fetcher import fetch_hf_papers_for_date  # noqa: E402
 from classifier import classify_papers  # noqa: E402
 from curator import find_code_url  # noqa: E402
+from technologies import tag as tag_technologies  # noqa: E402
 
 BATCH = 200          # rows per upsert request
 EMBED_BATCH = 8      # most papers one embed call may take; the function stops early when its CPU time runs low
@@ -193,13 +194,16 @@ def export_papers(cfg: dict, out_dir: str = EXPORT_DIR, session=requests) -> int
     """
     Write build/supabase/papers.json: every paper in the database, without
     abstracts or vectors. The website lists them and draws the Trends charts.
+    Abstracts are read only to tag each paper with the technologies it is about.
     """
     papers, offset = [], 0
     while True:
         resp = session.get(f"{cfg['url']}/rest/v1/papers", headers=_headers(cfg["key"]), timeout=TIMEOUT,
-                           params={"select": EXPORT_FIELDS, "order": "id", "limit": EXPORT_PAGE, "offset": offset})
+                           params={"select": EXPORT_FIELDS + ",abstract", "order": "id", "limit": EXPORT_PAGE, "offset": offset})
         resp.raise_for_status()
         page = resp.json() or []
+        for row in page:
+            row["tech"] = tag_technologies(row.get("title") or "", row.pop("abstract", None))
         papers.extend(page)
         if len(page) < EXPORT_PAGE:
             break

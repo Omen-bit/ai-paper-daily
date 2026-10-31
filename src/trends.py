@@ -14,6 +14,8 @@ import re
 from collections import Counter, defaultdict
 from datetime import date, timedelta
 
+from technologies import tag as tag_technologies
+
 esc = html.escape
 
 # Five chart colours, checked for colour-blind separation in light and dark mode.
@@ -58,8 +60,12 @@ def trend_rows(archive: list[dict], site_papers: dict) -> tuple[list[dict], str]
         d = _day(r)
         if len(d) != 10:
             continue
+        tech = r.get("tech")
+        if not isinstance(tech, list):  # older exports and site papers: tag them here
+            tech = tag_technologies(r.get("title") or "", r.get("abstract"))
         clean.append({"id": r.get("id"), "day": d, "title": r.get("title") or "",
-                      "cats": list(r.get("categories") or []) or [OTHER], "code": bool(r.get("code_url"))})
+                      "cats": list(r.get("categories") or []) or [OTHER], "code": bool(r.get("code_url")),
+                      "tech": tech, "up": int(r.get("hf_upvotes") or 0)})
     return clean, source
 
 

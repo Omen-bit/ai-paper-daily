@@ -24,6 +24,7 @@ if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
 from classifier import CATEGORIES
+import tech_trends
 import trends
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
@@ -589,7 +590,7 @@ def build_scout_page() -> str:
                 description="Describe your project and get a reading plan of AI papers, in order.")
 
 
-def build_trends_page(rows: list[dict], source: str, n_all: int) -> str:
+def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[str] | None = None) -> str:
     months = trends.last_months(rows, 12)
     if len(rows) < 30 or len(months) < 3:
         body = """<section class="page-head"><h1>Trends</h1>
@@ -603,12 +604,20 @@ def build_trends_page(rows: list[dict], source: str, n_all: int) -> str:
     last30 = sum(1 for r in rows if r["day"] > (date.fromisoformat(end) - timedelta(days=30)).isoformat())
     code = trends.code_share(rows, months)
     rising = next((m for m in moves if m["enough"] and m["delta"] > 0), None)
+    tech = tech_trends.tech_stats(rows, months)
+    spot = tech_trends.spotlight_pick(tech)
+    rated = [t for t in tech if t["status"] != "few"]
+    if spot:
+        fastest = (esc(spot["name"]), tech_trends.change(spot["growth"]) + " share in 90 days")
+    elif rising:
+        fastest = (esc(names.get(rising["topic"], rising["topic"])), trends.pts(rising["delta"]) + " in 3 months")
+    else:
+        fastest = ("—", "Needs more history")
     tiles = [
         ("Papers in a year", f"{len(rows):,}", f"of {n_all:,} in our database" if n_all > len(rows) else "in our database"),
         ("Last 30 days", f"{last30:,}", "new papers"),
         ("Share code", trends.pct(code[-1][1]), f"in {trends._month_label(code[-1][0], True)}"),
-        ("Rising fastest", esc(names.get(rising["topic"], rising["topic"])) if rising else "—",
-         trends.pts(rising["delta"]) + " in 3 months" if rising else "Needs more history"),
+        ("Rising fastest", *fastest),
     ]
     tiles_html = "".join(
         '<div class="stat"><span class="label">{}</span><strong{}>{}</strong><span>{}</span></div>'.format(
@@ -617,12 +626,46 @@ def build_trends_page(rows: list[dict], source: str, n_all: int) -> str:
     words = trends.rising_words(rows, months)
     field = trends.field_shares_json(rows, months)
     first, last = trends._month_label(months[0], True), trends._month_label(months[-1], True)
+    tech_html = ""
+    if rated:
+        board = section_head("Technologies to watch",
+                             "Each technology’s share of new papers in the last 90 days, against the 90 days before. Click one to see its papers.")
+        tech_html += f'''
+<section class="block">
+  {board}
+  {tech_trends.leaderboard(tech, months)}
+</section>
+'''
+        sl = tech_trends.spotlight(tech, months, on_site)
+        if sl:
+            tech_html += f'''
+<section class="block">
+  {section_head("Breakout of the season", "The fastest-growing technology, with the year’s most upvoted papers on it marked")}
+  <div class="card pad chart-box">{sl}</div>
+</section>
+'''
+        mm = tech_trends.momentum(tech)
+        if mm:
+            tech_html += f'''
+<section class="block">
+  {section_head("Momentum map", "How big each technology is, against how fast its share is changing. Hover or tab to a dot for its numbers.")}
+  <div class="card pad chart-box">{mm}</div>
+</section>
+'''
+        sm = tech_trends.multiples(tech, months)
+        if sm:
+            tech_html += f'''
+<section class="block">
+  {section_head("Every technology, month by month", "Share of each month’s papers")}
+  {sm}
+</section>
+'''
     body = f"""<section class="page-head">
   <h1>Trends</h1>
   <p>What AI research is about right now, from {len(rows):,} {esc(source)}, {first} to {last}. Updated every morning.</p>
 </section>
 <div class="stats">{tiles_html}</div>
-
+{tech_html}
 <section class="block">
   {section_head("Topic share, month by month", "Each band is a topic’s share of that month’s papers. Hover or tab through the months.")}
   <div class="card pad chart-box">{trends.share_area(per, months, top, names)}
@@ -658,7 +701,7 @@ def build_trends_page(rows: list[dict], source: str, n_all: int) -> str:
   <div class="card pad chart-box">{trends.code_chart(code)}</div>
 </section>"""
     return page("Trends", body, active="trends",
-                description="What AI research is about right now: topic shares, rising topics and words, and code availability.")
+                description="Which AI technologies are growing in research right now: agents, reasoning, RAG and more, plus topic shares and code availability.")
 
 
 def build_archive(days: list[dict], papers: dict) -> str:
@@ -973,7 +1016,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     archive = load_archive(export_dir)
     rows, source = trends.trend_rows(archive, papers)
     _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows))
-    _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers)))
+    _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers), set(papers)))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())
     _write(os.path.join(site_dir, "scout.html"), build_scout_page())
     _write(os.path.join(site_dir, "archive.html"), build_archive(days, papers))

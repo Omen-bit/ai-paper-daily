@@ -166,10 +166,11 @@ def test_export_papers_pages_through_the_table(tmp_path):
             self.offsets = []
 
         def get(self, url, headers=None, params=None, timeout=None):
-            assert url.endswith("/rest/v1/papers") and "abstract" not in params["select"]
+            assert url.endswith("/rest/v1/papers") and "abstract" in params["select"]
             self.offsets.append(params["offset"])
             n = 1000 if params["offset"] == 0 else 2
-            r = FakeResponse(200, [{"id": f"{params['offset'] + i}"} for i in range(n)])
+            r = FakeResponse(200, [{"id": f"{params['offset'] + i}", "title": "Agents that plan",
+                                    "abstract": "We use RAG. Our RAG is fast."} for i in range(n)])
             r.raise_for_status = lambda: None
             return r
 
@@ -177,7 +178,9 @@ def test_export_papers_pages_through_the_table(tmp_path):
     cfg = {"url": "https://x.supabase.co", "key": "k", "secret": "s"}
     assert sync.export_papers(cfg, str(tmp_path), session) == 1002
     assert session.offsets == [0, 1000]
-    assert len(json.load(open(tmp_path / "papers.json", encoding="utf-8"))["papers"]) == 1002
+    papers = json.load(open(tmp_path / "papers.json", encoding="utf-8"))["papers"]
+    assert len(papers) == 1002
+    assert papers[0]["tech"] == ["agents", "rag"] and "abstract" not in papers[0]  # abstracts are not published
 
 
 def test_prepare_picks_asks_the_function_for_each_pick(monkeypatch, tmp_path):

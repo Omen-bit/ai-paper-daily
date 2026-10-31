@@ -236,6 +236,25 @@ def test_trends_page_is_built_and_linked(tmp_path):
     assert 'class="tabs"' in archive
 
 
+def test_trends_page_tracks_technologies(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [], "2026-10-31", data_dir=data_dir)
+    export_dir = tmp_path / "export"
+    export_dir.mkdir()
+    rows = []
+    for m in range(4, 11):  # April to October, agents growing fast in the last three months
+        for i in range(60):
+            title = "AI Agents for Tasks" if (m >= 8 and i < 20) or (m < 8 and i < 5) else "A Study"
+            rows.append({"id": f"26{m:02d}.{i:05d}", "title": title, "categories": ["llms"],
+                         "first_seen": f"2026-{m:02d}-{1 + i % 28:02d}", "hf_upvotes": 3})
+    (export_dir / "papers.json").write_text(json.dumps({"papers": rows}), encoding="utf-8")
+    build_site(data_dir, site_dir, str(export_dir))
+    page = open(os.path.join(site_dir, "trends.html"), encoding="utf-8").read()
+    assert "Technologies to watch" in page and "AI agents" in page
+    assert "Breakout of the season" in page and "Every technology, month by month" in page
+    assert page.index("Technologies to watch") < page.index("Topic share, month by month")
+
+
 def test_trends_page_waits_for_three_months_of_history(tmp_path):
     data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
     papers = [_paper(f"2610.{i}", first_seen="2026-10-10") for i in range(40)]
