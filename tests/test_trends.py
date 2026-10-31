@@ -78,3 +78,12 @@ def test_charts_render_and_escape():
     assert "<table" in trends.share_table(per, months, ["llms"], names)
     assert "Busiest day" in trends.calendar(trends.daily_counts(rows), "2026-12-07")
     assert "code-line" in trends.code_chart(trends.code_share(rows, months))
+
+
+def test_end_labels_never_overlap():
+    from trends import spread_labels
+    out = spread_labels([300, 302, 305, 100, 299], 18, 20, 310)
+    ordered = sorted(out)
+    assert all(b - a >= 18 - 1e-9 for a, b in zip(ordered, ordered[1:]))
+    assert max(out) <= 310 and min(out) >= 20
+    assert out[3] == 100  # labels with room stay where they are

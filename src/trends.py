@@ -264,6 +264,23 @@ def pulse_rows(pulse: list[dict], names: dict, limit: int = 6, root: str = "") -
     return f'<ol class="pulse2">{"".join(out)}</ol>'
 
 
+def spread_labels(want: list[float], gap: float, top: float, bottom: float) -> list[float]:
+    """Moves label positions apart so no two are closer than gap, staying near
+    where they want to be and inside top..bottom. Keeps their order."""
+    order = sorted(range(len(want)), key=lambda i: want[i])
+    pos = [want[i] for i in order]
+    for j in range(len(pos)):  # push down
+        pos[j] = max(pos[j], top if j == 0 else pos[j - 1] + gap)
+    if pos and pos[-1] > bottom:  # then back up from the bottom
+        pos[-1] = bottom
+        for j in range(len(pos) - 2, -1, -1):
+            pos[j] = min(pos[j], pos[j + 1] - gap)
+    out = [0.0] * len(want)
+    for j, i in enumerate(order):
+        out[i] = pos[j]
+    return out
+
+
 def share_area(per_month: dict[str, Counter], months: list[str], topics: list[str], names: dict) -> str:
     """100% stacked area of topic shares by month: the top topics plus everything else."""
     W, H, L, R, T, B = 1000, 340, 44, 236, 16, 30
@@ -288,14 +305,9 @@ def share_area(per_month: dict[str, Counter], months: list[str], topics: list[st
     # Direct labels at the right edge, in ink, next to a swatch of the series colour
     labels = []
     last = len(months) - 1
-    used = []
+    spots = spread_labels([y(bottoms[last][k] + stacks[last][k] / 2) for k in range(len(layers))], 18, T + 6, T + ph)
     for k, t in enumerate(layers):
-        mid = bottoms[last][k] + stacks[last][k] / 2
-        ly = y(mid)
-        for u in used:  # keep labels at least 15px apart
-            if abs(ly - u) < 15:
-                ly = u + 15
-        used.append(ly)
+        ly = spots[k]
         name = "Everything else" if t == "__rest" else names.get(t, t)
         sw = "sw-rest" if t == "__rest" else f"sw-{SERIES[k]}"
         labels.append(f'<rect class="{sw}" x="{W - R + 12}" y="{ly - 5:.1f}" width="10" height="10" rx="2"/>'
