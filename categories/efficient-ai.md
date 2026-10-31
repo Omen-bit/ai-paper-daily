@@ -5,11 +5,10 @@
 
 ---
 
-**Total papers:** 1
+**Total papers:** 0
 
-| Date | Title | Authors | Links |
-|------|-------|---------|-------|
-| 2026-10-28 | [🔥 🔥 Intrinsic Distribution Matching](https://arxiv.org/abs/2610.39633) | Deyuan Liu, Yansen Han *+8 more* | [arXiv](https://arxiv.org/abs/2610.39633) · [PDF](https://arxiv.org/pdf/2610.39633) |
+*No papers curated yet in this category. Check back soon!*
+
 
 ---
 

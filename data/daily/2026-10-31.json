@@ -1,97 +1,126 @@
 {
  "schema_version": 1,
  "date": "2026-10-31",
- "generated_at": "2026-10-31T16:57:15.658508+00:00",
+ "generated_at": "2026-10-31T17:13:09.413920+00:00",
  "featured": [
-  "2610.36671",
-  "2610.39633"
+  "2610.39301",
+  "2610.38568"
  ],
  "papers": [
   {
-   "id": "2610.36671",
-   "title": "Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs",
+   "id": "2610.39301",
+   "title": "Youtu-Parsing-Omni: One Encoder, One Schema, All Modalities",
    "authors": [
-    "Donghyeon Cho",
-    "Joowon Kim",
-    "Seungho Shin",
-    "Eunho Yang"
+    "Yunhang Shen",
+    "Zhangquan Chen",
+    "Xiaotian Li",
+    "Zhongpeng Cai",
+    "Qing Zhou",
+    "Zekai Zhang",
+    "Kun Zhang",
+    "Zezhong Wu",
+    "Jian Hu",
+    "Haihan Gao",
+    "Heting Gao",
+    "Xin Li",
+    "Yinsong Liu",
+    "Deqian Jiang",
+    "Di Yin",
+    "Haoyu Cao",
+    "Xing Sun",
+    "Bing Liu",
+    "Yanqiu Qu",
+    "Yunfei Wu",
+    "Kun Yin",
+    "Zhixiang Wei",
+    "Yongxiang Hua",
+    "Qianyu Li",
+    "Xiaoxing Hu",
+    "Peiyuan Zhang",
+    "Lijiang Li",
+    "Dong Xu",
+    "Zhenchuan Yang",
+    "Yiliang Jiang"
    ],
-   "abstract": "Diffusion vision-language models (DVLMs) process their entire input at every denoising step. Since visual tokens make up 89-97% of this input on the benchmarks we study, most of the decoding computation is spent repeatedly processing the same image. Visual token pruning methods partially relieve this burden by removing part of the visual tokens, but they lose the removed information and still process the remaining image at every step. To measure how often the image is actually needed, we compare LLaDA-V's predictions with and without the image at every decoding step and find that removing the image changes a token being unmasked at only 22.8% of steps on average and at as few as 7.9%. We therefore propose LOWN, a decoding method that decides at every step whether to process the image and how many tokens to unmask. LOWN predicts the masked tokens without the image and processes the image only when this prediction disagrees with the last image-conditioned prediction. Agreement certifies the earlier prediction for reuse, and the number of certified tokens sets how many are unmasked in that step. We further observe that the need for the image differs across benchmarks, so LOWN's adaptive decision is needed rather than a fixed schedule. Without training or a tuned threshold, LOWN retains 99.6% of LLaDA-V's score on ten benchmarks at 35.3% of the decoding FLOPs on average. LOWN also generalizes across LLaDA-based DVLMs, composes orthogonally with visual token pruning, and runs under key-value caching for further efficiency gains. Code and project page are available at https://hyeon9698.github.io/LOWN/",
-   "url": "https://arxiv.org/abs/2610.36671",
-   "pdf_url": "https://arxiv.org/pdf/2610.36671",
-   "submitted": "2026-10-26",
+   "abstract": "We present Youtu-Parsing-Omni, an omni-modal parser that converts documents, images, audio, and video into structured records grounded in space and time, providing a perception layer for agents that read, locate, and cite evidence across modalities. Its design rests on one encoder for every modality and one schema for every task. Youtu-Omni-Encoder, initialized from a pre-trained language model to strengthen text reading, encodes all modalities with shared weights in a unified space-time coordinate system, and a few fusion layers let video frames attend to concurrent audio, bringing cross-modal fusion and temporal alignment into perception itself. OmniSchema unifies the outputs of all ten parsing tasks, allowing a single self-evolving post-training procedure, OmniSchema-Aware On-Policy Distillation (OSAD), to provide a shared token-role-based objective across tasks. In each round, the model is trained on its own rollouts against token-level targets from a reference-conditioned copy of itself, which is then refreshed with the trained weights, so that the parser and its supervision co-evolve. With a single 5 B-parameter checkpoint, Youtu-Parsing-Omni achieves state-of-the-art performance on OmniDocBench v1.6 (96.96 Overall) and leads all open-weight models on OmniParsingBench (75.08 Avg.), with its advantage concentrated on audio and video. It also achieves the best overall chart-parsing score (95.02) and the highest exact chemical-fingerprint agreement among compared systems, and matches a dedicated optical-music model in character-level transcription of typeset sheet music while staying far ahead of general-purpose systems. Code and model weights are publicly available.",
+   "url": "https://arxiv.org/abs/2610.39301",
+   "pdf_url": "https://arxiv.org/pdf/2610.39301",
+   "submitted": "2026-10-28",
    "arxiv_categories": [
-    "cs.CV",
-    "cs.AI",
-    "cs.LG"
+    "cs.CV"
    ],
    "categories": [
-    "multimodal",
-    "llms",
-    "computer-vision"
+    "other-ml"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 97,
-   "score": 44,
+   "hf_upvotes": 160,
+   "score": 40,
    "badges": [
     "Top Pick",
-    "Trending on HF",
-    "Interdisciplinary"
+    "Trending on HF"
    ],
    "featured": true,
    "slot": "pick",
    "summary": {
-    "text": "Efficiently utilizing visual information in Diffusion VLMs.",
+    "text": "This work enables advanced parsing tasks like chart parsing, chemical parsing, and music transcription.",
     "source": "groq:allam-2-7b"
    },
    "curator": {
-    "tldr": "Improving Diffusion VLMs efficiency by processing images only when needed and reducing FLOPs.",
-    "whats_new": "Adaptive image processing and token unmasking based on prediction agreement.",
-    "key_result": "LOWN reduces decoding FLOPs by 35.3% while retaining 99.6% of LLaDA-V's score.",
-    "why_it_matters": "Efficiently utilizing visual information in Diffusion VLMs.",
+    "tldr": "Youtu-Parsing-Omni unifies modalities in a shared space-time coordinate system, achieving state-of-the-art performance on various parsing tasks.",
+    "whats_new": "The paper introduces Youtu-Parsing-Omni, an omni-modal parser that fuses text, images, audio, and video.",
+    "key_result": "Youtu-Parsing-Omni achieves state-of-the-art performance on OmniDocBench v1.6, OmniParsingBench, and other parsing tasks.",
+    "why_it_matters": "This work enables advanced parsing tasks like chart parsing, chemical parsing, and music transcription.",
     "difficulty": "intermediate",
-    "difficulty_reason": "Understanding Diffusion VLMs and implementing adaptive decoding methods.",
+    "difficulty_reason": "Requires understanding of parsing tasks and multimodal learning.",
     "check_question": null,
     "check_answer": null,
     "build_ideas": [
-     "Adaptive image processing based on prediction agreement.",
-     "Token unmasking based on prediction agreement.",
-     "Adaptive decoding with key-value caching and visual token pruning."
+     "Develop an omni-modal parser that unifies text, images, audio, and video.",
+     "Use a single encoder for each modality and a single schema for parsing tasks.",
+     "Apply a self-supervised learning approach to improve performance on various parsing tasks."
     ]
    },
-   "code_url": "https://github.com/hyeon9698/LOWN",
+   "code_url": null,
    "first_seen": "2026-10-31"
   },
   {
-   "id": "2610.39633",
-   "title": "Intrinsic Distribution Matching",
+   "id": "2610.38568",
+   "title": "A-RSI: Adaptive Task Refresh for Zero-Data Multimodal Self-Improvement",
    "authors": [
-    "Deyuan Liu",
-    "Yansen Han",
-    "Kaiwen Zheng",
-    "Jun Xie",
-    "Jiacheng Liu",
-    "Zhenglin Cheng",
-    "Peng Sun",
-    "Jintao Zhang",
-    "Jianguo Li",
-    "Tao Lin"
+    "Yu Liu",
+    "Youxing Li",
+    "Yuedong Tan",
+    "Zhiwei Yang",
+    "Zihan Su",
+    "Hanqi Feng",
+    "Shaojie Zhang",
+    "Libin Liao",
+    "Zihao Wan",
+    "Chenxu Wu",
+    "Cong Cao",
+    "Fangfang Yuan",
+    "Yanbing Liu",
+    "Ziheng Chen",
+    "Pei Fu",
+    "Radu Timofte",
+    "Zongwei Wu",
+    "Nicu Sebe",
+    "Barnabas Poczos",
+    "Jian Luan"
    ],
-   "abstract": "One-step and few-step text-to-image generation must accurately render the details specified in the prompt despite limited opportunities for refinement. Distribution matching distillation (DMD) uses score differences to bring the generated distribution closer to a reference distribution. Following prior work, we estimate this difference with internal velocity branches, avoiding a separate fake-score network. We ask whether an explicit moment constraint improves this learned score supervision. A decomposition of the reverse-KL field into a Gaussian moment component and a non-Gaussian residual identifies statistics that can be constrained explicitly. We introduce Intrinsic Distribution Matching (IDM), which retains the full DMD correction and matches feature means and per-coordinate standard deviations using the generator's exponential-moving-average (EMA) copy, requiring no external feature encoder. Experiments use full-parameter and low-rank adaptation (LoRA) tuning on Z-Image-Turbo 6B and Qwen-Image 20B. At two network evaluations, IDM reaches 94.25% and 90.20% on Chinese and English LongText-Bench, the highest scores among the compared methods at this budget. Controlled ablations show gains from the added moment loss, while generator EMA features perform competitively with an external DINOv2 encoder across the five reported metrics. Code is available at https://github.com/inclusionAI/IDM.",
-   "url": "https://arxiv.org/abs/2610.39633",
-   "pdf_url": "https://arxiv.org/pdf/2610.39633",
-   "submitted": "2026-10-28",
+   "abstract": "Recursive self-improvement requires models not only to acquire useful training experience, but also to decide when their current experience has ceased to be useful. Existing methods often focus on what experience to generate next, while paying less attention to when fresh experience should be introduced. Many also construct training targets through self-consistency or majority voting, making supervision depend on the model's own uncertain predictions. We address these two questions separately: training dynamics determine when to acquire new experience, while the answers to new tasks remain independently checkable. A-RSI monitors reward variation and accuracy in training logs to refresh a task pool when its learning signal declines, without consulting validation or test scores. A static library of model-authored programs produces multimodal questions and derives their reference answers; we specify the task-generation contract, automatically verify chosen properties of the reward and refresh rules, and separately audit the generated answers. The training loop uses no external training examples or human-written answer labels. On the primary eleven-benchmark suite, A-RSI raises the performance average from 57.77 to 61.05 with 800 fresh tasks.",
+   "url": "https://arxiv.org/abs/2610.38568",
+   "pdf_url": "https://arxiv.org/pdf/2610.38568",
+   "submitted": "2026-10-27",
    "arxiv_categories": [
-    "cs.CV",
     "cs.AI"
    ],
    "categories": [
-    "generative-ai",
-    "efficient-ai"
+    "other-ml"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 243,
-   "score": 41,
+   "hf_upvotes": 163,
+   "score": 39,
    "badges": [
     "Trending",
     "Trending on HF"
@@ -99,25 +128,25 @@
    "featured": true,
    "slot": "trending",
    "summary": {
-    "text": "Enhances text-to-image generation quality and efficiency.",
+    "text": "Improving self-improvement methods and advancing self-supervised learning.",
     "source": "groq:allam-2-7b"
    },
    "curator": {
-    "tldr": "Improves text-to-image generation by matching generated distribution with reference using generator's EMA copy and explicit moment constraint.",
-    "whats_new": "Introduces Intrinsic Distribution Matching (IDM) for better text-to-image generation using generator's EMA copy and explicit moment constraint.",
-    "key_result": "IDM reaches 94.25% and 90.20% on Chinese and English LongText-Bench, outperforming compared methods.",
-    "why_it_matters": "Enhances text-to-image generation quality and efficiency.",
+    "tldr": "A-RSI refreshes tasks in self-improvement loops based on training metrics, improving performance on multimodal benchmarks.",
+    "whats_new": "Adaptive task refresh, multimodal self-improvement, and self-supervised learning without human labels or validation.",
+    "key_result": "A-RSI raises performance from 57.77 to 61.05 on multimodal benchmarks.",
+    "why_it_matters": "Improving self-improvement methods and advancing self-supervised learning.",
     "difficulty": "intermediate",
     "difficulty_reason": null,
-    "check_question": "How does Intrinsic Distribution Matching (IDM) improve text-to-image generation?",
-    "check_answer": "IDM improves text-to-image generation by matching generated distribution with reference using generator's EMA copy and explicit moment constraint.",
+    "check_question": null,
+    "check_answer": null,
     "build_ideas": [
-     "Apply Intrinsic Distribution Matching (IDM) for better text-to-image generation.",
-     "Use generator's Exponential Moving Average (EMA) copy for improved performance.",
-     "Experiment with low-rank adaptation (LoRA) tuning for better results."
+     "Apply adaptive task refresh in self-improvement loops.",
+     "Use multimodal self-improvement and self-supervised learning.",
+     "Refresh tasks based on training metrics without human labels or validation."
     ]
    },
-   "code_url": "https://github.com/inclusionAI/IDM",
+   "code_url": null,
    "first_seen": "2026-10-31"
   },
   {
