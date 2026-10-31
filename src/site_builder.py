@@ -173,6 +173,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
+<meta name="apd-track" content="{TRACK_URL}">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(description)}">
 <meta name="theme-color" content="#ff4f00">
@@ -190,7 +191,8 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     <a class="brand" href="{root}index.html" aria-label="{SITE_NAME}, home"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">AI PAPERS<em>/DAILY</em></span></a>
     <nav class="nav" aria-label="Main">
       {nav("index.html", "Today", "today")}
-      {nav("papers.html", "All papers", "papers")}
+      {nav("papers.html", '<span class="nav-long">All papers</span><span class="nav-short">Papers</span>', "papers")}
+      {nav("scout.html", "Scout", "scout")}
       {nav("archive.html", "Archive", "archive")}
       {nav("saved.html", "Saved", "saved", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
@@ -239,6 +241,8 @@ def slot_label(rec: dict, rank: int = 1) -> str:
         return "Trending"
     if slot == "runner-up":
         return "Runner-up"
+    if slot == "most-read":
+        return "Most read"
     if slot == "pick" or rank == 1:
         return "Today’s pick" if slot == "pick" else "Top pick"
     return f"Pick {rank:02d}"
@@ -287,10 +291,17 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
     else:
         summary = (rec.get("summary") or {}).get("text") or ""
         blurb = f'<p class="pick-blurb"><b>Why it matters</b>{esc(summary)}</p>' if summary else ""
+        if not blurb and rec.get("abstract"):
+            first = rec["abstract"].replace("\n", " ").split(". ")[0].strip().rstrip(".")
+            if len(first) > 220:
+                first = first[:217].rsplit(" ", 1)[0] + "…"
+            blurb = f'<p class="pick-blurb"><b>From the abstract</b>{esc(first)}.</p>' if first else ""
     label = slot_label(rec, rank)
     why = ""
     if rec.get("slot") == "trending" and rec.get("hf_upvotes"):
         why = f'<span class="pick-why">{int(rec["hf_upvotes"])} upvotes on Hugging Face</span>'
+    elif rec.get("slot") == "most-read":
+        why = f'<span class="pick-why">{int(rec.get("readers") or 0)} readers this week</span>'
     elif rec.get("slot") == "pick":
         why = '<span class="pick-why">Best new paper by our score</span>'
     topic = (rec.get("categories") or ["other-ml"])[0]
@@ -404,7 +415,31 @@ def topic_pulse(days: list[dict], limit: int = 6) -> str:
 # Pages
 # ---------------------------------------------------------------------------
 
-def build_index(days: list[dict], papers: dict) -> str:
+# Views a paper needs in the last week before our own readers fill the second slot
+MIN_MOST_READ_VIEWS = 20
+
+
+def load_most_read(data_dir: str) -> list[dict]:
+    """Our readers' most viewed papers of the last week, written by supabase_sync.py."""
+    try:
+        with open(os.path.join(data_dir, "most_read.json"), encoding="utf-8") as f:
+            return [p for p in json.load(f).get("papers", []) if p.get("id")]
+    except (OSError, ValueError, AttributeError):
+        return []
+
+
+def most_read_list(most_read: list[dict], papers: dict, limit: int = 5) -> str:
+    rows = [(papers[m["id"]], m) for m in most_read if m["id"] in papers and m.get("views", 0) >= 3][:limit]
+    if len(rows) < 3:
+        return ""
+    items = "".join(f"""<li><span class="mr-n">{n:02d}</span><a href="paper/{esc(r['id'])}.html">{esc(r['title'])}</a>
+      <span class="mr-views">{m['views']} readers</span></li>""" for n, (r, m) in enumerate(rows, 1))
+    return f"""<div class="block">{section_head("Most read this week", "By readers of this site")}
+      <ol class="card pad most-read">{items}</ol></div>"""
+
+
+def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = None) -> str:
+    most_read = most_read or []
     if not days:
         body = '<section class="hero"><div><h1>No papers yet.</h1><p class="lead">The first edition arrives tomorrow morning.</p></div></section>'
         return page(SITE_NAME, body, active="today")
@@ -412,6 +447,10 @@ def build_index(days: list[dict], papers: dict) -> str:
     latest = days[0]
     featured_ids = latest.get("featured", [])
     featured = [papers[i] for i in featured_ids if i in papers]
+    # Once our own readers are enough, the second slot shows what they read most
+    top = next((m for m in most_read if m["id"] in papers and m["id"] not in featured_ids[:1]), None)
+    if featured and top and top.get("views", 0) >= MIN_MOST_READ_VIEWS:
+        featured = featured[:1] + [dict(papers[top["id"]], slot="most-read", readers=top["views"])]
     others = [papers[p["id"]] for p in latest["papers"] if p["id"] not in featured_ids][:MORE_FROM_TODAY]
     n_today = len(latest["papers"])
     minutes = sum(pick_minutes(r) for r in featured)
@@ -466,6 +505,7 @@ def build_index(days: list[dict], papers: dict) -> str:
   <aside class="block side">
     {section_head("Topic pulse", pulse_sub)}
     <div class="card pad">{topic_pulse(days)}</div>
+    {most_read_list(most_read, papers)}
     <div class="block" data-continue hidden>
       {section_head("Continue reading")}
       <ul class="list" data-continue-list></ul>
@@ -507,6 +547,56 @@ def build_papers_page() -> str:
 <div class="center"><button class="btn btn-outline" id="more" type="button" hidden>Show more</button></div>
 <noscript><p class="empty">Turn on JavaScript to search, or browse the <a href="archive.html">archive</a>.</p></noscript>"""
     return page("All papers", body, active="papers")
+
+
+# Anonymous view counts and feedback (supabase/functions/track)
+TRACK_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/track"
+
+# "Ask this paper" (supabase/functions/ask), same rules as search
+ASK_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/ask"
+ASK_SUGGESTIONS = ["What problem does it solve?", "What would I need to try it?", "How did they test it?"]
+
+# Project Scout (supabase/functions/scout), same rules as search
+SCOUT_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/scout"
+
+SCOUT_EXAMPLES = [
+    "A voice notes app that turns speech into text fully offline on an Android phone, with no server.",
+    "A helper that reads our customer support tickets and drafts replies, running on one laptop without a GPU.",
+    "A chatbot for my college library that answers questions from our PDF catalogue and cites the page it used.",
+]
+
+
+def build_scout_page() -> str:
+    examples = "".join(f'<button class="example" type="button" data-example="{esc(e)}">{esc(e)}</button>'
+                       for e in SCOUT_EXAMPLES)
+    body = f"""<section class="page-head scout-head">
+  <h1>Project Scout</h1>
+  <p>Describe what you want to build. Scout searches more than 8,000 AI papers and gives you a short reading plan, in order, with what each paper adds to your project.</p>
+</section>
+<div class="scout">
+  <form class="card pad scout-form" data-scout data-url="{SCOUT_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" novalidate>
+    <label class="field-label" for="desc">Describe your project</label>
+    <p class="field-hint" id="desc-hint">Plain words, no code. Say what it does, who it's for, and any limits, like “runs on a phone” or “no GPU”.</p>
+    <textarea class="input textarea" id="desc" rows="7" maxlength="1000" aria-describedby="desc-hint desc-error"></textarea>
+    <div class="field-foot"><span class="field-error" id="desc-error" role="alert" hidden></span><span class="char-count" data-count>0 / 1000</span></div>
+    <button class="btn btn-primary btn-block" type="submit" data-scout-go>Find papers</button>
+    <div class="examples"><span class="label">Or try an example</span>{examples}</div>
+    <p class="fine">Your description goes to our search service and to Groq, which plans the search. We don't store it.</p>
+  </form>
+  <section class="scout-out" data-scout-out aria-live="polite">
+    <div class="card pad scout-intro">
+      <span class="label">How it works</span>
+      <ol class="how">
+        <li><b>You describe</b> the project in a few sentences.</li>
+        <li><b>Scout searches</b> by meaning, from a few angles at once.</li>
+        <li><b>You get a plan:</b> what to read first, what to build on, and what can wait.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+<noscript><p class="empty">Turn on JavaScript to use Project Scout.</p></noscript>"""
+    return page("Project Scout", body, active="scout",
+                description="Describe your project and get a reading plan of AI papers, in order.")
 
 
 def build_archive(days: list[dict], papers: dict) -> str:
@@ -610,6 +700,19 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     if abstract:
         layer("l-abstract", f"{reading_minutes(abstract)} min", "Abstract",
               f'<div class="prose" data-prose><h2>Abstract<span>Select any sentence to highlight it or add a note</span></h2>{abstract_html(abstract)}</div>')
+    if abstract:
+        chips = "".join(f'<button class="qchip" type="button" data-ask-suggest>{q}</button>' for q in ASK_SUGGESTIONS)
+        layer("l-ask", "Ask", "Ask this paper", f"""<div class="ask" data-ask data-url="{ASK_URL}">
+  <h2>Ask this paper<span>Answers come only from the abstract, with the sentence they rely on</span></h2>
+  <ol class="ask-log" data-ask-log aria-live="polite"></ol>
+  <div class="ask-suggest">{chips}</div>
+  <form class="ask-form" data-ask-form>
+    <label class="sr-only" for="ask-q">Your question about this paper</label>
+    <input class="input" id="ask-q" maxlength="300" autocomplete="off" placeholder="e.g. What hardware does it need?">
+    <button class="btn btn-primary" type="submit">Ask</button>
+  </form>
+  <p class="field-error" data-ask-error role="alert" hidden></p>
+</div>""")
     if notes.get("check_question"):
         answer = notes.get("check_answer")
         answer_html = (f'<p class="check-a" data-check-answer hidden>{esc(answer)}</p>'
@@ -678,6 +781,11 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>{code_btn}
       <a class="btn btn-outline" href="{esc(rec.get('pdf_url'))}" rel="noopener">{icon("file", 15)} Open PDF</a>
       <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">View on Hugging Face {icon("external", 15)}</a>
+    </div>
+    <div class="feedback" data-feedback="{esc(rec['id'])}">
+      <span data-feedback-q>Was this paper worth your time?</span>
+      <button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, useful</button>
+      <button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not for me</button>
     </div>
     {done}
     {pager}
@@ -784,8 +892,9 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR) -> int:
         shutil.rmtree(site_dir)
     shutil.copytree(ASSETS_DIR, os.path.join(site_dir, "assets"))
 
-    _write(os.path.join(site_dir, "index.html"), build_index(days, papers))
+    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(data_dir)))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())
+    _write(os.path.join(site_dir, "scout.html"), build_scout_page())
     _write(os.path.join(site_dir, "archive.html"), build_archive(days, papers))
     _write(os.path.join(site_dir, "saved.html"), build_saved_page())
 

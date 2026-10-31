@@ -150,3 +150,50 @@ def test_home_has_for_you_section_and_site_ids(tmp_path):
     assert RECOMMEND_URL.endswith("/functions/v1/recommend")
     ids = json.load(open(os.path.join(site_dir, "data", "ids.json"), encoding="utf-8"))
     assert ids == ["2610.1", "2610.2"]
+
+
+def test_scout_page_has_describe_only_form(tmp_path):
+    from site_builder import SCOUT_URL
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [_paper("2610.1")], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "scout.html"), encoding="utf-8").read()
+    assert f'data-url="{SCOUT_URL}"' in page and SCOUT_URL.endswith("/functions/v1/scout")
+    assert '<label class="field-label" for="desc">Describe your project</label>' in page
+    assert "no code" in page and 'maxlength="1000"' in page
+    assert 'href="scout.html"' in open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+
+
+def test_paper_page_has_ask_box(tmp_path):
+    from site_builder import ASK_URL
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [_paper("2610.1")], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    assert f'data-url="{ASK_URL}"' in page and ASK_URL.endswith("/functions/v1/ask")
+    assert 'for="ask-q"' in page and "data-ask-suggest" in page
+
+
+def test_most_read_takes_second_slot_once_readers_are_enough(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    a, b = _paper("2610.1", 9, slot="pick"), _paper("2610.2", 3, slot="trending", hf_upvotes=9)
+    others = [_paper(f"2610.{n}", 1, title=f"Other {n}") for n in range(3, 7)]
+    save_day([a, b] + others, [a, b], "2026-10-31", data_dir=data_dir)
+
+    def most_read(views):
+        with open(os.path.join(data_dir, "most_read.json"), "w", encoding="utf-8") as f:
+            json.dump({"papers": [{"id": "2610.5", "views": views}, {"id": "2610.4", "views": 5},
+                                  {"id": "2610.3", "views": 4}]}, f)
+
+    most_read(8)  # too few readers: Trending stays
+    build_site(data_dir, site_dir)
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert "Trending" in home and "Most read this week" in home and "8 readers" in home
+
+    most_read(25)
+    build_site(data_dir, site_dir)
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert ">Most read<" in home and "25 readers this week" in home
+    assert 'data-picks="2610.1 2610.5"' in home
+    page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    assert 'data-feedback="2610.1"' in page and 'data-vote="useful"' in page

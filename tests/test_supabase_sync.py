@@ -140,3 +140,19 @@ def test_embed_stops_at_once_when_function_is_missing():
 
     with pytest.raises(RuntimeError):
         sync.embed_pending(cfg, Session(), sleep=lambda s: None)
+
+
+def test_save_most_read_writes_counts(tmp_path):
+    import json
+
+    class MostReadSession:
+        def post(self, url, json=None, headers=None, timeout=None):
+            assert url.endswith("/rest/v1/rpc/most_read") and json == {"days": 7, "n": 20}
+            r = FakeResponse(200, [{"paper_id": "2610.1", "views": 31, "useful": 4, "not_useful": None}])
+            r.raise_for_status = lambda: None
+            return r
+
+    cfg = {"url": "https://x.supabase.co", "key": "k", "secret": "s"}
+    assert sync.save_most_read(cfg, str(tmp_path), MostReadSession()) == 1
+    data = json.load(open(tmp_path / "most_read.json", encoding="utf-8"))
+    assert data["papers"] == [{"id": "2610.1", "views": 31, "useful": 4, "not_useful": 0}]

@@ -13,6 +13,7 @@ Usage:
 Needs SUPABASE_URL, SUPABASE_SECRET_KEY and SYNC_SECRET. When they are not
 set the script prints a note and exits 0, so the daily run never fails here.
 """
+import json
 import os
 import sys
 import time
@@ -171,12 +172,38 @@ def sync(everything: bool = False, data_dir: str = DATA_DIR, session=requests, b
     return len(rows)
 
 
+MOST_READ_DAYS = 7
+
+
+def save_most_read(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
+    """
+    Write data/most_read.json: our own readers' most viewed papers of the last
+    week, from the anonymous counts. The website reads it for "Most read".
+    """
+    resp = session.post(f"{cfg['url']}/rest/v1/rpc/most_read", headers=_headers(cfg["key"]),
+                        json={"days": MOST_READ_DAYS, "n": 20}, timeout=TIMEOUT)
+    resp.raise_for_status()
+    papers = [{"id": r["paper_id"], "views": int(r["views"] or 0), "useful": int(r["useful"] or 0),
+               "not_useful": int(r["not_useful"] or 0)} for r in resp.json() or []]
+    os.makedirs(data_dir, exist_ok=True)
+    with open(os.path.join(data_dir, "most_read.json"), "w", encoding="utf-8") as f:
+        json.dump({"days": MOST_READ_DAYS, "updated": date.today().isoformat(), "papers": papers}, f, indent=1)
+    print(f"[supabase] Most read: {len(papers)} papers with views in the last {MOST_READ_DAYS} days.")
+    return len(papers)
+
+
 def main() -> int:
     try:
         days = 0
         if "--backfill-hf" in sys.argv:
             days = int(sys.argv[sys.argv.index("--backfill-hf") + 1])
         sync(everything="--all" in sys.argv or days > 0, backfill_days=days)
+        cfg = _config()
+        if cfg:
+            try:
+                save_most_read(cfg)
+            except Exception as exc:  # the counts table may not exist yet
+                print(f"[supabase] Most read skipped: {exc}")
     except Exception as exc:  # never fail the daily run because of search
         print(f"[supabase] Sync failed: {exc}")
         if os.environ.get("GITHUB_ACTIONS") == "true":

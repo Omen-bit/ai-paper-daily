@@ -10,3 +10,12 @@ verify_jwt = false
 
 [functions.recommend]
 verify_jwt = false
+
+[functions.scout]
+verify_jwt = false
+
+[functions.ask]
+verify_jwt = false
+
+[functions.track]
+verify_jwt = false

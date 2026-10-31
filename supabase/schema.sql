@@ -120,3 +120,46 @@ revoke all on function public.hit_rate_limit(text, int, int) from public, anon, 
 grant execute on function public.hit_rate_limit(text, int, int) to service_role;
 grant execute on function public.match_papers(extensions.vector, int, date) to anon, authenticated;
 grant execute on function public.recommend_papers(text[], int, date) to anon, authenticated;
+
+-- Anonymous reading counts and feedback, one row per paper per day.
+-- No visitor data is kept: only totals. Only the functions (secret key) can write or read it.
+create table if not exists public.paper_stats (
+  paper_id   text not null,
+  day        date not null default current_date,
+  views      integer not null default 0,
+  useful     integer not null default 0,
+  not_useful integer not null default 0,
+  primary key (paper_id, day)
+);
+alter table public.paper_stats enable row level security;
+
+create or replace function public.bump_stat(pid text, what text)
+returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if what not in ('view', 'useful', 'not_useful') then
+    raise exception 'unknown stat %', what;
+  end if;
+  insert into public.paper_stats as s (paper_id, day, views, useful, not_useful)
+  values (pid, current_date, (what = 'view')::int, (what = 'useful')::int, (what = 'not_useful')::int)
+  on conflict (paper_id, day) do update set
+    views = s.views + (what = 'view')::int,
+    useful = s.useful + (what = 'useful')::int,
+    not_useful = s.not_useful + (what = 'not_useful')::int;
+end $$;
+
+-- The most viewed papers of the last few days, for the "Most read" slot
+create or replace function public.most_read(days int default 7, n int default 20)
+returns table (paper_id text, views bigint, useful bigint, not_useful bigint)
+language sql stable security definer set search_path = '' as $$
+  select s.paper_id, sum(s.views), sum(s.useful), sum(s.not_useful)
+  from public.paper_stats s
+  where s.day > current_date - days and s.paper_id <> 'scout'
+  group by s.paper_id
+  order by sum(s.views) desc, sum(s.useful) desc
+  limit least(n, 100);
+$$;
+revoke all on function public.bump_stat(text, text) from public, anon, authenticated;
+revoke all on function public.most_read(int, int) from public, anon, authenticated;
+grant execute on function public.bump_stat(text, text) to service_role;
+grant execute on function public.most_read(int, int) to service_role;

@@ -441,6 +441,141 @@
   }
   paintStreak();
 
+  // ---- Paper page: "Ask this paper" ----
+  var ask = document.querySelector("[data-ask]");
+  var askPaper = document.querySelector("[data-paper-id]");
+  if (ask && askPaper) {
+    var askForm = ask.querySelector("[data-ask-form]");
+    var askInput = document.getElementById("ask-q");
+    var askLog = ask.querySelector("[data-ask-log]");
+    var askErr = ask.querySelector("[data-ask-error]");
+    var askBtn = askForm.querySelector("button");
+    var lastTurn = null;
+
+    // Find a sentence of the abstract and mark it for a moment
+    var showInAbstract = function (sentence) {
+      var prose = document.querySelector("[data-prose]");
+      if (!prose) return;
+      var probe = sentence.slice(0, 40);
+      var walker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT);
+      var node;
+      while ((node = walker.nextNode())) {
+        var at = node.nodeValue.indexOf(probe);
+        if (at < 0) continue;
+        var range = document.createRange();
+        range.setStart(node, at);
+        range.setEnd(node, Math.min(node.nodeValue.length, at + sentence.length));
+        var mark = document.createElement("mark");
+        mark.className = "flash";
+        try { range.surroundContents(mark); } catch (e) { break; }
+        mark.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(function () {
+          var parent = mark.parentNode;
+          while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+          parent.removeChild(mark);
+          parent.normalize();
+        }, 2600);
+        return;
+      }
+      document.getElementById("l-abstract").scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    var askQuestion = function (question) {
+      question = question.replace(/\s+/g, " ").trim();
+      if (question.length < 4) { askErr.textContent = "Type a question first."; askErr.hidden = false; return; }
+      askErr.hidden = true;
+      var turn = document.createElement("li");
+      turn.className = "ask-turn";
+      turn.innerHTML = '<p class="ask-q">' + esc(question) + '</p><div class="ask-a is-loading"><span class="pixbar pixbar-run" aria-hidden="true">' +
+        new Array(7).join("<i></i>") + '</span><span class="sr-only">Reading the abstract…</span></div>';
+      askLog.appendChild(turn);
+      askInput.value = "";
+      askBtn.disabled = true;
+      fetch(ask.getAttribute("data-url"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: askPaper.getAttribute("data-paper-id"), question: question, previous: lastTurn })
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; });
+      }).then(function (res) {
+        var box = turn.querySelector(".ask-a");
+        box.classList.remove("is-loading");
+        if (!res.ok) {
+          box.classList.add("is-error");
+          box.textContent = res.data.error || "Couldn't answer that right now.";
+          return;
+        }
+        var d = res.data;
+        box.innerHTML = "<p>" + esc(d.answer) + "</p>" +
+          (d.quote ? '<button class="ask-quote" type="button"><span class="label">From the abstract</span>“' + esc(d.quote) + "”</button>" :
+            (d.answerable ? '<p class="ask-note">Not tied to one sentence of the abstract, so check the paper.</p>' : ""));
+        var qb = box.querySelector(".ask-quote");
+        if (qb) qb.addEventListener("click", function () { showInAbstract(d.quote); });
+        lastTurn = d.answerable ? { q: question, a: d.answer } : null;
+      }).catch(function () {
+        var box = turn.querySelector(".ask-a");
+        box.classList.remove("is-loading");
+        box.classList.add("is-error");
+        box.textContent = "Couldn't reach the server. Check your connection and try again.";
+      }).then(function () { askBtn.disabled = false; });
+    };
+
+    askForm.addEventListener("submit", function (e) { e.preventDefault(); askQuestion(askInput.value); });
+    askInput.addEventListener("input", function () { askErr.hidden = true; });
+    Array.prototype.forEach.call(ask.querySelectorAll("[data-ask-suggest]"), function (b) {
+      b.addEventListener("click", function () { askQuestion(b.textContent); });
+    });
+  }
+
+  // ---- Anonymous counts: views for "Most read", and the feedback buttons ----
+  // Only the paper ID and the kind of event are sent. Each browser counts a
+  // paper once, and only after 15 seconds on its page.
+  var trackMeta = document.querySelector('meta[name="apd-track"]');
+  function track(id, event) {
+    if (!trackMeta || !window.fetch || /localhost|127\.0\.0\.1/.test(location.hostname) && !window.APD_TRACK_LOCAL) return;
+    fetch(trackMeta.content, {
+      method: "POST", keepalive: true,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id, event: event })
+    }).catch(function () { /* counts are best effort */ });
+  }
+  var viewedPaper = document.querySelector("[data-paper-id]");
+  if (viewedPaper) {
+    var viewed = load("apd.viewed", []);
+    var vid = viewedPaper.getAttribute("data-paper-id");
+    if (viewed.indexOf(vid) < 0) {
+      setTimeout(function () {
+        if (document.visibilityState === "hidden") return;
+        viewed = [vid].concat(viewed).slice(0, 1000);
+        store("apd.viewed", viewed);
+        track(vid, "view");
+      }, 15000);
+    }
+  }
+  function wireFeedback(box) {
+    var fid = box.getAttribute("data-feedback");
+    var votes = load("apd.feedback", {});
+    var paintVote = function () {
+      var v = votes[fid];
+      Array.prototype.forEach.call(box.querySelectorAll("[data-vote]"), function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-vote") === v ? "true" : "false");
+        b.disabled = !!v;
+      });
+      if (v) box.querySelector("[data-feedback-q]").textContent = "Thanks. This helps us pick better papers.";
+    };
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-vote]");
+      if (!b || votes[fid]) return;
+      votes = load("apd.feedback", {});
+      votes[fid] = b.getAttribute("data-vote");
+      store("apd.feedback", votes);
+      track(fid, votes[fid]);
+      paintVote();
+    });
+    paintVote();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-feedback]"), wireFeedback);
+
   // ---- Lists built from this browser's history or saved papers ----
   function storedRow(item, verb, removable) {
     return '<li class="row" data-id="' + esc(item.id) + '">' +
@@ -475,6 +610,191 @@
       showSavedCount();
     });
     paintSaved();
+  }
+
+  // ---- Project Scout: describe a project, get a reading plan ----
+  // Same rules as looksLikeCode() in supabase/functions/_shared/scout.ts.
+  var CODE_PATTERNS = [
+    /```/, /^\s*(import|from)\s+[\w.]+(\s+import\b|\s*;|\s*$)/m, /^\s*(def|class)\s+\w+\s*[(:]/m,
+    /^\s*return\b[^.!?]*$/m, /\bfunction\s*\w*\s*\([^)]*\)\s*\{/, /=>\s*\{/, /^\s*#include\s*</m,
+    /\b(console\.log|print)\s*\(/, /<\/?[a-z][\w-]*(\s[^>]*)?>/i, /^\s*(const|let|var)\s+\w+\s*=/m,
+    /;\s*$/m, /^\s*[\w.]+\s*=\s*[\w.]+\(.*\)\s*$/m
+  ];
+  function looksLikeCode(t) {
+    if (!t.trim()) return false;
+    if (/```/.test(t)) return true;
+    var signals = CODE_PATTERNS.filter(function (re) { return re.test(t); }).length;
+    if (signals >= 2) return true;
+    var symbols = (t.match(/[{}();=<>\[\]]/g) || []).length;
+    return t.length >= 40 && symbols / t.length > 0.06;
+  }
+
+  var scoutForm = document.querySelector("[data-scout]");
+  if (scoutForm) {
+    var desc = document.getElementById("desc");
+    var descErr = document.getElementById("desc-error");
+    var countEl = scoutForm.querySelector("[data-count]");
+    var goBtn = scoutForm.querySelector("[data-scout-go]");
+    var out = document.querySelector("[data-scout-out]");
+    var introHtml = out.innerHTML;
+    var STAGE_NAMES = { start: "Start here", core: "Build on these", further: "Go further" };
+    var STAGE_NOTES = { start: "The foundations, or the simplest approach that works.",
+      core: "The methods your project would use.", further: "Optional, for when the basics work." };
+    var onSiteIds = null;
+
+    var problemWith = function (text) {
+      if (looksLikeCode(text)) return "This looks like code. Describe what you want to build in plain words instead.";
+      if (text.length < 30) return "Add a little more detail, at least 30 characters, so Scout knows what to look for.";
+      return "";
+    };
+    var showProblem = function (msg) {
+      descErr.textContent = msg;
+      descErr.hidden = !msg;
+      desc.setAttribute("aria-invalid", msg ? "true" : "false");
+    };
+    var paintCount = function () { countEl.textContent = desc.value.length + " / 1000"; };
+    desc.addEventListener("input", function () { paintCount(); if (!descErr.hidden) showProblem(""); });
+    desc.addEventListener("blur", function () {
+      var v = desc.value.trim();
+      if (v) showProblem(problemWith(v));
+    });
+    // Pasted code is caught straight away, before any typing
+    desc.addEventListener("paste", function () {
+      setTimeout(function () { if (looksLikeCode(desc.value)) showProblem(problemWith(desc.value)); }, 0);
+    });
+    Array.prototype.forEach.call(scoutForm.querySelectorAll("[data-example]"), function (b) {
+      b.addEventListener("click", function () {
+        desc.value = b.getAttribute("data-example");
+        paintCount(); showProblem(""); desc.focus();
+      });
+    });
+
+    var siteIds = function () {
+      if (onSiteIds) return Promise.resolve(onSiteIds);
+      return fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+        .then(function (list) { onSiteIds = {}; list.forEach(function (id) { onSiteIds[id] = true; }); return onSiteIds; });
+    };
+
+    var planItem = function (p, n, onSite) {
+      var topic = (p.categories && p.categories[0]) || "other-ml";
+      var local = onSite[p.id];
+      var href = local ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
+      var isSaved = saved.some(function (s) { return s.id === p.id; });
+      return '<li class="plan-item" data-id="' + esc(p.id) + '">' +
+        '<span class="plan-n">' + String(n).padStart(2, "0") + "</span>" +
+        '<div class="plan-body"><a class="plan-title" href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.title) + "</a>" +
+        (p.reason ? '<p class="plan-reason">' + esc(p.reason) + "</p>" : "") +
+        '<span class="plan-meta"><span class="topic t-' + esc(topic) + '"><span class="dot"></span>' + esc(scoutNames[topic] || topic) + "</span>" +
+        (p.code_url ? '<span class="sep"></span><a href="' + esc(p.code_url) + '" rel="noopener">Code</a>' : "") +
+        (local ? "" : '<span class="sep"></span>On Hugging Face') + "</span></div>" +
+        '<button class="quick-save" type="button" data-quick-save="' + esc(p.id) + '" data-title="' + esc(p.title) + '" aria-pressed="' + isSaved +
+        '" aria-label="Save for later">' + (isSaved ? "✓" : "+") + "</button></li>";
+    };
+
+    var paintPlan = function (data, description, at) {
+      siteIds().then(function (onSite) {
+        var plan = data.plan || [];
+        if (!plan.length) {
+          out.innerHTML = '<div class="card pad empty-card"><span class="label">No matches</span><p>Scout found no close papers. Try naming the task and the data, for example “summarise legal contracts” instead of “legal AI app”.</p></div>';
+          return;
+        }
+        var n = 0, groups = "";
+        ["start", "core", "further"].forEach(function (stage) {
+          var items = plan.filter(function (p) { return p.stage === stage; });
+          if (!items.length) return;
+          groups += '<li class="plan-stage stage-' + stage + '"><div class="stage-head"><h2>' + STAGE_NAMES[stage] + "</h2><span>" + STAGE_NOTES[stage] + "</span></div>" +
+            '<ol class="plan-list">' + items.map(function (p) { n++; return planItem(p, n, onSite); }).join("") + "</ol></li>";
+        });
+        var queries = (data.queries || []).map(function (q) { return '<span class="qchip">' + esc(q) + "</span>"; }).join("");
+        out.innerHTML =
+          '<div class="card pad scout-summary"><span class="label">' + (at ? "Your last plan, " + ago(at) : "Your reading plan") + "</span>" +
+          "<p>" + esc(data.summary || description) + "</p>" +
+          (queries ? '<div class="qchips"><span>Searched for</span>' + queries + "</div>" : "") +
+          (data.mode === "basic" ? '<p class="fine">These are the closest papers by meaning. Reasons appear when the planner is available.</p>' : "") +
+          '<div class="scout-actions"><button class="btn btn-outline btn-sm" type="button" data-scout-copy><span>Copy plan</span></button>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-scout-new>Start over</button></div></div>' +
+          '<ol class="plan">' + groups + "</ol>" +
+          '<div class="feedback" data-feedback="scout"><span data-feedback-q>Was this reading plan useful?</span>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, useful</button>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not really</button></div>';
+        wireFeedback(out.querySelector("[data-feedback]"));
+        out.querySelector("[data-scout-new]").addEventListener("click", function () {
+          try { localStorage.removeItem("apd.scout"); } catch (e) { /* private mode */ }
+          out.innerHTML = introHtml; desc.value = ""; paintCount(); desc.focus();
+        });
+        var copyBtn = out.querySelector("[data-scout-copy]");
+        copyBtn.addEventListener("click", function () {
+          var lines = ["Reading plan: " + (data.summary || description), ""];
+          ["start", "core", "further"].forEach(function (stage) {
+            var items = plan.filter(function (p) { return p.stage === stage; });
+            if (!items.length) return;
+            lines.push(STAGE_NAMES[stage]);
+            items.forEach(function (p) {
+              lines.push("- " + p.title + " (https://arxiv.org/abs/" + p.id + ")" + (p.reason ? "\n  " + p.reason : ""));
+            });
+            lines.push("");
+          });
+          if (navigator.clipboard) navigator.clipboard.writeText(lines.join("\n")).then(function () { confirmLabel(copyBtn, "Copied"); });
+        });
+        markRead(out);
+      });
+    };
+
+    var scoutNames = {};
+    try { scoutNames = JSON.parse(scoutForm.getAttribute("data-names")) || {}; } catch (e) { /* slugs */ }
+
+    var LOADING = ["Reading your description…", "Searching papers from a few angles…", "Putting them in order…"];
+    var loading = function () {
+      var step = 0;
+      out.innerHTML = '<div class="card pad scout-loading" aria-busy="true"><span class="label" data-loading-text>' + LOADING[0] + "</span>" +
+        '<span class="pixbar pixbar-run" aria-hidden="true">' + new Array(9).join("<i></i>") + "</span></div>" +
+        '<div class="plan-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>';
+      var label = out.querySelector("[data-loading-text]");
+      return setInterval(function () { step = Math.min(step + 1, LOADING.length - 1); label.textContent = LOADING[step]; }, 2500);
+    };
+
+    scoutForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var text = desc.value.replace(/\s+/g, " ").trim();
+      var problem = problemWith(text);
+      if (problem) { showProblem(problem); desc.focus(); return; }
+      showProblem("");
+      goBtn.disabled = true;
+      goBtn.textContent = "Finding papers…";
+      var timer = loading();
+      fetch(scoutForm.getAttribute("data-url"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: text })
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, status: r.status, data: d }; });
+      }).then(function (res) {
+        clearInterval(timer);
+        if (!res.ok) {
+          if (res.status === 400 || /code|characters/.test(res.data.error || "")) showProblem(res.data.error || "");
+          out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t make a plan</span><p>' +
+            esc(res.data.error || "Scout is unavailable right now. Try again in a minute.") + "</p></div>";
+          return;
+        }
+        store("apd.scout", { description: text, data: res.data, at: Date.now() });
+        paintPlan(res.data, text, 0);
+        out.scrollIntoView({ behavior: "smooth", block: "start" });
+      }).catch(function () {
+        clearInterval(timer);
+        out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t reach Scout</span><p>Check your connection and try again.</p></div>';
+      }).then(function () {
+        goBtn.disabled = false;
+        goBtn.textContent = "Find papers";
+      });
+    });
+
+    // Bring back the last plan from this browser
+    var last = load("apd.scout", null);
+    if (last && last.data && last.data.plan) {
+      desc.value = last.description || "";
+      paintCount();
+      paintPlan(last.data, last.description || "", last.at);
+    }
   }
 
   // ---- All papers: search, filter and sort over data/papers.json ----
