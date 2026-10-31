@@ -28,23 +28,23 @@
 <!-- TODAY_START -->
 ### Saturday, October 31, 2026 · [2026-10-31](digests/2026-10-31.md)
 
-#### 1. [Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs](https://arxiv.org/abs/2610.36671)
-`⭐ Top Pick` `🔥 Trending on HF` `🌐 Multimodal AI` `🤖 LLMs & Language Models` `94 HF upvotes`
+#### 1. [Youtu-Parsing-Omni: One Encoder, One Schema, All Modalities](https://arxiv.org/abs/2610.39301)
+`⭐ Top Pick` `🔥 Trending on HF` `🔖 Other ML` `124 HF upvotes`
 
 > 💡 **Why It Matters:**  
-> LOWN accelerates diffusion vision-language models by dynamically skipping redundant image processing, achieving 35% of decoding FLOPs while retaining 99.6% of performance.
+> Youtu-Parsing-Omni enables omni-modal perception, enabling agents to understand and align text, images, audio, and video, improving performance on OmniDocBench and OmniParsingBench tasks.
 
-**Authors:** Donghyeon Cho, Joowon Kim, Seungho Shin et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.36671) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.36671) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.36671)  
+**Authors:** Yunhang Shen, Zhangquan Chen, Xiaotian Li et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.39301) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.39301) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.39301)  
 
-#### 2. [Intrinsic Distribution Matching](https://arxiv.org/abs/2610.39633)
-`🔥 Trending on HF` `🎨 Generative AI & Diffusion` `📱 Efficient AI & Edge` `239 HF upvotes`
+#### 2. [L3G-World: Real-Time Infinite World Generation with Latent 3D Gaussian Memory](https://arxiv.org/abs/2610.40614)
+`🔥 Trending on HF` `💡 Novel Method` `🎨 Generative AI & Diffusion` `👁️ Computer Vision` `36 HF upvotes`
 
 > 💡 **Why It Matters:**  
-> Intrinsic Distribution Matching improves text-to-image generation by matching generator's EMA features with a moment constraint, achieving state-of-the-art performance on Chinese and English LongText-Bench.
+> L3G-World enables real-time, spatially consistent infinite world generation by using compact latent 3D Gaussian memory to overcome prior scalability and speed limitations.
 
-**Authors:** Deyuan Liu, Yansen Han, Kaiwen Zheng et al.  
-**Links:** [arXiv Paper](https://arxiv.org/abs/2610.39633) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.39633) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.39633)  
+**Authors:** Jinhyeok Choi, JoungBin Lee, Jongmin Lee et al.  
+**Links:** [arXiv Paper](https://arxiv.org/abs/2610.40614) &nbsp;|&nbsp; [Direct PDF](https://arxiv.org/pdf/2610.40614) &nbsp;|&nbsp; [HF Community](https://huggingface.co/papers/2610.40614)  
 
 **[Read the full digest with abstracts](digests/2026-10-31.md)**
 <!-- TODAY_END -->
@@ -70,7 +70,7 @@ Explore past curated papers categorized by research subfield:
 <!-- ARCHIVE_START -->
 | Date | Papers | Top Category | Digest |
 | :--- | :---: | :--- | :--- |
-| **2026-10-31** | `2` | Multimodal AI | [Read digest](digests/2026-10-31.md) |
+| **2026-10-31** | `2` | Other ML | [Read digest](digests/2026-10-31.md) |
 | **2026-10-30** | `2` | Other ML | [Read digest](digests/2026-10-30.md) |
 | **2026-10-29** | `2` | LLMs & Language Models | [Read digest](digests/2026-10-29.md) |
 | **2026-10-28** | `2` | Generative AI & Diffusion | [Read digest](digests/2026-10-28.md) |
@@ -98,11 +98,11 @@ Explore past curated papers categorized by research subfield:
 
 **Most active categories:**
 
-- 🔖 **Other ML**: `15` papers
-- 🤖 **LLMs & Language Models**: `4` papers
+- 🔖 **Other ML**: `16` papers
 - 🎨 **Generative AI & Diffusion**: `4` papers
-- 🌐 **Multimodal AI**: `2` papers
+- 🤖 **LLMs & Language Models**: `3` papers
 - 👁️ **Computer Vision**: `2` papers
+- 🧠 **Reasoning & Agents**: `2` papers
 <!-- STATS_END -->
 
 ---

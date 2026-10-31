@@ -1,90 +1,12 @@
 {
  "schema_version": 1,
  "date": "2026-10-31",
- "generated_at": "2026-10-31T07:07:12.470581+00:00",
+ "generated_at": "2026-10-31T07:15:51.333115+00:00",
  "featured": [
-  "2610.36671",
-  "2610.39633"
+  "2610.39301",
+  "2610.40614"
  ],
  "papers": [
-  {
-   "id": "2610.36671",
-   "title": "Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs",
-   "authors": [
-    "Donghyeon Cho",
-    "Joowon Kim",
-    "Seungho Shin",
-    "Eunho Yang"
-   ],
-   "abstract": "Diffusion vision-language models (DVLMs) process their entire input at every denoising step. Since visual tokens make up 89-97% of this input on the benchmarks we study, most of the decoding computation is spent repeatedly processing the same image. Visual token pruning methods partially relieve this burden by removing part of the visual tokens, but they lose the removed information and still process the remaining image at every step. To measure how often the image is actually needed, we compare LLaDA-V's predictions with and without the image at every decoding step and find that removing the image changes a token being unmasked at only 22.8% of steps on average and at as few as 7.9%. We therefore propose LOWN, a decoding method that decides at every step whether to process the image and how many tokens to unmask. LOWN predicts the masked tokens without the image and processes the image only when this prediction disagrees with the last image-conditioned prediction. Agreement certifies the earlier prediction for reuse, and the number of certified tokens sets how many are unmasked in that step. We further observe that the need for the image differs across benchmarks, so LOWN's adaptive decision is needed rather than a fixed schedule. Without training or a tuned threshold, LOWN retains 99.6% of LLaDA-V's score on ten benchmarks at 35.3% of the decoding FLOPs on average. LOWN also generalizes across LLaDA-based DVLMs, composes orthogonally with visual token pruning, and runs under key-value caching for further efficiency gains. Code and project page are available at https://hyeon9698.github.io/LOWN/",
-   "url": "https://arxiv.org/abs/2610.36671",
-   "pdf_url": "https://arxiv.org/pdf/2610.36671",
-   "submitted": "2026-10-26",
-   "arxiv_categories": [
-    "cs.CV",
-    "cs.AI",
-    "cs.LG"
-   ],
-   "categories": [
-    "multimodal",
-    "llms",
-    "computer-vision"
-   ],
-   "source": "HuggingFace",
-   "hf_upvotes": 94,
-   "score": 44,
-   "badges": [
-    "Top Pick",
-    "Trending on HF",
-    "Interdisciplinary"
-   ],
-   "featured": true,
-   "summary": {
-    "text": "LOWN accelerates diffusion vision-language models by dynamically skipping redundant image processing, achieving 35% of decoding FLOPs while retaining 99.6% of performance.",
-    "source": "groq:qwen/qwen3.8-27b"
-   },
-   "first_seen": "2026-10-31"
-  },
-  {
-   "id": "2610.39633",
-   "title": "Intrinsic Distribution Matching",
-   "authors": [
-    "Deyuan Liu",
-    "Yansen Han",
-    "Kaiwen Zheng",
-    "Jun Xie",
-    "Jiacheng Liu",
-    "Zhenglin Cheng",
-    "Peng Sun",
-    "Jintao Zhang",
-    "Jianguo Li",
-    "Tao Lin"
-   ],
-   "abstract": "One-step and few-step text-to-image generation must accurately render the details specified in the prompt despite limited opportunities for refinement. Distribution matching distillation (DMD) uses score differences to bring the generated distribution closer to a reference distribution. Following prior work, we estimate this difference with internal velocity branches, avoiding a separate fake-score network. We ask whether an explicit moment constraint improves this learned score supervision. A decomposition of the reverse-KL field into a Gaussian moment component and a non-Gaussian residual identifies statistics that can be constrained explicitly. We introduce Intrinsic Distribution Matching (IDM), which retains the full DMD correction and matches feature means and per-coordinate standard deviations using the generator's exponential-moving-average (EMA) copy, requiring no external feature encoder. Experiments use full-parameter and low-rank adaptation (LoRA) tuning on Z-Image-Turbo 6B and Qwen-Image 20B. At two network evaluations, IDM reaches 94.25% and 90.20% on Chinese and English LongText-Bench, the highest scores among the compared methods at this budget. Controlled ablations show gains from the added moment loss, while generator EMA features perform competitively with an external DINOv2 encoder across the five reported metrics. Code is available at https://github.com/inclusionAI/IDM.",
-   "url": "https://arxiv.org/abs/2610.39633",
-   "pdf_url": "https://arxiv.org/pdf/2610.39633",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.CV",
-    "cs.AI"
-   ],
-   "categories": [
-    "generative-ai",
-    "efficient-ai"
-   ],
-   "source": "HuggingFace",
-   "hf_upvotes": 239,
-   "score": 41,
-   "badges": [
-    "Trending on HF"
-   ],
-   "featured": true,
-   "summary": {
-    "text": "Intrinsic Distribution Matching improves text-to-image generation by matching generator's EMA features with a moment constraint, achieving state-of-the-art performance on Chinese and English LongText-Bench.",
-    "source": "groq:allam-2-7b"
-   },
-   "first_seen": "2026-10-31"
-  },
   {
    "id": "2610.39301",
    "title": "Youtu-Parsing-Omni: One Encoder, One Schema, All Modalities",
@@ -131,13 +53,17 @@
     "other-ml"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 123,
+   "hf_upvotes": 124,
    "score": 40,
    "badges": [
+    "Top Pick",
     "Trending on HF"
    ],
-   "featured": false,
-   "summary": null,
+   "featured": true,
+   "summary": {
+    "text": "Youtu-Parsing-Omni enables omni-modal perception, enabling agents to understand and align text, images, audio, and video, improving performance on OmniDocBench and OmniParsingBench tasks.",
+    "source": "groq:allam-2-7b"
+   },
    "first_seen": "2026-10-31"
   },
   {
@@ -171,8 +97,11 @@
     "Trending on HF",
     "Novel Method"
    ],
-   "featured": false,
-   "summary": null,
+   "featured": true,
+   "summary": {
+    "text": "L3G-World enables real-time, spatially consistent infinite world generation by using compact latent 3D Gaussian memory to overcome prior scalability and speed limitations.",
+    "source": "groq:qwen/qwen3.8-27b"
+   },
    "first_seen": "2026-10-31"
   },
   {
