@@ -85,3 +85,28 @@ def test_format_badges_and_authors():
     formatted_auth = format_authors(authors, max_shown=3)
     assert "Alice, Bob, Charlie" in formatted_auth
     assert "+3 more" in formatted_auth
+
+
+def _p(pid, title, upvotes=0):
+    return {"id": pid, "title": title, "abstract": "We study models.", "authors": ["A"],
+            "categories": [], "hf_upvotes": upvotes, "source": "arXiv"}
+
+
+def test_select_daily_picks_best_then_trending():
+    from scorer import select_daily
+    papers = [_p("1", "Plain study", 0), _p("2", "Another plain study", 40), _p("3", "Third study", 2)]
+    best = max((score_paper(dict(p)) for p in papers), key=lambda x: x["score"])["id"]
+    chosen = select_daily(papers)
+    assert chosen[0]["id"] == best and chosen[0]["slot"] == "pick"
+    others = [p for p in papers if p["id"] != best]
+    hot = max(others, key=lambda p: p["hf_upvotes"])
+    if hot["hf_upvotes"] >= 5:
+        assert chosen[1]["id"] == hot["id"] and chosen[1]["slot"] == "trending"
+
+
+def test_select_daily_falls_back_to_runner_up_without_upvotes():
+    from scorer import select_daily
+    chosen = select_daily([_p("1", "Plain study"), _p("2", "Another plain study")])
+    assert [p["slot"] for p in chosen] == ["pick", "runner-up"]
+    assert select_daily([]) == []
+    assert [p["slot"] for p in select_daily([_p("1", "Only one")])] == ["pick"]

@@ -7,3 +7,6 @@ verify_jwt = false
 
 [functions.search]
 verify_jwt = false
+
+[functions.recommend]
+verify_jwt = false

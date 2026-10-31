@@ -3,7 +3,7 @@ main.py
 Orchestrates the full pipeline:
   1. Fetch papers from arXiv + HuggingFace
   2. Classify into categories
-  3. Score and select top 2
+  3. Score, then pick the best paper plus the trending one
   4. Generate "Why it matters" summaries via Groq
   5. Render daily digest markdown
   6. Update category pages
@@ -37,7 +37,7 @@ if ROOT_DIR not in sys.path:
 
 from fetcher import fetch_all_papers
 from classifier import classify_papers, get_all_category_slugs, get_category_display
-from scorer import score_and_rank_papers
+from scorer import select_daily
 from groq_summarizer import summarize_papers
 from curator import curate_papers
 from renderer import render_digest, save_digest, render_category_page
@@ -47,7 +47,7 @@ import paper_store
 
 
 CATEGORIES_DIR = os.path.join(ROOT_DIR, "categories")
-TOP_N_PAPERS = 2  # Number of papers to feature per day
+TOP_N_PAPERS = 2  # Today's pick + the trending paper (see scorer.select_daily)
 
 
 def update_category_pages(selected_papers: list[dict], all_existing_stats: dict) -> None:
@@ -133,8 +133,8 @@ def run() -> None:
     all_papers = classify_papers(all_papers)
 
     # --- Step 3: Score and select top N ---
-    print(f"\n⚡ Scoring {len(all_papers)} papers and selecting top {TOP_N_PAPERS}...")
-    selected = score_and_rank_papers(all_papers, top_n=TOP_N_PAPERS)
+    print(f"\n⚡ Scoring {len(all_papers)} papers: today's pick plus the trending paper...")
+    selected = select_daily(all_papers)
 
     if not selected:
         print("❌ No papers selected after scoring.")

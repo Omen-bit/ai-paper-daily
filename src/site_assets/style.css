@@ -179,6 +179,10 @@ button, input, select { font: inherit; color: inherit; }
 .pick-n { color: var(--accent-ink); }
 .pick.is-first .pick-n { color: var(--accent); }
 .pick-read { color: var(--good); }
+.pick-top { align-items: center; }
+.pick-why { margin-right: auto; font: 400 13px/1.2 var(--sans); letter-spacing: 0; text-transform: none; color: var(--muted); }
+.pick.is-first .pick-why { color: color-mix(in srgb, var(--bg) 70%, transparent); }
+.pick[data-slot="trending"] .pick-n { padding: 4px 7px; border-radius: 4px; background: var(--yellow); color: #111; }
 .pick h3 { margin: 0; font: 600 clamp(21px, 1.9vw, 29px)/1.15 var(--sans); letter-spacing: -.025em; text-wrap: balance; }
 .pick h3 a::after { content: ""; position: absolute; inset: 0; border-radius: var(--r); }
 .pick-blurb { margin: 0; font-size: 16px; line-height: 1.55; max-width: 62ch; }
@@ -217,6 +221,8 @@ button, input, select { font: inherit; color: inherit; }
   border: 1px solid color-mix(in srgb, var(--c, var(--muted)) 35%, transparent); background: color-mix(in srgb, var(--c, var(--muted)) 9%, transparent); color: var(--c, var(--muted)); }
 .badge.topic::before { content: ""; width: 6px; height: 6px; background: var(--c); }
 .badge-pick { --c: var(--accent-ink); }
+.badge-hot { --c: #8a6a00; background: var(--yellow-wash); border-color: var(--yellow); }
+:root[data-theme="dark"] .badge-hot { --c: var(--yellow); }
 .quick-save { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font: 400 18px/1 var(--pixel); cursor: pointer; opacity: 0; transition: opacity .15s; }
 .row:hover .quick-save, .quick-save:focus-visible, .quick-save[aria-pressed="true"] { opacity: 1; }
 .quick-save[aria-pressed="true"] { background: var(--yellow); border-color: var(--yellow); color: #111; }
@@ -349,6 +355,12 @@ mark.hl { background: var(--yellow-wash); color: inherit; box-shadow: 0 2px 0 va
 .note-list blockquote { margin: 0 0 6px; padding-left: 10px; border-left: 3px solid var(--yellow); color: var(--muted); font-size: 13px; }
 .note-list p { margin: 0; font-weight: 500; }
 .note-list button { margin-top: 4px; border: 0; background: none; padding: 0; color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline; }
+.foryou { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.foryou-item { display: flex; flex-direction: column; gap: 8px; min-height: 120px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); font-size: 13px; }
+.foryou-item a { font-size: 16px; font-weight: 600; line-height: 1.3; letter-spacing: -.01em; }
+.foryou-item a:hover { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.foryou-meta { margin-top: auto; display: flex; align-items: center; color: var(--muted); font-size: 12px; }
+.foryou-item.skeleton { height: auto; background: linear-gradient(var(--line-2), var(--line-2)) 20px 22px / 40% 10px no-repeat, linear-gradient(var(--line-2), var(--line-2)) 20px 48px / 80% 14px no-repeat, var(--surface); }
 .nextlist { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 14px; }
 .nextlist a { display: block; font-weight: 500; line-height: 1.35; }
 .nextlist a:hover { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
@@ -387,12 +399,15 @@ body.focus .focus-exit { display: inline-flex; }
   .margin { grid-column: 1; }
 }
 @media (max-width: 1000px) {
+  .foryou { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero, .split, .chart-card { grid-template-columns: 1fr; }
   .picks { grid-template-columns: 1fr; }
   .chart-facts { grid-template-columns: repeat(3, 1fr); }
   .cmdk { width: auto; } .cmdk span { display: none; }
 }
 @media (max-width: 680px) {
+  .foryou { grid-template-columns: 1fr; }
+  .foryou-item { min-height: 0; }
   .bar-in { gap: 12px; }
   .brand-name, .streak, .cmdk { display: none; }
   .nav { overflow-x: auto; scrollbar-width: none; } .nav a { padding: 8px; }

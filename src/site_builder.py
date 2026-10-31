@@ -132,6 +132,7 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
                     rec["featured"] = True
                     rec["summary"] = rec.get("summary") or old.get("summary")
                     rec["featured_on"] = old.get("featured_on")
+                    rec["slot"] = old.get("slot")
                 if not rec.get("abstract"):
                     rec["abstract"] = old.get("abstract", "")
                 for key in ("curator", "code_url"):
@@ -231,10 +232,24 @@ def ticker(days: list[dict]) -> str:
 # Components
 # ---------------------------------------------------------------------------
 
+def slot_label(rec: dict, rank: int = 1) -> str:
+    """What a featured paper was picked for. Days before the change have no slot."""
+    slot = rec.get("slot")
+    if slot == "trending":
+        return "Trending"
+    if slot == "runner-up":
+        return "Runner-up"
+    if slot == "pick" or rank == 1:
+        return "Today’s pick" if slot == "pick" else "Top pick"
+    return f"Pick {rank:02d}"
+
+
 def badges(rec: dict, root: str) -> str:
     out = []
     if rec.get("featured"):
-        out.append('<span class="badge badge-pick">Top pick</span>')
+        cls = "badge-hot" if rec.get("slot") == "trending" else "badge-pick"
+        label = "Trending" if rec.get("slot") == "trending" else "Top pick"
+        out.append(f'<span class="badge {cls}">{label}</span>')
     for c in rec.get("categories") or ["other-ml"]:
         out.append(f'<a class="badge topic t-{esc(c)}" href="{root}papers.html?cat={esc(c)}">{esc(category_name(c))}</a>')
     return f'<div class="badges">{"".join(out)}</div>'
@@ -272,11 +287,16 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
     else:
         summary = (rec.get("summary") or {}).get("text") or ""
         blurb = f'<p class="pick-blurb"><b>Why it matters</b>{esc(summary)}</p>' if summary else ""
-    label = "Top pick" if rank == 1 else f"Pick {rank:02d}"
+    label = slot_label(rec, rank)
+    why = ""
+    if rec.get("slot") == "trending" and rec.get("hf_upvotes"):
+        why = f'<span class="pick-why">{int(rec["hf_upvotes"])} upvotes on Hugging Face</span>'
+    elif rec.get("slot") == "pick":
+        why = '<span class="pick-why">Best new paper by our score</span>'
     topic = (rec.get("categories") or ["other-ml"])[0]
     code = f'<span class="has-code">{icon("code", 14)}Code available</span>' if rec.get("code_url") else ""
-    return f"""<article class="pick{' is-first' if rank == 1 else ''}" data-id="{esc(rec['id'])}">
-  <header class="pick-top"><span class="pick-n">{label}</span><span class="pick-read" hidden>Read ✓</span></header>
+    return f"""<article class="pick{' is-first' if rank == 1 else ''}" data-id="{esc(rec['id'])}" data-slot="{esc(rec.get('slot') or '')}">
+  <header class="pick-top"><span class="pick-n">{label}</span>{why}<span class="pick-read" hidden>Read ✓</span></header>
   <h3><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></h3>
   {blurb}
   <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
@@ -424,7 +444,7 @@ def build_index(days: list[dict], papers: dict) -> str:
     body = f"""<section class="hero">
   <div>
     <h1>Papers worth<br>building on.</h1>
-    <p class="lead">Two AI papers a day, picked from everything new on arXiv and Hugging Face, and explained so you can build with them.</p>
+    <p class="lead">The best new AI paper each day, plus the one everyone is reading. Picked from everything new on arXiv and Hugging Face, and explained so you can build with it.</p>
   </div>
   <div class="daily card" data-daily data-picks="{esc(' '.join(r['id'] for r in featured))}" data-minutes="{minutes}">
     <div class="ring" data-ring style="--p:0"><span class="ring-n" data-ring-n>0/{len(featured)}</span></div>
@@ -436,6 +456,10 @@ def build_index(days: list[dict], papers: dict) -> str:
 <section class="block" id="today">
   {section_head("Today’s picks", f"Chosen from {n_today} new papers")}
   <div class="picks">{cards}</div>
+</section>
+<section class="block" data-foryou data-url="{RECOMMEND_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" hidden>
+  {section_head("For you", "Recent papers close in meaning to what you’ve read. Worked out from this browser’s history only.")}
+  <ol class="foryou" data-foryou-list aria-busy="true">{'<li class="foryou-item skeleton" aria-hidden="true"></li>' * 3}</ol>
 </section>
 <section class="split">
   {more or '<div></div>'}
@@ -455,6 +479,8 @@ def build_index(days: list[dict], papers: dict) -> str:
 # The search function in Supabase (supabase/functions/search). Public by design:
 # it only answers this site and is rate limited per visitor.
 SEARCH_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/search"
+# The "For you" function (supabase/functions/recommend), same rules as search
+RECOMMEND_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/recommend"
 
 SKELETON_ROWS = '<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>' * 6
 
@@ -515,7 +541,7 @@ def build_day(day: dict, papers: dict) -> str:
   <h1>{esc(nice_date(day['date']))}</h1>
   <p>{len(day['papers'])} papers that day.</p>
 </section>
-<section class="block">{section_head("Top picks")}<div class="picks">{cards}</div></section>
+<section class="block">{section_head("Picks that day")}<div class="picks">{cards}</div></section>
 {rest_html}"""
     return page(nice_date(day["date"]), body, root="../", active="archive")
 
@@ -619,7 +645,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     if related:
         related_html = f'<div class="card pad"><span class="label">Read next, same idea</span><ol class="nextlist">{"".join(related_item(r, "../") for r in related)}</ol></div>'
 
-    kicker = '<span class="pick-n">Top pick</span>' if rec.get("featured") else ""
+    kicker = f'<span class="pick-n">{esc(slot_label(rec))}</span>' if rec.get("featured") else ""
     topic = (rec.get("categories") or ["other-ml"])[0]
     minutes = pick_minutes(rec)
     title = esc(rec["title"])
@@ -733,7 +759,7 @@ def compact(rec: dict) -> dict:
         "c": rec.get("categories") or ["other-ml"],
         "d": rec.get("first_seen", ""),
         "s": rec.get("score") or 0,
-        "f": 1 if rec.get("featured") else 0,
+        "f": (2 if rec.get("slot") == "trending" else 1) if rec.get("featured") else 0,
     }
 
 
@@ -794,6 +820,9 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR) -> int:
                      reverse=True)
     _write(os.path.join(site_dir, "data", "papers.json"),
            json.dumps([compact(r) for r in listing], ensure_ascii=False, separators=(",", ":")))
+    # Which papers have a page here; other "For you" results link to Hugging Face
+    _write(os.path.join(site_dir, "data", "ids.json"),
+           json.dumps(sorted(papers), separators=(",", ":")))
     # GitHub Pages: serve files as-is, no Jekyll processing
     _write(os.path.join(site_dir, ".nojekyll"), "")
 

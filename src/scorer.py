@@ -186,6 +186,39 @@ def score_and_rank_papers(papers: list[dict], top_n: int = 2) -> list[dict]:
     return selected
 
 
+# A paper needs this many Hugging Face upvotes to fill the "Trending" slot
+MIN_TRENDING_UPVOTES = 5
+
+
+def select_daily(papers: list[dict]) -> list[dict]:
+    """
+    Pick the day's two papers, each for a different reason:
+      1. "pick": the best new paper by our score.
+      2. "trending": the most upvoted paper on Hugging Face among the rest.
+         When nothing has enough upvotes, the runner-up by score ("runner-up").
+    Each selected paper gets a "slot" key saying which one it is.
+    """
+    if not papers:
+        return []
+    ranked = sorted((score_paper(p) for p in papers), key=lambda x: x["score"], reverse=True)
+    top = ranked[0]
+    top["badges"] = ([("⭐", "Top Pick")] + top["badges"])[:4]
+    top["slot"] = "pick"
+    rest = ranked[1:]
+    if not rest:
+        return [top]
+    hot = max(rest, key=lambda p: (p.get("hf_upvotes") or 0, p["score"]))
+    if (hot.get("hf_upvotes") or 0) >= MIN_TRENDING_UPVOTES:
+        hot["slot"] = "trending"
+        hot["badges"] = [("🔥", "Trending")] + [b for b in hot["badges"]][:3]
+    else:
+        hot = rest[0]
+        hot["slot"] = "runner-up"
+    print(f"  [pick] Today's pick: {top['title'][:60]}")
+    print(f"  [pick] {hot['slot'].capitalize()}: {hot['title'][:60]} ({hot.get('hf_upvotes') or 0} upvotes)")
+    return [top, hot]
+
+
 def format_badges(badges: list[tuple[str, str]]) -> str:
     """Format badges as inline markdown spans."""
     if not badges:

@@ -174,6 +174,58 @@
     }
   });
 
+  // ---- Home: "For you", papers close in meaning to this browser's reading ----
+  // Only the IDs of papers opened here are sent, to our own Supabase function.
+  // Results are kept for the day so the function is not called on every visit.
+  var forYou = document.querySelector("[data-foryou]");
+  if (forYou && reads.length && window.fetch) {
+    var fyIds = reads.slice(0, 50).map(function (h) { return h.id; });
+    var fyKey = dayKey(Date.now()) + ":" + fyIds.slice(0, 20).join(",");
+    var fyNames = {};
+    try { fyNames = JSON.parse(forYou.getAttribute("data-names")) || {}; } catch (e) { /* plain slugs */ }
+    var fyList = forYou.querySelector("[data-foryou-list]");
+    var fySub = forYou.querySelector(".sub");
+    var paintForYou = function (results, onSite) {
+      if (!results || !results.length) { forYou.hidden = true; return; }
+      fyList.innerHTML = results.slice(0, 6).map(function (p) {
+        var topic = (p.categories && p.categories[0]) || "other-ml";
+        var local = onSite[p.id];
+        var href = local ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
+        var date = p.first_seen ? new Date(p.first_seen + "T00:00:00") : null;
+        var meta = (date ? date.getDate() + " " + MONTHS[date.getMonth()] : "") +
+          (p.code_url ? '<span class="sep"></span>Code available' : "") +
+          (local ? "" : '<span class="sep"></span>On Hugging Face');
+        return '<li class="foryou-item" data-id="' + esc(p.id) + '">' +
+          '<span class="topic t-' + esc(topic) + '"><span class="dot"></span>' + esc(fyNames[topic] || topic) + "</span>" +
+          '<a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.title) + "</a>" +
+          '<span class="foryou-meta">' + meta + "</span></li>";
+      }).join("");
+      fyList.removeAttribute("aria-busy");
+      if (fySub) fySub.textContent = "Close in meaning to the " + (fyIds.length === 1 ? "paper" : fyIds.length + " papers") +
+        " you’ve opened here. Worked out from this browser’s history only.";
+      forYou.hidden = false;
+    };
+    var cached = load("apd.foryou", null);
+    var idsReq = fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+    var recReq = cached && cached.key === fyKey ? Promise.resolve(cached.results) :
+      fetch(forYou.getAttribute("data-url"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: fyIds, limit: 6, days: 30 })
+      }).then(function (r) { return r.ok ? r.json() : { results: [] }; })
+        .then(function (d) {
+          var results = d.results || [];
+          store("apd.foryou", { key: fyKey, results: results });
+          return results;
+        });
+    forYou.hidden = false;
+    Promise.all([recReq, idsReq]).then(function (both) {
+      var onSite = {};
+      (both[1] || []).forEach(function (id) { onSite[id] = true; });
+      paintForYou(both[0], onSite);
+    }).catch(function () { forYou.hidden = true; });
+  }
+
   // ---- Paper page ----
   var article = document.querySelector("[data-paper-id]");
   if (article) {
@@ -461,7 +513,7 @@
     var local = onSite[p.i];
     var href = local ? "paper/" + esc(p.i) + ".html" : "https://huggingface.co/papers/" + esc(p.i);
     var authors = p.a.join(", ") + (p.n > p.a.length ? " + " + (p.n - p.a.length) + " more" : "");
-    var badges = (p.f ? '<span class="badge badge-pick">Top pick</span>' : "") + p.c.map(function (c) {
+    var badges = (p.f === 2 ? '<span class="badge badge-hot">Trending</span>' : p.f ? '<span class="badge badge-pick">Top pick</span>' : "") + p.c.map(function (c) {
       return '<a class="badge topic t-' + esc(c) + '" href="papers.html?cat=' + esc(c) + '">' + esc(names[c] || c) + "</a>";
     }).join("");
     return '<li class="row' + (readIds[p.i] ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +

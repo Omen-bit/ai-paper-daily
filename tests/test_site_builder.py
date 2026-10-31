@@ -126,3 +126,27 @@ def test_paper_page_has_check_question_and_next_pick(tmp_path):
     assert "What is &lt;traded&gt; for speed?" in page
     assert "data-check-answer" in page
     assert "data-done" in page and "paper/2610.2.html" in page.replace("../", "paper/")
+
+
+def test_trending_slot_is_labelled(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    a = _paper("2610.1", 9, slot="pick")
+    b = _paper("2610.2", 3, slot="trending", hf_upvotes=42)
+    save_day([a, b], [a, b], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert "Today’s pick" in home and "Trending" in home and "42 upvotes on Hugging Face" in home
+    listing = json.load(open(os.path.join(site_dir, "data", "papers.json"), encoding="utf-8"))
+    assert {p["i"]: p["f"] for p in listing} == {"2610.1": 1, "2610.2": 2}
+
+
+def test_home_has_for_you_section_and_site_ids(tmp_path):
+    from site_builder import RECOMMEND_URL
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1"), _paper("2610.2")], [_paper("2610.1")], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert "data-foryou" in home and f'data-url="{RECOMMEND_URL}"' in home
+    assert RECOMMEND_URL.endswith("/functions/v1/recommend")
+    ids = json.load(open(os.path.join(site_dir, "data", "ids.json"), encoding="utf-8"))
+    assert ids == ["2610.1", "2610.2"]
