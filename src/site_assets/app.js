@@ -741,6 +741,18 @@
   }
   Array.prototype.forEach.call(document.querySelectorAll("[data-feedback]"), wireFeedback);
 
+  // ---- Trends: show every technology in the leaderboard ----
+  Array.prototype.forEach.call(document.querySelectorAll("[data-board-all]"), function (btn) {
+    var wrap = btn.closest(".tech-board-wrap");
+    var label = btn.textContent;
+    btn.addEventListener("click", function () {
+      var open = wrap.hasAttribute("data-all");
+      if (open) wrap.removeAttribute("data-all"); else wrap.setAttribute("data-all", "");
+      btn.setAttribute("aria-expanded", String(!open));
+      btn.textContent = open ? label : "Show fewer";
+    });
+  });
+
   // ---- Trends: you vs the field, from this browser's reading history ----
   var youField = document.querySelector("[data-you-field]");
   if (youField) {

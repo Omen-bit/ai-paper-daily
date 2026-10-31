@@ -11,6 +11,7 @@ Pages:
   paper/<id>.html       one page per paper
   data/papers.json      compact list of all papers, read by papers.html
 """
+import hashlib
 import html
 import json
 import os
@@ -165,6 +166,16 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
 EDITION = ""
 
 # Runs before first paint so a saved dark theme never flashes white
+def _asset_version() -> str:
+    """Changes whenever style.css or app.js changes, so browsers never keep an old copy."""
+    h = hashlib.sha1()
+    for name in ("style.css", "app.js"):
+        with open(os.path.join(ASSETS_DIR, name), "rb") as f:
+            h.update(f.read())
+    return h.hexdigest()[:10]
+
+
+ASSET_V = _asset_version()
 THEME_SCRIPT = ("<script>try{var t=localStorage.getItem('apd.theme')||(matchMedia('(prefers-color-scheme: dark)')"
                 ".matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}</script>")
 
@@ -193,7 +204,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 {THEME_SCRIPT}
 <link rel="preload" href="{root}assets/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{root}assets/fonts/geist-pixel-square.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}assets/style.css">
+<link rel="stylesheet" href="{root}assets/style.css?v={ASSET_V}">
 <link rel="icon" href="{FAVICON}">
 </head>
 <body{f' class="{body_class}"' if body_class else ""}>
@@ -225,7 +236,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     <span>Summaries are written by AI from the abstract. Check the paper.</span>
   </div>
 </footer>
-<script src="{root}assets/app.js" defer></script>
+<script src="{root}assets/app.js?v={ASSET_V}" defer></script>
 </body>
 </html>
 """
@@ -652,14 +663,6 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
   <div class="card pad chart-box">{mm}</div>
 </section>
 '''
-        sm = tech_trends.multiples(tech, months)
-        if sm:
-            tech_html += f'''
-<section class="block">
-  {section_head("Every technology, month by month", "Share of each month’s papers")}
-  {sm}
-</section>
-'''
     body = f"""<section class="page-head">
   <h1>Trends</h1>
   <p>What AI research is about right now, from {len(rows):,} {esc(source)}, {first} to {last}. Updated every morning.</p>
@@ -670,11 +673,6 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
   {section_head("Topic share, month by month", "Each band is a topic’s share of that month’s papers. Hover or tab through the months.")}
   <div class="card pad chart-box">{trends.share_area(per, months, top, names)}
     <details class="table-view"><summary>Show as a table</summary>{trends.share_table(per, months, top, names)}</details></div>
-</section>
-
-<section class="block">
-  {section_head("Rising and falling", "Share in the last 3 months, change against the 9 months before. Each line has its own scale.")}
-  {trends.mover_cards(moves, names, months)}
 </section>
 
 <section class="split split-even">
@@ -694,11 +692,6 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
 <section class="block">
   {section_head("The year in papers", "Papers per day. Stronger colour means a busier day.")}
   <div class="card pad">{trends.calendar(trends.daily_counts(rows), end)}</div>
-</section>
-
-<section class="block">
-  {section_head("How many papers share code", "Share of each month’s papers that link to a code repository")}
-  <div class="card pad chart-box">{trends.code_chart(code)}</div>
 </section>"""
     return page("Trends", body, active="trends",
                 description="Which AI technologies are growing in research right now: agents, reasoning, RAG and more, plus topic shares and code availability.")

@@ -1,8 +1,7 @@
 """
 tech_trends.py
 Numbers and SVG charts for specific technologies (AI agents, RAG, ...) on the
-Trends page: the leaderboard, the breakout spotlight, the momentum map and the
-small multiples.
+Trends page: the leaderboard, the breakout spotlight and the momentum map.
 
 Growth compares a technology's share of all papers in the last 90 days with its
 share in the 90 days before. Shares, not counts, so a busy week on Hugging Face
@@ -21,6 +20,7 @@ from trends import _month_label, _spark, esc, pct
 RECENT_DAYS = 90
 MIN_RECENT = 15
 MIN_BEFORE = 6
+BOARD_ROWS = 8  # rows the leaderboard shows before "Show all"
 
 # Status: label, a shape so it is never colour alone, and the cut-off on growth
 STATUS = {
@@ -129,21 +129,23 @@ def leaderboard(stats: list[dict], months: list[str]) -> str:
     if not rated:
         return '<p class="empty-note">Technologies appear once the database has a few months of papers.</p>'
     rows = []
-    for s in rated:
+    for n, s in enumerate(rated):
         hi = max(max(s["line"]) * 1.15, 0.001)
-        rows.append(f'''<tr class="st-{s["status"]}">
+        rows.append(f'''<tr class="st-{s["status"]}{" tb-more" if n >= BOARD_ROWS else ""}">
   <th scope="row"><a href="{_search(s["name"])}">{esc(s["name"])}</a></th>
   <td class="tb-spark">{_spark(s["line"], w=140, h=32, cls="spark tb-line", lo=0, hi=hi)}</td>
   <td class="num">{s["recent"]:,}<span>{pct(s["share"], 1)} of papers</span></td>
   <td class="num tb-change"><i class="tb-shape" aria-hidden="true">{STATUS[s["status"]][1]}</i>{change(s["growth"])}</td>
   <td>{_status_pill(s["status"])}</td>
 </tr>''')
+    more = (f'<button class="btn tb-all" type="button" data-board-all aria-expanded="false">'
+            f'Show all {len(rated)} technologies</button>' if len(rated) > BOARD_ROWS else "")
     few = [s["name"] for s in stats if s["status"] == "few"]
     note = (f'<p class="tb-note">Not enough papers yet to rate: {esc(", ".join(few))}.</p>' if few else "")
     return f'''<div class="card tech-board-wrap"><table class="tech-board">
 <thead><tr><th scope="col">Technology</th><th scope="col">{_month_label(months[0])} to {_month_label(months[-1])}</th>
 <th scope="col" class="num">Papers, last 90 days</th><th scope="col" class="num">Change in share</th><th scope="col">Status</th></tr></thead>
-<tbody>{"".join(rows)}</tbody></table>{note}</div>'''
+<tbody>{"".join(rows)}</tbody></table>{more}{note}</div>'''
 
 
 # ---------------------------------------------------------------------------
@@ -309,24 +311,3 @@ def momentum(stats: list[dict]) -> str:
     dumbbell = (f'<div class="mm-narrow"><p class="db-key"><span><i class="db-from"></i>90 days before</span>'
                 f'<span><i class="db-to"></i>Last 90 days</span></p><ol class="dumbbell">{"".join(bells)}</ol></div>')
     return f'<div class="mm-wide">{scatter}</div>{dumbbell}'
-
-
-# ---------------------------------------------------------------------------
-# 4. Small multiples: one mini chart per technology, all on the same scale
-# ---------------------------------------------------------------------------
-
-def multiples(stats: list[dict], months: list[str]) -> str:
-    rated = [s for s in stats if s["status"] != "few"]
-    if not rated:
-        return ""
-    cards = []
-    for s in rated:
-        hi = max(max(s["line"]) * 1.15, 0.001)
-        cards.append(f'''<li class="sm st-{s["status"]}"><a href="{_search(s["name"])}">
-  <span class="sm-head"><b>{esc(s["name"])}</b><span class="sm-now">{pct(s["line"][-1], 1)}</span></span>
-  {_spark(s["line"], w=200, h=56, cls="spark sm-line", lo=0, hi=hi)}
-  <span class="sm-axis"><span>{_month_label(months[0])}</span><span>peak {pct(max(s["line"]), 1)}</span><span>{_month_label(months[-1])}</span></span>
-  <span class="sm-foot">{_status_pill(s["status"])}<span>{change(s["growth"])}</span></span></a></li>''')
-    return (f'<ol class="smalls">{"".join(cards)}</ol>'
-            f'<p class="tb-note">Each chart has its own scale, starting at 0, so small technologies show their shape too. '
-            f'Compare sizes on the momentum map or the table.</p>')

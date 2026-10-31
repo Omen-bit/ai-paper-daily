@@ -251,8 +251,9 @@ def test_trends_page_tracks_technologies(tmp_path):
     build_site(data_dir, site_dir, str(export_dir))
     page = open(os.path.join(site_dir, "trends.html"), encoding="utf-8").read()
     assert "Technologies to watch" in page and "AI agents" in page
-    assert "Breakout of the season" in page and "Every technology, month by month" in page
+    assert "Breakout of the season" in page and "Every technology, month by month" not in page
     assert page.index("Technologies to watch") < page.index("Topic share, month by month")
+    assert "assets/style.css?v=" in page and "assets/app.js?v=" in page
 
 
 def test_trends_page_waits_for_three_months_of_history(tmp_path):

@@ -1,6 +1,6 @@
 """
 tests/test_tech_trends.py
-Unit tests for tech_trends.py: growth figures, statuses and the four charts.
+Unit tests for tech_trends.py: growth figures, statuses and the charts.
 """
 import sys
 import os
@@ -81,7 +81,7 @@ def test_stats_compare_shares_not_counts():
 def test_empty_input_gives_nothing():
     assert tech_stats([], MONTHS) == []
     assert "empty-note" in tt.leaderboard([], MONTHS)
-    assert tt.spotlight([], MONTHS) == "" and tt.momentum([]) == "" and tt.multiples([], MONTHS) == ""
+    assert tt.spotlight([], MONTHS) == "" and tt.momentum([]) == ""
 
 
 def test_charts_render_with_status_text_not_colour_alone():
@@ -92,8 +92,14 @@ def test_charts_render_with_status_text_not_colour_alone():
     spot = tt.spotlight(stats, MONTHS, on_site={"2601.02000"})
     assert "AI agents went from" in spot and 'class="sl-main"' in spot and "Show as a table" in spot
     assert 'href="paper/2601.02000.html"' in spot or "huggingface.co/papers/" in spot
-    smalls = tt.multiples(stats, MONTHS)
-    assert smalls.count('class="sm ') == 4  # agents, rag, moe, diffusion; not the "few" one
+
+
+def test_leaderboard_shows_eight_rows_then_a_button():
+    rows = []
+    for i, t in enumerate(["agents", "rag", "moe", "diffusion", "speech", "code", "safety", "robotics", "3d", "rl"]):
+        rows += _rows(0, 89, 20, [t], start_id=20000 + i * 100)
+    board = tt.leaderboard(tech_stats(rows, MONTHS), MONTHS)
+    assert board.count("tb-more") == 2 and "Show all 10 technologies" in board
 
 
 def test_momentum_map_needs_four_technologies_with_growth():
