@@ -9,6 +9,7 @@ Orchestrates the full pipeline:
   6. Update category pages
   7. Update README dashboard
   8. Update stats.json
+  9. Save structured paper records to data/ (used by the website)
 """
 import sys, io
 # Force UTF-8 output on Windows (avoids cp1252 emoji errors)
@@ -41,6 +42,7 @@ from groq_summarizer import summarize_papers
 from renderer import render_digest, save_digest, render_category_page
 from readme_updater import update_readme
 from stats_tracker import update_stats, load_stats
+import paper_store
 
 
 CATEGORIES_DIR = os.path.join(ROOT_DIR, "categories")
@@ -101,6 +103,7 @@ def run() -> None:
 
     # Load stats to check recently featured paper IDs (prevent duplicates on weekend/lookback)
     current_stats = load_stats()
+    paper_store.backfill_from_stats(current_stats)
     recent_paper_ids = set()
     for d in current_stats.get("digests", [])[:7]:
         for p in d.get("papers", []):
@@ -142,6 +145,9 @@ def run() -> None:
     # --- Step 5: Update stats ---
     print("\n📊 Updating stats.json...")
     stats = update_stats(selected, date_str)
+
+    # Save every candidate as a structured record for the website
+    paper_store.save_day(all_papers, selected, date_str)
 
     # --- Step 6: Render daily digest ---
     print("\n📝 Rendering daily digest...")
