@@ -178,3 +178,36 @@ def test_export_papers_pages_through_the_table(tmp_path):
     assert sync.export_papers(cfg, str(tmp_path), session) == 1002
     assert session.offsets == [0, 1000]
     assert len(json.load(open(tmp_path / "papers.json", encoding="utf-8"))["papers"]) == 1002
+
+
+def test_prepare_picks_asks_the_function_for_each_pick(monkeypatch, tmp_path):
+    data = str(tmp_path)
+    save_day([_paper("2610.00001"), _paper("2610.00002"), _paper("2610.00003")],
+             [_paper("2610.00001"), _paper("2610.00002")], "2026-10-31", data_dir=data)
+    replies = [FakeResponse(200, {"id": "2610.00001", "status": "ready"}), FakeResponse(500)]
+    calls = []
+
+    class Session:
+        def post(self, url, json=None, headers=None, timeout=None):
+            calls.append((url, json, headers))
+            return replies.pop(0)
+
+    cfg = {"url": "https://x.supabase.co", "key": "k", "secret": "s3cret"}
+    assert sync.prepare_picks(cfg, data_dir=data, session=Session()) == 1
+    assert [c[1] for c in calls] == [{"id": "2610.00001", "prepare": True}, {"id": "2610.00002", "prepare": True}]
+    assert all(c[0].endswith("/functions/v1/ask") and c[2]["x-sync-secret"] == "s3cret" for c in calls)
+    assert sync.prepare_picks(cfg, data_dir=str(tmp_path / "empty"), session=Session()) == 0
+
+
+def test_prune_fulltext_calls_the_cleanup(monkeypatch):
+    calls = []
+
+    class Session:
+        def post(self, url, json=None, headers=None, timeout=None):
+            calls.append((url, json))
+            r = FakeResponse(200, 3)
+            r.raise_for_status = lambda: None
+            return r
+
+    assert sync.prune_fulltext({"url": "https://x.supabase.co", "key": "k", "secret": "s"}, session=Session()) == 3
+    assert calls == [("https://x.supabase.co/rest/v1/rpc/prune_fulltext", {"days": 30})]

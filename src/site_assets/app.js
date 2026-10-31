@@ -493,7 +493,12 @@
       var turn = document.createElement("li");
       turn.className = "ask-turn";
       turn.innerHTML = '<p class="ask-q">' + esc(question) + '</p><div class="ask-a is-loading"><span class="pixbar pixbar-run" aria-hidden="true">' +
-        new Array(7).join("<i></i>") + '</span><span class="sr-only">Reading the abstract…</span></div>';
+        new Array(7).join("<i></i>") + '</span><span class="ask-wait">Reading the paper…</span></div>';
+      // The first question on a paper reads the whole thing from arXiv, which takes a few seconds
+      var slow = setTimeout(function () {
+        var w = turn.querySelector(".ask-wait");
+        if (w) w.textContent = "Reading the full paper for the first time. This takes a few seconds, and later questions are instant.";
+      }, 2500);
       askLog.appendChild(turn);
       askLog.scrollTop = askLog.scrollHeight;
       askInput.value = "";
@@ -505,6 +510,7 @@
       }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; });
       }).then(function (res) {
+        clearTimeout(slow);
         var box = turn.querySelector(".ask-a");
         box.classList.remove("is-loading");
         if (!res.ok) {
@@ -513,14 +519,25 @@
           return;
         }
         var d = res.data;
-        box.innerHTML = "<p>" + esc(d.answer) + "</p>" +
-          (d.quote ? '<button class="ask-quote" type="button"><span class="label">From the abstract</span>“' + esc(d.quote) + "”</button>" :
-            (d.answerable ? '<p class="ask-note">Not tied to one sentence of the abstract, so check the paper.</p>' : ""));
-        var qb = box.querySelector(".ask-quote");
+        var fromAbstract = !d.section || d.section === "Abstract";
+        var quote = "";
+        if (d.quote && fromAbstract) {
+          quote = '<button class="ask-quote" type="button"><span class="label">From the abstract</span>“' + esc(d.quote) + "”</button>";
+        } else if (d.quote) {
+          // A sentence from the full paper: open it on arXiv
+          quote = '<a class="ask-quote" href="https://arxiv.org/html/' + esc(askPaper.getAttribute("data-paper-id")) +
+            '" target="_blank" rel="noopener"><span class="label">From the paper · ' + esc(d.section) + "</span>“" + esc(d.quote) + "”</a>";
+        } else if (d.answerable) {
+          quote = '<p class="ask-note">Not tied to one sentence of the paper, so check it before relying on this.</p>';
+        }
+        var only = d.mode === "abstract" ? '<p class="ask-note">Answered from the abstract only: the full paper couldn’t be read.</p>' : "";
+        box.innerHTML = "<p>" + esc(d.answer) + "</p>" + quote + only;
+        var qb = box.querySelector("button.ask-quote");
         if (qb) qb.addEventListener("click", function () { showInAbstract(d.quote); });
         lastTurn = d.answerable ? { q: question, a: d.answer } : null;
         askLog.scrollTop = askLog.scrollHeight;
       }).catch(function () {
+        clearTimeout(slow);
         var box = turn.querySelector(".ask-a");
         box.classList.remove("is-loading");
         box.classList.add("is-error");

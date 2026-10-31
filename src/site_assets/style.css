@@ -509,12 +509,15 @@ body.focus .focus-exit { display: inline-flex; }
 .ask-q { margin: 0 0 6px auto; max-width: 80%; width: fit-content; padding: 10px 14px; border-radius: 12px 12px 2px 12px; background: var(--ink); color: var(--bg); font-size: 15px; }
 .ask-a { max-width: 92%; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px 12px 12px 2px; background: var(--surface); font-size: calc(16px * var(--reader-scale, 1)); line-height: 1.55; }
 .ask-a p { margin: 0; }
-.ask-a.is-loading { width: 120px; }
+.ask-a.is-loading { display: grid; gap: 8px; justify-items: start; }
+.ask-a.is-loading .pixbar { width: 120px; }
 .ask-a.is-error { color: var(--bad); }
 .ask-quote { display: block; width: 100%; margin-top: 10px; padding: 10px 12px; border: 0; border-left: 3px solid var(--yellow); border-radius: 4px; background: var(--yellow-wash); color: var(--ink); font: inherit; font-size: 14px; line-height: 1.5; text-align: left; cursor: pointer; }
 .ask-quote .label { margin-bottom: 4px; }
 .ask-quote:hover { box-shadow: inset 0 0 0 1px var(--yellow); }
 .ask-note { margin-top: 8px !important; font-size: 13px; color: var(--muted); }
+a.ask-quote { text-decoration: none; }
+.ask-wait { font-size: 13px; line-height: 1.5; color: var(--muted); }
 .ask-suggest { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .ask-suggest .qchip { border: 1px solid transparent; font: inherit; font-size: 13px; cursor: pointer; }
 .ask-suggest .qchip:hover { border-color: var(--yellow); }

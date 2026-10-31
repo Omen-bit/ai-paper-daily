@@ -766,7 +766,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         ask_panel = f"""<section class="ask ask-panel" id="ask" data-ask data-url="{ASK_URL}" aria-labelledby="ask-title">
       <div class="ask-head"><h2 id="ask-title">Ask this paper</h2>
         <button class="icon-button ask-close" type="button" data-ask-close aria-label="Close questions">×</button></div>
-      <p class="ask-sub">Answers come only from the abstract, with the sentence they rely on. Or select any sentence and press Ask.</p>
+      <p class="ask-sub">Answers come from the full paper, with the section and sentence they rely on. Or select any sentence and press Ask.</p>
       <ol class="ask-log" data-ask-log aria-live="polite"></ol>
       <div class="ask-suggest">{chips}</div>
       <form class="ask-form" data-ask-form>

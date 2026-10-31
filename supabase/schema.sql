@@ -166,3 +166,75 @@ revoke all on function public.bump_stat(text, text) from public, anon, authentic
 revoke all on function public.most_read(int, int) from public, anon, authenticated;
 grant execute on function public.bump_stat(text, text) to service_role;
 grant execute on function public.most_read(int, int) to service_role;
+
+-- Full text for "Ask this paper". A paper is read from arXiv the first time someone
+-- asks about it (or in advance for the daily picks), split into sections, and kept.
+-- Papers nobody asks about for 30 days are removed by prune_fulltext().
+-- RLS on with no policies: only the functions (secret key) can read or write these.
+create table if not exists public.paper_fulltext (
+  paper_id    text primary key,
+  status      text not null check (status in ('ready', 'none')),  -- none: no readable full text
+  source      text,
+  n_sections  integer not null default 0,
+  fetched_at  timestamptz not null default now(),
+  last_asked  timestamptz
+);
+alter table public.paper_fulltext enable row level security;
+
+create table if not exists public.paper_sections (
+  paper_id  text not null references public.paper_fulltext(paper_id) on delete cascade,
+  idx       integer not null,
+  heading   text not null default '',
+  body      text not null,
+  tsv       tsvector generated always as
+              (setweight(to_tsvector('english', heading), 'A') || to_tsvector('english', body)) stored,
+  primary key (paper_id, idx)
+);
+alter table public.paper_sections enable row level security;
+create index if not exists paper_sections_tsv on public.paper_sections using gin (tsv);
+
+-- The passages of one paper that best match a question. Any word of the question may
+-- match (OR), ranked by how well. With no match, the paper's opening passages.
+create or replace function public.match_sections(pid text, q text, n int default 5)
+returns table (idx int, heading text, body text, rank real)
+language plpgsql security definer set search_path = '' as $$
+declare
+  words text := replace(plainto_tsquery('english', coalesce(q, ''))::text, ' & ', ' | ');
+  query tsquery;
+begin
+  update public.paper_fulltext set last_asked = now() where paper_id = pid;
+  if words <> '' then
+    query := to_tsquery('english', words);
+    return query
+      select s.idx, s.heading, s.body, ts_rank_cd(s.tsv, query)
+      from public.paper_sections s
+      where s.paper_id = pid and s.tsv @@ query
+      order by 4 desc, s.idx
+      limit least(n, 10);
+    if found then return; end if;
+  end if;
+  return query
+    select s.idx, s.heading, s.body, 0::real
+    from public.paper_sections s
+    where s.paper_id = pid
+    order by s.idx
+    limit least(n, 10);
+end $$;
+
+-- Forget papers nobody has asked about lately. Papers with no readable full text are
+-- retried after a week, since arXiv sometimes adds the HTML version later.
+create or replace function public.prune_fulltext(days int default 30)
+returns integer
+language plpgsql security definer set search_path = '' as $$
+declare gone int;
+begin
+  delete from public.paper_fulltext
+  where coalesce(last_asked, fetched_at) < now() - make_interval(days => days)
+     or (status = 'none' and fetched_at < now() - interval '7 days');
+  get diagnostics gone = row_count;
+  return gone;
+end $$;
+revoke all on function public.match_sections(text, text, int) from public, anon, authenticated;
+revoke all on function public.prune_fulltext(int) from public, anon, authenticated;
+grant execute on function public.match_sections(text, text, int) to service_role;
+grant execute on function public.prune_fulltext(int) to service_role;

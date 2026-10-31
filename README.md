@@ -36,7 +36,7 @@ Around those daily picks sits a database of about a year of AI papers (8,000+), 
 | | Feature | What it does |
 | :---: | :--- | :--- |
 | ⭐ | **Today's picks** | The best new paper by our score, plus the trending or most-read one. Notes in three depths: 10 seconds, 1 minute, and "build with it". |
-| 💬 | **Ask this paper** | Ask a question beside the text and get an answer drawn only from the abstract, with the sentence it relies on. Select any sentence and press **Ask** to ask about it. |
+| 💬 | **Ask this paper** | Ask a question beside the text and get an answer from the full paper, with the section and sentence it relies on. The first question on a paper reads it from arXiv (a few seconds); after that answers are instant. Select any sentence and press **Ask** to ask about it. |
 | 🧭 | **Project Scout** | Describe what you want to build in plain words. Scout searches the whole database from several angles and returns a short reading plan: start here, build on these, read later. |
 | 🎯 | **For you** | Recommendations from the papers you opened, worked out in your browser. No account needed. |
 | 📈 | **Trends** | A year of AI research in charts: topic share by month, rising and falling topics, words on the rise, how much research ships code, and how your reading compares with the field. |
@@ -169,10 +169,10 @@ The live features run as **Supabase Edge Functions**, called straight from the s
 | `search` | Search box, All papers | Finds papers by meaning |
 | `recommend` | For you | Finds papers close to what you've read |
 | `scout` | Project Scout | Plans searches with Groq, matches papers, orders them into a reading plan |
-| `ask` | Ask this paper | Answers from the abstract only and quotes the sentence it used |
+| `ask` | Ask this paper | Reads the full paper from arXiv's HTML version the first time, saves it in sections, then answers from the best-matching sections and quotes the sentence it used |
 | `track` | Most read | Counts anonymous views and "worth it" votes |
 
-Every public function has a per-visitor hourly limit, and `embed` only accepts the pipeline's `SYNC_SECRET`. If Groq is unavailable, Scout falls back to plain search; Ask needs Groq.
+Every public function has a per-visitor hourly limit, and `embed` only accepts the pipeline's `SYNC_SECRET`. If Groq is unavailable, Scout falls back to plain search; Ask needs Groq. Saved full texts nobody has asked about for 30 days are removed by the daily run, and today's picks are read in advance.
 
 ### Ranking signals
 - **Community momentum:** Hugging Face upvotes. The most-upvoted paper of the day becomes **Trending**.

@@ -10,6 +10,9 @@ Usage:
                                        also load a year of Hugging Face daily
                                        papers (search only, no site pages)
 
+Every run also exports the papers for the website, prepares today's picks for
+"Ask this paper", and removes saved full texts nobody has asked about lately.
+
 Needs SUPABASE_URL, SUPABASE_SECRET_KEY and SYNC_SECRET. When they are not
 set the script prints a note and exits 0, so the daily run never fails here.
 """
@@ -221,6 +224,42 @@ def save_most_read(cfg: dict, out_dir: str = EXPORT_DIR, session=requests) -> in
     return len(papers)
 
 
+FULLTEXT_KEEP_DAYS = 30
+
+
+def prepare_picks(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
+    """
+    Have the ask function read today's picks' full text from arXiv now, so the
+    first visitor to ask about them gets an answer straight away.
+    """
+    days = load_days(data_dir)
+    if not days:
+        return 0
+    ids = [f if isinstance(f, str) else (f or {}).get("id") for f in days[0].get("featured") or []]
+    ready = 0
+    for pid in filter(None, ids):
+        try:
+            resp = session.post(f"{cfg['url']}/functions/v1/ask", json={"id": pid, "prepare": True},
+                                headers={"x-sync-secret": cfg["secret"], "Content-Type": "application/json"},
+                                timeout=TIMEOUT)
+            status = (resp.json() or {}).get("status") if resp.status_code == 200 else f"HTTP {resp.status_code}"
+        except (requests.RequestException, ValueError) as exc:
+            status = f"failed ({str(exc)[:80]})"
+        print(f"[supabase] Full text for {pid}: {status}")
+        ready += status == "ready"
+    return ready
+
+
+def prune_fulltext(cfg: dict, session=requests) -> int:
+    """Remove saved full texts nobody has asked about for a month, to keep the database small."""
+    resp = session.post(f"{cfg['url']}/rest/v1/rpc/prune_fulltext", headers=_headers(cfg["key"]),
+                        json={"days": FULLTEXT_KEEP_DAYS}, timeout=TIMEOUT)
+    resp.raise_for_status()
+    gone = int(resp.json() or 0)
+    print(f"[supabase] Removed {gone} saved full texts not asked about in {FULLTEXT_KEEP_DAYS} days.")
+    return gone
+
+
 def main() -> int:
     try:
         days = 0
@@ -229,7 +268,7 @@ def main() -> int:
         sync(everything="--all" in sys.argv or days > 0, backfill_days=days)
         cfg = _config()
         if cfg:
-            for step in (export_papers, save_most_read):
+            for step in (export_papers, save_most_read, prepare_picks, prune_fulltext):
                 try:
                     step(cfg)
                 except Exception as exc:  # e.g. the counts table may not exist yet
