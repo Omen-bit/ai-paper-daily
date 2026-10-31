@@ -261,4 +261,46 @@ def fetch_all_papers(max_arxiv: int = 150) -> list[dict]:
 
     result = list(paper_map.values())
     print(f"  [fetch] {len(result)} unique papers after deduplication")
+    _fill_missing_arxiv_categories(result)
     return result
+
+
+def _fill_missing_arxiv_categories(papers: list[dict]) -> None:
+    """
+    HuggingFace items usually carry no arXiv categories, which leaves the classifier
+    without its category signal. Look them up in one batched arXiv id_list query.
+    Leaves papers unchanged if the lookup fails.
+    """
+    missing = [p for p in papers if not p.get("arxiv_categories") and p.get("id")]
+    if not missing:
+        return
+
+    ids = ",".join(p["id"] for p in missing)
+    url = f"{ARXIV_API_BASE}?id_list={ids}&max_results={len(missing)}"
+
+    def _do_fetch():
+        resp = requests.get(url, timeout=REQUEST_TIMEOUT, headers={"User-Agent": USER_AGENT})
+        if resp.status_code == 429:
+            raise Exception("429 rate limited by arXiv")
+        if resp.status_code >= 500:
+            raise Exception(f"{resp.status_code} server error from arXiv")
+        return feedparser.parse(resp.text)
+
+    feed = _fetch_with_retry(_do_fetch, "arxiv-categories")
+    if feed is None:
+        return
+
+    cats_by_id = {}
+    for entry in feed.entries:
+        try:
+            arxiv_id = _strip_version(entry.id.split("/abs/")[-1])
+            cats_by_id[arxiv_id] = [tag.term for tag in entry.tags if "." in tag.term]
+        except Exception:
+            continue
+
+    filled = 0
+    for p in missing:
+        if cats_by_id.get(p["id"]):
+            p["arxiv_categories"] = cats_by_id[p["id"]]
+            filled += 1
+    print(f"  [fetch] arXiv categories filled for {filled}/{len(missing)} HuggingFace papers")

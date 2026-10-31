@@ -16,6 +16,10 @@ GROQ_MODELS_PREFERRED = [
     "llama-3.1-8b-instant",
 ]
 
+# Model ids containing any of these are not general chat models (speech, safety
+# classifiers, agentic systems) and are never used as a fallback.
+_NON_CHAT_MODEL_MARKERS = ("whisper", "tts", "guard", "playai", "orpheus", "compound", "distil")
+
 SYSTEM_PROMPT = (
     "You are a concise science communicator helping researchers quickly understand "
     "why a paper matters. Given a paper title and abstract, write a SINGLE sentence "
@@ -48,18 +52,20 @@ def _get_client():
     global _groq_client
     if _groq_client is None:
         from groq import Groq
-        import httpx
         api_key = _get_api_key()
         if not api_key:
             raise ValueError("GROQ_API_KEY is not set or is empty")
-        _groq_client = Groq(api_key=api_key, http_client=httpx.Client())
+        _groq_client = Groq(api_key=api_key)
     return _groq_client
 
 
 def _resolve_active_models() -> list:
     """
     Call client.models.list() once and keep only models from GROQ_MODELS_PREFERRED
-    that appear in the returned list. Falls back to the static chain on any error.
+    that appear in the returned list. If every preferred model has been retired,
+    fall back to whatever chat models the account can use, so a Groq deprecation
+    never silently turns every summary into the heuristic.
+    Falls back to the static chain if models.list() itself fails.
     """
     global _auth_failed
     try:
@@ -69,6 +75,13 @@ def _resolve_active_models() -> list:
         if resolved:
             print(f"  [groq] Active model chain: {resolved}")
             return resolved
+        fallback = sorted(
+            m for m in available
+            if not any(marker in m.lower() for marker in _NON_CHAT_MODEL_MARKERS)
+        )
+        if fallback:
+            print(f"  [groq] Preferred models retired; falling back to available models: {fallback}")
+            return fallback
         print("  [groq] None of the preferred models found; using static chain")
     except Exception as exc:
         error_str = str(exc)
@@ -307,10 +320,20 @@ def summarize_papers(papers: list[dict]) -> list[dict]:
         f"{heuristic_count}/{total} from heuristic."
     )
     api_key = _get_api_key()
-    if heuristic_count == total and api_key:
-        print(
-            "  WARNING: Every summary used the heuristic fallback despite "
-            "GROQ_API_KEY being set. Check key validity and Groq API status."
-        )
+    if total and heuristic_count == total:
+        if api_key:
+            _warn(
+                "Every summary used the heuristic fallback despite GROQ_API_KEY being set. "
+                "Check key validity and Groq API status in the [groq] lines above."
+            )
+        else:
+            _warn("GROQ_API_KEY is not set, so every summary used the heuristic fallback.")
 
     return papers
+
+
+def _warn(message: str) -> None:
+    """Print a warning; on GitHub Actions also raise a visible run annotation."""
+    print(f"  WARNING: {message}")
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        print(f"::warning title=Groq summaries unavailable::{message}")

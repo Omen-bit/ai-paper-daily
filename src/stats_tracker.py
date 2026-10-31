@@ -123,10 +123,14 @@ def _parse_digest_file(filepath: str) -> list[dict]:
             raw = auth_match.group(1).split("*+")[0].replace("et al.", "").strip("., *")
             authors = [a.strip() for a in raw.split(",") if a.strip()]
 
+        date_match = re.search(r"\*\*Date:\*\*\s*(\d{4}-\d{2}-\d{2})", block)
+
         papers.append({
             "id": arxiv_id,
             "title": title,
             "url": url,
+            "pdf_url": f"https://arxiv.org/pdf/{arxiv_id}" if arxiv_id else "",
+            "submitted": date_match.group(1) if date_match else "",
             "authors": authors,
             "categories": paper_cats,
         })
@@ -206,6 +210,33 @@ def _recompute_all(stats: dict) -> dict:
 _reconcile_totals = _recompute_all
 
 
+def _merge_paper_records(stored: list[dict], parsed: list[dict]) -> list[dict]:
+    """
+    Combine the paper records stored in stats.json with those parsed from the digest file.
+    Stored records are the source of truth: they hold the full author list, badges,
+    submission date and PDF link, which the Markdown only partly shows. Parsed records
+    only fill fields that are missing or empty, and add papers absent from stats.
+    """
+    if not stored:
+        return parsed
+    if not parsed:
+        return stored
+
+    def _key(p: dict) -> str:
+        return p.get("id") or p.get("title", "")
+
+    parsed_by_key = {_key(p): p for p in parsed}
+    merged = []
+    for record in stored:
+        fill = parsed_by_key.pop(_key(record), {})
+        for field, value in fill.items():
+            if value and not record.get(field):
+                record[field] = value
+        merged.append(record)
+    merged.extend(parsed_by_key.values())
+    return merged
+
+
 def reconcile_from_disk(stats: dict) -> dict:
     """
     Dynamically reconcile stats.json against the digests/ folder.
@@ -237,8 +268,7 @@ def reconcile_from_disk(stats: dict) -> dict:
         if date_str in digests_by_date:
             entry = digests_by_date[date_str]
             entry["paper_count"] = actual_count
-            if papers:
-                entry["papers"] = papers
+            entry["papers"] = _merge_paper_records(entry.get("papers", []), papers)
         else:
             new_entry = {
                 "date": date_str,

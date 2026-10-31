@@ -6,7 +6,7 @@ Assigns papers to one or more of 12 thematic categories plus a fallback "Other M
 Design notes:
 - Specific/rare keywords score 3 points in title, 1 point in abstract.
 - Generic broad keywords score 1 point in title, 0 in abstract (weight 1/3 of specific ones).
-- arXiv category bonus contributes at most 2 points (cannot alone cross the threshold).
+- arXiv category bonus contributes at most 1 point (cannot alone cross the threshold).
 - A category is assigned only if its score >= MIN_CATEGORY_SCORE.
 - Up to 3 categories per paper; minimum 1 (fallback to "Other ML" if none pass).
 """
@@ -213,7 +213,7 @@ def classify_paper(paper: dict, top_n: int = 3) -> list[dict]:
                 score += 1
                 break
 
-        # arXiv category bonus: at most 2 pts total, and capped so it cannot
+        # arXiv category bonus: at most 1 pt total, so it cannot
         # alone push a category over MIN_CATEGORY_SCORE.
         arxiv_bonus_map = {
             "llms": ["cs.cl", "cs.lg"],
@@ -233,8 +233,9 @@ def classify_paper(paper: dict, top_n: int = 3) -> list[dict]:
         for code in arxiv_bonus_map.get(slug, []):
             if code in arxiv_cats:
                 bonus += 1
-        # Cap: bonus can be at most 2 and cannot alone reach the threshold
-        bonus = min(bonus, 2)
+        # Cap: bonus can be at most 1 so it can never alone reach MIN_CATEGORY_SCORE;
+        # a category always needs at least one keyword match.
+        bonus = min(bonus, MIN_CATEGORY_SCORE - 1)
         score += bonus
 
         if score >= MIN_CATEGORY_SCORE:
