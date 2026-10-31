@@ -7,6 +7,7 @@
 // with the x-sync-secret header.
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 import { db, guard, json, sameSecret, underLimit } from "../_shared/http.ts";
+import { groq, hasGroq } from "../_shared/groq.ts";
 import { ASK_PROMPT, askInput, cleanQuestion, parseAnswer } from "../_shared/ask.ts";
 import {
   FULL_PROMPT, fullInput, htmlUrl, type Passage, parseArxivHtml, parseFullAnswer, searchText, toPassages, usable,
@@ -14,32 +15,8 @@ import {
 
 const QUESTIONS_PER_HOUR = 30;
 const PASSAGES_PER_ANSWER = 5;
-const GROQ_KEY = Deno.env.get("GROQ_API_KEY") ?? "";
 const SYNC_SECRET = Deno.env.get("SYNC_SECRET") ?? "";
-const GROQ_MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
 const ID = /^[0-9]{4}\.[0-9]{4,5}$/;
-
-async function groq(system: string, user: string, maxTokens: number): Promise<string | null> {
-  for (const model of GROQ_MODELS) {
-    try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model, temperature: 0.1, max_tokens: maxTokens, response_format: { type: "json_object" },
-          messages: [{ role: "system", content: system }, { role: "user", content: user }],
-        }),
-        signal: AbortSignal.timeout(20000),
-      });
-      if (!res.ok) { console.error("groq", model, res.status); continue; }
-      const text = (await res.json())?.choices?.[0]?.message?.content;
-      if (typeof text === "string" && text.trim()) return text;
-    } catch (e) {
-      console.error("groq", model, String(e));
-    }
-  }
-  return null;
-}
 
 /**
  * Makes sure the paper's full text is saved, reading it from arXiv the first time.
@@ -97,7 +74,7 @@ Deno.serve(async (req) => {
     return json(req, { id, status: await ensureFullText(id) });
   }
 
-  if (!GROQ_KEY) return json(req, { error: "Asking questions isn't switched on yet." }, 503);
+  if (!hasGroq()) return json(req, { error: "Asking questions isn't switched on yet." }, 503);
   const question = cleanQuestion(body.question);
   if (question.length < 4) return json(req, { error: "Type a question first." }, 400);
   if (!(await underLimit(req, "ask", QUESTIONS_PER_HOUR))) {
@@ -121,13 +98,13 @@ Deno.serve(async (req) => {
         { heading: "Abstract", body: paper.abstract },
         ...(hits as Passage[]).map((h) => ({ heading: h.heading, body: h.body })),
       ];
-      const answer = parseFullAnswer(await groq(FULL_PROMPT, fullInput(paper.title, passages, question, previous), 500), passages);
+      const answer = parseFullAnswer(await groq(FULL_PROMPT, fullInput(paper.title, passages, question, previous), 500, 0.1, 30000), passages);
       if (answer) return json(req, { ...answer, mode: "full" });
     }
   }
 
   // 2. From the abstract only
-  const answer = parseAnswer(await groq(ASK_PROMPT, askInput(paper.title, paper.abstract, question, previous), 400), paper.abstract);
+  const answer = parseAnswer(await groq(ASK_PROMPT, askInput(paper.title, paper.abstract, question, previous), 400, 0.1, 30000), paper.abstract);
   if (!answer) return json(req, { error: "Couldn't answer that right now. Try asking it another way." }, 502);
   return json(req, { ...answer, section: answer.quote ? "Abstract" : null, mode: "abstract" });
 });

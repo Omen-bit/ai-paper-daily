@@ -11,10 +11,23 @@ import time
 from typing import Optional
 
 # Preferred model order. Dynamic filtering at startup removes retired models.
+# Groq retired the Llama 3 models on 16 Aug 2026; set GROQ_MODELS (comma-separated)
+# to change the order without a code change.
 GROQ_MODELS_PREFERRED = [
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant",
+    m.strip() for m in os.environ.get("GROQ_MODELS", "").split(",") if m.strip()
+] or [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
 ]
+
+
+def call_options(model: str, max_tokens: int) -> dict:
+    """Extra settings per model. Reasoning models (gpt-oss) think briefly, keep their
+    thinking out of the reply, and need token room for it."""
+    if "gpt-oss" in model:
+        return {"max_tokens": max_tokens + 1024,
+                "extra_body": {"reasoning_effort": "low", "include_reasoning": False}}
+    return {"max_tokens": max_tokens}
 
 # Model ids containing any of these are not general chat models (speech, safety
 # classifiers, agentic systems) and are never used as a fallback.
@@ -168,8 +181,8 @@ def _call_groq(model: str, title: str, abstract: str) -> tuple[Optional[str], st
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_message},
             ],
-            max_tokens=80,
             temperature=0.3,
+            **call_options(model, 80),
         )
         choice = response.choices[0]
         return choice.message.content.strip(), choice.finish_reason

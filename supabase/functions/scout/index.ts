@@ -9,6 +9,7 @@
 //      the brief (fallback: the closest papers, marked as not checked)
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 import { db, guard, json, underLimit } from "../_shared/http.ts";
+import { groq } from "../_shared/groq.ts";
 import {
   type Candidate, cleanDescription, descriptionProblem, fallbackReport, type Match, MIN_SIMILARITY, mergeMatches,
   NEEDS_PROMPT, parseNeeds, parseReport, PLAN_PROMPT, planInput, singleNeed,
@@ -16,39 +17,8 @@ import {
 
 const model = new Supabase.ai.Session("gte-small");
 const SCOUTS_PER_HOUR = 10;
-const GROQ_KEY = Deno.env.get("GROQ_API_KEY") ?? "";
-const GROQ_MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
 // Can be tuned without a code change: set SCOUT_MIN_SIMILARITY as a Supabase secret
 const FLOOR = Number(Deno.env.get("SCOUT_MIN_SIMILARITY")) || MIN_SIMILARITY;
-
-/** One JSON-mode Groq call, trying each model in turn. Returns the raw text or null. */
-async function groq(system: string, user: string, maxTokens: number): Promise<string | null> {
-  if (!GROQ_KEY) return null;
-  for (const m of GROQ_MODELS) {
-    try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: m, temperature: 0.2, max_tokens: maxTokens,
-          response_format: { type: "json_object" },
-          messages: [{ role: "system", content: system }, { role: "user", content: user }],
-        }),
-        signal: AbortSignal.timeout(25000),
-      });
-      if (!res.ok) {
-        console.error("groq", m, res.status);
-        continue;
-      }
-      const data = await res.json();
-      const text = data?.choices?.[0]?.message?.content;
-      if (typeof text === "string" && text.trim()) return text;
-    } catch (e) {
-      console.error("groq", m, String(e));
-    }
-  }
-  return null;
-}
 
 async function match(text: string): Promise<Match[]> {
   const vector = await model.run(text, { mean_pool: true, normalize: true });

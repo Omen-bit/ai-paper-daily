@@ -127,8 +127,8 @@ def _ask(model: str, title: str, abstract: str) -> Optional[str]:
             {"role": "user", "content": f"Title: {title}\n\nAbstract: {gs._truncate_abstract(abstract, 2500)}"},
         ],
         response_format={"type": "json_object"},
-        max_tokens=750,
         temperature=0.2,
+        **gs.call_options(model, 750),
     )
     choice = response.choices[0]
     if choice.finish_reason == "length":
