@@ -1,0 +1,31 @@
+name: 🔎 Full sync to Supabase
+
+# Run this by hand once after setting up Supabase. It uploads every paper in
+# data/, loads past Hugging Face daily papers for search, and embeds them all.
+# The daily run keeps things up to date after that. Safe to run again.
+on:
+  workflow_dispatch:
+    inputs:
+      backfill_days:
+        description: "Days of past Hugging Face papers to load (0 to skip)"
+        default: "365"
+        required: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements.txt
+      - name: Upload and embed every paper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SYNC_SECRET: ${{ secrets.SYNC_SECRET }}
+          BACKFILL_DAYS: ${{ inputs.backfill_days }}
+        run: python src/supabase_sync.py --all --backfill-hf "$BACKFILL_DAYS"
