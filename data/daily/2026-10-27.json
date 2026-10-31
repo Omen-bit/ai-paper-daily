@@ -1,0 +1,62 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-27",
+ "generated_at": "2026-10-31T07:07:07.017193+00:00",
+ "featured": [
+  "2610.33503",
+  "2610.14253"
+ ],
+ "papers": [
+  {
+   "id": "2610.33503",
+   "title": "Novel or Not? PatEx-Gym: Agentic Prior-Art Search for Novelty Assessment in Patent Examination",
+   "authors": [
+    "Qiyao Wang",
+    "Xinyi Chen",
+    "Hongbo Wang",
+    "Jiayuan Lu"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.33503",
+   "pdf_url": "https://arxiv.org/pdf/2610.33503",
+   "submitted": "2026-10-23",
+   "arxiv_categories": [],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-27"
+  },
+  {
+   "id": "2610.14253",
+   "title": "SliderEdit++: Improved Slider Trajectories in Instruction-Based Image Editing",
+   "authors": [
+    "Arman Zarei",
+    "Sayan Nag",
+    "Bryan Wang",
+    "Franck Dernoncourt"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.14253",
+   "pdf_url": "https://arxiv.org/pdf/2610.14253",
+   "submitted": "2026-10-13",
+   "arxiv_categories": [],
+   "categories": [
+    "generative-ai"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-27"
+  }
+ ],
+ "backfilled": true
+}

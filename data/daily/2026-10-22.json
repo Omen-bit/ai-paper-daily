@@ -1,0 +1,62 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-22",
+ "generated_at": "2026-10-31T07:07:07.017616+00:00",
+ "featured": [
+  "2610.17860",
+  "2610.30128"
+ ],
+ "papers": [
+  {
+   "id": "2610.17860",
+   "title": "Socratic Skill Learning: Interleaving Teaching and Practice for Transferable Agent Skills",
+   "authors": [
+    "Letian Zhu",
+    "Han Li",
+    "Yifan Yao",
+    "Xinping Lei"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.17860",
+   "pdf_url": "https://arxiv.org/pdf/2610.17860",
+   "submitted": "2026-10-12",
+   "arxiv_categories": [],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-22"
+  },
+  {
+   "id": "2610.30128",
+   "title": "Think Harder Where It Matters: Item-Level Adaptive Recursion for Sequential Recommendation",
+   "authors": [
+    "Zhanshuo Cao",
+    "Jiakai Tang",
+    "Yuqi Zhou",
+    "Sunhao Dai"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.30128",
+   "pdf_url": "https://arxiv.org/pdf/2610.30128",
+   "submitted": "2026-10-21",
+   "arxiv_categories": [],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-22"
+  }
+ ],
+ "backfilled": true
+}

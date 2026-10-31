@@ -1,0 +1,62 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-21",
+ "generated_at": "2026-10-31T07:07:07.017687+00:00",
+ "featured": [
+  "2610.26855",
+  "2610.25369"
+ ],
+ "papers": [
+  {
+   "id": "2610.26855",
+   "title": "Ropedia W0: Scaling Loco-Manipulation World Models across Embodiments with Human Experience",
+   "authors": [
+    "Tianqi Liu",
+    "Hanfei Zhao",
+    "Qifeng Liang",
+    "Hui En Pang"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.26855",
+   "pdf_url": "https://arxiv.org/pdf/2610.26855",
+   "submitted": "2026-10-18",
+   "arxiv_categories": [],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-21"
+  },
+  {
+   "id": "2610.25369",
+   "title": "Painting Change Map as guidance for generating painting processes",
+   "authors": [
+    "Markus Pobitzer",
+    "Chang Liu",
+    "Niccolò Biondi",
+    "Nicu Sebe"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.25369",
+   "pdf_url": "https://arxiv.org/pdf/2610.25369",
+   "submitted": "2026-10-17",
+   "arxiv_categories": [],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-21"
+  }
+ ],
+ "backfilled": true
+}

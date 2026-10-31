@@ -1,9 +1,10 @@
 {
-  "total_papers": 22,
-  "total_digests": 11,
+  "total_papers": 24,
+  "total_digests": 12,
   "first_digest": "2026-10-20",
-  "last_updated": "2026-10-30T07:27:44.003078+00:00",
+  "last_updated": "2026-10-31T07:07:12.466405+00:00",
   "papers_by_date": {
+    "2026-10-31": 2,
     "2026-10-30": 2,
     "2026-10-29": 2,
     "2026-10-28": 2,
@@ -17,16 +18,31 @@
     "2026-10-20": 2
   },
   "papers_by_category": {
+    "multimodal": 2,
+    "llms": 4,
+    "computer-vision": 2,
+    "generative-ai": 4,
+    "efficient-ai": 1,
     "other-ml": 15,
-    "llms": 3,
     "ai-science": 1,
-    "generative-ai": 3,
-    "multimodal": 1,
-    "computer-vision": 1,
     "reasoning-agents": 2,
     "ml-theory": 1
   },
   "top_authors": {
+    "Donghyeon Cho": 1,
+    "Joowon Kim": 1,
+    "Seungho Shin": 1,
+    "Eunho Yang": 1,
+    "Deyuan Liu": 1,
+    "Yansen Han": 1,
+    "Kaiwen Zheng": 1,
+    "Jun Xie": 1,
+    "Jiacheng Liu": 1,
+    "Zhenglin Cheng": 1,
+    "Peng Sun": 1,
+    "Jintao Zhang": 1,
+    "Jianguo Li": 1,
+    "Tao Lin": 1,
     "Yifan Sun": 1,
     "Naicheng Yu": 1,
     "Jiawen Gong": 1,
@@ -98,13 +114,25 @@
     "Luyang Niu": 1
   },
   "top_keywords": {
+    "look": 1,
+    "only": 1,
+    "when": 1,
+    "needed": 1,
+    "certificate-guided": 1,
+    "visual": 1,
+    "routing": 1,
+    "efficient": 2,
+    "diffusion": 1,
+    "vlms": 1,
+    "intrinsic": 1,
+    "distribution": 1,
+    "matching": 1,
     "your": 1,
     "benchmark": 1,
     "empirical": 1,
     "measure": 1,
     "over": 1,
     "difficulty": 1,
-    "efficient": 1,
     "streaming": 1,
     "audio-visual": 1,
     "target": 1,
@@ -209,6 +237,81 @@
   },
   "digests": [
     {
+      "date": "2026-10-31",
+      "paper_count": 2,
+      "top_category": "Multimodal AI",
+      "categories_covered": [
+        "multimodal",
+        "llms",
+        "computer-vision",
+        "generative-ai",
+        "efficient-ai"
+      ],
+      "papers": [
+        {
+          "id": "2610.36671",
+          "title": "Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs",
+          "authors": [
+            "Donghyeon Cho",
+            "Joowon Kim",
+            "Seungho Shin",
+            "Eunho Yang"
+          ],
+          "categories": [
+            "multimodal",
+            "llms",
+            "computer-vision"
+          ],
+          "badges": [
+            [
+              "⭐",
+              "Top Pick"
+            ],
+            [
+              "🔥",
+              "Trending on HF"
+            ],
+            [
+              "🔀",
+              "Interdisciplinary"
+            ]
+          ],
+          "url": "https://arxiv.org/abs/2610.36671",
+          "pdf_url": "https://arxiv.org/pdf/2610.36671",
+          "submitted": "2026-10-26"
+        },
+        {
+          "id": "2610.39633",
+          "title": "Intrinsic Distribution Matching",
+          "authors": [
+            "Deyuan Liu",
+            "Yansen Han",
+            "Kaiwen Zheng",
+            "Jun Xie",
+            "Jiacheng Liu",
+            "Zhenglin Cheng",
+            "Peng Sun",
+            "Jintao Zhang",
+            "Jianguo Li",
+            "Tao Lin"
+          ],
+          "categories": [
+            "generative-ai",
+            "efficient-ai"
+          ],
+          "badges": [
+            [
+              "🔥",
+              "Trending on HF"
+            ]
+          ],
+          "url": "https://arxiv.org/abs/2610.39633",
+          "pdf_url": "https://arxiv.org/pdf/2610.39633",
+          "submitted": "2026-10-28"
+        }
+      ]
+    },
+    {
       "date": "2026-10-30",
       "paper_count": 2,
       "top_category": "Other ML",
@@ -305,7 +408,9 @@
           "categories": [
             "llms",
             "ai-science"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.32046",
+          "submitted": "2026-10-22"
         },
         {
           "id": "2610.35864",
@@ -321,7 +426,9 @@
             "llms",
             "generative-ai",
             "multimodal"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.35864",
+          "submitted": "2026-10-26"
         }
       ]
     },
@@ -350,7 +457,9 @@
             "generative-ai",
             "computer-vision",
             "reasoning-agents"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.37381",
+          "submitted": "2026-10-27"
         },
         {
           "id": "2610.36729",
@@ -364,7 +473,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.36729",
+          "submitted": "2026-10-26"
         }
       ]
     },
@@ -389,7 +500,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.33503",
+          "submitted": "2026-10-23"
         },
         {
           "id": "2610.14253",
@@ -403,7 +516,9 @@
           ],
           "categories": [
             "generative-ai"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.14253",
+          "submitted": "2026-10-13"
         }
       ]
     },
@@ -427,7 +542,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.24738",
+          "submitted": "2026-10-16"
         },
         {
           "id": "2610.30932",
@@ -441,7 +558,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.30932",
+          "submitted": "2026-10-21"
         }
       ]
     },
@@ -465,7 +584,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.24738",
+          "submitted": "2026-10-16"
         },
         {
           "id": "2610.23987",
@@ -479,7 +600,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.23987",
+          "submitted": "2026-10-13"
         }
       ]
     },
@@ -503,7 +626,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.24738",
+          "submitted": "2026-10-16"
         },
         {
           "id": "2610.23987",
@@ -517,7 +642,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.23987",
+          "submitted": "2026-10-13"
         }
       ]
     },
@@ -541,7 +668,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.24738",
+          "submitted": "2026-10-16"
         },
         {
           "id": "2610.23987",
@@ -555,7 +684,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.23987",
+          "submitted": "2026-10-13"
         }
       ]
     },
@@ -579,7 +710,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.17860",
+          "submitted": "2026-10-12"
         },
         {
           "id": "2610.30128",
@@ -593,7 +726,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.30128",
+          "submitted": "2026-10-21"
         }
       ]
     },
@@ -617,7 +752,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.26855",
+          "submitted": "2026-10-18"
         },
         {
           "id": "2610.25369",
@@ -631,7 +768,9 @@
           ],
           "categories": [
             "other-ml"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.25369",
+          "submitted": "2026-10-17"
         }
       ]
     },
@@ -658,7 +797,9 @@
           ],
           "categories": [
             "reasoning-agents"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.17724",
+          "submitted": "2026-10-12"
         },
         {
           "id": "2610.26848",
@@ -672,7 +813,9 @@
           ],
           "categories": [
             "ml-theory"
-          ]
+          ],
+          "pdf_url": "https://arxiv.org/pdf/2610.26848",
+          "submitted": "2026-10-18"
         }
       ]
     }

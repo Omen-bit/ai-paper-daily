@@ -1,0 +1,72 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-30",
+ "generated_at": "2026-10-31T07:07:07.016794+00:00",
+ "featured": [
+  "2610.29927",
+  "2610.32749"
+ ],
+ "papers": [
+  {
+   "id": "2610.29927",
+   "title": "Your Benchmark Is an Empirical Measure Over Difficulty",
+   "authors": [
+    "Yifan Sun",
+    "Naicheng Yu",
+    "Jiawen Gong",
+    "Jingyan Shen",
+    "Huan Zhang"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.29927",
+   "pdf_url": "https://arxiv.org/pdf/2610.29927",
+   "submitted": "2026-10-20",
+   "arxiv_categories": [],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [
+    "Top Pick",
+    "Trending on HF",
+    "Survey / Review",
+    "Novel Method"
+   ],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-30"
+  },
+  {
+   "id": "2610.32749",
+   "title": "Efficient Streaming Audio-Visual Target Speaker Extraction for Real-World Acoustic Scenes",
+   "authors": [
+    "Wendi Sang",
+    "Kai Li",
+    "Yifan Li",
+    "Jianqiang Huang",
+    "Xiaolin Hu"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.32749",
+   "pdf_url": "https://arxiv.org/pdf/2610.32749",
+   "submitted": "2026-10-22",
+   "arxiv_categories": [],
+   "categories": [
+    "llms"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [
+    "Trending on HF",
+    "Novel Method"
+   ],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-30"
+  }
+ ],
+ "backfilled": true
+}

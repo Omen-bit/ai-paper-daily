@@ -9,7 +9,7 @@
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
-|  | [ Where is Physical RSI capability from? An Observational…](https://arxiv.org/abs/2610.26848) | Zekai Li, Jiayi Yu *+2 more* | [arXiv](https://arxiv.org/abs/2610.26848) · [PDF](#) |
+| 2026-10-18 | [ Where is Physical RSI capability from? An Observational…](https://arxiv.org/abs/2610.26848) | Zekai Li, Jiayi Yu *+2 more* | [arXiv](https://arxiv.org/abs/2610.26848) · [PDF](https://arxiv.org/pdf/2610.26848) |
 
 ---
 

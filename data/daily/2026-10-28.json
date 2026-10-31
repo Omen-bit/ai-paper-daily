@@ -1,0 +1,64 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-28",
+ "generated_at": "2026-10-31T07:07:07.017105+00:00",
+ "featured": [
+  "2610.37381",
+  "2610.36729"
+ ],
+ "papers": [
+  {
+   "id": "2610.37381",
+   "title": "PDRVLA: A Vision-Language-Action Model with Physical Dynamics Representations",
+   "authors": [
+    "Hanqing Wang",
+    "Zhaotian Cai",
+    "Ruichuan An",
+    "Bohan Zeng"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.37381",
+   "pdf_url": "https://arxiv.org/pdf/2610.37381",
+   "submitted": "2026-10-27",
+   "arxiv_categories": [],
+   "categories": [
+    "generative-ai",
+    "computer-vision",
+    "reasoning-agents"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-28"
+  },
+  {
+   "id": "2610.36729",
+   "title": "Hy-Nomas: Towards Free-form Interactive World Generation",
+   "authors": [
+    "Qiaoling Chen",
+    "Jiaxiang Cheng",
+    "Xueqing Deng",
+    "Tiankai Hang"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.36729",
+   "pdf_url": "https://arxiv.org/pdf/2610.36729",
+   "submitted": "2026-10-26",
+   "arxiv_categories": [],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-28"
+  }
+ ],
+ "backfilled": true
+}

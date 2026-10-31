@@ -9,8 +9,8 @@
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
-|  | [ PDRVLA: A Vision-Language-Action Model with Physical Dy…](https://arxiv.org/abs/2610.37381) | Hanqing Wang, Zhaotian Cai *+2 more* | [arXiv](https://arxiv.org/abs/2610.37381) · [PDF](#) |
-|  | [ Evidence-First Agentic Verification](https://arxiv.org/abs/2610.17724) | Reza Sanayei, Razvan-Gabriel Dumitru *+2 more* | [arXiv](https://arxiv.org/abs/2610.17724) · [PDF](#) |
+| 2026-10-27 | [ PDRVLA: A Vision-Language-Action Model with Physical Dy…](https://arxiv.org/abs/2610.37381) | Hanqing Wang, Zhaotian Cai *+2 more* | [arXiv](https://arxiv.org/abs/2610.37381) · [PDF](https://arxiv.org/pdf/2610.37381) |
+| 2026-10-12 | [ Evidence-First Agentic Verification](https://arxiv.org/abs/2610.17724) | Reza Sanayei, Razvan-Gabriel Dumitru *+2 more* | [arXiv](https://arxiv.org/abs/2610.17724) · [PDF](https://arxiv.org/pdf/2610.17724) |
 
 ---
 

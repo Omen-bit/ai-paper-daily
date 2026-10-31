@@ -9,7 +9,7 @@
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
-|  | [ Can Test-Time Memory Evolution Outperform Test-Time Tra…](https://arxiv.org/abs/2610.32046) | Yepeng Liu, Shengmai Chen *+2 more* | [arXiv](https://arxiv.org/abs/2610.32046) · [PDF](#) |
+| 2026-10-22 | [ Can Test-Time Memory Evolution Outperform Test-Time Tra…](https://arxiv.org/abs/2610.32046) | Yepeng Liu, Shengmai Chen *+2 more* | [arXiv](https://arxiv.org/abs/2610.32046) · [PDF](https://arxiv.org/pdf/2610.32046) |
 
 ---
 

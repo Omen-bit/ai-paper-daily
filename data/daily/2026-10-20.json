@@ -1,0 +1,62 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-20",
+ "generated_at": "2026-10-31T07:07:07.017750+00:00",
+ "featured": [
+  "2610.17724",
+  "2610.26848"
+ ],
+ "papers": [
+  {
+   "id": "2610.17724",
+   "title": "Evidence-First Agentic Verification",
+   "authors": [
+    "Reza Sanayei",
+    "Razvan-Gabriel Dumitru",
+    "Sunjie Hou",
+    "MohammadHossein Rezaei"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.17724",
+   "pdf_url": "https://arxiv.org/pdf/2610.17724",
+   "submitted": "2026-10-12",
+   "arxiv_categories": [],
+   "categories": [
+    "reasoning-agents"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-20"
+  },
+  {
+   "id": "2610.26848",
+   "title": "Where is Physical RSI capability from? An Observational Scaling Law of LLM-as-policy",
+   "authors": [
+    "Zekai Li",
+    "Jiayi Yu",
+    "Jinlu Zhang",
+    "Luyang Niu"
+   ],
+   "abstract": "",
+   "url": "https://arxiv.org/abs/2610.26848",
+   "pdf_url": "https://arxiv.org/pdf/2610.26848",
+   "submitted": "2026-10-18",
+   "arxiv_categories": [],
+   "categories": [
+    "ml-theory"
+   ],
+   "source": "",
+   "hf_upvotes": 0,
+   "score": null,
+   "badges": [],
+   "featured": true,
+   "summary": null,
+   "first_seen": "2026-10-20"
+  }
+ ],
+ "backfilled": true
+}
