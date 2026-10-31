@@ -12,3 +12,5 @@ Thumbs.db
 .pytest_cache/
 .ruff_cache/
 *.log
+# Built website (published by the workflow, not committed)
+site/

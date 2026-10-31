@@ -18,14 +18,20 @@ jobs:
       TZ: "Asia/Kolkata"
 
     permissions:
-      contents: write   # Required to push commits
+      contents: write # Required to push commits
+      pages: write # Required to publish the website
+      id-token: write # Required by actions/deploy-pages
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       # -- 1. Checkout the repository --------------------------------------
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # Full history needed for accurate git log
+          fetch-depth: 0 # Full history needed for accurate git log
 
       # -- 2. Set up Python -------------------------------------------------
       - name: 🐍 Set up Python 3.11
@@ -45,6 +51,10 @@ jobs:
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python src/main.py
+
+      # -- 4b. Build the website from data/ ---------------------------------
+      - name: 🌐 Build website
+        run: python src/site_builder.py
 
       # -- 5. Always write a last-run timestamp (guarantees a commit exists) --
       - name: 🕐 Write last-run timestamp
@@ -91,3 +101,13 @@ jobs:
             sleep 2
           done
           echo "✅ Changes pushed successfully."
+
+      # -- 7. Publish the website to GitHub Pages ---------------------------
+      - name: 📦 Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,4 @@
+Fonts in this folder are subset copies of:
+- Geist and Geist Mono by Vercel
+- Newsreader by Production Type
+All are licensed under the SIL Open Font License 1.1: https://openfontlicense.org
