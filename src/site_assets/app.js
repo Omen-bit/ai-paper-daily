@@ -193,7 +193,8 @@
         var href = local ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
         var when = p.submitted || p.first_seen;
         var date = when ? new Date(String(when).slice(0, 10) + "T00:00:00") : null;
-        var meta = (date ? date.getDate() + " " + MONTHS[date.getMonth()] : "") +
+        var meta = (date ? "Published " + date.getDate() + " " + MONTHS[date.getMonth()] : "") +
+          (isOlder(p) ? '<span class="sep"></span>Older paper, trending now' : "") +
           (p.code_url ? '<span class="sep"></span>Code available' : "") +
           (local ? "" : '<span class="sep"></span>On Hugging Face');
         return '<li class="foryou-item" data-id="' + esc(p.id) + '">' +
@@ -238,6 +239,21 @@
     return "w" + (h >>> 0).toString(36);
   };
   var isoToday = function () { return new Date().toISOString().slice(0, 10); };
+  var longDay = function (iso) {
+    var d = new Date(String(iso || "").slice(0, 10) + "T00:00:00");
+    return isNaN(d) ? "" : d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
+  };
+  // A paper that reached Hugging Face more than 30 days after arXiv: "older, trending now"
+  var isOlder = function (p) {
+    var a = new Date(String(p.submitted || "").slice(0, 10) + "T00:00:00");
+    var b = new Date(String(p.first_seen || "").slice(0, 10) + "T00:00:00");
+    return !isNaN(a) && !isNaN(b) && (b - a) / 864e5 > 30;
+  };
+  var publishedLine = function (p) {
+    var when = longDay(p.submitted || p.first_seen);
+    return (when ? '<span class="pub-date">Published ' + esc(when) + "</span>" : "") +
+      (isOlder(p) ? '<span class="old-flag">Older paper, trending now</span>' : "");
+  };
   var shortDay = function (iso) {
     var d = new Date(String(iso).slice(0, 10) + "T00:00:00");
     return isNaN(d) ? "" : d.getDate() + " " + MONTHS[d.getMonth()];
@@ -908,7 +924,8 @@
     var planRow = function (p, n, onSite, needs) {
       var local = onSite[p.id];
       var isSaved = saved.some(function (s) { return s.id === p.id; });
-      var links = (p.code_url ? '<a class="text-link" href="' + esc(p.code_url) + '" rel="noopener">Get the code</a>' : "") +
+      var links = publishedLine(p) +
+        (p.code_url ? '<a class="text-link" href="' + esc(p.code_url) + '" rel="noopener">Get the code</a>' : "") +
         (local ? "" : '<span class="syl-ext">On Hugging Face</span>');
       return '<li class="syl-row" id="sp-' + pad2(n) + '" data-id="' + esc(p.id) + '">' +
         '<span class="syl-n" aria-hidden="true">' + n + "</span>" +

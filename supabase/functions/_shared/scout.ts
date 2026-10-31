@@ -15,7 +15,7 @@ export const MIN_SIMILARITY = 0.74;
 
 export type Match = {
   id: string; title: string; authors?: string[]; categories?: string[];
-  first_seen?: string; featured?: boolean; code_url?: string | null; similarity: number;
+  submitted?: string; first_seen?: string; featured?: boolean; code_url?: string | null; similarity: number;
 };
 export type Candidate = Match & { hits: number; needs: string[]; abstract?: string; notes?: string };
 export type Need = { id: string; label: string; query: string };

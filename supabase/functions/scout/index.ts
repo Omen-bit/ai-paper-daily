@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
       const c = byId.get(p.id)!;
       return {
         ...p, title: c.title, authors: (c.authors ?? []).slice(0, 3), categories: c.categories ?? [],
-        first_seen: c.first_seen, code_url: c.code_url ?? null, similarity: Math.round(c.similarity * 1000) / 1000,
+        submitted: c.submitted ?? null, first_seen: c.first_seen, code_url: c.code_url ?? null, similarity: Math.round(c.similarity * 1000) / 1000,
       };
     });
     return json(req, {

@@ -273,3 +273,19 @@ def test_home_has_a_hidden_watched_projects_section(tmp_path):
     assert "data-watch " in home and "Your projects" in home and "/functions/v1/search" in home
     scout = open(os.path.join(site_dir, "scout.html"), encoding="utf-8").read()
     assert "If nothing fits, it says so." in scout
+
+
+def test_picks_show_when_the_paper_came_out(tmp_path):
+    from site_builder import is_older
+    assert is_older({"submitted": "2026-08-01", "first_seen": "2026-10-31"})
+    assert not is_older({"submitted": "2026-10-20", "first_seen": "2026-10-31"})
+    assert not is_older({"first_seen": "2026-10-31"})
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    picks = [_paper("2610.1"), _paper("2608.2", submitted="2026-08-01")]
+    save_day(picks, picks, "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir, str(tmp_path / "export"))
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert "Published 30 Oct 2026" in home and "Published 1 Aug 2026" in home
+    assert home.count("Older paper, trending now") == 1
+    old = open(os.path.join(site_dir, "paper", "2608.2.html"), encoding="utf-8").read()
+    assert "Trending since" in old

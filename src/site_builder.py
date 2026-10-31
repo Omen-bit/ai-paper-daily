@@ -112,6 +112,22 @@ def published(rec: dict) -> str:
     return (rec.get("submitted") or rec.get("first_seen") or "")[:10]
 
 
+OLDER_DAYS = 30  # a paper that reached Hugging Face this long after arXiv is "older, trending now"
+
+
+def is_older(rec: dict) -> bool:
+    """True when the paper came out on arXiv well before it started trending."""
+    try:
+        out = date.fromisoformat(str(rec.get("submitted"))[:10])
+        seen = date.fromisoformat(str(rec.get("first_seen"))[:10])
+    except ValueError:
+        return False
+    return (seen - out).days > OLDER_DAYS
+
+
+OLDER_FLAG = '<span class="old-flag">Older paper, trending now</span>'
+
+
 # ---------------------------------------------------------------------------
 # Loading
 # ---------------------------------------------------------------------------
@@ -334,6 +350,7 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
   <header class="pick-top"><span class="pick-n">{label}</span>{why}<span class="pick-read" hidden>Read ✓</span></header>
   <h3><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></h3>
   {blurb}
+  <p class="pick-date">Published {esc(nice_date(published(rec)))}{OLDER_FLAG if is_older(rec) else ""}</p>
   <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
 </article>"""
 
@@ -825,6 +842,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
               f'<div class="check"><h2>Could you explain it to a friend?</h2><p class="check-q">{esc(notes["check_question"])}</p>{answer_html}</div>')
 
     facts = [("Published", nice_date(published(rec)))]
+    if is_older(rec):
+        facts.append(("Trending since", nice_date(rec["first_seen"])))
     if rec.get("featured_on"):
         facts.append(("Top pick on", f'<a href="../day/{esc(rec["featured_on"])}.html">{esc(nice_date(rec["featured_on"]))}</a>'))
     if rec.get("hf_upvotes"):

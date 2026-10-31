@@ -1004,3 +1004,10 @@ body.focus .ask-fab { display: none; }
   .tech-board td.num span { font-size: 11px; }
   .tech-board .status { padding: 2px 8px 2px 6px; font-size: 11px; }
 }
+
+/* When a paper came out */
+.pick-date { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; font-size: 13px; color: var(--muted); position: relative; z-index: 1; }
+.pick.is-first .pick-date { color: color-mix(in srgb, var(--bg) 70%, transparent); }
+.old-flag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; background: var(--yellow-wash); color: var(--ink); font: 500 12px/1.4 var(--sans); white-space: nowrap; }
+.pick.is-first .old-flag { background: var(--yellow); color: #111; }
+.pub-date { font-size: 13px; color: var(--muted); }
