@@ -58,3 +58,26 @@ def test_build_site_with_no_data(tmp_path):
     assert load_days(str(tmp_path / "missing")) == []
     assert build_site(str(tmp_path / "missing"), str(tmp_path / "site")) == 0
     assert os.path.exists(tmp_path / "site" / "index.html")
+
+
+def test_related_papers_prefer_shared_words_and_topics():
+    from site_builder import related_papers
+    papers = {
+        "a": {"id": "a", "title": "Sparse attention for long documents", "abstract": "", "categories": ["llms"]},
+        "b": {"id": "b", "title": "Long documents with sparse attention kernels", "abstract": "", "categories": ["llms"]},
+        "c": {"id": "c", "title": "Robot grasping from images", "abstract": "", "categories": ["computer-vision"]},
+    }
+    rel = related_papers(papers)
+    assert rel["a"] == ["b"]
+    assert "c" not in rel["a"]
+
+
+def test_paper_page_has_reader_tools_and_bibtex(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    papers = [_paper("2610.1", 9), _paper("2610.2", 3)]
+    save_day(papers, [papers[0]], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    html = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    for marker in ["data-save", "data-share", "data-copy-bibtex", "archivePrefix = {arXiv}", 'rel="next"']:
+        assert marker in html, marker
+    assert os.path.exists(os.path.join(site_dir, "saved.html"))
