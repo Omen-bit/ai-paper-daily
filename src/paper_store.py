@@ -59,6 +59,8 @@ def to_record(paper: dict, date_str: str, featured: bool) -> dict:
         "badges": _badge_labels(paper.get("badges")),
         "featured": featured,
         "summary": summary,
+        "curator": paper.get("curator"),
+        "code_url": paper.get("code_url") or None,
         "first_seen": date_str,
     }
 

@@ -81,3 +81,22 @@ def test_paper_page_has_reader_tools_and_bibtex(tmp_path):
     for marker in ["data-save", "data-share", "data-copy-bibtex", "archivePrefix = {arXiv}", 'rel="next"']:
         assert marker in html, marker
     assert os.path.exists(os.path.join(site_dir, "saved.html"))
+
+
+def test_curator_notes_show_on_paper_page_and_card(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    notes = {"tldr": "Short <take>.", "whats_new": "New bit.", "key_result": None,
+             "why_it_matters": "Matters.", "build_ideas": ["Build one.", "Build two."],
+             "difficulty": "advanced", "difficulty_reason": "Needs many GPUs."}
+    paper = _paper("2610.7", 5, why_it_matters="Matters.", summary_source="groq:m",
+                   curator=notes, code_url="https://github.com/a/b")
+    save_day([paper], [paper], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "paper", "2610.7.html"), encoding="utf-8").read()
+    assert "Curator's notes" in page
+    assert "Short &lt;take&gt;." in page
+    assert "Key result" not in page  # empty fields are left out
+    assert "Build two." in page and "Advanced" in page
+    assert 'href="https://github.com/a/b"' in page
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert "In short" in home and "Code available" in home

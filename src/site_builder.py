@@ -42,6 +42,7 @@ ICONS = {
     "search": '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
     "arrow": '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
     "back": '<path d="m15 18-6-6 6-6"/>',
+    "code": '<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>',
     "external": '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
     "file": '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8M16 17H8M10 9H8"/>',
     "sun": '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-14.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
@@ -145,6 +146,9 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
                     rec["featured_on"] = old.get("featured_on")
                 if not rec.get("abstract"):
                     rec["abstract"] = old.get("abstract", "")
+                for key in ("curator", "code_url"):
+                    if not rec.get(key) and old.get(key):
+                        rec[key] = old[key]
             if rec.get("featured") and not rec.get("featured_on"):
                 rec["featured_on"] = day["date"]
             papers[rec["id"]] = rec
@@ -228,9 +232,29 @@ def badges(rec: dict, root: str) -> str:
     return f'<div class="badges">{"".join(out)}</div>'
 
 
+LEVELS = {"beginner": 1, "intermediate": 2, "advanced": 3}
+
+
+def level_meter(difficulty: str) -> str:
+    """Three bars, filled up to the difficulty, with the word next to them."""
+    n = LEVELS.get(difficulty or "", 0)
+    if not n:
+        return ""
+    bars = "".join(f'<i class="{"on" if k <= n else ""}"></i>' for k in (1, 2, 3))
+    return f'<span class="level"><span class="level-bars" aria-hidden="true">{bars}</span>{esc(difficulty.capitalize())}</span>'
+
+
 def featured_card(rec: dict, rank: int, root: str) -> str:
-    summary = (rec.get("summary") or {}).get("text") or ""
-    summary_html = f'<p class="why"><b>Why it matters</b>{esc(summary)}</p>' if summary else ""
+    notes = rec.get("curator") or {}
+    if notes.get("tldr"):
+        summary_html = f'<p class="why"><b>In short</b>{esc(notes["tldr"])}</p>'
+    else:
+        summary = (rec.get("summary") or {}).get("text") or ""
+        summary_html = f'<p class="why"><b>Why it matters</b>{esc(summary)}</p>' if summary else ""
+    extras = level_meter(notes.get("difficulty"))
+    if rec.get("code_url"):
+        extras += f'<span class="has-code">{icon("code", 14)}Code available</span>'
+    extras_html = f'<div class="card-extras">{extras}</div>' if extras else ""
     label = '<span class="badge badge-pick">Top pick</span>' if rank == 1 else f'<span class="rank">Pick {rank}</span>'
     topic = (rec.get("categories") or ["other-ml"])[0]
     return f"""<article class="card t-{esc(topic)}">
@@ -238,6 +262,7 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
   <h3><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></h3>
   <p class="authors">{esc(format_authors(rec.get('authors', []), 3))}</p>
   {summary_html}
+  {extras_html}
   {badges(dict(rec, featured=False), root)}
 </article>"""
 
@@ -418,10 +443,35 @@ def mini_row(rec: dict, root: str) -> str:
 </li>"""
 
 
+def curator_notes(notes: dict) -> str:
+    """The Curator's reading notes for a top pick."""
+    rows = [("What's new", notes.get("whats_new")), ("Key result", notes.get("key_result")),
+            ("Why it matters", notes.get("why_it_matters"))]
+    grid = "".join(f"<div><dt>{k}</dt><dd>{esc(v)}</dd></div>" for k, v in rows if v)
+    ideas = "".join(f"<li>{esc(i)}</li>" for i in notes.get("build_ideas", []))
+    reason = notes.get("difficulty_reason")
+    level = level_meter(notes.get("difficulty"))
+    level_html = f'<p class="notes-level">{level}{f"<span>{esc(reason)}</span>" if reason else ""}</p>' if level else ""
+    return f"""<section class="notes" aria-labelledby="notes-title">
+    <h2 class="notes-label" id="notes-title">Curator's notes</h2>
+    <p class="notes-tldr">{esc(notes["tldr"])}</p>
+    <dl class="notes-grid">{grid}</dl>
+    <div class="notes-build"><h3>What you could build</h3><ul>{ideas}</ul></div>
+    {level_html}
+    <p class="notes-foot">Written by AI from the abstract. Check the paper before you rely on a detail.</p>
+  </section>"""
+
+
 def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dict = None) -> str:
     summary = (rec.get("summary") or {}).get("text")
-    summary_html = (f'<div class="callout"><span class="callout-label">Why it matters</span><p>{esc(summary)}</p></div>'
-                    if summary else "")
+    notes = rec.get("curator")
+    if notes and notes.get("tldr"):
+        summary_html = curator_notes(notes)
+    else:
+        summary_html = (f'<div class="callout"><span class="callout-label">Why it matters</span><p>{esc(summary)}</p></div>'
+                        if summary else "")
+    code_html = (f'\n    <a class="btn btn-outline" href="{esc(rec["code_url"])}" rel="noopener">{icon("code", 15)} View the code</a>'
+                 if rec.get("code_url") else "")
     abstract = rec.get("abstract")
     abstract_block = ""
     if abstract:
@@ -474,14 +524,14 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
   {abstract_block}
   <dl class="facts">{facts_html}</dl>
   <div class="actions">
-    <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>
+    <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>{code_html}
     <a class="btn btn-outline" href="{esc(rec.get('pdf_url'))}" rel="noopener">{icon("file", 15)} Open PDF</a>
     <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">View on Hugging Face {icon("external", 15)}</a>
   </div>
   {pager}
 </article>
 {related_html}"""
-    desc = summary or (abstract or "")[:160]
+    desc = (notes or {}).get("tldr") or summary or (abstract or "")[:160]
     return page(rec["title"], body, root="../", description=desc)
 
 

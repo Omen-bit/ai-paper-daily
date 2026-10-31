@@ -305,6 +305,11 @@ def summarize_papers(papers: list[dict]) -> list[dict]:
 
     for i, paper in enumerate(papers, 1):
         print(f"\n[{i}/{len(papers)}]")
+        if paper.get("why_it_matters") and str(paper.get("summary_source", "")).startswith("groq:"):
+            # The Curator already wrote this line in its notes
+            print(f"  [groq] Using the Curator's line for: {paper.get('title', '')[:60]}")
+            groq_count += 1
+            continue
         text, source = get_summary(paper)
         paper["why_it_matters"] = text
         paper["summary_source"] = source

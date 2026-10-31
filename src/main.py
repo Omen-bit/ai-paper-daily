@@ -39,6 +39,7 @@ from fetcher import fetch_all_papers
 from classifier import classify_papers, get_all_category_slugs, get_category_display
 from scorer import score_and_rank_papers
 from groq_summarizer import summarize_papers
+from curator import curate_papers
 from renderer import render_digest, save_digest, render_category_page
 from readme_updater import update_readme
 from stats_tracker import update_stats, load_stats
@@ -139,7 +140,8 @@ def run() -> None:
         print("❌ No papers selected after scoring.")
         sys.exit(1)
 
-    # --- Step 4: Summarize with Groq ---
+    # --- Step 4: Curator notes, then "Why it matters" for any paper still missing it ---
+    selected = curate_papers(selected)
     selected = summarize_papers(selected)
 
     # --- Step 5: Update stats ---

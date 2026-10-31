@@ -216,6 +216,7 @@ def fetch_hf_papers() -> list[dict]:
                 "arxiv_categories": paper_info.get("arxivCategories", []),
                 "source": "HuggingFace",
                 "hf_upvotes": upvotes,
+                "github_repo": paper_info.get("githubRepo") or "",
             }
 
             if paper["title"] and paper["abstract"]:
@@ -256,6 +257,8 @@ def fetch_all_papers(max_arxiv: int = 150) -> list[dict]:
         if pid in paper_map:
             paper_map[pid]["hf_upvotes"] = max(paper_map[pid].get("hf_upvotes", 0), p["hf_upvotes"])
             paper_map[pid]["source"] = "arXiv + HuggingFace"
+            if p.get("github_repo"):
+                paper_map[pid]["github_repo"] = p["github_repo"]
         else:
             paper_map[pid] = p
 
