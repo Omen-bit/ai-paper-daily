@@ -1,0 +1,6 @@
+# Supabase CLI settings used by the deploy workflow.
+# Functions check their own secret or origin, so the platform JWT check is off.
+project_id = "ai-paper-daily"
+
+[functions.embed]
+verify_jwt = false

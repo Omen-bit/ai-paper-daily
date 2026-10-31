@@ -175,6 +175,33 @@ def fetch_hf_papers() -> list[dict]:
     if data is None:
         return []
 
+    papers = parse_hf_items(data)
+    print(f"  [hf] {len(papers)} trending papers fetched")
+    return papers
+
+
+def fetch_hf_papers_for_date(date_str: str) -> list[dict]:
+    """Papers on Hugging Face's daily list for one past date (YYYY-MM-DD). Used by the backfill."""
+    def _do_fetch():
+        resp = requests.get(
+            "https://huggingface.co/api/daily_papers",
+            params={"date": date_str},
+            timeout=REQUEST_TIMEOUT,
+            headers={"User-Agent": USER_AGENT},
+        )
+        if resp.status_code == 429:
+            raise Exception("429 rate limited by HuggingFace")
+        if resp.status_code >= 500:
+            raise Exception(f"{resp.status_code} server error from HuggingFace")
+        resp.raise_for_status()
+        return resp.json()
+
+    data = _fetch_with_retry(_do_fetch, "hf")
+    return parse_hf_items(data) if data else []
+
+
+def parse_hf_items(data: list) -> list[dict]:
+    """Turn Hugging Face daily_papers items into pipeline papers."""
     papers = []
     for item in data:
         try:
@@ -226,7 +253,6 @@ def fetch_hf_papers() -> list[dict]:
             print(f"  [hf] Skipping item due to parse error: {exc}")
             continue
 
-    print(f"  [hf] {len(papers)} trending papers fetched")
     return papers
 
 

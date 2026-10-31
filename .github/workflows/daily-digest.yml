@@ -52,6 +52,15 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python src/main.py
 
+      # -- 4a. Send the day's papers to Supabase for search (never fails the run)
+      - name: 🔎 Sync papers to Supabase
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SYNC_SECRET: ${{ secrets.SYNC_SECRET }}
+        run: python src/supabase_sync.py
+
       # -- 4b. Build the website from data/ ---------------------------------
       - name: 🌐 Build website
         run: python src/site_builder.py
