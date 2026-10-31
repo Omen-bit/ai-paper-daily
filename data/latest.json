@@ -1,126 +1,97 @@
 {
  "schema_version": 1,
  "date": "2026-10-31",
- "generated_at": "2026-10-31T14:39:00.728929+00:00",
+ "generated_at": "2026-10-31T16:57:15.658508+00:00",
  "featured": [
-  "2610.39301",
-  "2610.38568"
+  "2610.36671",
+  "2610.39633"
  ],
  "papers": [
   {
-   "id": "2610.39301",
-   "title": "Youtu-Parsing-Omni: One Encoder, One Schema, All Modalities",
+   "id": "2610.36671",
+   "title": "Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs",
    "authors": [
-    "Yunhang Shen",
-    "Zhangquan Chen",
-    "Xiaotian Li",
-    "Zhongpeng Cai",
-    "Qing Zhou",
-    "Zekai Zhang",
-    "Kun Zhang",
-    "Zezhong Wu",
-    "Jian Hu",
-    "Haihan Gao",
-    "Heting Gao",
-    "Xin Li",
-    "Yinsong Liu",
-    "Deqian Jiang",
-    "Di Yin",
-    "Haoyu Cao",
-    "Xing Sun",
-    "Bing Liu",
-    "Yanqiu Qu",
-    "Yunfei Wu",
-    "Kun Yin",
-    "Zhixiang Wei",
-    "Yongxiang Hua",
-    "Qianyu Li",
-    "Xiaoxing Hu",
-    "Peiyuan Zhang",
-    "Lijiang Li",
-    "Dong Xu",
-    "Zhenchuan Yang",
-    "Yiliang Jiang"
+    "Donghyeon Cho",
+    "Joowon Kim",
+    "Seungho Shin",
+    "Eunho Yang"
    ],
-   "abstract": "We present Youtu-Parsing-Omni, an omni-modal parser that converts documents, images, audio, and video into structured records grounded in space and time, providing a perception layer for agents that read, locate, and cite evidence across modalities. Its design rests on one encoder for every modality and one schema for every task. Youtu-Omni-Encoder, initialized from a pre-trained language model to strengthen text reading, encodes all modalities with shared weights in a unified space-time coordinate system, and a few fusion layers let video frames attend to concurrent audio, bringing cross-modal fusion and temporal alignment into perception itself. OmniSchema unifies the outputs of all ten parsing tasks, allowing a single self-evolving post-training procedure, OmniSchema-Aware On-Policy Distillation (OSAD), to provide a shared token-role-based objective across tasks. In each round, the model is trained on its own rollouts against token-level targets from a reference-conditioned copy of itself, which is then refreshed with the trained weights, so that the parser and its supervision co-evolve. With a single 5 B-parameter checkpoint, Youtu-Parsing-Omni achieves state-of-the-art performance on OmniDocBench v1.6 (96.96 Overall) and leads all open-weight models on OmniParsingBench (75.08 Avg.), with its advantage concentrated on audio and video. It also achieves the best overall chart-parsing score (95.02) and the highest exact chemical-fingerprint agreement among compared systems, and matches a dedicated optical-music model in character-level transcription of typeset sheet music while staying far ahead of general-purpose systems. Code and model weights are publicly available.",
-   "url": "https://arxiv.org/abs/2610.39301",
-   "pdf_url": "https://arxiv.org/pdf/2610.39301",
-   "submitted": "2026-10-28",
+   "abstract": "Diffusion vision-language models (DVLMs) process their entire input at every denoising step. Since visual tokens make up 89-97% of this input on the benchmarks we study, most of the decoding computation is spent repeatedly processing the same image. Visual token pruning methods partially relieve this burden by removing part of the visual tokens, but they lose the removed information and still process the remaining image at every step. To measure how often the image is actually needed, we compare LLaDA-V's predictions with and without the image at every decoding step and find that removing the image changes a token being unmasked at only 22.8% of steps on average and at as few as 7.9%. We therefore propose LOWN, a decoding method that decides at every step whether to process the image and how many tokens to unmask. LOWN predicts the masked tokens without the image and processes the image only when this prediction disagrees with the last image-conditioned prediction. Agreement certifies the earlier prediction for reuse, and the number of certified tokens sets how many are unmasked in that step. We further observe that the need for the image differs across benchmarks, so LOWN's adaptive decision is needed rather than a fixed schedule. Without training or a tuned threshold, LOWN retains 99.6% of LLaDA-V's score on ten benchmarks at 35.3% of the decoding FLOPs on average. LOWN also generalizes across LLaDA-based DVLMs, composes orthogonally with visual token pruning, and runs under key-value caching for further efficiency gains. Code and project page are available at https://hyeon9698.github.io/LOWN/",
+   "url": "https://arxiv.org/abs/2610.36671",
+   "pdf_url": "https://arxiv.org/pdf/2610.36671",
+   "submitted": "2026-10-26",
    "arxiv_categories": [
-    "cs.CV"
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
    ],
    "categories": [
-    "other-ml"
+    "multimodal",
+    "llms",
+    "computer-vision"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 146,
-   "score": 40,
+   "hf_upvotes": 97,
+   "score": 44,
    "badges": [
     "Top Pick",
-    "Trending on HF"
+    "Trending on HF",
+    "Interdisciplinary"
    ],
    "featured": true,
    "slot": "pick",
    "summary": {
-    "text": "The paper presents a versatile parser that improves performance on various tasks.",
+    "text": "Efficiently utilizing visual information in Diffusion VLMs.",
     "source": "groq:allam-2-7b"
    },
    "curator": {
-    "tldr": "Youtu-Parsing-Omni is an omni-modal parser that unifies text, images, audio, and video into a shared space-time coordinate system.",
-    "whats_new": "The paper introduces Youtu-Parsing-Omni, an omni-modal parser that fuses text, images, audio, and video.",
-    "key_result": "Youtu-Parsing-Omni achieves state-of-the-art performance on OmniDocBench v1.6 and OmniParsingBench.",
-    "why_it_matters": "The paper presents a versatile parser that improves performance on various tasks.",
-    "difficulty": "beginner",
-    "difficulty_reason": null,
+    "tldr": "Improving Diffusion VLMs efficiency by processing images only when needed and reducing FLOPs.",
+    "whats_new": "Adaptive image processing and token unmasking based on prediction agreement.",
+    "key_result": "LOWN reduces decoding FLOPs by 35.3% while retaining 99.6% of LLaDA-V's score.",
+    "why_it_matters": "Efficiently utilizing visual information in Diffusion VLMs.",
+    "difficulty": "intermediate",
+    "difficulty_reason": "Understanding Diffusion VLMs and implementing adaptive decoding methods.",
     "check_question": null,
     "check_answer": null,
     "build_ideas": [
-     "Develop an omni-modal parser for diverse tasks.",
-     "Use a single encoder for all modalities and a shared schema.",
-     "Apply self-supervised learning for parser and schema co-evolution."
+     "Adaptive image processing based on prediction agreement.",
+     "Token unmasking based on prediction agreement.",
+     "Adaptive decoding with key-value caching and visual token pruning."
     ]
    },
-   "code_url": null,
+   "code_url": "https://github.com/hyeon9698/LOWN",
    "first_seen": "2026-10-31"
   },
   {
-   "id": "2610.38568",
-   "title": "A-RSI: Adaptive Task Refresh for Zero-Data Multimodal Self-Improvement",
+   "id": "2610.39633",
+   "title": "Intrinsic Distribution Matching",
    "authors": [
-    "Yu Liu",
-    "Youxing Li",
-    "Yuedong Tan",
-    "Zhiwei Yang",
-    "Zihan Su",
-    "Hanqi Feng",
-    "Shaojie Zhang",
-    "Libin Liao",
-    "Zihao Wan",
-    "Chenxu Wu",
-    "Cong Cao",
-    "Fangfang Yuan",
-    "Yanbing Liu",
-    "Ziheng Chen",
-    "Pei Fu",
-    "Radu Timofte",
-    "Zongwei Wu",
-    "Nicu Sebe",
-    "Barnabas Poczos",
-    "Jian Luan"
+    "Deyuan Liu",
+    "Yansen Han",
+    "Kaiwen Zheng",
+    "Jun Xie",
+    "Jiacheng Liu",
+    "Zhenglin Cheng",
+    "Peng Sun",
+    "Jintao Zhang",
+    "Jianguo Li",
+    "Tao Lin"
    ],
-   "abstract": "Recursive self-improvement requires models not only to acquire useful training experience, but also to decide when their current experience has ceased to be useful. Existing methods often focus on what experience to generate next, while paying less attention to when fresh experience should be introduced. Many also construct training targets through self-consistency or majority voting, making supervision depend on the model's own uncertain predictions. We address these two questions separately: training dynamics determine when to acquire new experience, while the answers to new tasks remain independently checkable. A-RSI monitors reward variation and accuracy in training logs to refresh a task pool when its learning signal declines, without consulting validation or test scores. A static library of model-authored programs produces multimodal questions and derives their reference answers; we specify the task-generation contract, automatically verify chosen properties of the reward and refresh rules, and separately audit the generated answers. The training loop uses no external training examples or human-written answer labels. On the primary eleven-benchmark suite, A-RSI raises the performance average from 57.77 to 61.05 with 800 fresh tasks.",
-   "url": "https://arxiv.org/abs/2610.38568",
-   "pdf_url": "https://arxiv.org/pdf/2610.38568",
-   "submitted": "2026-10-27",
+   "abstract": "One-step and few-step text-to-image generation must accurately render the details specified in the prompt despite limited opportunities for refinement. Distribution matching distillation (DMD) uses score differences to bring the generated distribution closer to a reference distribution. Following prior work, we estimate this difference with internal velocity branches, avoiding a separate fake-score network. We ask whether an explicit moment constraint improves this learned score supervision. A decomposition of the reverse-KL field into a Gaussian moment component and a non-Gaussian residual identifies statistics that can be constrained explicitly. We introduce Intrinsic Distribution Matching (IDM), which retains the full DMD correction and matches feature means and per-coordinate standard deviations using the generator's exponential-moving-average (EMA) copy, requiring no external feature encoder. Experiments use full-parameter and low-rank adaptation (LoRA) tuning on Z-Image-Turbo 6B and Qwen-Image 20B. At two network evaluations, IDM reaches 94.25% and 90.20% on Chinese and English LongText-Bench, the highest scores among the compared methods at this budget. Controlled ablations show gains from the added moment loss, while generator EMA features perform competitively with an external DINOv2 encoder across the five reported metrics. Code is available at https://github.com/inclusionAI/IDM.",
+   "url": "https://arxiv.org/abs/2610.39633",
+   "pdf_url": "https://arxiv.org/pdf/2610.39633",
+   "submitted": "2026-10-28",
    "arxiv_categories": [
+    "cs.CV",
     "cs.AI"
    ],
    "categories": [
-    "other-ml"
+    "generative-ai",
+    "efficient-ai"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 162,
-   "score": 39,
+   "hf_upvotes": 243,
+   "score": 41,
    "badges": [
     "Trending",
     "Trending on HF"
@@ -128,24 +99,25 @@
    "featured": true,
    "slot": "trending",
    "summary": {
-    "text": "Improves multimodal self-improvement without external data or human labels.",
+    "text": "Enhances text-to-image generation quality and efficiency.",
     "source": "groq:allam-2-7b"
    },
    "curator": {
-    "tldr": "A-RSI refreshes tasks in self-improving models based on training dynamics, achieving better performance on multimodal benchmarks without external data.",
-    "whats_new": "Focuses on task refresh timing and uses a static library for multimodal questions and answers.",
-    "key_result": "Raises performance average from 57.77 to 61.05 with 800 fresh tasks.",
-    "why_it_matters": "Improves multimodal self-improvement without external data or human labels.",
+    "tldr": "Improves text-to-image generation by matching generated distribution with reference using generator's EMA copy and explicit moment constraint.",
+    "whats_new": "Introduces Intrinsic Distribution Matching (IDM) for better text-to-image generation using generator's EMA copy and explicit moment constraint.",
+    "key_result": "IDM reaches 94.25% and 90.20% on Chinese and English LongText-Bench, outperforming compared methods.",
+    "why_it_matters": "Enhances text-to-image generation quality and efficiency.",
     "difficulty": "intermediate",
     "difficulty_reason": null,
-    "check_question": "How does A-RSI improve multimodal self-improvement without external data or human labels?",
-    "check_answer": "A-RSI refreshes tasks based on training dynamics and uses a static library for multimodal question-answer generation.",
+    "check_question": "How does Intrinsic Distribution Matching (IDM) improve text-to-image generation?",
+    "check_answer": "IDM improves text-to-image generation by matching generated distribution with reference using generator's EMA copy and explicit moment constraint.",
     "build_ideas": [
-     "Monitor training dynamics for task refresh in self-improving models",
-     "Use a static library for multimodal question-answer generation"
+     "Apply Intrinsic Distribution Matching (IDM) for better text-to-image generation.",
+     "Use generator's Exponential Moving Average (EMA) copy for improved performance.",
+     "Experiment with low-rank adaptation (LoRA) tuning for better results."
     ]
    },
-   "code_url": null,
+   "code_url": "https://github.com/inclusionAI/IDM",
    "first_seen": "2026-10-31"
   },
   {
@@ -403,7 +375,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 33,
+   "hf_upvotes": 35,
    "score": 33,
    "badges": [
     "Trending on HF",
@@ -645,7 +617,7 @@
     "audio-speech"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 11,
+   "hf_upvotes": 12,
    "score": 29,
    "badges": [
     "Trending on HF"
@@ -742,6 +714,41 @@
    "first_seen": "2026-10-31"
   },
   {
+   "id": "2610.40362",
+   "title": "Your LR Schedule May Not Be Principled: Effective Learning Rate Scheduling in Weight-Normalized Training",
+   "authors": [
+    "Qifan Yu",
+    "Xinyu Ma",
+    "Xingyan Bin",
+    "Di He"
+   ],
+   "abstract": "Weight-normalized (WN) training is emerging as a compelling alternative to conventional weight decay (WD), with recent studies reporting substantial pretraining loss gains. We show that these gains are driven primarily by the induced effective learning rate (ELR) trajectory rather than by normalization alone. Matching ELR trajectories largely collapses the training loss dynamics of WN and WD. Schedule design should therefore target ELR rather than the nominal learning rate (LR) alone. Building on this principle, we propose AIR (Affine Inverse-square-Root decay), which combines a theoretically derived $1/\\sqrt{t}$ decay with an affine adjustment to satisfy prescribed peak and terminal LRs over a finite training horizon. We further identify late-stage ELR scheduling as a key source of its gains, because a shared late schedule attenuates the effect of earlier LR choices. Experiments on 128 B-token Mixture-of-Experts pretraining demonstrate that AIR outperforms cosine and other candidate schedules in training loss, downstream performance, and hyperparameter robustness, reducing terminal training loss by approximately 0.01 relative to cosine at matched cumulative LR. Applying the same ELR trajectory to WD reproduces the corresponding training dynamics, showing that the benefits extend beyond fixed-norm training and establishing ELR as the principled scheduling object.",
+   "url": "https://arxiv.org/abs/2610.40362",
+   "pdf_url": "https://arxiv.org/pdf/2610.40362",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.LG"
+   ],
+   "categories": [
+    "llms",
+    "ml-theory",
+    "efficient-ai"
+   ],
+   "source": "arXiv + HuggingFace",
+   "hf_upvotes": 5,
+   "score": 28,
+   "badges": [
+    "Trending on HF",
+    "Interdisciplinary"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-10-31"
+  },
+  {
    "id": "2610.38342",
    "title": "Investor's Last Exam: Can AI Agents Do Equity Investment Without Seeing the Future?",
    "authors": [
@@ -768,7 +775,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 10,
+   "hf_upvotes": 11,
    "score": 28,
    "badges": [
     "Trending on HF"
@@ -945,7 +952,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 7,
+   "hf_upvotes": 8,
    "score": 27,
    "badges": [
     "Trending on HF",
@@ -1086,45 +1093,10 @@
     "reasoning-agents"
    ],
    "source": "arXiv + HuggingFace",
-   "hf_upvotes": 10,
+   "hf_upvotes": 11,
    "score": 25,
    "badges": [
     "Trending on HF"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-10-31"
-  },
-  {
-   "id": "2610.40362",
-   "title": "Your LR Schedule May Not Be Principled: Effective Learning Rate Scheduling in Weight-Normalized Training",
-   "authors": [
-    "Qifan Yu",
-    "Xinyu Ma",
-    "Xingyan Bin",
-    "Di He"
-   ],
-   "abstract": "Weight-normalized (WN) training is emerging as a compelling alternative to conventional weight decay (WD), with recent studies reporting substantial pretraining loss gains. We show that these gains are driven primarily by the induced effective learning rate (ELR) trajectory rather than by normalization alone. Matching ELR trajectories largely collapses the training loss dynamics of WN and WD. Schedule design should therefore target ELR rather than the nominal learning rate (LR) alone. Building on this principle, we propose AIR (Affine Inverse-square-Root decay), which combines a theoretically derived $1/\\sqrt{t}$ decay with an affine adjustment to satisfy prescribed peak and terminal LRs over a finite training horizon. We further identify late-stage ELR scheduling as a key source of its gains, because a shared late schedule attenuates the effect of earlier LR choices. Experiments on 128 B-token Mixture-of-Experts pretraining demonstrate that AIR outperforms cosine and other candidate schedules in training loss, downstream performance, and hyperparameter robustness, reducing terminal training loss by approximately 0.01 relative to cosine at matched cumulative LR. Applying the same ELR trajectory to WD reproduces the corresponding training dynamics, showing that the benefits extend beyond fixed-norm training and establishing ELR as the principled scheduling object.",
-   "url": "https://arxiv.org/abs/2610.40362",
-   "pdf_url": "https://arxiv.org/pdf/2610.40362",
-   "submitted": "2026-10-29",
-   "arxiv_categories": [
-    "cs.LG"
-   ],
-   "categories": [
-    "llms",
-    "ml-theory",
-    "efficient-ai"
-   ],
-   "source": "arXiv + HuggingFace",
-   "hf_upvotes": 4,
-   "score": 25,
-   "badges": [
-    "Trending on HF",
-    "Interdisciplinary"
    ],
    "featured": false,
    "slot": null,
@@ -1380,7 +1352,7 @@
     "llms"
    ],
    "source": "arXiv + HuggingFace",
-   "hf_upvotes": 6,
+   "hf_upvotes": 8,
    "score": 24,
    "badges": [
     "Trending on HF"
@@ -1421,7 +1393,7 @@
     "code-ai"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 2,
+   "hf_upvotes": 3,
    "score": 24,
    "badges": [
     "Trending on HF"
@@ -1648,6 +1620,37 @@
    "first_seen": "2026-10-31"
   },
   {
+   "id": "2609.05881",
+   "title": "Broken on Arrival: Non-Functional Quantized LLM Artifacts in Public Model Registries and How to Catch Them",
+   "authors": [
+    "Aditi Patodiya"
+   ],
+   "abstract": "Developers download quantized large language models (LLMs) from public registries to run them locally. None of the registries we examined documented functional testing of their files. We tested all 305 eligible code-capable GGUF tags (the llama.cpp format) across 15 model lines in the official Ollama library, plus 22 popular Hugging Face community files. A 15-task code screen identified suspects, which we retested on all 164 HumanEval+ tasks. Seven official tags (2.3%) solved at most six of them. All were low-bit quantizations of models with at most four billion parameters. We rebuilt five suspect files from the original weights. All five registry files matched our uncalibrated rebuilds tensor for tensor, so none was corrupted. Exact reproducibility did not imply function. With the weights, toolchain and tensor mix held fixed, adding an importance matrix raised three Qwen2.5-Coder-3B builds from zero to 76-113 solved tasks. The same uncalibrated recipe left the smaller Qwen2.5-Coder-1.5B functional, showing that the recipe alone does not predict failure. None of 66 sampled tags that passed the screen was non-functional. We release the audit data and the quantcheck tool and recommend screening low-bit tags before publication, then calibrating or withholding failures.",
+   "url": "https://arxiv.org/abs/2609.05881",
+   "pdf_url": "https://arxiv.org/pdf/2609.05881",
+   "submitted": "2026-10-24",
+   "arxiv_categories": [
+    "cs.SE",
+    "cs.LG"
+   ],
+   "categories": [
+    "llms",
+    "efficient-ai"
+   ],
+   "source": "HuggingFace",
+   "hf_upvotes": 5,
+   "score": 21,
+   "badges": [
+    "Trending on HF"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-10-31"
+  },
+  {
    "id": "2610.37695",
    "title": "After One-Click Video: The Inflow of Service-Type Content, the Failure of the Recommendation Pool Mechanism, and the BoLe System",
    "authors": [
@@ -1787,42 +1790,11 @@
     "llms"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 3,
+   "hf_upvotes": 4,
    "score": 19,
    "badges": [
     "Trending on HF",
     "Novel Method"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-10-31"
-  },
-  {
-   "id": "2609.05881",
-   "title": "Broken on Arrival: Non-Functional Quantized LLM Artifacts in Public Model Registries and How to Catch Them",
-   "authors": [
-    "Aditi Patodiya"
-   ],
-   "abstract": "Developers download quantized large language models (LLMs) from public registries to run them locally. None of the registries we examined documented functional testing of their files. We tested all 305 eligible code-capable GGUF tags (the llama.cpp format) across 15 model lines in the official Ollama library, plus 22 popular Hugging Face community files. A 15-task code screen identified suspects, which we retested on all 164 HumanEval+ tasks. Seven official tags (2.3%) solved at most six of them. All were low-bit quantizations of models with at most four billion parameters. We rebuilt five suspect files from the original weights. All five registry files matched our uncalibrated rebuilds tensor for tensor, so none was corrupted. Exact reproducibility did not imply function. With the weights, toolchain and tensor mix held fixed, adding an importance matrix raised three Qwen2.5-Coder-3B builds from zero to 76-113 solved tasks. The same uncalibrated recipe left the smaller Qwen2.5-Coder-1.5B functional, showing that the recipe alone does not predict failure. None of 66 sampled tags that passed the screen was non-functional. We release the audit data and the quantcheck tool and recommend screening low-bit tags before publication, then calibrating or withholding failures.",
-   "url": "https://arxiv.org/abs/2609.05881",
-   "pdf_url": "https://arxiv.org/pdf/2609.05881",
-   "submitted": "2026-10-24",
-   "arxiv_categories": [
-    "cs.SE",
-    "cs.LG"
-   ],
-   "categories": [
-    "llms",
-    "efficient-ai"
-   ],
-   "source": "HuggingFace",
-   "hf_upvotes": 4,
-   "score": 18,
-   "badges": [
-    "Trending on HF"
    ],
    "featured": false,
    "slot": null,

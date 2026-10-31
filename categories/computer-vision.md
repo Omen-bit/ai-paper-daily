@@ -5,11 +5,12 @@
 
 ---
 
-**Total papers:** 1
+**Total papers:** 2
 
 | Date | Title | Authors | Links |
 |------|-------|---------|-------|
 | 2026-10-27 | [ PDRVLA: A Vision-Language-Action Model with Physical Dy…](https://arxiv.org/abs/2610.37381) | Hanqing Wang, Zhaotian Cai *+2 more* | [arXiv](https://arxiv.org/abs/2610.37381) · [PDF](https://arxiv.org/pdf/2610.37381) |
+| 2026-10-26 | [⭐ 🔥 🔀 Look Only When Needed: Certificate-Guided Visual Routin…](https://arxiv.org/abs/2610.36671) | Donghyeon Cho, Joowon Kim *+2 more* | [arXiv](https://arxiv.org/abs/2610.36671) · [PDF](https://arxiv.org/pdf/2610.36671) |
 
 ---
 
