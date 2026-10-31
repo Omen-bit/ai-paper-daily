@@ -606,8 +606,10 @@ def build_trends_page(rows: list[dict], source: str, n_all: int) -> str:
         ("Rising fastest", esc(names.get(rising["topic"], rising["topic"])) if rising else "—",
          trends.pts(rising["delta"]) + " in 3 months" if rising else "Needs more history"),
     ]
-    tiles_html = "".join(f'<div class="stat"><span class="label">{k}</span><strong{' class="stat-text"' if len(v) > 8 else ''}>{v}</strong><span>{s}</span></div>'
-                         for k, v, s in tiles)
+    tiles_html = "".join(
+        '<div class="stat"><span class="label">{}</span><strong{}>{}</strong><span>{}</span></div>'.format(
+            k, ' class="stat-text"' if len(v) > 8 else "", v, s)
+        for k, v, s in tiles)
     words = trends.rising_words(rows, months)
     field = trends.field_shares_json(rows, months)
     first, last = trends._month_label(months[0], True), trends._month_label(months[-1], True)
