@@ -112,3 +112,31 @@ def test_backfill_keeps_existing_rows_and_survives_bad_days():
     assert [r["first_seen"] for r in rows] == ["2026-10-28", "2026-10-30"]
     assert rows[0]["featured"] is False and rows[0]["code_url"] == "https://github.com/a/b"
     assert rows[0]["categories"]  # classified into our topics
+
+
+def test_embed_retries_with_smaller_batches_after_cpu_limit():
+    cfg = {"url": "https://x.supabase.co", "key": "k", "secret": "s"}
+    replies = [FakeResponse(546), FakeResponse(200, {"embedded": 4, "remaining": 0})]
+
+    class Session:
+        limits = []
+
+        def post(self, url, json=None, headers=None, timeout=None):
+            self.limits.append(json["limit"])
+            return replies.pop(0)
+
+    session = Session()
+    assert sync.embed_pending(cfg, session, sleep=lambda s: None) == 4
+    assert session.limits == [8, 4]
+
+
+def test_embed_stops_at_once_when_function_is_missing():
+    import pytest
+    cfg = {"url": "https://x.supabase.co", "key": "k", "secret": "s"}
+
+    class Session:
+        def post(self, *a, **k):
+            return FakeResponse(404)
+
+    with pytest.raises(RuntimeError):
+        sync.embed_pending(cfg, Session(), sleep=lambda s: None)

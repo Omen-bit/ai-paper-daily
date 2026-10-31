@@ -117,6 +117,16 @@
       }
     });
 
+    // Esc closes the open citation box and returns focus to its button
+    var cite = article.querySelector(".cite");
+    if (cite) {
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape" || !cite.open) return;
+        cite.open = false;
+        cite.querySelector("summary").focus();
+      });
+    }
+
     // Copy the BibTeX entry
     var copyBtn = article.querySelector("[data-copy-bibtex]");
     copyBtn.addEventListener("click", function () {
@@ -231,8 +241,10 @@
 
   function render(reset) {
     if (reset) { results.innerHTML = ""; shown = 0; }
+    results.removeAttribute("aria-busy");
     if (!matches.length) {
-      results.innerHTML = '<li class="empty"><strong>No papers match these filters.</strong>Try fewer words, or pick "All topics".</li>';
+      results.innerHTML = '<li class="empty"><strong>No papers match these filters.</strong>Try fewer words, or show every topic.' +
+        '<div class="empty-action"><button class="btn btn-outline btn-sm" type="button" data-clear>Clear all filters</button></div></li>';
     } else {
       results.insertAdjacentHTML("beforeend", matches.slice(shown, shown + PAGE).map(row).join(""));
     }
@@ -264,9 +276,19 @@
   q.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(apply, 120); });
   [cat, sort, feat].forEach(function (el) { el.addEventListener("change", apply); });
   more.addEventListener("click", function () { render(false); });
+  results.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest("[data-clear]")) return;
+    q.value = ""; cat.value = ""; feat.checked = false;
+    apply();
+    q.focus();
+  });
 
   fetch("data/papers.json")
     .then(function (r) { return r.json(); })
     .then(function (data) { all = data; apply(); })
-    .catch(function () { count.textContent = "Could not load papers. Try reloading the page."; });
+    .catch(function () {
+      results.removeAttribute("aria-busy");
+      results.innerHTML = "";
+      count.textContent = "We could not load the paper list. Reload the page to try again.";
+    });
 })();

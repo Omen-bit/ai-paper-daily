@@ -30,8 +30,9 @@ from classifier import classify_papers  # noqa: E402
 from curator import find_code_url  # noqa: E402
 
 BATCH = 200          # rows per upsert request
-EMBED_BATCH = 10     # papers per embed call, small enough for the function's CPU limit
-MAX_EMBED_CALLS = 3000
+EMBED_BATCH = 8      # most papers one embed call may take; the function stops early when its CPU time runs low
+MAX_EMBED_CALLS = 6000
+EMBED_RETRIES = 4    # attempts per call before giving up (CPU limit or cold start errors)
 TIMEOUT = 60
 
 
@@ -93,17 +94,30 @@ def upsert(cfg: dict, rows: list[dict], session=requests, keep_existing: bool = 
 def embed_pending(cfg: dict, session=requests, sleep=time.sleep) -> int:
     """Call the embed function until no paper is missing a vector."""
     total = 0
-    for _ in range(MAX_EMBED_CALLS):
-        r = session.post(f"{cfg['url']}/functions/v1/embed", json={"limit": EMBED_BATCH},
-                         headers={"x-sync-secret": cfg["secret"], "Content-Type": "application/json"},
-                         timeout=TIMEOUT)
-        if r.status_code >= 300:
-            raise RuntimeError(f"Embedding failed ({r.status_code}): {r.text[:200]}")
-        body = r.json()
+    batch = EMBED_BATCH
+    for call in range(MAX_EMBED_CALLS):
+        body = None
+        for attempt in range(EMBED_RETRIES):
+            r = session.post(f"{cfg['url']}/functions/v1/embed", json={"limit": batch},
+                             headers={"x-sync-secret": cfg["secret"], "Content-Type": "application/json"},
+                             timeout=TIMEOUT)
+            if r.status_code < 300:
+                body = r.json()
+                break
+            if r.status_code in (401, 403, 404):  # wrong secret or function missing: retrying won't help
+                raise RuntimeError(f"Embedding failed ({r.status_code}): {r.text[:200]}")
+            # Hit the CPU limit or a cold start: take fewer papers and try again
+            batch = max(1, batch // 2)
+            print(f"[supabase] Embed call failed ({r.status_code}), retrying with {batch} per call")
+            sleep(2 * (attempt + 1))
+        if body is None:
+            raise RuntimeError(f"Embedding kept failing after {total} papers ({r.status_code}): {r.text[:200]}")
         total += body.get("embedded", 0)
+        if call % 50 == 0:
+            print(f"[supabase] Embedded {total} so far, {body.get('remaining', 0)} left")
         if not body.get("remaining") or not body.get("embedded"):
             break
-        sleep(0.2)
+        sleep(0.1)
     return total
 
 

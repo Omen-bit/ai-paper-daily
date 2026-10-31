@@ -11,6 +11,9 @@ const db = createClient(
   { auth: { persistSession: false } },
 );
 const SYNC_SECRET = Deno.env.get("SYNC_SECRET") ?? "";
+// The free plan allows about 2 s of CPU per call. Stop taking new papers after
+// this much time so the call always returns cleanly; the caller simply calls again.
+const TIME_BUDGET_MS = 1000;
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -30,13 +33,15 @@ Deno.serve(async (req) => {
     return json({ error: "This function is only for the pipeline." }, 401);
   }
   const body = await req.json().catch(() => ({}));
-  const limit = Math.min(Math.max(Number(body.limit) || 20, 1), 50);
+  const limit = Math.min(Math.max(Number(body.limit) || 8, 1), 20);
+  const started = Date.now();
 
   const { data, error } = await db.from("papers").select("id,title,abstract").is("embedding", null).limit(limit);
   if (error) return json({ error: error.message }, 500);
 
   let embedded = 0;
   for (const paper of data ?? []) {
+    if (embedded > 0 && Date.now() - started > TIME_BUDGET_MS) break;
     // Title plus abstract, cut to stay inside gte-small's 512-token window
     const text = `${paper.title}\n\n${paper.abstract ?? ""}`.slice(0, 2000);
     const vector = await model.run(text, { mean_pool: true, normalize: true });
