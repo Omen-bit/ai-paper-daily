@@ -243,3 +243,13 @@ def test_trends_page_waits_for_three_months_of_history(tmp_path):
     build_site(data_dir, site_dir, str(tmp_path / "none"))
     page = open(os.path.join(site_dir, "trends.html"), encoding="utf-8").read()
     assert "three months" in page and "Topic share" not in page
+
+
+def test_home_has_a_hidden_watched_projects_section(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [_paper("2610.1")], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir, str(tmp_path / "none"))
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert "data-watch " in home and "Your projects" in home and "/functions/v1/search" in home
+    scout = open(os.path.join(site_dir, "scout.html"), encoding="utf-8").read()
+    assert "If nothing fits, it says so." in scout

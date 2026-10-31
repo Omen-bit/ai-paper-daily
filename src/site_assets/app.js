@@ -73,7 +73,7 @@
 
   // ---- Mark papers already read in any list ----
   function markRead(scope) {
-    Array.prototype.forEach.call((scope || document).querySelectorAll(".row[data-id]"), function (row) {
+    Array.prototype.forEach.call((scope || document).querySelectorAll(".row[data-id], .syl-row[data-id]"), function (row) {
       if (readIds[row.getAttribute("data-id")]) row.classList.add("is-read");
     });
   }
@@ -225,6 +225,128 @@
       (both[1] || []).forEach(function (id) { onSite[id] = true; });
       paintForYou(both[0], onSite);
     }).catch(function () { forYou.hidden = true; });
+  }
+
+  // ---- Watch a Scout project: new matching papers on the home page ----
+  // Kept in this browser only. The home page checks once a day with search by meaning,
+  // sending only the project's search phrases.
+  var WATCH_MAX = 3;
+  var NEW_MARGIN = 0.06;  // new papers must match a little better than Scout's floor
+  var watchKey = function (text) {
+    var h = 0;
+    for (var i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
+    return "w" + (h >>> 0).toString(36);
+  };
+  var isoToday = function () { return new Date().toISOString().slice(0, 10); };
+  var shortDay = function (iso) {
+    var d = new Date(String(iso).slice(0, 10) + "T00:00:00");
+    return isNaN(d) ? "" : d.getDate() + " " + MONTHS[d.getMonth()];
+  };
+  window.apdWatch = {
+    list: function () { return load("apd.watch", []); },
+    wire: function (btn, data, description) {
+      var key = watchKey(description);
+      var paint = function () {
+        var on = window.apdWatch.list().some(function (w) { return w.key === key; });
+        btn.setAttribute("aria-pressed", String(on));
+        btn.textContent = on ? "Watching ✓" : "Watch this project";
+        btn.classList.toggle("btn-primary", !on);
+        btn.classList.toggle("btn-outline", on);
+      };
+      paint();
+      btn.addEventListener("click", function () {
+        var list = window.apdWatch.list();
+        var on = list.some(function (w) { return w.key === key; });
+        if (on) {
+          list = list.filter(function (w) { return w.key !== key; });
+        } else {
+          var queries = (data.needs || []).slice(0, 2).map(function (n) { return n.query; });
+          list.unshift({
+            key: key, title: data.summary || description.slice(0, 140), description: description,
+            queries: queries.length ? queries : [description.slice(0, 300)], floor: data.floor || 0.74,
+            seen: (data.plan || []).map(function (p) { return p.id; }), since: isoToday()
+          });
+          list = list.slice(0, WATCH_MAX);
+        }
+        store("apd.watch", list);
+        store("apd.watchnews", null);
+        paint();
+        if (!on) confirmLabel(btn, "Watching ✓ · new papers will show on the home page");
+      });
+    }
+  };
+
+  var watchBox = document.querySelector("[data-watch]");
+  var watched = window.apdWatch.list();
+  if (watchBox && watched.length && window.fetch) {
+    var watchList = watchBox.querySelector("[data-watch-list]");
+    var search = function (q, since) {
+      return fetch(watchBox.getAttribute("data-url"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: q, limit: 10, since: since })
+      }).then(function (r) { return r.ok ? r.json() : { results: [] }; })
+        .then(function (d) { return d.results || []; }).catch(function () { return []; });
+    };
+    var newFor = function (w) {
+      return Promise.all(w.queries.map(function (q) { return search(q, w.since); })).then(function (lists) {
+        var best = {};
+        lists.forEach(function (l) {
+          l.forEach(function (p) {
+            if (w.seen.indexOf(p.id) >= 0 || p.similarity < w.floor + NEW_MARGIN) return;
+            if (!best[p.id] || best[p.id].similarity < p.similarity) best[p.id] = p;
+          });
+        });
+        return Object.keys(best).map(function (id) { return best[id]; })
+          .sort(function (a, b) { return b.similarity - a.similarity; }).slice(0, 3);
+      });
+    };
+    var paintWatch = function (news, onSite) {
+      var list = window.apdWatch.list();
+      if (!list.length) { watchBox.hidden = true; return; }
+      watchList.innerHTML = list.map(function (w) {
+        var items = news[w.key] || [];
+        return '<div class="card pad watch-card" data-key="' + esc(w.key) + '">' +
+          '<div class="watch-head"><span class="label">Watching since ' + esc(shortDay(w.since)) + "</span>" +
+          '<span class="watch-count' + (items.length ? " has-new" : "") + '">' + (items.length ? items.length + " new" : "Nothing new") + "</span></div>" +
+          '<p class="watch-title">' + esc(w.title) + "</p>" +
+          (items.length ? '<ol class="watch-items">' + items.map(function (p) {
+            var local = onSite[p.id];
+            return '<li><a href="' + (local ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id)) + '"' +
+              (local ? "" : ' rel="noopener"') + ">" + esc(p.title) + "</a>" +
+              '<span class="foryou-meta">' + esc(shortDay(p.first_seen || p.submitted)) + (p.code_url ? '<span class="sep"></span>Code available' : "") + "</span></li>";
+          }).join("") + "</ol>" : '<p class="watch-empty">No new papers fit yet. We check every day.</p>') +
+          '<div class="watch-actions"><a class="text-link" href="scout.html" data-rescout>Run Scout again</a>' +
+          '<button class="text-link" type="button" data-unwatch>Stop watching</button></div></div>';
+      }).join("");
+      Array.prototype.forEach.call(watchList.querySelectorAll(".watch-card"), function (card) {
+        var key = card.getAttribute("data-key");
+        var w = list.filter(function (x) { return x.key === key; })[0];
+        card.querySelector("[data-unwatch]").addEventListener("click", function () {
+          store("apd.watch", window.apdWatch.list().filter(function (x) { return x.key !== key; }));
+          card.remove();
+          if (!window.apdWatch.list().length) watchBox.hidden = true;
+        });
+        card.querySelector("[data-rescout]").addEventListener("click", function () { store("apd.scoutdraft", w.description); });
+      });
+      watchList.removeAttribute("aria-busy");
+      watchBox.hidden = false;
+    };
+    var cachedNews = load("apd.watchnews", null);
+    var newsReq = cachedNews && cachedNews.day === isoToday() ? Promise.resolve(cachedNews.items) :
+      Promise.all(watched.map(newFor)).then(function (all) {
+        var items = {};
+        watched.forEach(function (w, i) { items[w.key] = all[i]; });
+        store("apd.watchnews", { day: isoToday(), items: items });
+        return items;
+      });
+    watchBox.hidden = false;
+    Promise.all([newsReq, fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })])
+      .then(function (both) {
+        var onSite = {};
+        (both[1] || []).forEach(function (id) { onSite[id] = true; });
+        paintWatch(both[0] || {}, onSite);
+      }).catch(function () { watchBox.hidden = true; });
   }
 
   // ---- Paper page ----
@@ -711,9 +833,8 @@
     var goBtn = scoutForm.querySelector("[data-scout-go]");
     var out = document.querySelector("[data-scout-out]");
     var introHtml = out.innerHTML;
-    var STAGE_NAMES = { start: "Start here", core: "Build on these", further: "Go further" };
-    var STAGE_NOTES = { start: "The foundations, or the simplest approach that works.",
-      core: "The methods your project would use.", further: "Optional, for when the basics work." };
+    var STAGE_NAMES = { start: "Start here", core: "Build on", further: "Later" };
+    var STAGE_NOTES = { start: "The simplest approach that works", core: "The methods to build on", further: "Optional, once the basics work" };
     var onSiteIds = null;
 
     var problemWith = function (text) {
@@ -749,46 +870,193 @@
         .then(function (list) { onSiteIds = {}; list.forEach(function (id) { onSiteIds[id] = true; }); return onSiteIds; });
     };
 
-    var planItem = function (p, n, onSite) {
-      var topic = (p.categories && p.categories[0]) || "other-ml";
+    var FIT_NAMES = { direct: "Direct fit", partial: "Partial fit" };
+    var STATUS = { covered: ["✓", "Covered"], partly: ["~", "Partly covered"], missing: ["✕", "No paper found"] };
+    var VERDICT = {
+      good: ["Good match", "Our papers cover every part of this project."],
+      partial: ["Partly covered", "Some parts have papers that fit. The rest you’d build without one, or with a broader search."],
+      none: ["No good papers yet", "Nothing in our database really fits this project, so Scout isn’t showing any. That’s an honest answer, not an error."]
+    };
+    var pad2 = function (n) { return String(n).padStart(2, "0"); };
+    var paperHref = function (p, onSite) {
+      return onSite[p.id] ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
+    };
+
+    // One row of the reading-order panel. Which needs a paper serves is shown as
+    // Harvey balls (full: direct fit, half: partial fit, empty: not this paper).
+    var ballsFor = function (p, needs) {
+      return needs.map(function (nd) {
+        var serves = (p.needs || []).indexOf(nd.id) >= 0;
+        var kind = !serves ? "none" : p.fit === "direct" ? "full" : "half";
+        var words = !serves ? "not covered by this paper" : p.fit === "direct" ? "direct fit" : "partial fit";
+        return '<li class="syl-ball"><span class="hb hb-' + kind + '" aria-hidden="true"></span>' +
+          '<span class="syl-ball-label">' + esc(nd.label) + '</span><span class="sr-only">: ' + words + "</span></li>";
+      }).join("");
+    };
+    var planRow = function (p, n, onSite, needs) {
       var local = onSite[p.id];
-      var href = local ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
       var isSaved = saved.some(function (s) { return s.id === p.id; });
-      return '<li class="plan-item" data-id="' + esc(p.id) + '">' +
-        '<span class="plan-n">' + String(n).padStart(2, "0") + "</span>" +
-        '<div class="plan-body"><a class="plan-title" href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.title) + "</a>" +
-        (p.reason ? '<p class="plan-reason">' + esc(p.reason) + "</p>" : "") +
-        '<span class="plan-meta"><span class="topic t-' + esc(topic) + '"><span class="dot"></span>' + esc(scoutNames[topic] || topic) + "</span>" +
-        (p.code_url ? '<span class="sep"></span><a href="' + esc(p.code_url) + '" rel="noopener">Code</a>' : "") +
-        (local ? "" : '<span class="sep"></span>On Hugging Face') + "</span></div>" +
+      var links = (p.code_url ? '<a class="text-link" href="' + esc(p.code_url) + '" rel="noopener">Get the code</a>' : "") +
+        (local ? "" : '<span class="syl-ext">On Hugging Face</span>');
+      return '<li class="syl-row" id="sp-' + pad2(n) + '" data-id="' + esc(p.id) + '">' +
+        '<span class="syl-n" aria-hidden="true">' + n + "</span>" +
+        '<div class="syl-paper"><a class="syl-title" href="' + paperHref(p, onSite) + '"' + (local ? "" : ' rel="noopener"') + ">" +
+        '<span class="sr-only">Paper ' + n + ": </span>" + esc(p.title) + "</a>" +
+        (p.reason ? '<p class="syl-reason">' + esc(p.reason) + "</p>" : "") +
+        (links ? '<div class="syl-links">' + links + "</div>" : "") + "</div>" +
+        (needs.length ? '<ul class="syl-needs" aria-label="What it covers">' + ballsFor(p, needs) + "</ul>" : "") +
         '<button class="quick-save" type="button" data-quick-save="' + esc(p.id) + '" data-title="' + esc(p.title) + '" aria-pressed="' + isSaved +
         '" aria-label="Save for later">' + (isSaved ? "✓" : "+") + "</button></li>";
+    };
+
+    var chipsFor = function (ids, numberOf) {
+      return ids.filter(function (id) { return numberOf[id]; }).map(function (id) {
+        return '<a class="pchip" href="#sp-' + pad2(numberOf[id]) + '" aria-label="Paper ' + numberOf[id] + '">' + numberOf[id] + "</a>";
+      }).join("");
+    };
+
+    var tryChips = function (list) {
+      if (!list || !list.length) return "";
+      return '<div class="try"><span class="label">Try searching for</span>' + list.map(function (t) {
+        return '<a class="qchip" href="papers.html?q=' + encodeURIComponent(t) + '&amp;m=1">' + esc(t) + "</a>";
+      }).join("") + "</div>";
+    };
+
+    var verdictCard = function (data, description, at, cov) {
+      var v = VERDICT[data.verdict];
+      var counts = { covered: 0, partly: 0, missing: 0 };
+      cov.forEach(function (c) { counts[c.status] = (counts[c.status] || 0) + 1; });
+      var meter = cov.length ? '<div class="cov-meter" role="img" aria-label="' + counts.covered + " of " + cov.length + ' needs covered">' +
+        cov.map(function (c) { return '<i class="s-' + esc(c.status) + '" title="' + esc(c.label) + ": " + STATUS[c.status][1] + '"></i>'; }).join("") + "</div>" +
+        '<p class="cov-count"><b>' + counts.covered + " of " + cov.length + "</b> needs covered" +
+        (counts.partly ? " · " + counts.partly + " partly" : "") + (counts.missing ? " · " + counts.missing + " with no paper" : "") + "</p>" : "";
+      return '<div class="card pad scout-verdict' + (v ? " v-" + esc(data.verdict) : "") + '">' +
+        '<div class="verdict-top"><span class="label">' + (at ? "Your last Scout, " + ago(at) : "Your project") + "</span>" +
+        (v ? '<span class="verdict-pill">' + v[0] + "</span>" : "") + "</div>" +
+        '<p class="verdict-summary">' + esc(data.summary || description) + "</p>" + meter +
+        (v ? '<p class="verdict-note">' + v[1] + "</p>" : "") +
+        (data.mode === "basic" && (data.plan || []).length ? '<p class="fine">The planner was unavailable, so these are the closest papers by meaning and haven’t been checked for fit.</p>' : "") +
+        '<div class="scout-actions">' +
+        ((data.plan || []).length ? '<button class="btn btn-primary btn-sm" type="button" data-scout-watch aria-pressed="false">Watch this project</button>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-scout-copy><span>Copy as Markdown</span></button>' : "") +
+        '<button class="btn btn-outline btn-sm" type="button" data-scout-new>Start over</button></div></div>';
+    };
+
+    var coverageSection = function (cov, numberOf, plan, tries) {
+      if (!cov.length) return "";
+      var rows = cov.map(function (c) {
+        var ids = plan.filter(function (p) { return (p.needs || []).indexOf(c.need) >= 0; }).map(function (p) { return p.id; });
+        var s = STATUS[c.status] || STATUS.missing;
+        return '<li class="cov s-' + esc(c.status) + '"><span class="cov-icon" aria-hidden="true">' + s[0] + "</span>" +
+          '<div class="cov-body"><div class="cov-head"><b>' + esc(c.label) + '</b><span class="cov-status">' + s[1] + "</span></div>" +
+          (c.note ? "<p>" + esc(c.note) + "</p>" : "") + "</div>" +
+          '<span class="cov-papers">' + chipsFor(ids, numberOf) + "</span></li>";
+      }).join("");
+      return '<section class="scout-sec"><div class="sec-head"><h2>What your project needs</h2><span>Each part of your project, and whether a paper covers it</span></div>' +
+        '<ul class="card cov-list">' + rows + "</ul>" + tryChips(tries) + "</section>";
+    };
+
+    var buildSection = function (steps, numberOf) {
+      if (!steps || !steps.length) return "";
+      return '<section class="scout-sec"><div class="sec-head"><h2>How to build it</h2><span>Steps in order, with the papers for each</span></div><ol class="build">' +
+        steps.map(function (st, i) {
+          var chips = chipsFor(st.papers || [], numberOf);
+          return '<li class="build-step' + (chips ? "" : " no-paper") + '"><span class="build-n">' + (i + 1) + "</span>" +
+            '<div class="build-body"><b>' + esc(st.title) + "</b><p>" + esc(st.detail) + "</p>" +
+            '<div class="build-papers">' + (chips ? "<span>Papers</span>" + chips : "<span>No paper: you build this part yourself</span>") + "</div></div></li>";
+        }).join("") + "</ol></section>";
+    };
+
+    var compareSection = function (plan, numberOf, needNames) {
+      var useful = plan.filter(function (p) { return p.approach || p.result || p.requires || p.best_for; });
+      if (plan.length < 2 || !useful.length) return "";
+      var cell = function (label, text) { return '<td data-label="' + label + '">' + (text ? esc(text) : '<span class="muted">Not stated</span>') + "</td>"; };
+      return '<section class="scout-sec"><div class="sec-head"><h2>Compare at a glance</h2><span>From the abstracts, and the full paper where we have it</span></div>' +
+        '<div class="card compare-wrap"><table class="compare"><thead><tr><th scope="col">Paper</th><th scope="col">Approach</th><th scope="col">What it needs</th>' +
+        '<th scope="col">Key result</th><th scope="col">Best for</th><th scope="col">Code</th></tr></thead><tbody>' +
+        plan.map(function (p) {
+          return '<tr><th scope="row"><a class="pchip" href="#sp-' + pad2(numberOf[p.id]) + '">' + numberOf[p.id] + "</a>" +
+            '<span class="compare-title">' + esc(p.title) + "</span>" +
+            (p.fit ? '<span class="syl-fit"><i class="hb hb-' + (p.fit === "direct" ? "full" : "half") + '" aria-hidden="true"></i>' + FIT_NAMES[p.fit] + "</span>" : "") + "</th>" +
+            cell("Approach", p.approach) + cell("What it needs", p.requires) + cell("Key result", p.result) + cell("Best for", p.best_for) +
+            '<td data-label="Code">' + (p.code_url ? '<a href="' + esc(p.code_url) + '" rel="noopener">Repo ↗</a>' : '<span class="muted">None yet</span>') + "</td></tr>";
+        }).join("") + "</tbody></table></div></section>";
+    };
+
+    var extrasSection = function (data) {
+      var need = (data.you_need || []).map(function (t) { return '<li>' + esc(t) + "</li>"; }).join("");
+      var watch = (data.watch_out || []).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+      if (!need && !watch) return "";
+      return '<section class="scout-extras">' +
+        (need ? '<div class="card pad"><span class="label">You’ll need</span><ul class="need-list">' + need + "</ul></div>" : "") +
+        (watch ? '<div class="card pad watch-out"><span class="label">Watch out for</span><ul>' + watch + "</ul></div>" : "") + "</section>";
+    };
+
+    var asMarkdown = function (data, description) {
+      var plan = data.plan || [], lines = ["# " + (data.summary || description), ""];
+      var v = VERDICT[data.verdict];
+      if (v) lines.push("**" + v[0] + ".** " + v[1], "");
+      if ((data.coverage || []).length) {
+        lines.push("## What the project needs");
+        data.coverage.forEach(function (c) { lines.push("- " + (STATUS[c.status] || STATUS.missing)[0] + " **" + c.label + "**" + (c.note ? ": " + c.note : "")); });
+        lines.push("");
+      }
+      if ((data.steps || []).length) {
+        lines.push("## How to build it");
+        data.steps.forEach(function (st, i) { lines.push((i + 1) + ". **" + st.title + "**: " + st.detail); });
+        lines.push("");
+      }
+      lines.push("## Papers");
+      plan.forEach(function (p, i) {
+        lines.push((i + 1) + ". [" + p.title + "](https://arxiv.org/abs/" + p.id + ")" + (p.fit ? " (" + FIT_NAMES[p.fit] + ")" : "") +
+          (p.reason ? "\n   " + p.reason : "") + (p.code_url ? "\n   Code: " + p.code_url : ""));
+      });
+      if ((data.you_need || []).length) lines.push("", "## You’ll need", data.you_need.map(function (t) { return "- " + t; }).join("\n"));
+      if ((data.watch_out || []).length) lines.push("", "## Watch out for", data.watch_out.map(function (t) { return "- " + t; }).join("\n"));
+      lines.push("", "Made with Project Scout, AI Papers Daily");
+      return lines.join("\n");
     };
 
     var paintPlan = function (data, description, at) {
       siteIds().then(function (onSite) {
         var plan = data.plan || [];
-        if (!plan.length) {
-          out.innerHTML = '<div class="card pad empty-card"><span class="label">No matches</span><p>Scout found no close papers. Try naming the task and the data, for example “summarise legal contracts” instead of “legal AI app”.</p></div>';
-          return;
-        }
-        var n = 0, groups = "";
+        // Plans saved before Scout rated papers have no verdict or coverage
+        if (!data.version) data = Object.assign({}, data, { verdict: plan.length ? null : "none", coverage: [] });
+        var cov = data.coverage || [];
+        var needNames = {}, numberOf = {};
+        (data.needs || []).forEach(function (n) { needNames[n.id] = n.label; });
+        plan.forEach(function (p, i) { numberOf[p.id] = i + 1; });
+
+        // Number papers in the order they're shown
+        var n = 0;
+        ["start", "core", "further"].forEach(function (stage) {
+          plan.forEach(function (p) { if (p.stage === stage) numberOf[p.id] = ++n; });
+        });
+        var needs = (data.needs || []).filter(function (nd) { return nd.label; });
+        var groups = "";
         ["start", "core", "further"].forEach(function (stage) {
           var items = plan.filter(function (p) { return p.stage === stage; });
           if (!items.length) return;
-          groups += '<li class="plan-stage stage-' + stage + '"><div class="stage-head"><h2>' + STAGE_NAMES[stage] + "</h2><span>" + STAGE_NOTES[stage] + "</span></div>" +
-            '<ol class="plan-list">' + items.map(function (p) { n++; return planItem(p, n, onSite); }).join("") + "</ol></li>";
+          groups += '<section class="syl-stage stage-' + stage + '"><h3 class="syl-stage-name">' + STAGE_NAMES[stage] +
+            "<small>" + STAGE_NOTES[stage] + "</small></h3>" +
+            '<ol class="syl-list">' + items.map(function (p) { return planRow(p, numberOf[p.id], onSite, needs); }).join("") + "</ol></section>";
         });
-        var queries = (data.queries || []).map(function (q) { return '<span class="qchip">' + esc(q) + "</span>"; }).join("");
-        out.innerHTML =
-          '<div class="card pad scout-summary"><span class="label">' + (at ? "Your last plan, " + ago(at) : "Your reading plan") + "</span>" +
-          "<p>" + esc(data.summary || description) + "</p>" +
-          (queries ? '<div class="qchips"><span>Searched for</span>' + queries + "</div>" : "") +
-          (data.mode === "basic" ? '<p class="fine">These are the closest papers by meaning. Reasons appear when the planner is available.</p>' : "") +
-          '<div class="scout-actions"><button class="btn btn-outline btn-sm" type="button" data-scout-copy><span>Copy plan</span></button>' +
-          '<button class="btn btn-outline btn-sm" type="button" data-scout-new>Start over</button></div></div>' +
-          '<ol class="plan">' + groups + "</ol>" +
-          '<div class="feedback" data-feedback="scout"><span data-feedback-q>Was this reading plan useful?</span>' +
+        var head = needs.length ? '<div class="syl-head" aria-hidden="true"><span>Read in this order</span><ul class="syl-needs">' +
+          needs.map(function (nd) { return "<li>" + esc(nd.label) + "</li>"; }).join("") + "</ul><span></span></div>" : "";
+        var key = needs.length ? '<p class="syl-key"><span><i class="hb hb-full"></i>Direct fit</span><span><i class="hb hb-half"></i>Partial fit</span>' +
+          '<span><i class="hb hb-none"></i>Not covered by this paper</span></p>' : "";
+        var papersSection = plan.length ? '<section class="scout-sec"><div class="sec-head"><h2>The papers</h2><span>' + plan.length +
+          (plan.length === 1 ? " paper fits" : " papers fit") + ", and the needs each one covers</span></div>" +
+          '<div class="card syllabus" style="--n-needs:' + needs.length + '">' + head + groups + key + "</div></section>" : "";
+        var noneHelp = data.verdict === "none" && !cov.length ? '<div class="card pad empty-card"><p>Try naming the task and the data, for example “summarise legal contracts” instead of “legal AI app”.</p>' + tryChips(data.try) + "</div>" : "";
+
+        out.innerHTML = verdictCard(data, description, at, cov) +
+          coverageSection(cov, numberOf, plan, data.verdict === "good" ? [] : data.try) +
+          buildSection(data.steps, numberOf) +
+          papersSection +
+          compareSection(plan.slice().sort(function (a, b) { return numberOf[a.id] - numberOf[b.id]; }), numberOf, needNames) +
+          extrasSection(data) + noneHelp +
+          '<div class="feedback" data-feedback="scout"><span data-feedback-q>Was this useful?</span>' +
           '<button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, useful</button>' +
           '<button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not really</button></div>';
         wireFeedback(out.querySelector("[data-feedback]"));
@@ -797,19 +1065,11 @@
           out.innerHTML = introHtml; desc.value = ""; paintCount(); desc.focus();
         });
         var copyBtn = out.querySelector("[data-scout-copy]");
-        copyBtn.addEventListener("click", function () {
-          var lines = ["Reading plan: " + (data.summary || description), ""];
-          ["start", "core", "further"].forEach(function (stage) {
-            var items = plan.filter(function (p) { return p.stage === stage; });
-            if (!items.length) return;
-            lines.push(STAGE_NAMES[stage]);
-            items.forEach(function (p) {
-              lines.push("- " + p.title + " (https://arxiv.org/abs/" + p.id + ")" + (p.reason ? "\n  " + p.reason : ""));
-            });
-            lines.push("");
-          });
-          if (navigator.clipboard) navigator.clipboard.writeText(lines.join("\n")).then(function () { confirmLabel(copyBtn, "Copied"); });
+        if (copyBtn) copyBtn.addEventListener("click", function () {
+          if (navigator.clipboard) navigator.clipboard.writeText(asMarkdown(data, description)).then(function () { confirmLabel(copyBtn, "Copied"); });
         });
+        var watchBtn = out.querySelector("[data-scout-watch]");
+        if (watchBtn && window.apdWatch) window.apdWatch.wire(watchBtn, data, description);
         markRead(out);
       });
     };
@@ -868,6 +1128,14 @@
       desc.value = last.description || "";
       paintCount();
       paintPlan(last.data, last.description || "", last.at);
+    }
+    // "Run Scout again" from a watched project on the home page
+    var draft = load("apd.scoutdraft", null);
+    if (draft) {
+      desc.value = String(draft);
+      paintCount();
+      try { localStorage.removeItem("apd.scoutdraft"); } catch (e) { /* private mode */ }
+      desc.focus();
     }
   }
 

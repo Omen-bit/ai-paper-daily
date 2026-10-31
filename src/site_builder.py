@@ -480,6 +480,10 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   {section_head("For you", "Recent papers close in meaning to what you’ve read. Worked out from this browser’s history only.")}
   <ol class="foryou" data-foryou-list aria-busy="true">{'<li class="foryou-item skeleton" aria-hidden="true"></li>' * 3}</ol>
 </section>
+<section class="block" data-watch data-url="{SEARCH_URL}" hidden>
+  {section_head("Your projects", "New papers for the projects you watch in Scout. Checked once a day, from this browser only.", '<a class="more" href="scout.html">Open Scout</a>')}
+  <div class="watch-list" data-watch-list aria-busy="true"></div>
+</section>
 <section class="split">
   <div class="split-main">{more}{most_read_list(most_read, papers)}</div>
   <aside class="block side">
@@ -557,7 +561,7 @@ def build_scout_page() -> str:
                        for e in SCOUT_EXAMPLES)
     body = f"""<section class="page-head scout-head">
   <h1>Project Scout</h1>
-  <p>Describe what you want to build. Scout searches more than 8,000 AI papers and gives you a short reading plan, in order, with what each paper adds to your project.</p>
+  <p>Describe what you want to build. Scout checks more than 8,000 AI papers and tells you honestly which parts of your project they cover, how to build it, and which papers to read. If nothing fits, it says so.</p>
 </section>
 <div class="scout">
   <form class="card pad scout-form" data-scout data-url="{SCOUT_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" novalidate>
@@ -574,8 +578,8 @@ def build_scout_page() -> str:
       <span class="label">How it works</span>
       <ol class="how">
         <li><b>You describe</b> the project in a few sentences.</li>
-        <li><b>Scout searches</b> by meaning, from a few angles at once.</li>
-        <li><b>You get a plan:</b> what to read first, what to build on, and what can wait.</li>
+        <li><b>Scout splits it</b> into its parts and searches for each one by meaning.</li>
+        <li><b>You get a brief:</b> what’s covered, build steps, and a comparison of only the papers that fit.</li>
       </ol>
     </div>
   </section>

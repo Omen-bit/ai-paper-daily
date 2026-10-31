@@ -15,6 +15,8 @@ Deno.serve(async (req) => {
   const q = String(body.q ?? "").replace(/\s+/g, " ").trim().slice(0, 300);
   if (q.length < 3) return json(req, { error: "Type at least 3 characters." }, 400);
   const limit = Math.min(Math.max(Number(body.limit) || 30, 1), 50);
+  // Optional: only papers first seen on or after this day (used by "Watch this project")
+  const since = /^\d{4}-\d{2}-\d{2}$/.test(String(body.since ?? "")) ? String(body.since) : null;
 
   if (!(await underLimit(req, "search", SEARCHES_PER_HOUR))) {
     return json(req, { error: "You've searched a lot in the last hour. Try again in a few minutes." }, 429);
@@ -24,6 +26,7 @@ Deno.serve(async (req) => {
   const { data, error } = await db.rpc("match_papers", {
     query_embedding: JSON.stringify(vector),
     match_count: limit,
+    since,
   });
   if (error) {
     console.error("match_papers failed", error.message);
