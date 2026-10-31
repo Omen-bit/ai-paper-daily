@@ -196,7 +196,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     </nav>
     <div class="header-actions">
       <a class="search-trigger" href="{root}papers.html" data-search-trigger>{icon("search", 15)}<span>Search papers…</span><kbd>/</kbd></a>
-      <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle dark mode">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
+      <button class="icon-button" type="button" data-theme-toggle aria-label="Switch light or dark theme" data-tip="Switch theme">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
     </div>
   </div>
 </header>
@@ -280,7 +280,7 @@ def build_index(days: list[dict], papers: dict) -> str:
     if others:
         rows = "\n".join(paper_row(r, "") for r in others)
         link = (f'<a class="link-arrow" href="day/{esc(latest["date"])}.html">'
-                f'All {len(latest["papers"])} papers from today</a>')
+                f'See all {len(latest["papers"])} papers from today</a>')
         more = f"""<section class="section">
   {section_head("More from today", "Also new, ranked by our score.", link)}
   <ul class="list">{rows}</ul>
@@ -295,9 +295,10 @@ def build_index(days: list[dict], papers: dict) -> str:
   <p class="edition">Edition {len(days)}, {esc(long_date(latest['date']))}</p>
   <h1>The AI papers worth building on, picked every morning.</h1>
   <p class="lead">{esc(TAGLINE)}</p>
+  <label class="hero-search-label" for="hero-q">Search papers by title or author</label>
   <form class="hero-search" action="papers.html" role="search">
-    <label class="input-wrap">{icon("search", 16)}<input class="input input-lg" name="q" type="search" placeholder="Search papers by title or author" aria-label="Search papers"></label>
-    <button class="btn btn-primary btn-lg">Search</button>
+    <label class="input-wrap">{icon("search", 16)}<input class="input input-lg" id="hero-q" name="q" type="search" placeholder="e.g. diffusion, Llama, retrieval"></label>
+    <button class="btn btn-primary btn-lg">Search papers</button>
   </form>
   <p class="hero-note">{len(papers)} papers tracked across {len(counts)} topics since {esc(nice_date(first))}. <a href="papers.html">Browse all papers</a></p>
 </section>
@@ -317,6 +318,9 @@ def build_index(days: list[dict], papers: dict) -> str:
     return page(SITE_NAME, body, active="today")
 
 
+SKELETON_ROWS = '<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>' * 6
+
+
 def build_papers_page() -> str:
     options = "".join(f'<option value="{esc(slug)}">{esc(name)}</option>'
                       for slug, name in CATEGORY_NAMES.items())
@@ -325,13 +329,16 @@ def build_papers_page() -> str:
   <p>Every paper we have tracked, newest first. Search by title or author, or narrow it down by topic.</p>
 </section>
 <div class="toolbar">
-  <label class="input-wrap">{icon("search", 15)}<input class="input" id="q" type="search" placeholder="Search title or author…" aria-label="Search papers" autocomplete="off"></label>
-  <select class="select" id="cat" aria-label="Topic"><option value="">All topics</option>{options}</select>
-  <select class="select" id="sort" aria-label="Sort"><option value="new">Newest first</option><option value="score">Highest score</option></select>
+  <div class="field field-grow"><label class="field-label" for="q">Search</label>
+    <span class="input-wrap">{icon("search", 15)}<input class="input" id="q" type="search" placeholder="Title or author" autocomplete="off"></span></div>
+  <div class="field"><label class="field-label" for="cat">Topic</label>
+    <select class="select" id="cat"><option value="">All topics</option>{options}</select></div>
+  <div class="field"><label class="field-label" for="sort">Sort by</label>
+    <select class="select" id="sort"><option value="new">Newest first</option><option value="score">Highest score</option></select></div>
   <label class="toggle"><input id="feat" type="checkbox"> Top picks only</label>
 </div>
 <div class="result-meta"><span id="count">Loading papers…</span></div>
-<ul class="list" id="results"></ul>
+<ul class="list" id="results" aria-busy="true">{SKELETON_ROWS}</ul>
 <div class="center"><button class="btn btn-outline" id="more" type="button" hidden>Show more</button></div>
 <noscript><p class="empty">Turn on JavaScript to search, or browse the <a href="archive.html">archive</a>.</p></noscript>"""
     return page("All papers", body, active="papers")
@@ -345,7 +352,7 @@ def build_archive(days: list[dict], papers: dict) -> str:
   <span class="row-date">{esc(nice_date(day['date'], with_year=False))}</span>
   <span class="row-title"><a href="day/{esc(day['date'])}.html">{esc(nice_date(day['date']))}</a></span>
   <span class="row-authors">{picks}</span>
-  <div class="badges"><span class="badge">{len(day.get('papers', []))} papers</span></div>
+  <div class="badges"><span class="meta-text">{len(day.get('papers', []))} papers</span></div>
 </li>""")
     body = f"""<section class="page-head">
   <h1>Every edition</h1>
@@ -460,7 +467,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
     </details>
     <div class="text-size" role="group" aria-label="Text size">
-      <button type="button" data-size="-1" aria-label="Smaller text">A</button><button type="button" data-size="1" aria-label="Larger text">A</button>
+      <button type="button" data-size="-1" aria-label="Make text smaller" data-tip="Smaller text">A</button><button type="button" data-size="1" aria-label="Make text larger" data-tip="Larger text">A</button>
     </div>
   </div>
   {summary_html}
@@ -468,8 +475,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
   <dl class="facts">{facts_html}</dl>
   <div class="actions">
     <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>
-    <a class="btn btn-outline" href="{esc(rec.get('pdf_url'))}" rel="noopener">{icon("file", 15)} PDF</a>
-    <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">Hugging Face {icon("external", 15)}</a>
+    <a class="btn btn-outline" href="{esc(rec.get('pdf_url'))}" rel="noopener">{icon("file", 15)} Open PDF</a>
+    <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">View on Hugging Face {icon("external", 15)}</a>
   </div>
   {pager}
 </article>
