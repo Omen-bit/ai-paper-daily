@@ -1,119 +1,164 @@
 {
  "schema_version": 1,
  "date": "2026-11-01",
- "generated_at": "2026-11-01T13:13:07.112265+00:00",
+ "generated_at": "2026-11-01T13:19:43.575705+00:00",
  "featured": [
-  "2610.36671",
-  "2610.39302"
+  "2610.40614",
+  "2610.37161"
  ],
  "scanned": 641,
  "papers": [
   {
-   "id": "2610.36671",
-   "title": "Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs",
+   "id": "2610.40614",
+   "title": "L3G-World: Real-Time Infinite World Generation with Latent 3D Gaussian Memory",
    "authors": [
-    "Donghyeon Cho",
-    "Joowon Kim",
-    "Seungho Shin",
-    "Eunho Yang"
+    "Jinhyeok Choi",
+    "JoungBin Lee",
+    "Jongmin Lee",
+    "Minkyeong Jeon",
+    "Jiyoung Kim",
+    "Kaeun Han",
+    "Yoonjin Yoon",
+    "Seungryong Kim"
    ],
-   "abstract": "Diffusion vision-language models (DVLMs) process their entire input at every denoising step. Since visual tokens make up 89-97% of this input on the benchmarks we study, most of the decoding computation is spent repeatedly processing the same image. Visual token pruning methods partially relieve this burden by removing part of the visual tokens, but they lose the removed information and still process the remaining image at every step. To measure how often the image is actually needed, we compare LLaDA-V's predictions with and without the image at every decoding step and find that removing the image changes a token being unmasked at only 22.8% of steps on average and at as few as 7.9%. We therefore propose LOWN, a decoding method that decides at every step whether to process the image and how many tokens to unmask. LOWN predicts the masked tokens without the image and processes the image only when this prediction disagrees with the last image-conditioned prediction. Agreement certifies the earlier prediction for reuse, and the number of certified tokens sets how many are unmasked in that step. We further observe that the need for the image differs across benchmarks, so LOWN's adaptive decision is needed rather than a fixed schedule. Without training or a tuned threshold, LOWN retains 99.6% of LLaDA-V's score on ten benchmarks at 35.3% of the decoding FLOPs on average. LOWN also generalizes across LLaDA-based DVLMs, composes orthogonally with visual token pruning, and runs under key-value caching for further efficiency gains. Code and project page are available at https://hyeon9698.github.io/LOWN/",
-   "url": "https://arxiv.org/abs/2610.36671",
-   "pdf_url": "https://arxiv.org/pdf/2610.36671",
-   "submitted": "2026-10-26",
+   "abstract": "Interactive world models generate visual content conditioned on user actions, yet maintaining spatial consistency over long-horizon exploration in real time remains challenging. Existing approaches rely on either temporal context or explicit 3D memory, both of which scale poorly because memory grows with the length of the generated stream. Moreover, explicit 3D memories condition latent video generators by re-encoding RGB renderings, which precludes real-time generation. In this paper, we introduce a Latent 3D Gaussian Memory (L3G) that combines the efficiency of feed-forward reconstruction with a compact, rapidly renderable scene representation. Building on this memory, we propose L3G-World, in which a memory updater and a video diffusion transformer (DiT) alternate autoregressively to generate spatially consistent worlds. The memory updater spawns Gaussians in newly observed regions and refines existing ones, so that the memory grows with scene extent rather than stream length. Each Gaussian further stores a VAE latent feature, allowing the memory to be rendered directly into the DiT's latent space without VAE re-encoding. Experiments show that L3G-World achieves state-of-the-art generation quality and long-horizon spatial consistency, with up to $38.6\\times$ fewer 3D primitives, $3.2\\times$ faster memory updates, and $359\\times$ faster memory rendering relative to the most efficient prior 3D-memory baseline for each metric, enabling real-time world generation at 9 FPS.",
+   "url": "https://arxiv.org/abs/2610.40614",
+   "pdf_url": "https://arxiv.org/pdf/2610.40614",
+   "submitted": "2026-10-29",
    "arxiv_categories": [
-    "cs.CV",
-    "cs.AI",
-    "cs.LG"
+    "cs.CV"
    ],
    "categories": [
-    "multimodal",
-    "llms",
+    "generative-ai",
     "computer-vision"
    ],
-   "source": "HuggingFace",
-   "hf_upvotes": 100,
-   "score": 44,
+   "source": "arXiv + HuggingFace",
+   "hf_upvotes": 39,
+   "score": 39,
    "badges": [
     "Top Pick",
     "Trending on HF",
-    "Interdisciplinary"
+    "Novel Method"
    ],
    "featured": true,
    "slot": "pick",
    "summary": {
-    "text": "Reduces compute cost for vision‑language diffusion models, enabling faster inference on limited hardware.",
+    "text": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
-    "tldr": "LOWN skips image processing during diffusion decoding unless needed, cutting FLOPs while keeping accuracy.",
-    "whats_new": "Introduces certificate‑guided token unmasking that decides per step whether to use visual tokens, unlike prior static pruning methods.",
-    "key_result": "Retains 99.6% of LLaDA‑V's score while using only 35.3% of decoding FLOPs on average across ten benchmarks.",
-    "why_it_matters": "Reduces compute cost for vision‑language diffusion models, enabling faster inference on limited hardware.",
-    "difficulty": "intermediate",
-    "difficulty_reason": "Requires understanding of diffusion VLM decoding and integrating certificate logic",
-    "check_question": "How often does removing the image change an unmasked token during decoding according to the authors?",
-    "check_answer": "Only 22.8% of steps on average, and as few as 7.9% on some benchmarks.",
+    "tldr": "L3G-World uses a latent 3D Gaussian memory to generate spatially consistent worlds in real time.",
+    "whats_new": "It introduces a compact Gaussian memory that grows with scene extent and renders directly into latent space, avoiding re-encoding. This yields far fewer primitives and faster updates/rendering.",
+    "key_result": "L3G-World runs at 9 FPS with up to 38.6× fewer 3D primitives, 3.2× faster memory updates, and 359× faster memory rendering versus the best prior baseline.",
+    "why_it_matters": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
+    "difficulty": "advanced",
+    "difficulty_reason": "Requires expertise in diffusion transformers and 3D Gaussian representations.",
+    "check_question": "How does L3G-World keep memory size manageable while maintaining real-time performance?",
+    "check_answer": "Memory grows with scene extent, not stream length, using Gaussians that store VAE latents and can be rendered directly, avoiding re-encoding.",
     "build_ideas": [
-     "Implement a real‑time image captioning service that uses LOWN to lower latency",
-     "Create a mobile app that generates visual stories with diffusion VLMs using LOWN for efficiency",
-     "Develop a batch image‑to‑text pipeline that integrates LOWN to cut cloud compute expenses"
+     "Generate endless game levels that adapt to player movement in real time.",
+     "Create virtual walkthroughs of architectural designs with instant scene updates.",
+     "Develop an AI-driven film set that expands dynamically as the story progresses."
     ]
    },
-   "code_url": "https://github.com/hyeon9698/LOWN",
+   "code_url": "https://github.com/cvlab-kaist/L3G-World",
    "first_seen": "2026-11-01"
   },
   {
-   "id": "2610.39302",
-   "title": "Proving and Improving the Platonic Representation Hypothesis with JEPAs",
+   "id": "2610.37161",
+   "title": "WorkFactory: Turning Professional Intents into Executable Work for Scalable Agent Training",
    "authors": [
-    "Randall Balestriero",
-    "Yann LeCun"
+    "Ziyang Zeng",
+    "Tingyang Chen",
+    "Jia Deng",
+    "Qiyao Wang",
+    "Shuo Tang",
+    "Yike Yang",
+    "Tao Ren",
+    "Wayne Xin Zhao",
+    "Feng Chang",
+    "Jujie He",
+    "Chuan Hao",
+    "Ran Tao",
+    "Bryan Dai"
    ],
-   "abstract": "Whether models trained on different modalities converge to the same representation of the world is central to AI. The Platonic Representation Hypothesis (PRH) conjectures that they do as they scale, but without a proof it offers neither a guarantee nor a recipe. We turn the hypothesis into a theorem. First, we prove a \\emph{Platonic Representation Theorem}: Joint-Embedding Predictive Architectures (JEPAs) trained separately on any number of modalities learn the same representation up to one rotation whenever their positive pairs are two observations of one scene--\\emph{good views}--and their misalignment is bounded otherwise. Second, we show that next-token prediction is a JEPA with \\emph{bad views}, parts of a single document, which explains why language models align with vision only through scale. Third, we validate the theory from 145k captions to the texts of 940M web images, and uncover a scaling law of alignment that predicts unseen runs within seed noise. Good views need 42 times fewer training samples than next-token prediction on the same corpus to reach the same alignment, and a 109M-parameter text JEPA aligns with DINOv2 and CLIP's image encoders better than every language model we evaluated, up to 72B parameters, and than CLIP's text encoder: next-token prediction is a remarkably inefficient route to platonic representations. As a showcase, one rotation turns separately trained encoders into an image captioner (CIDEr .838 on COCO). Even that rotation needs no pair: on the latest pair-free benchmark, our text JEPA beats every zero-shot accuracy reported with language models up to 8B parameters, e.g., 64\\% against at most 56\\% top-5 on ImageNet-100. Positive views, and not scale alone, are thus the lever to build platonic representations.",
-   "url": "https://arxiv.org/abs/2610.39302",
-   "pdf_url": "https://arxiv.org/pdf/2610.39302",
-   "submitted": "2026-10-29",
+   "abstract": "Scaling supervised training for working agents requires diverse professional tasks that yield reliable expert demonstrations. However, missing or inconsistent task information can obstruct teacher execution and weaken the resulting supervision. We propose WorkFactory, a scalable framework for constructing coherent and executable professional tasks. Starting from professional intents, information-level planning builds an information support graph to guide task instantiation, explicitly representing the dependencies and locations of information required for the intended outputs. Probe executions then identify support failures and guide repairs while preserving the intended work. We construct 112,686 tasks spanning 612 occupations and use the collected teacher trajectories to fine-tune Qwen models at 4B, 27B, and 35B-A3B scales, yielding the WorkPilot family. All three models improve over their respective base models across four professional-work benchmarks, with WorkPilot-35B-A3B improving from 879 to 1565 Elo on GDPval-AA v2.1. Scaling analyses reveal model-dependent diminishing returns, with execution length first increasing and then decreasing. Controlled component analyses show that planning and repair reduce probe-diagnosed task environment defects and improve downstream performance. The data and models are available at https://github.com/IQuestLab/WorkFactory.",
+   "url": "https://arxiv.org/abs/2610.37161",
+   "pdf_url": "https://arxiv.org/pdf/2610.37161",
+   "submitted": "2026-10-26",
    "arxiv_categories": [
-    "cs.AI",
-    "cs.CV",
-    "stat.ML"
+    "cs.AI"
    ],
    "categories": [
-    "llms",
-    "alignment",
-    "ml-theory"
+    "reasoning-agents"
    ],
-   "source": "arXiv + HuggingFace",
-   "hf_upvotes": 60,
-   "score": 38,
+   "source": "HuggingFace",
+   "hf_upvotes": 36,
+   "score": 33,
    "badges": [
     "Trending",
     "Trending on HF",
-    "Interdisciplinary"
+    "Novel Method"
    ],
    "featured": true,
    "slot": "trending",
    "summary": {
-    "text": "Builders can obtain strong multimodal alignment with far less data by using joint‑embedding on good views.",
+    "text": "Provides developers with a massive, high‑quality task dataset for training agents that can perform real‑world professional work.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
-    "tldr": "JEPAs trained on paired views learn a shared representation up to rotation, proving the Platonic Representation Hypothesis and outperforming next‑token prediction.",
-    "whats_new": "Provides a formal Platonic Representation Theorem for JEPAs and shows that next‑token prediction is a highly inefficient way to achieve alignment.",
-    "key_result": "Good views need 42 × fewer training samples than next‑token prediction to reach the same alignment, and a 109 M‑parameter text JEPA outperforms larger language models and CLIP’s text encoder.",
-    "why_it_matters": "Builders can obtain strong multimodal alignment with far less data by using joint‑embedding on good views.",
-    "difficulty": "intermediate",
-    "difficulty_reason": "Requires training and evaluating joint‑embedding models and measuring alignment metrics",
-    "check_question": "What are “good views” and how many times fewer samples do they need compared to next‑token prediction?",
-    "check_answer": "Good views are two observations of the same scene, and they require 42 times fewer training samples than next‑token prediction to achieve comparable alignment.",
+    "tldr": "WorkFactory builds coherent professional tasks from intents, enabling scalable training of work agents.",
+    "whats_new": "Introduces an information-level planning graph and probe‑execution repair loop to generate executable tasks at large scale.",
+    "key_result": "WorkPilot-35B-A3B raises performance from 879 to 1565 Elo on GDPval-AA v2.1.",
+    "why_it_matters": "Provides developers with a massive, high‑quality task dataset for training agents that can perform real‑world professional work.",
+    "difficulty": "advanced",
+    "difficulty_reason": "Requires large‑scale model fine‑tuning and handling of complex task graphs.",
+    "check_question": "What mechanism does WorkFactory use to detect and fix missing information in generated tasks?",
+    "check_answer": "It runs probe executions that identify support failures and then repairs the task while preserving the intended work.",
     "build_ideas": [
-     "Train a text‑only JEPA and rotate its encoder to create an image captioner",
-     "Use a JEPA with good views to align audio and video embeddings for cross‑modal retrieval",
-     "Replace a large language model with a small JEPA for zero‑shot image classification"
+     "Create a virtual assistant that automates specific occupational workflows using WorkPilot models.",
+     "Develop a benchmark suite that evaluates agent performance on the 112k generated tasks.",
+     "Fine‑tune a smaller model on a subset of occupations for domain‑specific automation."
     ]
    },
-   "code_url": "https://github.com/galilai-group/prh-proof",
+   "code_url": "https://github.com/IQuestLab/WorkFactory",
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.40647",
+   "title": "Read, Allocate, Route: Role-Coupled Tokenization for Pixel-Space Generative Transformers",
+   "authors": [
+    "Jiongfan Yang",
+    "Weichen Fan",
+    "Haiwen Diao",
+    "Zhongang Cai",
+    "Ziwei Liu"
+   ],
+   "abstract": "Pixel-space generative Transformers typically use one token per image patch, so capturing finer detail requires more tokens and makes global attention increasingly expensive. We observe that finer detail does not necessarily require more global communication: low-frequency structure benefits from global exchange, while high-frequency detail can be modeled locally. Based on this insight, we introduce SpecSlot, a pixel-space rectified-flow Transformer that decouples output detail from the length of the global attention sequence. SpecSlot expands each spatial anchor into multiple slots, each assigned a disjoint band of DCT coefficients; this separates anchor density from spectral subdivision. Only the lowest-frequency slot from each anchor participates in global attention, while all slots interact locally. This allows the model to increase spectral detail without enlarging the global sequence. A spatial head further adds a local correction to the spectral prediction, while the generative state, target, and loss remain in pixel space. On ImageNet-256, SpecSlot achieves a comparable final FID to a FLOPs-matched JiT control while converging faster. On ImageNet-512, it improves FID by 2.84 over the control with 3.9% fewer FLOPs, and comes within only 0.69 FID of JiT-B/16 at 38.2% lower cost. On text-to-image generation, SpecSlot surpasses JiT-B/8 on DPG-Bench by 1.06 at 40.6% lower forward cost.",
+   "url": "https://arxiv.org/abs/2610.40647",
+   "pdf_url": "https://arxiv.org/pdf/2610.40647",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.LG",
+    "cs.NE"
+   ],
+   "categories": [
+    "llms",
+    "generative-ai"
+   ],
+   "source": "arXiv + HuggingFace",
+   "hf_upvotes": 24,
+   "score": 34,
+   "badges": [
+    "Trending on HF"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
    "first_seen": "2026-11-01"
   },
   {
@@ -224,48 +269,6 @@
    "score": 33,
    "badges": [
     "Trending on HF"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
-   "id": "2610.37161",
-   "title": "WorkFactory: Turning Professional Intents into Executable Work for Scalable Agent Training",
-   "authors": [
-    "Ziyang Zeng",
-    "Tingyang Chen",
-    "Jia Deng",
-    "Qiyao Wang",
-    "Shuo Tang",
-    "Yike Yang",
-    "Tao Ren",
-    "Wayne Xin Zhao",
-    "Feng Chang",
-    "Jujie He",
-    "Chuan Hao",
-    "Ran Tao",
-    "Bryan Dai"
-   ],
-   "abstract": "Scaling supervised training for working agents requires diverse professional tasks that yield reliable expert demonstrations. However, missing or inconsistent task information can obstruct teacher execution and weaken the resulting supervision. We propose WorkFactory, a scalable framework for constructing coherent and executable professional tasks. Starting from professional intents, information-level planning builds an information support graph to guide task instantiation, explicitly representing the dependencies and locations of information required for the intended outputs. Probe executions then identify support failures and guide repairs while preserving the intended work. We construct 112,686 tasks spanning 612 occupations and use the collected teacher trajectories to fine-tune Qwen models at 4B, 27B, and 35B-A3B scales, yielding the WorkPilot family. All three models improve over their respective base models across four professional-work benchmarks, with WorkPilot-35B-A3B improving from 879 to 1565 Elo on GDPval-AA v2.1. Scaling analyses reveal model-dependent diminishing returns, with execution length first increasing and then decreasing. Controlled component analyses show that planning and repair reduce probe-diagnosed task environment defects and improve downstream performance. The data and models are available at https://github.com/IQuestLab/WorkFactory.",
-   "url": "https://arxiv.org/abs/2610.37161",
-   "pdf_url": "https://arxiv.org/pdf/2610.37161",
-   "submitted": "2026-10-26",
-   "arxiv_categories": [
-    "cs.AI"
-   ],
-   "categories": [
-    "reasoning-agents"
-   ],
-   "source": "HuggingFace",
-   "hf_upvotes": 36,
-   "score": 33,
-   "badges": [
-    "Trending on HF",
-    "Novel Method"
    ],
    "featured": false,
    "slot": null,
