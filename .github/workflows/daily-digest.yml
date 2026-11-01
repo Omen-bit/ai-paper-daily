@@ -53,6 +53,11 @@ jobs:
         run: python src/supabase_sync.py
 
       - name: Build the website
+        env:
+          # Optional repository variables (Settings > Secrets and variables > Actions > Variables)
+          SITE_URL: ${{ vars.SITE_URL }}
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+          BUTTONDOWN_USER: ${{ vars.BUTTONDOWN_USER }}
         run: python src/site_builder.py
 
       - name: Commit the day's data
