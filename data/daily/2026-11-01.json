@@ -1,122 +1,119 @@
 {
  "schema_version": 1,
  "date": "2026-11-01",
- "generated_at": "2026-11-01T06:46:29.845668+00:00",
+ "generated_at": "2026-11-01T07:41:29.922695+00:00",
  "featured": [
-  "2610.40614",
-  "2610.40647"
+  "2610.36671",
+  "2610.39302"
  ],
- "scanned": 738,
+ "scanned": 721,
  "papers": [
   {
-   "id": "2610.40614",
-   "title": "L3G-World: Real-Time Infinite World Generation with Latent 3D Gaussian Memory",
+   "id": "2610.36671",
+   "title": "Look Only When Needed: Certificate-Guided Visual Routing for Efficient Diffusion VLMs",
    "authors": [
-    "Jinhyeok Choi",
-    "JoungBin Lee",
-    "Jongmin Lee",
-    "Minkyeong Jeon",
-    "Jiyoung Kim",
-    "Kaeun Han",
-    "Yoonjin Yoon",
-    "Seungryong Kim"
+    "Donghyeon Cho",
+    "Joowon Kim",
+    "Seungho Shin",
+    "Eunho Yang"
    ],
-   "abstract": "Interactive world models generate visual content conditioned on user actions, yet maintaining spatial consistency over long-horizon exploration in real time remains challenging. Existing approaches rely on either temporal context or explicit 3D memory, both of which scale poorly because memory grows with the length of the generated stream. Moreover, explicit 3D memories condition latent video generators by re-encoding RGB renderings, which precludes real-time generation. In this paper, we introduce a Latent 3D Gaussian Memory (L3G) that combines the efficiency of feed-forward reconstruction with a compact, rapidly renderable scene representation. Building on this memory, we propose L3G-World, in which a memory updater and a video diffusion transformer (DiT) alternate autoregressively to generate spatially consistent worlds. The memory updater spawns Gaussians in newly observed regions and refines existing ones, so that the memory grows with scene extent rather than stream length. Each Gaussian further stores a VAE latent feature, allowing the memory to be rendered directly into the DiT's latent space without VAE re-encoding. Experiments show that L3G-World achieves state-of-the-art generation quality and long-horizon spatial consistency, with up to $38.6\\times$ fewer 3D primitives, $3.2\\times$ faster memory updates, and $359\\times$ faster memory rendering relative to the most efficient prior 3D-memory baseline for each metric, enabling real-time world generation at 9 FPS.",
-   "url": "https://arxiv.org/abs/2610.40614",
-   "pdf_url": "https://arxiv.org/pdf/2610.40614",
-   "submitted": "2026-10-29",
+   "abstract": "Diffusion vision-language models (DVLMs) process their entire input at every denoising step. Since visual tokens make up 89-97% of this input on the benchmarks we study, most of the decoding computation is spent repeatedly processing the same image. Visual token pruning methods partially relieve this burden by removing part of the visual tokens, but they lose the removed information and still process the remaining image at every step. To measure how often the image is actually needed, we compare LLaDA-V's predictions with and without the image at every decoding step and find that removing the image changes a token being unmasked at only 22.8% of steps on average and at as few as 7.9%. We therefore propose LOWN, a decoding method that decides at every step whether to process the image and how many tokens to unmask. LOWN predicts the masked tokens without the image and processes the image only when this prediction disagrees with the last image-conditioned prediction. Agreement certifies the earlier prediction for reuse, and the number of certified tokens sets how many are unmasked in that step. We further observe that the need for the image differs across benchmarks, so LOWN's adaptive decision is needed rather than a fixed schedule. Without training or a tuned threshold, LOWN retains 99.6% of LLaDA-V's score on ten benchmarks at 35.3% of the decoding FLOPs on average. LOWN also generalizes across LLaDA-based DVLMs, composes orthogonally with visual token pruning, and runs under key-value caching for further efficiency gains. Code and project page are available at https://hyeon9698.github.io/LOWN/",
+   "url": "https://arxiv.org/abs/2610.36671",
+   "pdf_url": "https://arxiv.org/pdf/2610.36671",
+   "submitted": "2026-10-26",
    "arxiv_categories": [
-    "cs.CV"
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
    ],
    "categories": [
-    "generative-ai",
+    "multimodal",
+    "llms",
     "computer-vision"
    ],
-   "source": "arXiv + HuggingFace",
-   "hf_upvotes": 38,
-   "score": 39,
+   "source": "HuggingFace",
+   "hf_upvotes": 100,
+   "score": 44,
    "badges": [
     "Top Pick",
     "Trending on HF",
-    "Novel Method"
+    "Interdisciplinary"
    ],
    "featured": true,
    "slot": "pick",
    "summary": {
-    "text": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
+    "text": "Reduces compute cost for vision‑language diffusion models, enabling faster inference on limited hardware.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
-    "tldr": "L3G-World uses a latent 3D Gaussian memory to generate infinite, spatially consistent worlds in real time.",
-    "whats_new": "Introduces a compact latent 3D Gaussian memory that grows with scene extent and renders directly into diffusion latent space, avoiding re-encoding.",
-    "key_result": "Achieves real-time world generation at 9 FPS with up to 38.6× fewer 3D primitives, 3.2× faster updates, and 359× faster rendering versus prior baselines.",
-    "why_it_matters": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
-    "difficulty": "advanced",
-    "difficulty_reason": "Requires expertise in diffusion models, 3D Gaussian representations, and high-performance GPU implementation.",
-    "check_question": "How does the proposed memory grow compared to previous methods?",
-    "check_answer": "The memory grows with the scene extent rather than the length of the generated stream, unlike prior approaches that scale with stream length.",
+    "tldr": "LOWN skips image processing during diffusion decoding unless needed, cutting FLOPs while keeping performance.",
+    "whats_new": "Introduces certificate‑guided token unmasking that decides per step whether to use visual tokens, unlike prior static pruning methods.",
+    "key_result": "Retains 99.6% of LLaDA‑V's score on ten benchmarks while using only 35.3% of decoding FLOPs on average.",
+    "why_it_matters": "Reduces compute cost for vision‑language diffusion models, enabling faster inference on limited hardware.",
+    "difficulty": "intermediate",
+    "difficulty_reason": "Requires understanding of diffusion VLM decoding and integration of certificate logic",
+    "check_question": "How often does removing the image change an unmasked token during decoding according to the authors?",
+    "check_answer": "Only 22.8% of steps on average, and as few as 7.9% of steps, see a change when the image is removed.",
     "build_ideas": [
-     "Generate endless game levels that adapt to player movement in real time.",
-     "Create virtual walkthroughs of architectural designs that update instantly as users explore.",
-     "Develop an AI-driven film set that expands on demand during live production."
+     "Implement a real‑time image captioning service that uses LOWN to lower latency",
+     "Create a mobile app that generates visual stories with diffusion VLMs using LOWN for efficiency",
+     "Build a benchmark suite comparing static token pruning vs. LOWN on various VLM tasks"
     ]
    },
-   "code_url": "https://github.com/cvlab-kaist/L3G-World",
+   "code_url": "https://github.com/hyeon9698/LOWN",
    "first_seen": "2026-11-01"
   },
   {
-   "id": "2610.40647",
-   "title": "Read, Allocate, Route: Role-Coupled Tokenization for Pixel-Space Generative Transformers",
+   "id": "2610.39302",
+   "title": "Proving and Improving the Platonic Representation Hypothesis with JEPAs",
    "authors": [
-    "Jiongfan Yang",
-    "Weichen Fan",
-    "Haiwen Diao",
-    "Zhongang Cai",
-    "Ziwei Liu"
+    "Randall Balestriero",
+    "Yann LeCun"
    ],
-   "abstract": "Pixel-space generative Transformers typically use one token per image patch, so capturing finer detail requires more tokens and makes global attention increasingly expensive. We observe that finer detail does not necessarily require more global communication: low-frequency structure benefits from global exchange, while high-frequency detail can be modeled locally. Based on this insight, we introduce SpecSlot, a pixel-space rectified-flow Transformer that decouples output detail from the length of the global attention sequence. SpecSlot expands each spatial anchor into multiple slots, each assigned a disjoint band of DCT coefficients; this separates anchor density from spectral subdivision. Only the lowest-frequency slot from each anchor participates in global attention, while all slots interact locally. This allows the model to increase spectral detail without enlarging the global sequence. A spatial head further adds a local correction to the spectral prediction, while the generative state, target, and loss remain in pixel space. On ImageNet-256, SpecSlot achieves a comparable final FID to a FLOPs-matched JiT control while converging faster. On ImageNet-512, it improves FID by 2.84 over the control with 3.9% fewer FLOPs, and comes within only 0.69 FID of JiT-B/16 at 38.2% lower cost. On text-to-image generation, SpecSlot surpasses JiT-B/8 on DPG-Bench by 1.06 at 40.6% lower forward cost.",
-   "url": "https://arxiv.org/abs/2610.40647",
-   "pdf_url": "https://arxiv.org/pdf/2610.40647",
+   "abstract": "Whether models trained on different modalities converge to the same representation of the world is central to AI. The Platonic Representation Hypothesis (PRH) conjectures that they do as they scale, but without a proof it offers neither a guarantee nor a recipe. We turn the hypothesis into a theorem. First, we prove a \\emph{Platonic Representation Theorem}: Joint-Embedding Predictive Architectures (JEPAs) trained separately on any number of modalities learn the same representation up to one rotation whenever their positive pairs are two observations of one scene--\\emph{good views}--and their misalignment is bounded otherwise. Second, we show that next-token prediction is a JEPA with \\emph{bad views}, parts of a single document, which explains why language models align with vision only through scale. Third, we validate the theory from 145k captions to the texts of 940M web images, and uncover a scaling law of alignment that predicts unseen runs within seed noise. Good views need 42 times fewer training samples than next-token prediction on the same corpus to reach the same alignment, and a 109M-parameter text JEPA aligns with DINOv2 and CLIP's image encoders better than every language model we evaluated, up to 72B parameters, and than CLIP's text encoder: next-token prediction is a remarkably inefficient route to platonic representations. As a showcase, one rotation turns separately trained encoders into an image captioner (CIDEr .838 on COCO). Even that rotation needs no pair: on the latest pair-free benchmark, our text JEPA beats every zero-shot accuracy reported with language models up to 8B parameters, e.g., 64\\% against at most 56\\% top-5 on ImageNet-100. Positive views, and not scale alone, are thus the lever to build platonic representations.",
+   "url": "https://arxiv.org/abs/2610.39302",
+   "pdf_url": "https://arxiv.org/pdf/2610.39302",
    "submitted": "2026-10-29",
    "arxiv_categories": [
-    "cs.CV",
     "cs.AI",
-    "cs.LG",
-    "cs.NE"
+    "cs.CV",
+    "stat.ML"
    ],
    "categories": [
     "llms",
-    "generative-ai"
+    "alignment",
+    "ml-theory"
    ],
    "source": "arXiv + HuggingFace",
-   "hf_upvotes": 36,
-   "score": 34,
+   "hf_upvotes": 58,
+   "score": 38,
    "badges": [
     "Trending",
-    "Trending on HF"
+    "Trending on HF",
+    "Interdisciplinary"
    ],
    "featured": true,
    "slot": "trending",
    "summary": {
-    "text": "Builders can generate higher‑resolution images with less global attention cost, enabling faster and cheaper training.",
+    "text": "Builders can achieve strong multimodal alignment with far less data and compute by using joint‑embedding predictive training instead of language modeling.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
-    "tldr": "SpecSlot adds spectral slots to pixel Transformers, separating global attention from high‑frequency detail.",
-    "whats_new": "It introduces disjoint DCT‑coefficient slots per spatial anchor, letting only low‑frequency slots attend globally while all slots interact locally.",
-    "key_result": "On ImageNet‑512, SpecSlot improves FID by 2.84 over the control with 3.9% fewer FLOPs.",
-    "why_it_matters": "Builders can generate higher‑resolution images with less global attention cost, enabling faster and cheaper training.",
-    "difficulty": "advanced",
-    "difficulty_reason": "Requires implementing custom tokenization and modifying Transformer attention mechanisms.",
-    "check_question": "How does SpecSlot limit global attention to reduce cost while still increasing image detail?",
-    "check_answer": "Only the lowest‑frequency slot from each spatial anchor participates in global attention; higher‑frequency slots are processed locally, allowing more detail without lengthening the global sequence.",
+    "tldr": "JEPAs trained on good views learn a shared representation up to rotation, proving the Platonic Representation Hypothesis and outperforming next‑token prediction.",
+    "whats_new": "Provides a formal Platonic Representation Theorem for JEPAs and demonstrates that next‑token prediction is far less sample‑efficient than joint‑embedding with good views.",
+    "key_result": "Good views need 42 × fewer training samples than next‑token prediction to reach the same alignment, and a 109M‑parameter text JEPA outperforms larger language models and CLIP's text encoder.",
+    "why_it_matters": "Builders can achieve strong multimodal alignment with far less data and compute by using joint‑embedding predictive training instead of language modeling.",
+    "difficulty": "intermediate",
+    "difficulty_reason": "Requires training JEPA models and measuring alignment, moderate compute and familiarity with contrastive learning",
+    "check_question": "What kind of positive pairs (views) must JEPAs use to guarantee learning the same representation up to rotation?",
+    "check_answer": "They must be “good views,” i.e., two observations of the same scene; other pairs are allowed only if their misalignment is bounded.",
     "build_ideas": [
-     "Create a high‑resolution image synthesis service using SpecSlot for cheaper inference.",
-     "Implement a text‑to‑image generator that leverages SpecSlot to reduce compute on large models.",
-     "Develop a research toolkit to compare spectral slot tokenization against standard patch tokenization."
+     "Train a text‑only JEPA and rotate its encoder to create an image captioner without paired data",
+     "Use good‑view JEPA training to align audio and video embeddings for cross‑modal retrieval",
+     "Replace next‑token language model pre‑training with JEPA on web captions to build a low‑resource multimodal assistant"
     ]
    },
-   "code_url": "https://github.com/JiongfanYang/SpecSlot",
+   "code_url": "https://github.com/galilai-group/prh-proof",
    "first_seen": "2026-11-01"
   },
   {
@@ -223,7 +220,7 @@
     "other-ml"
    ],
    "source": "arXiv + HuggingFace",
-   "hf_upvotes": 20,
+   "hf_upvotes": 21,
    "score": 33,
    "badges": [
     "Trending on HF"
@@ -464,7 +461,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 20,
+   "hf_upvotes": 21,
    "score": 31,
    "badges": [
     "Trending on HF"
@@ -754,47 +751,6 @@
    "first_seen": "2026-11-01"
   },
   {
-   "id": "2610.38352",
-   "title": "WeVisCut: The Whole Editing Room in One Agent From Narration to Long-Form Video",
-   "authors": [
-    "Chenyu Mu",
-    "Wenming Weng",
-    "Qinrui Wang",
-    "Xingsong Ye",
-    "Hao Yu",
-    "Jun He",
-    "Chong Sun",
-    "Chen Li",
-    "Jing Lyu",
-    "Erkun Yang",
-    "Cheng Deng"
-   ],
-   "abstract": "Producing long-form videos from narration requires interdependent decisions that remain coherent across shots. Existing agentic editors often use multi-stage workflows driven by general models, leaving the quality-cost trade-off of compact, task-adapted policies unclear. We address this gap with WeVisCut, a long-form script-to-video system that connects tool execution with policy learning. Its agent harness maintains shared production state so that tool feedback informs subsequent decisions and repairs. Because finished videos do not expose these decisions, our four-stage data pipeline combines editing inversion with verified replay to turn recovered editing intent into executable supervision. Applied to 3,750 finished videos, this pipeline yields over 130K training examples. We use this supervision to train a single 9B policy that coordinates production and recovers from failures within the same harness. Moreover, we introduce a 100-task benchmark and five metrics assessing editing quality and delivery reliability. Under a shared tool environment, WeVisCut substantially outperforms its base model and achieves comparable performance to Claude Opus 5 while using nearly 33x fewer generated tokens per successful output minute. It also outperforms task-matched native editors on our proposed metrics.",
-   "url": "https://arxiv.org/abs/2610.38352",
-   "pdf_url": "https://arxiv.org/pdf/2610.38352",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.CV",
-    "cs.AI"
-   ],
-   "categories": [
-    "alignment",
-    "reasoning-agents"
-   ],
-   "source": "arXiv + HuggingFace",
-   "hf_upvotes": 18,
-   "score": 27,
-   "badges": [
-    "Trending on HF"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
    "id": "2610.23656",
    "title": "ABF-Bench: A Verifiable Benchmark for Agentic Blockchain Forensics",
    "authors": [
@@ -891,6 +847,47 @@
    "badges": [
     "Trending on HF",
     "Interdisciplinary"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.38352",
+   "title": "WeVisCut: The Whole Editing Room in One Agent From Narration to Long-Form Video",
+   "authors": [
+    "Chenyu Mu",
+    "Wenming Weng",
+    "Qinrui Wang",
+    "Xingsong Ye",
+    "Hao Yu",
+    "Jun He",
+    "Chong Sun",
+    "Chen Li",
+    "Jing Lyu",
+    "Erkun Yang",
+    "Cheng Deng"
+   ],
+   "abstract": "Producing long-form videos from narration requires interdependent decisions that remain coherent across shots. Existing agentic editors often use multi-stage workflows driven by general models, leaving the quality-cost trade-off of compact, task-adapted policies unclear. We address this gap with WeVisCut, a long-form script-to-video system that connects tool execution with policy learning. Its agent harness maintains shared production state so that tool feedback informs subsequent decisions and repairs. Because finished videos do not expose these decisions, our four-stage data pipeline combines editing inversion with verified replay to turn recovered editing intent into executable supervision. Applied to 3,750 finished videos, this pipeline yields over 130K training examples. We use this supervision to train a single 9B policy that coordinates production and recovers from failures within the same harness. Moreover, we introduce a 100-task benchmark and five metrics assessing editing quality and delivery reliability. Under a shared tool environment, WeVisCut substantially outperforms its base model and achieves comparable performance to Claude Opus 5 while using nearly 33x fewer generated tokens per successful output minute. It also outperforms task-matched native editors on our proposed metrics.",
+   "url": "https://arxiv.org/abs/2610.38352",
+   "pdf_url": "https://arxiv.org/pdf/2610.38352",
+   "submitted": "2026-10-27",
+   "arxiv_categories": [
+    "cs.CV",
+    "cs.AI"
+   ],
+   "categories": [
+    "alignment",
+    "reasoning-agents"
+   ],
+   "source": "HuggingFace",
+   "hf_upvotes": 18,
+   "score": 27,
+   "badges": [
+    "Trending on HF"
    ],
    "featured": false,
    "slot": null,
@@ -1683,46 +1680,6 @@
    "first_seen": "2026-11-01"
   },
   {
-   "id": "2610.38349",
-   "title": "Aligning Misaligned Benchmarks for Single-View Novel View Synthesis",
-   "authors": [
-    "Yang-Che Tseng",
-    "Erqun Dong",
-    "Jeong-gi Kwak",
-    "Gopal Sharma",
-    "Shakiba Kheradmand",
-    "Stephan Garbin",
-    "Hossam Isack",
-    "Kwang Moo Yi"
-   ],
-   "abstract": "While single-view novel view synthesis methods have been dramatically enhanced recently, how to quantify their performance has yet to be standardized. In this work, we demonstrate that an important factor lies in how each method's own reference frame is aligned with the so-called ground-truth pose. Existing methods often rely on test-time optimization of target poses for this alignment, which inherently is ill-posed due to the complexity of the optimization landscape of camera poses vs render accuracy, leading to methods being evaluated at an arbitrary local optimum. Some recognize this limitation and thus rely on 3D reconstructions of entire scenes using training and test views to align poses, which may be infeasible. In this work, instead, we propose to use traditional 2D-to-2D and 2D-to-3D image matching techniques to align 3D reconstructions. We also evaluate only within co-visible regions, between different views, which is the only place where a `correct' ground truth can be defined. Our evaluations show that with proper coordinate alignment, novel-view synthesis methods that use explicit 3D Gaussians achieve the state of the art, despite being previously reported in the literature to be outperformed by pure image-based 2D methods. We further provide a simple baseline that directly utilizes an off-the-shelf video generator and a feed-forward geometry estimator. Our simple baseline is already comparable to state-of-the-art methods specifically trained for novel-view synthesis, without any task-specific training.",
-   "url": "https://arxiv.org/abs/2610.38349",
-   "pdf_url": "https://arxiv.org/pdf/2610.38349",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.CV",
-    "cs.AI"
-   ],
-   "categories": [
-    "generative-ai",
-    "computer-vision",
-    "alignment"
-   ],
-   "source": "arXiv",
-   "hf_upvotes": 0,
-   "score": 20,
-   "badges": [
-    "Interdisciplinary",
-    "Novel Method"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
    "id": "2610.36420",
    "title": "SO-101 Bench: Accessible Spatial Manipulation",
    "authors": [
@@ -2429,47 +2386,6 @@
    "first_seen": "2026-11-01"
   },
   {
-   "id": "2610.38378",
-   "title": "Towards Reliable, Scalable, and Value-Aligned Generative Recommendation for Large-Scale Advertising",
-   "authors": [
-    "Yatong Xiao",
-    "Yibo Sheng",
-    "Lixiang Wang",
-    "Mingjie Sun",
-    "Yunhao Sha",
-    "Pengfei Zhang",
-    "Shengyu Wang",
-    "Peng Wang",
-    "Wenjin Wu",
-    "Peng Jiang"
-   ],
-   "abstract": "Generative recommendation (GR) reformulates item retrieval as autoregressive generation of discrete semantic identifiers (SIDs), offering a unified paradigm for personalized recommendation. GR4AD, as an industrial generative recommendation framework, has greatly improved advertising revenue while enabling efficient real-time serving in Kuaishou.However, continued deployment has exposed three limitations: deterministic SID assignment remains sensitive to semantic boundaries; conventional backbone scaling provides diminishing revenue gains under strict serving constraints; and sequence-level value optimization provides limited credit assignment to intermediate SID decisions, causing likelihood-based beam search to prematurely prune potentially high-value candidates. We present GR4AD-X, which addresses these limitations through reliable SID construction, serving-efficient capacity scaling, and unified value alignment. Specifically, GR4AD-X improves SID reliability through Multi-Path assignment. It expands model capacity along multiple complementary dimensions rather than relying solely on wider or deeper backbones, achieving a better effectiveness-efficiency trade-off under strict serving constraints. Finally, Unified Value-Guided Generation and Discrimination (UniVGD) aligns generation with commercial value through prefix-level reward optimization, value-guided beam pruning, and discriminative reranking within a unified model. Large-scale online A/B tests on the Kuaishou advertising platform demonstrate that GR4AD-X achieves a cumulative revenue improvement of 3.07% over the deployed GR4AD baseline while satisfying strict latency and throughput constraints.",
-   "url": "https://arxiv.org/abs/2610.38378",
-   "pdf_url": "https://arxiv.org/pdf/2610.38378",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.IR",
-    "cs.LG"
-   ],
-   "categories": [
-    "alignment",
-    "llms",
-    "ml-theory"
-   ],
-   "source": "arXiv",
-   "hf_upvotes": 0,
-   "score": 16,
-   "badges": [
-    "Interdisciplinary"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
    "id": "2610.40455",
    "title": "A Unified Benchmark for Aerial-Enhanced Autonomous Driving: The KITScenes Aerial Dataset",
    "authors": [
@@ -2628,43 +2544,6 @@
    "score": 15,
    "badges": [
     "Novel Method"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
-   "id": "2610.38357",
-   "title": "CSO: Refining Robotic Policies via Skill Distribution Alignment and Skill-Grained Optimization",
-   "authors": [
-    "Zhiyuan Xiang",
-    "Xiang Deng",
-    "Wanjie Tao",
-    "Xu Chen",
-    "Zhao Jielun",
-    "Weili Guan"
-   ],
-   "abstract": "Discretizing continuous actions into discrete skills using methods like VQ-VAE has emerged as a powerful paradigm for robotic manipulation. However, quantization errors yield a suboptimal distribution for the skill prior, degrading its performance. While reinforcement learning offers a path for refinement, its direct application faces unstable encoder updates and a granularity dilemma in importance sampling. To address these challenges, we introduce Cascaded Skills Optimization (CSO), a two-stage post-training framework. First, Rejection-Sampling Supervised Fine-tuning aligns the model's observation-to-skill mapping with the distribution of successful online trajectories via supervised fine-tuning. Second, with the observation encoder frozen, Skills Policy Optimization computes an independent, clipped importance ratio for each complete skill, enabling stable and efficient updates. With a lightweight QueST-style policy, CSO raises overall LIBERO success from 80.1% to 97.5%, improves performance on RoboTwin2.0, and achieves 61.0% success across five physical single-arm tasks. Additional comparisons with FAST, discrete BEAST, and fixed-buffer IQL further validate the effectiveness of our two-stage post-training strategy.",
-   "url": "https://arxiv.org/abs/2610.38357",
-   "pdf_url": "https://arxiv.org/pdf/2610.38357",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.RO",
-    "cs.LG"
-   ],
-   "categories": [
-    "efficient-ai",
-    "llms",
-    "generative-ai"
-   ],
-   "source": "arXiv",
-   "hf_upvotes": 0,
-   "score": 15,
-   "badges": [
-    "Interdisciplinary"
    ],
    "featured": false,
    "slot": null,
@@ -3376,44 +3255,6 @@
    "score": 14,
    "badges": [
     "Interdisciplinary",
-    "Novel Method"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
-   "id": "2610.38366",
-   "title": "TCC-RAG: Temporal Causal Chain-Guided RAG for Temporal Knowledge Graph Question Answering",
-   "authors": [
-    "Xinxun Zhang",
-    "Yuxiang Wang",
-    "Shanshan Feng",
-    "Jun Zhang",
-    "Tieyun Qian",
-    "Binhang Yuan",
-    "Kai Yin",
-    "Xiao Yan",
-    "Jiawei Jiang"
-   ],
-   "abstract": "Recent advances in large language models (LLMs) have spurred growing interest in temporal knowledge graph question answering (TKGQA). Most existing methods rely on semantic retrieval augmented generation (RAG), which suffers from fundamental limitations in complex temporal reasoning. On the one hand, semantic-based RAG methods struggle to capture the multi-hop causal knowledge required for complex temporal reasoning. On the other hand, these methods introduce excessive redundant knowledge, trapping LLMs in spurious reasoning chains that potentially result in erroneous answers. To address these problems, we propose a Temporal Causal Chain-guided RAG (TCC-RAG) to retrieve a concise yet sufficient set of causal knowledge to support complex temporal reasoning. Specifically, we reformulate the temporal knowledge graph into a multi-view causal cue graph, with causal cues inducing connections that explicitly encode temporal evolution and causal dynamics. Based on the causal cue graph, we construct a query-specific temporal causal chain to guide the retrieval process, enabling the model to focus on a concise set of causally relevant knowledge. Finally, we introduce a causal evidence filter to refine the retrieved knowledge, ensuring its causal consistency with the underlying temporal logic of the query. Experiments show that TCC-RAG achieves substantial performance gains of 10.72% and 8.40% on two TKGQA benchmarks, and delivers a remarkable 62.97% improvement for multi-step temporal reasoning.",
-   "url": "https://arxiv.org/abs/2610.38366",
-   "pdf_url": "https://arxiv.org/pdf/2610.38366",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.CL"
-   ],
-   "categories": [
-    "reasoning-agents",
-    "llms"
-   ],
-   "source": "arXiv",
-   "hf_upvotes": 0,
-   "score": 14,
-   "badges": [
     "Novel Method"
    ],
    "featured": false,
@@ -4603,81 +4444,6 @@
    "score": 13,
    "badges": [
     "Interdisciplinary",
-    "Novel Method"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
-   "id": "2610.38391",
-   "title": "SCOPE: Selective Critical-Step On-Policy Self-Distillation for Agentic Reinforcement Learning",
-   "authors": [
-    "Qirui Liu",
-    "Wei Cao",
-    "Yu Mi",
-    "Yichen Sun",
-    "Xuekun Zhang",
-    "Lei Liu",
-    "Yue Shen",
-    "Zhixuan Chu"
-   ],
-   "abstract": "Outcome-based reinforcement learning provides coarse supervision for long-horizon LLM agents: failed trajectories may contain correct steps, while successful trajectories can contain errors. Trajectory-level skills can also shift teacher preferences at unrelated steps, introducing off-target distillation signals. We introduce SCOPE, a framework for Selective Critical-Step On-Policy Self-Distillation. After a supervised warm-up, the policy analyzes its own trajectories, generates step-specific hindsight skills, and distills their guidance only at selected error steps. A bounded signed teacher-student coefficient stabilizes auxiliary updates while preserving positive reinforcement and negative correction. A success-relative pairwise length reward further encourages efficient task completion. Experiments on ALFWorld and WebShop demonstrate consistent improvements across multiple model backbones. With Qwen2.5-3B, SCOPE achieves 97.7% success on ALFWorld and 85.2% on WebShop, outperforming SEED by 5.9 and 6.3 percentage points, respectively. On unseen ALFWorld tasks, SCOPE reaches 89.6% success, improving over GRPO by 23.2 percentage points with 46.7% fewer interactions. Scaling to Qwen3-32B, SCOPE achieves 99.2% success on seen ALFWorld tasks and 94.0% on unseen tasks.",
-   "url": "https://arxiv.org/abs/2610.38391",
-   "pdf_url": "https://arxiv.org/pdf/2610.38391",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.AI"
-   ],
-   "categories": [
-    "reasoning-agents"
-   ],
-   "source": "arXiv",
-   "hf_upvotes": 0,
-   "score": 13,
-   "badges": [],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-01"
-  },
-  {
-   "id": "2610.38389",
-   "title": "Visually Irrelevant Hallucinations in Medical Vision-Language Models",
-   "authors": [
-    "Ke Zou",
-    "Nan Zhou",
-    "Tao Yang",
-    "Meng Liu",
-    "Linchao He",
-    "Zehui Liao",
-    "Ling Huang",
-    "Guangren Huang",
-    "Yidi Chen",
-    "Yi Zhang",
-    "Hu Chen",
-    "Huazhu Fu"
-   ],
-   "abstract": "Medical vision-language models (VLMs) show strong performance in radiology report generation (RRG) and medical visual question answering (Med-VQA), producing free-form clinical descriptions and answers from medical images. However, they may generate clinically meaningful statements that lack visual evidence or contradict image content. We refer to these errors as visually irrelevant hallucinations and investigate them at the phrase level. We propose CLEAR (Counterfactual Localized Evaluation of Alignment and Response), a model-agnostic post-hoc framework for phrase-level hallucination risk estimation. CLEAR decomposes generated responses into visually assessable clinical phrases. For each phrase, phrase-conditioned grounding identifies a candidate visual region, which is selectively perturbed by a localized counterfactual intervention. CLEAR characterizes the intervention using two complementary auditing cues: response cues, capturing semantic and clinically meaningful changes in the generated response, and alignment cues, measuring changes in image-phrase compatibility. These cues are normalized and jointly modeled to estimate phrase-level hallucination risk. Across four datasets spanning RRG and Med-VQA, CLEAR outperforms state-of-the-art hallucination detection baselines across multiple medical and general-purpose VLMs. On MIMIC-CXR, CLEAR improves AUPRC from 85.10% to 90.23%. Its effectiveness is further validated on a GT-derived controlled VIH benchmark. These results establish visually irrelevant hallucination as an important fine-grained reliability failure mode in medical VLMs and demonstrate the value of model-agnostic visual-support auditing for more trustworthy multimodal clinical generation.",
-   "url": "https://arxiv.org/abs/2610.38389",
-   "pdf_url": "https://arxiv.org/pdf/2610.38389",
-   "submitted": "2026-10-28",
-   "arxiv_categories": [
-    "cs.CV"
-   ],
-   "categories": [
-    "multimodal",
-    "computer-vision"
-   ],
-   "source": "arXiv",
-   "hf_upvotes": 0,
-   "score": 13,
-   "badges": [
     "Novel Method"
    ],
    "featured": false,
@@ -7478,6 +7244,218 @@
    "score": 11,
    "badges": [
     "Interdisciplinary"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.39399",
+   "title": "ACD-GS: Asymmetric Curvature-aware Densification for 3D Gaussian Splatting",
+   "authors": [
+    "Houqiang Zhong",
+    "Tianchi Zhu",
+    "Qiang Hu",
+    "Xiaoyun Zhang",
+    "Li Song",
+    "Wenjun Zhang"
+   ],
+   "abstract": "3D Gaussian Splatting (3DGS) has emerged as a powerful paradigm for real-time photorealistic novel view synthesis. However, its training-time densification remains largely heuristic, often resulting in redundant Gaussian proliferation and inaccurate geometric reconstruction. Existing methods predominantly rely on first-order screen-space gradients to trigger cloning and splitting, which fail to distinguish true geometric discontinuities from high-frequency textures or noisy residuals. To address this limitation, we propose ACD-GS, an Asymmetric Curvature-aware Densification framework for compact and geometry-aware 3D Gaussian optimization. Our key insight is that second-order depth responses provide a more reliable structural prior for density control, enabling asymmetric regulation of cloning and splitting to better capture geometric discontinuities. Building on this, we introduce a multi-view photometric consistency constraint to suppress transient single-view errors, together with a capacity-aware adaptive regulation strategy that balances densification and pruning during training. Unlike post-hoc compression or quantization-based approaches, ACD-GS directly prevents redundant Gaussian generation during training, yielding inherently compact representations. Extensive experiments demonstrate that our method reduces nearly 60% of Gaussian count and storage while maintaining competitive rendering fidelity, consistently outperforming existing methods across multiple datasets. Our code is available in https://waveviewer.github.io/ACD-GS/.",
+   "url": "https://arxiv.org/abs/2610.39399",
+   "pdf_url": "https://arxiv.org/pdf/2610.39399",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.CV"
+   ],
+   "categories": [
+    "generative-ai"
+   ],
+   "source": "arXiv",
+   "hf_upvotes": 0,
+   "score": 11,
+   "badges": [
+    "Novel Method"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.39306",
+   "title": "CAD-WAM: Anticipating Geometry for Text-to-CAD Generation",
+   "authors": [
+    "Zhengyang Li",
+    "Weijie Zheng",
+    "Yuxin Cui",
+    "Sijie Wang",
+    "Wenjie Feng",
+    "Qiyu Kang"
+   ],
+   "abstract": "Generating editable computer-aided design (CAD) models from text requires selecting operations that produce the intended changes to the geometry constructed so far. An incorrect operation can compromise subsequent steps, making reliable multi-step generation challenging. Existing methods based on large language models (LLMs) primarily learn to predict commands, without explicit supervision of the geometric states those commands should produce. Inspired by world-action models, we introduce CAD-WAM, which couples geometry-conditioned action generation with next-state prediction. We define complete modeling operations as actions in a CAD domain-specific language (DSL) and encode surface point clouds of intermediate solids into compact latent states using a pretrained variational autoencoder. An LLM backbone generates the next action from the target description and current geometric state, while an auxiliary head on the same backbone predicts the next state to provide geometric supervision during training. We construct step-wise training trajectories from parametric CAD models in the DeepCAD dataset, pairing each trajectory with an expert-level textual description. At inference, each generated action is executed by a CAD kernel, and the resulting solid is re-encoded to inform the next decision. On the DeepCAD test set, CAD-WAM outperforms the task-specific baselines in geometric accuracy and output validity, with larger gains on models requiring more operations, and produces more accurate geometry than general-purpose LLMs prompted with the same DSL. Ablations further show that next-state supervision reduces mean Chamfer distance by 13.2\\% relative to an otherwise identical model trained only to predict actions. Code is available at https://github.com/Lzy-1037/CAD-WAM.",
+   "url": "https://arxiv.org/abs/2610.39306",
+   "pdf_url": "https://arxiv.org/pdf/2610.39306",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.CV",
+    "cs.GR"
+   ],
+   "categories": [
+    "llms",
+    "generative-ai",
+    "computer-vision"
+   ],
+   "source": "arXiv",
+   "hf_upvotes": 0,
+   "score": 11,
+   "badges": [
+    "Interdisciplinary"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.39265",
+   "title": "DeCoRL: Decomposed Consistency Reinforcement Learning for Multi-Image Composition",
+   "authors": [
+    "Zhiqiang Wu",
+    "Shuang Sun",
+    "Jiale Zhang",
+    "Jing Li",
+    "Yibo Chen",
+    "Xu Tang",
+    "Yao Hu"
+   ],
+   "abstract": "Multi-image composition (MICo) is a critical yet challenging capability for large-scale image editing models, where consistency degrades rapidly as the number of reference images increases. While supervised fine-tuning (SFT) can equip models with basic MICo ability, it provides only implicit supervision on the composed image and often fails to learn reliable object-level correspondence across multiple references. We propose DeCoRL, a reinforcement-learning (RL) framework that improves MICo consistency by decomposing holistic MICo consistency into object-level consistency. DeCoRL first establishes instruction-relevant object correspondences across reference images and localizes the corresponding regions in the generated image. It then uses a VLM-based reward model trained on single-object consistency annotations to produce fine-grained, object-wise feedback, which is aggregated into a multi-object consistency reward to guide RL post-training. We further introduce DeCo-Bench, a benchmark covering compositions from 2 to 6 reference images. Experiments on DeCo-Bench and the public MICo-Bench demonstrate consistent improvements in MICo consistency.",
+   "url": "https://arxiv.org/abs/2610.39265",
+   "pdf_url": "https://arxiv.org/pdf/2610.39265",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.CV",
+    "cs.AI"
+   ],
+   "categories": [
+    "generative-ai",
+    "alignment",
+    "multimodal"
+   ],
+   "source": "arXiv",
+   "hf_upvotes": 0,
+   "score": 11,
+   "badges": [
+    "Interdisciplinary",
+    "Novel Method"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.39251",
+   "title": "Where to Learn and How Far to Roll Out: Efficient Adaptive Training for GUI Agents",
+   "authors": [
+    "Yuxiang Chai",
+    "Quyu Kong",
+    "Panrong Tong",
+    "Steven Hoi",
+    "Yue Wang"
+   ],
+   "abstract": "Trajectory-level GRPO is a common approach for training multi-step GUI agents, but repeatedly rolling out complete trajectories from the task root can be inefficient: task-level rewards provide coarse supervision over which intermediate decisions require improvement, while already-mastered prefixes are repeatedly re-executed before reaching difficult states. We introduce a two-stage adaptive training framework that jointly addresses where to learn and how far to roll out. We first construct reusable intermediate checkpoints from successful expert trajectories and select informative pivots using action disagreement, which measures uncertainty directly from sampled GUI actions. Stage I performs one-step RL at these pivots to improve uncertain local decisions. Stage II then progressively expands policy responsibility through adaptive Local, Suffix, and Root training according to task progress. Recoverable checkpoints enable repeated training from intermediate states without replaying the preceding trajectory. Across MobileGym and CUA-Gym-Hub, our method reduces environment interaction by 56-61% relative to Vanilla GRPO while improving task performance, demonstrating that jointly allocating training across states and rollout ranges can substantially improve GUI-agent RL efficiency.",
+   "url": "https://arxiv.org/abs/2610.39251",
+   "pdf_url": "https://arxiv.org/pdf/2610.39251",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.AI"
+   ],
+   "categories": [
+    "reasoning-agents"
+   ],
+   "source": "arXiv",
+   "hf_upvotes": 0,
+   "score": 11,
+   "badges": [],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.39237",
+   "title": "Grounding Multimodal Reasoning with Evidence-Ablated Negatives",
+   "authors": [
+    "Chenxi Liu",
+    "Tianyi Xiong",
+    "Yanshuo Chen",
+    "Heng Huang"
+   ],
+   "abstract": "Reinforcement learning with verifiable rewards (RLVR) has become a powerful tool for improving multimodal reasoning. However, standard outcome supervision suffers from credit assignment ambiguity, as a model may receive positive rewards by exploiting language priors or dataset shortcuts rather than grounding its reasoning in the requisite visual evidence. This makes high-quality negative responses critical, since effective negatives should remain plausible under the current policy while exposing the shortcut that should be suppressed. In this paper, we propose EVAN, a multimodal reinforcement learning framework utilizing EVidence-Ablated Negatives to train LMMs against their own language-prior failures. EVAN first identifies highly visually dependent examples using a scaled image information gain metric and preserves data diversity with a mixed-ranking strategy. It then constructs evidence-ablated images by masking the most discriminative image patches, eliciting plausible but visually ungrounded responses from the current policy. During policy optimization, these negative responses are incorporated as bounded auxiliary signals under the clean image, penalizing shortcut learning while maintaining RL stability. Experiments across challenging multimodal reasoning benchmarks demonstrate that EVAN mitigates modality imbalance and improves over strong RLVR baselines. Our code is available at https://github.com/DawnLIU35/EVAN.git.",
+   "url": "https://arxiv.org/abs/2610.39237",
+   "pdf_url": "https://arxiv.org/pdf/2610.39237",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.CL"
+   ],
+   "categories": [
+    "reasoning-agents",
+    "multimodal"
+   ],
+   "source": "arXiv",
+   "hf_upvotes": 0,
+   "score": 11,
+   "badges": [
+    "Novel Method"
+   ],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-01"
+  },
+  {
+   "id": "2610.39175",
+   "title": "PRISM: Personalized Item Representations in User History",
+   "authors": [
+    "Renzhi Wu",
+    "Zikun Cui",
+    "Junjie Yang",
+    "Li Sheng",
+    "Yongjun Xie",
+    "Jerry Fu",
+    "Nipun Mathur",
+    "Sri Reddy",
+    "Hong Li"
+   ],
+   "abstract": "Sequential recommenders typically construct history inputs from item identifiers or content features using an embedding map shared across users. The same item therefore yields the same initial embedding representation, even when users have different relationships to the item. We propose personalized item representations in user history, where each item's embedding expresses its relationship to the user. Personalization becomes a property of the history inputs themselves, supplying richer evidence for later sequence modeling. We instantiate this idea with PRISM, which reuses upstream ranking computation to generate personalized item embeddings. An autoencoder jointly compresses all layer states from a user tower, a user--item tower, and same-request candidate mixing into one embedding per scored pair for downstream replay. Offline evaluation on Surface 1, a major recommendation surface at billion scale, reports an average downstream normalized entropy (NE) change of $-0.15\\%$, compared with $-0.07\\%$ for VISTA at similar history lengths. We further identify an empirical sequence-length scaling law: over history lengths of 26--240 events, NE gain follows a fitted power law with exponent 0.468, increasing from 0.06\\% to 0.17\\%. Therefore, personalized item representations in user history provide a new scaling dimension for improving recommendation quality.",
+   "url": "https://arxiv.org/abs/2610.39175",
+   "pdf_url": "https://arxiv.org/pdf/2610.39175",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.IR",
+    "cs.AI"
+   ],
+   "categories": [
+    "other-ml"
+   ],
+   "source": "arXiv",
+   "hf_upvotes": 0,
+   "score": 11,
+   "badges": [
+    "Novel Method"
    ],
    "featured": false,
    "slot": null,
