@@ -197,6 +197,15 @@ THEME_SCRIPT = ("<script>try{var t=localStorage.getItem('apd.theme')||(matchMedi
                 ".matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}</script>")
 
 
+# The Trends tab stays out of the menu until there is enough history to show
+# (build_site decides). The page itself is still built, so links to it work.
+SHOW_TRENDS = True
+
+
+def trends_ready(rows: list[dict]) -> bool:
+    return len(rows) >= 30 and len(trends.last_months(rows, 12)) >= 3
+
+
 def page(title: str, body: str, root: str = "", description: str = TAGLINE, active: str = "",
          edition: str = "", body_class: str = "") -> str:
     """Wrap body in the shared layout. root is the relative path to the site root."""
@@ -234,12 +243,11 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
       {nav("index.html", "Today", "today")}
       {nav("papers.html", '<span class="nav-long">All papers</span><span class="nav-short">Papers</span>', "papers")}
       {nav("scout.html", "Scout", "scout")}
-      {nav("trends.html", "Trends", "trends")}
+      {nav("trends.html", "Trends", "trends") if SHOW_TRENDS or active == "trends" else ""}
       {nav("saved.html", "Saved", "saved", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
     <div class="header-actions">
       <a class="cmdk" href="{root}papers.html" data-search-trigger>{icon("search", 15)}<span>Search papers or an idea</span><kbd>/</kbd></a>
-      <span class="streak" data-streak hidden title="Days in a row you read a paper"></span>
       <button class="icon-button" type="button" data-theme-toggle aria-label="Switch light or dark theme" data-tip="Switch theme">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
     </div>
   </div>
@@ -250,7 +258,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 <footer class="site-footer">
   <div class="wrap foot-in">
     <span>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.</span>
-    <span>Summaries are written by AI from the abstract. Check the paper.</span>
+    <span>Summaries are written by AI. Check the paper before you rely on them.</span>
   </div>
 </footer>
 <script src="{root}assets/app.js?v={ASSET_V}" defer></script>
@@ -360,7 +368,7 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
 # Slots whose cards ask "Seen this already?". The answers, and the clicks on
 # each card, show whether readers get something from us that Hugging Face
 # didn't already give them.
-MEASURED_SLOTS = ("pick", "trending", "runner-up", "most-read")
+MEASURED_SLOTS = ("pick",)
 
 
 def seen_check(rec: dict) -> str:
@@ -516,7 +524,6 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
     n_today = len(latest["papers"])
     # Newer editions read every arXiv paper but store only the best ("scanned" counts them all)
     n_scanned = max(latest.get("scanned") or 0, n_today)
-    minutes = sum(pick_minutes(r) for r in featured)
 
     cards = "\n".join(featured_card(r, n, "") for n, r in enumerate(featured, 1))
     more = ""
@@ -535,12 +542,6 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
     <h1>Papers worth<br>building on.</h1>
     <p class="lead">The best new AI paper each day, plus the one everyone is reading. Picked from everything new on arXiv and Hugging Face, and explained so you can build with it.</p>
   </div>
-  <div class="daily card" data-daily data-picks="{esc(' '.join(r['id'] for r in featured))}" data-minutes="{minutes}">
-    <div class="ring" data-ring style="--p:0"><span class="ring-n" data-ring-n>0/{len(featured)}</span></div>
-    <div class="daily-copy"><span class="label">Today’s reading</span><strong data-daily-title>{len(featured)} picks today.</strong>
-      <span data-daily-sub>About {minutes} minutes to read both.</span>
-      <span class="week" data-week aria-hidden="true"></span></div>
-  </div>
 </section>
 <section class="block" id="today">
   {section_head("Today’s picks", f"Chosen from {n_scanned:,} new papers")}
@@ -556,13 +557,9 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
 </section>
 <section class="split">
   <div class="split-main">{more}{most_read_list(most_read, papers)}</div>
-  <aside class="block side">
-    {section_head("Topic pulse", "Share of this week’s papers, against the 4 weeks before", '<a class="more" href="trends.html">All trends</a>')}
-    <div class="card pad">{trends.pulse_rows(trends.weekly_pulse(trend_rows), CATEGORY_NAMES)}</div>
-    <div class="block" data-continue hidden>
-      {section_head("Continue reading")}
-      <ul class="list" data-continue-list></ul>
-    </div>
+  <aside class="block side" data-continue hidden>
+    {section_head("Continue reading")}
+    <ul class="list" data-continue-list></ul>
   </aside>
 </section>
 {chart}"""
@@ -629,6 +626,9 @@ TRACK_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/track"
 
 # "Ask this paper" (supabase/functions/ask), same rules as search
 ASK_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/ask"
+# The breakdown function (supabase/functions/breakdown): the paper's own
+# contributions, results, limitations and conclusion, read from arXiv's HTML.
+BREAKDOWN_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/breakdown"
 ASK_SUGGESTIONS = ["What problem does it solve?", "What would I need to try it?", "How did they test it?"]
 
 # Project Scout (supabase/functions/scout), same rules as search
@@ -676,7 +676,7 @@ def build_scout_page() -> str:
 
 def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[str] | None = None) -> str:
     months = trends.last_months(rows, 12)
-    if len(rows) < 30 or len(months) < 3:
+    if not trends_ready(rows):
         body = """<section class="page-head"><h1>Trends</h1>
   <p>Trends need at least three months of papers. They appear here once the history has loaded.</p></section>"""
         return page("Trends", body, active="trends")
@@ -825,9 +825,26 @@ def reading_minutes(text: str) -> int:
     return max(1, round(len((text or "").split()) / 230))
 
 
+_TEX = [(r"\\times", "×"), (r"\\%", "%"), (r"\\approx", "≈"), (r"\\sim", "~"), (r"\\pm", "±"),
+        (r"\\(?:leq|le)\b", "≤"), (r"\\(?:geq|ge)\b", "≥"), (r"\\(?:mathrm|text|textbf|mathbf|mathcal)\{([^{}]*)\}", r"\1"),
+        (r"\\[,;! ]", " "), (r"[{}]", "")]
+
+
+def tidy_tex(text: str) -> str:
+    """Simple inline LaTeX in abstracts, made readable: $38.6\\times$ becomes 38.6×."""
+    def fix(m):
+        inner = m.group(1)
+        if not re.search(r"[\\^_{]", inner):
+            return m.group(0)  # not maths, e.g. prices like $5 and $6
+        for pat, repl in _TEX:
+            inner = re.sub(pat, repl, inner)
+        return inner.strip()
+    return re.sub(r"\$([^$]{1,60})\$", fix, text or "")
+
+
 def abstract_html(abstract: str) -> str:
     """Abstract with its first sentence set as a lede, so the eye has a way in."""
-    text = (abstract or "").strip()
+    text = tidy_tex((abstract or "").strip())
     if not text:
         return ""
     cut = text.find(". ")
@@ -852,8 +869,9 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
 
     def layer(key, tag, label, inner, first=False):
         toc.append(f'<a href="#{key}" data-toc="{key}">{label}</a>')
+        tag_html = f'<span class="layer-tag">{tag}</span>' if tag else ""
         layers.append(f'<section class="layer{" layer-first" if first else ""}" id="{key}" data-layer>'
-                      f'<span class="layer-tag">{tag}</span>{inner}</section>')
+                      f'{tag_html}{inner}</section>')
 
     short = notes.get("tldr") or summary
     if short:
@@ -870,8 +888,17 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         level_html = f'<p class="level-note">{level}{f"<span>{esc(reason)}</span>" if reason else ""}</p>' if level else ""
         layer("l-build", "Build", "Build with it", f"<h2>What you could build</h2><ol class=\"ideas\">{ideas}</ol>{level_html}")
     if abstract:
-        layer("l-abstract", f"{reading_minutes(abstract)} min", "Abstract",
+        layer("l-abstract", "", "Abstract",
               f'<div class="prose" data-prose><h2>Abstract<span>Select any sentence to highlight it or add a note</span></h2>{abstract_html(abstract)}</div>')
+        # Papers without curator notes also ask for the short AI summary, shown at the top
+        want_summary = "" if short else ' data-summary="1"'
+        layer("l-paper", "", "From the paper",
+              f'''<div class="bd" data-breakdown="{esc(rec['id'])}" data-url="{BREAKDOWN_URL}"{want_summary}>
+        <h2>From the full paper</h2>
+        <p class="bd-note" data-bd-note>What the paper says it contributes, its results tables, its limitations and its conclusion, copied from the paper itself.</p>
+        <button class="btn btn-outline" type="button" data-bd-load hidden>Read the full breakdown</button>
+        <div class="bd-out" data-bd-out aria-live="polite"></div>
+      </div>''')
     ask_panel = ask_fab = ""
     if abstract:
         # Beside the text while reading on wide screens; a sheet behind a button on smaller ones
@@ -906,23 +933,14 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         facts.append(("HF upvotes", str(rec["hf_upvotes"])))
     facts.append(("Authors", str(len(rec.get("authors", [])))))
     facts_html = "".join(f"<div><dt>{k}</dt><dd>{v if k == 'Top pick on' else esc(v)}</dd></div>" for k, v in facts)
-    code_btn = (f'<a class="btn btn-outline" href="{esc(rec["code_url"])}" rel="noopener">{icon("code", 15)} View the code</a>'
+    code_btn = (f'<a class="btn btn-outline" href="{esc(rec["code_url"])}" rel="noopener" data-out="code">{icon("code", 15)} Code</a>'
                 if rec.get("code_url") else "")
 
     done = ""
     if next_pick:
-        done = f"""<section class="done-card" data-done data-picks="{esc(' '.join(day_picks))}">
-    <div><span class="label">Edition progress</span><strong data-done-title>{len(day_picks)} picks in this edition.</strong><span data-done-sub>Read both to keep your streak going.</span></div>
-    <a class="next-card" href="{esc(next_pick['id'])}.html"><span class="label">Next pick</span>{esc(next_pick['title'])} →</a>
+        done = f"""<section class="done-card">
+    <a class="next-card" href="{esc(next_pick['id'])}.html"><span class="label">Next pick</span>{esc(next_pick['title'])}</a>
   </section>"""
-    pager = ""
-    if prev or nxt:
-        prev_html = (f'<a class="pager-link" href="{esc(prev["id"])}.html" rel="prev"><span>Previous paper</span>{esc(prev["title"])}</a>'
-                     if prev else "<span></span>")
-        next_html = (f'<a class="pager-link next" href="{esc(nxt["id"])}.html" rel="next"><span>Next paper</span>{esc(nxt["title"])}</a>'
-                     if nxt else "<span></span>")
-        pager = f'<nav class="pager" aria-label="More papers from the same day">{prev_html}{next_html}</nav>'
-
     related_html = ""
     if related:
         related_html = (f'<section class="read-next"><h2 class="label">Read next, same idea</h2>'
@@ -932,16 +950,10 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     topic = (rec.get("categories") or ["other-ml"])[0]
     minutes = pick_minutes(rec)
     title = esc(rec["title"])
-    body = f"""<div class="progress" aria-hidden="true"><span data-progress></span></div>
-<button class="btn btn-outline btn-sm focus-exit" type="button" data-focus-exit>Exit focus <kbd>Esc</kbd></button>
-<div class="read-grid">
+    body = f"""<div class="read-grid">
   <aside class="rail" aria-label="Reading tools">
     <a class="crumbs" href="../papers.html">{icon("back", 15)} All papers</a>
-    <div class="rail-box"><span class="label">Your progress</span><span class="pixbar" data-pixbar>{'<i></i>' * 8}</span><span class="rail-small" data-left>About {minutes} min to read</span></div>
     <nav class="toc" aria-label="Sections">{"".join(toc)}</nav>
-    <div class="rail-notes" data-notes><span class="label">Your notes</span>
-      <p class="rail-small" data-notes-empty>Select text in the abstract to highlight it or add a note. They stay in this browser.</p>
-      <ol class="note-list" data-notes-list></ol></div>
     <div class="rail-actions">
       <button class="btn btn-outline btn-sm" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>
       <details class="tools">
@@ -952,7 +964,9 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
             <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
           </details>
           <button class="btn btn-outline btn-sm" type="button" data-share>{icon("share", 15)}<span>Share</span></button>
-          <button class="btn btn-outline btn-sm" type="button" data-focus>Focus mode <kbd>F</kbd></button>
+          <div class="rail-notes" data-notes><span class="label">Your notes</span>
+            <p class="rail-small" data-notes-empty>Select text in the abstract to highlight it or add a note. They stay in this browser.</p>
+            <ol class="note-list" data-notes-list></ol></div>
           <div class="text-size" role="group" aria-label="Text size"><button type="button" data-size="-1" aria-label="Make text smaller">A</button><button type="button" data-size="1" aria-label="Make text larger">A</button></div>
         </div>
       </details>
@@ -962,15 +976,17 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     <p class="paper-kicker">{kicker}<span>arXiv <span class="mono">{esc(rec['id'])}</span></span></p>
     <h1>{title}</h1>
     <p class="byline">{esc(', '.join(rec.get('authors', [])))}</p>
-    <div class="paper-meta">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}<span class="mins">{minutes} min read</span>{f'<a class="code-link" href="{esc(rec["code_url"])}" rel="noopener">&lt;/&gt; Code</a>' if rec.get("code_url") else ""}</div>
+    <div class="paper-meta">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}<span class="mins">{minutes} min read</span></div>
+    <div class="paper-actions">
+      <a class="btn btn-primary" href="{esc(rec.get('pdf_url'))}" rel="noopener" data-out="pdf">Read the PDF {icon("external", 15)}</a>{code_btn}
+      <a class="btn btn-outline" href="{esc(rec.get('url'))}" rel="noopener" data-out="arxiv">arXiv</a>
+      <a class="btn btn-outline" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener" data-out="hf">Hugging Face</a>
+    </div>
+    <section class="layer layer-first bd-short" data-bd-short hidden><h2 class="label">In short</h2><p class="tldr" data-bd-short-text></p>
+      <p class="bd-ai">Written by AI from the paper. Every number in it was checked against the paper.</p></section>
     {"".join(layers)}
     <div class="source">
       <dl class="facts">{facts_html}</dl>
-      <div class="actions">
-        <a class="btn btn-primary" href="{esc(rec.get('url'))}" rel="noopener">Read on arXiv {icon("external", 15)}</a>{code_btn}
-        <a class="text-link" href="{esc(rec.get('pdf_url'))}" rel="noopener">PDF</a>
-        <a class="text-link" href="https://huggingface.co/papers/{esc(rec['id'])}" rel="noopener">Hugging Face</a>
-      </div>
     </div>
     <div class="feedback" data-feedback="{esc(rec['id'])}">
       <span data-feedback-q>Was this paper worth your time?</span>
@@ -979,7 +995,6 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     </div>
     {done}
     {related_html}
-    {pager}
   </article>
   <aside class="margin" aria-label="Ask this paper">
     {ask_panel}
@@ -1098,6 +1113,8 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
 
     archive = load_archive(export_dir)
     rows, source = trends.trend_rows(archive, papers)
+    global SHOW_TRENDS
+    SHOW_TRENDS = trends_ready(rows)
     _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows))
     _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers), set(papers)))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())

@@ -78,8 +78,10 @@ def test_paper_page_has_reader_tools_and_bibtex(tmp_path):
     save_day(papers, [papers[0]], "2026-10-31", data_dir=data_dir)
     build_site(data_dir, site_dir)
     html = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
-    for marker in ["data-save", "data-share", "data-copy-bibtex", "archivePrefix = {arXiv}", 'rel="next"']:
+    for marker in ["data-save", "data-share", "data-copy-bibtex", "archivePrefix = {arXiv}", 'data-out="pdf"']:
         assert marker in html, marker
+    for gone in ['rel="next"', "data-focus", "data-pixbar", "data-progress"]:
+        assert gone not in html, gone
     assert os.path.exists(os.path.join(site_dir, "saved.html"))
 
 
@@ -125,7 +127,7 @@ def test_paper_page_has_check_question_and_next_pick(tmp_path):
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
     assert "What is &lt;traded&gt; for speed?" in page
     assert "data-check-answer" in page
-    assert "data-done" in page and "paper/2610.2.html" in page.replace("../", "paper/")
+    assert "Next pick" in page and "paper/2610.2.html" in page.replace("../", "paper/")
 
 
 def test_trending_slot_is_labelled(tmp_path):
@@ -196,7 +198,7 @@ def test_most_read_takes_second_slot_once_readers_are_enough(tmp_path):
     build_site(data_dir, site_dir, export_dir)
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
     assert ">Most read<" in home and "25 readers this week" in home
-    assert 'data-picks="2610.1 2610.5"' in home
+    assert "data-daily" not in home and "Topic pulse" not in home
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
     assert 'data-feedback="2610.1"' in page and 'data-vote="useful"' in page
 
@@ -296,7 +298,7 @@ def test_featured_cards_ask_if_the_paper_was_seen_before():
     rec = {"id": "2610.00001", "title": "T", "abstract": "A.", "submitted": "2026-10-30", "slot": "pick"}
     html = featured_card(rec, 1, "")
     assert 'data-slot="pick"' in html and 'data-seen="2610.00001"' in html
-    assert seen_check(dict(rec, slot="most-read"))
+    assert seen_check(dict(rec, slot="most-read")) == ""  # asked on the top pick only
     assert seen_check(dict(rec, slot=None)) == ""  # editions from before slots existed
 
 
@@ -320,3 +322,32 @@ def test_cards_carry_summary_and_signals():
     assert c2["m"] == "First." and c2["u"] == 40 and "h" not in c2
     a = archive_compact({"id": "2601.2", "title": "T", "authors": [], "lead": "Lead.", "hf_upvotes": 7, "source": "HuggingFace"})
     assert (a["m"], a["u"], a["x"]) == ("Lead.", 7, 1)
+
+
+def test_paper_page_has_the_breakdown_and_asks_for_a_summary_only_without_notes(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    a = _paper("2610.1", 9, curator={"tldr": "Short take."})
+    b = _paper("2610.2", 3)
+    save_day([a, b], [a], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    with_notes = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    without = open(os.path.join(site_dir, "paper", "2610.2.html"), encoding="utf-8").read()
+    assert 'data-breakdown="2610.1"' in with_notes and "data-summary" not in with_notes
+    assert 'data-breakdown="2610.2"' in without and 'data-summary="1"' in without
+
+
+def test_trends_tab_waits_for_enough_history(tmp_path):
+    import site_builder
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1", 9)], [_paper("2610.1", 9)], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
+    assert 'href="trends.html"' not in home.split("</nav>")[0]
+    assert os.path.exists(os.path.join(site_dir, "trends.html"))
+    site_builder.SHOW_TRENDS = True
+
+
+def test_tidy_tex_makes_abstract_maths_readable():
+    from site_builder import tidy_tex
+    assert tidy_tex(r"up to $38.6\times$ fewer and $\geq 90\%$") == "up to 38.6× fewer and ≥ 90%"
+    assert tidy_tex("costs $5 and $6 per hour") == "costs $5 and $6 per hour"

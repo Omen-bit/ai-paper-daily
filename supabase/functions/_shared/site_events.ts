@@ -8,6 +8,8 @@ export const SITE_EVENTS: string[] = [
   ...SLOTS.flatMap((s) => [`seen_${s}_yes`, `seen_${s}_no`]),
   // Project Scout results: opened, saved, marked not relevant, "more like this"
   "scout_click", "scout_save", "scout_dismiss", "scout_more",
+  // Paper pages: the full breakdown opened, and clicks out to the paper elsewhere
+  "breakdown_load", "out_pdf", "out_arxiv", "out_hf", "out_code",
 ];
 
 export function isSiteEvent(event: string): boolean {

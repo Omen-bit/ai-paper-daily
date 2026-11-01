@@ -234,7 +234,7 @@ create or replace function public.bump_site(what text)
 returns void
 language plpgsql security definer set search_path = '' as $$
 begin
-  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more))$' then
+  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code))$' then
     raise exception 'unknown site event %', what;
   end if;
   insert into public.site_stats as s (day, event, n) values (current_date, what, 1)
@@ -308,6 +308,21 @@ begin
     limit least(n, 10);
 end $$;
 
+-- The full breakdown on each paper page: the paper's own contributions, results
+-- tables, limitations and conclusion, copied from arXiv's HTML version by plain
+-- code, plus at most one short AI summary. Made once per paper and kept.
+-- RLS on with no policies: only the functions (secret key) can read or write it.
+create table if not exists public.paper_breakdown (
+  paper_id    text primary key,
+  status      text not null check (status in ('ready', 'none')),  -- none: no usable web version
+  data        jsonb,
+  summary     text,
+  summary_at  timestamptz,
+  made_at     timestamptz not null default now()
+);
+alter table public.paper_breakdown enable row level security;
+create index if not exists paper_breakdown_summary_at on public.paper_breakdown (summary_at);
+
 -- Forget papers nobody has asked about lately. Papers with no readable full text are
 -- retried after a week, since arXiv sometimes adds the HTML version later.
 create or replace function public.prune_fulltext(days int default 30)
@@ -319,6 +334,8 @@ begin
   where coalesce(last_asked, fetched_at) < now() - make_interval(days => days)
      or (status = 'none' and fetched_at < now() - interval '7 days');
   get diagnostics gone = row_count;
+  -- Breakdowns are kept, except "no web version" ones, which are tried again after a week
+  delete from public.paper_breakdown where status = 'none' and made_at < now() - interval '7 days';
   return gone;
 end $$;
 revoke all on function public.match_sections(text, text, int) from public, anon, authenticated;

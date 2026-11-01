@@ -79,37 +79,11 @@
   }
   markRead();
 
-  // ---- Reading days and streak (from this browser's history only) ----
+  // ---- Day key, used to cache For you once a day ----
   function dayKey(ms) {
     var d = new Date(ms);
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
   }
-  function readDays() {
-    var set = {};
-    reads.forEach(function (h) { set[dayKey(h.at)] = true; });
-    return set;
-  }
-  function streakLength() {
-    var set = readDays(), n = 0, d = new Date();
-    if (!set[dayKey(d.getTime())]) d.setDate(d.getDate() - 1);  // today not read yet: count up to yesterday
-    while (set[dayKey(d.getTime())]) { n++; d.setDate(d.getDate() - 1); }
-    return n;
-  }
-  function readToday(ids) {
-    var today = dayKey(Date.now());
-    return ids.filter(function (id) {
-      return reads.some(function (h) { return h.id === id && dayKey(h.at) === today; });
-    });
-  }
-  function paintStreak() {
-    var el = document.querySelector("[data-streak]");
-    if (!el) return;
-    var n = streakLength();
-    el.textContent = n;
-    el.hidden = n < 1;
-    el.setAttribute("aria-label", n + "-day reading streak");
-  }
-
   // ---- Ticker: time until the next edition (01:30 UTC every day) ----
   var nextEl = document.querySelector("[data-next-edition]");
   if (nextEl) {
@@ -124,37 +98,10 @@
     setInterval(tick, 30000);
   }
 
-  // ---- Home: today's reading ring, week strip, read marks, quick save ----
-  var daily = document.querySelector("[data-daily]");
-  if (daily) {
-    var pickIds = (daily.getAttribute("data-picks") || "").split(" ").filter(Boolean);
-    var done = readToday(pickIds);
-    var total = pickIds.length || 1;
-    daily.querySelector("[data-ring]").style.setProperty("--p", Math.round(done.length / total * 100));
-    daily.querySelector("[data-ring-n]").textContent = done.length + "/" + pickIds.length;
-    var title = daily.querySelector("[data-daily-title]"), sub = daily.querySelector("[data-daily-sub]");
-    if (done.length >= pickIds.length && pickIds.length) {
-      title.textContent = "You're done for today.";
-      sub.textContent = "Both picks read. The next edition arrives tomorrow morning.";
-    } else if (done.length) {
-      title.textContent = (pickIds.length - done.length) === 1 ? "One pick left." : (pickIds.length - done.length) + " picks left.";
-      sub.textContent = "Finish today's edition to keep your streak.";
-    }
-    // Last 7 days, oldest first; today is outlined until something is read
-    var set = readDays(), cells = "";
-    for (var i = 6; i >= 0; i--) {
-      var d = new Date(); d.setDate(d.getDate() - i);
-      var on = set[dayKey(d.getTime())];
-      cells += '<i class="' + (on ? "on" : "") + (i === 0 && !on ? " today" : "") + '"></i>';
-    }
-    var streak = streakLength();
-    daily.querySelector("[data-week]").innerHTML = cells + "<em>" + (streak ? streak + "-day streak" : "Read a pick to start a streak") + "</em>";
-    Array.prototype.forEach.call(document.querySelectorAll(".pick[data-id]"), function (card) {
-      if (done.indexOf(card.getAttribute("data-id")) >= 0 || readIds[card.getAttribute("data-id")]) {
-        card.querySelector(".pick-read").hidden = false;
-      }
-    });
-  }
+  // ---- Home: read marks on the pick cards ----
+  Array.prototype.forEach.call(document.querySelectorAll(".pick[data-id]"), function (card) {
+    if (readIds[card.getAttribute("data-id")]) card.querySelector(".pick-read").hidden = false;
+  });
   document.addEventListener("click", function (e) {
     var btn = e.target.closest && e.target.closest("[data-quick-save]");
     if (!btn) return;
@@ -371,7 +318,7 @@
     var id = article.getAttribute("data-paper-id");
     var title = article.getAttribute("data-title");
 
-    // Remember the visit (powers the streak, Continue reading and, later, For you)
+    // Remember the visit (powers Continue reading and, later, For you)
     reads = reads.filter(function (h) { return h.id !== id; });
     reads.unshift({ id: id, t: title, at: Date.now(), c: (article.getAttribute("data-topics") || "").split(" ").filter(Boolean) });
     store("apd.history", reads.slice(0, 500));
@@ -425,19 +372,8 @@
       });
     });
 
-    // Focus mode: hides everything but the paper. F toggles, Esc leaves.
-    var setFocus = function (on) { document.body.classList.toggle("focus", on); };
-    document.querySelector("[data-focus]").addEventListener("click", function () { setFocus(true); });
-    document.querySelector("[data-focus-exit]").addEventListener("click", function () { setFocus(false); });
     document.addEventListener("keydown", function (e) {
-      var tag = (document.activeElement && document.activeElement.tagName) || "";
-      if (tag === "INPUT" || tag === "TEXTAREA" || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === "Escape") {
-        if (cite && cite.open) { cite.open = false; cite.querySelector("summary").focus(); return; }
-        setFocus(false);
-      } else if (e.key === "f" || e.key === "F") {
-        setFocus(!document.body.classList.contains("focus"));
-      }
+      if (e.key === "Escape" && cite && cite.open) { cite.open = false; cite.querySelector("summary").focus(); }
     });
 
     // Check yourself
@@ -449,23 +385,12 @@
       });
     }
 
-    // Progress: the bar under the header, the pixel bar, and the section list
-    var bar = document.querySelector("[data-progress]");
-    var pixels = document.querySelectorAll("[data-pixbar] i");
-    var left = document.querySelector("[data-left]");
+    // Section list: marks the section being read
     var layers = document.querySelectorAll("[data-layer]");
     var tocLinks = {};
     Array.prototype.forEach.call(document.querySelectorAll("[data-toc]"), function (a) { tocLinks[a.getAttribute("data-toc")] = a; });
-    var minutes = Number((left && left.textContent.match(/\d+/) || [1])[0]);
     var ticking = false;
     var update = function () {
-      var rect = article.getBoundingClientRect();
-      var total = rect.height - window.innerHeight + 120;
-      var done = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 1;
-      if (bar) bar.style.transform = "scaleX(" + done + ")";
-      var lit = Math.round(done * pixels.length);
-      Array.prototype.forEach.call(pixels, function (p, i) { p.classList.toggle("on", i < lit); });
-      if (left) left.textContent = done > 0.97 ? "Finished" : "About " + Math.max(1, Math.ceil(minutes * (1 - done))) + " min left";
       var current = null;
       Array.prototype.forEach.call(layers, function (s) {
         var r = s.getBoundingClientRect();
@@ -482,16 +407,6 @@
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
     }, { passive: true });
     update();
-
-    // Edition progress at the end of a top pick
-    var doneCard = document.querySelector("[data-done]");
-    if (doneCard) {
-      var ids = (doneCard.getAttribute("data-picks") || "").split(" ").filter(Boolean);
-      var got = readToday(ids).length;
-      var leftN = ids.length - got;
-      doneCard.querySelector("[data-done-title]").textContent = got + " of " + ids.length + " read." + (leftN === 1 ? " One left." : leftN > 1 ? " " + leftN + " left." : "");
-      doneCard.querySelector("[data-done-sub]").textContent = leftN ? "Finish this edition to keep your streak going." : "Edition finished. See you tomorrow morning.";
-    }
 
     // Highlights and notes, kept in this browser per paper
     var prose = document.querySelector("[data-highlightable]");
@@ -583,7 +498,87 @@
     }
     paintHighlights();
   }
-  paintStreak();
+
+  // ---- Paper page: the full breakdown, copied from the paper itself ----
+  var bd = document.querySelector("[data-breakdown]");
+  if (bd && window.fetch) {
+    var bdId = bd.getAttribute("data-breakdown");
+    var bdUrl = bd.getAttribute("data-url");
+    var bdWantSummary = bd.hasAttribute("data-summary");
+    var bdOut = bd.querySelector("[data-bd-out]");
+    var bdBtn = bd.querySelector("[data-bd-load]");
+    var bdNote = bd.querySelector("[data-bd-note]");
+    var bdShort = document.querySelector("[data-bd-short]");
+    var bdLayer = bd.closest("[data-layer]");
+    var bdCall = function (extra) {
+      var payload = { id: bdId, summary: bdWantSummary };
+      for (var k in extra) payload[k] = extra[k];
+      return fetch(bdUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "failed"); return d; }); });
+    };
+    var quoted = function (title, q) {
+      return '<h3>' + title + '</h3><blockquote class="bd-quote">' + esc(q.text) + '</blockquote>' +
+        '<p class="bd-src">From the section “' + esc(q.heading) + '”</p>';
+    };
+    var paintBreakdown = function (d) {
+      if (d.status === "none") {
+        bdBtn.hidden = true;
+        bdNote.textContent = "arXiv has no web version of this paper yet, so there’s no breakdown. The PDF has everything.";
+        return;
+      }
+      var b = d.breakdown || {}, html = "";
+      if (b.contributions && b.contributions.length) {
+        html += '<h3>What they contribute</h3><ul class="bd-list">' + b.contributions.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ul>";
+      }
+      if (b.tables && b.tables.length) {
+        html += "<h3>Key results</h3>" + b.tables.map(function (t) {
+          var rows = t.rows.map(function (r, i) {
+            var tag = i === 0 ? "th" : "td";
+            return "<tr>" + r.map(function (c) { return "<" + tag + ">" + esc(c) + "</" + tag + ">"; }).join("") + "</tr>";
+          }).join("");
+          return '<figure class="bd-table"><div class="bd-scroll" tabindex="0"><table>' + rows + "</table></div>" +
+            (t.caption ? "<figcaption>" + esc(t.caption) + "</figcaption>" : "") + "</figure>";
+        }).join("");
+      }
+      if (b.limitations) html += quoted("Limitations", b.limitations);
+      if (b.conclusion) html += quoted("Conclusion", b.conclusion);
+      if (b.links && b.links.length) {
+        html += '<h3>Links in the paper</h3><ul class="bd-links">' + b.links.map(function (u) {
+          return '<li><a href="' + esc(u) + '" rel="noopener" data-out="code">' + esc(u.replace(/^https?:\/\/(www\.)?/, "")) + "</a></li>";
+        }).join("") + "</ul>";
+      }
+      bdOut.innerHTML = html;
+      bdBtn.hidden = true;
+      bdNote.textContent = "Copied from the paper by our code, not written by AI. Tables may lose some formatting.";
+      if (d.summary && bdShort) {
+        bdShort.querySelector("[data-bd-short-text]").textContent = d.summary;
+        bdShort.hidden = false;
+      }
+    };
+    var bdMake = function () {
+      bdBtn.disabled = true;
+      bdBtn.textContent = "Reading the paper on arXiv…";
+      track("site", "breakdown_load");
+      bdCall({}).then(paintBreakdown).catch(function (e) {
+        bdBtn.disabled = false;
+        bdBtn.textContent = "Try again";
+        bdNote.textContent = e.message && e.message !== "failed" ? e.message : "Couldn’t read the paper right now. Try again in a minute.";
+      });
+    };
+    bdBtn.addEventListener("click", bdMake);
+    bdCall({ peek: true }).then(function (d) {
+      if (d.status === "missing") { bdBtn.hidden = false; return; }
+      paintBreakdown(d);
+      // Saved before anyone asked for a summary: make it now (once per paper, capped per day)
+      if (d.status === "ready" && d.summaryLater && bdWantSummary) bdCall({}).then(function (x) { if (x.summary) paintBreakdown(x); }).catch(function () {});
+    }).catch(function () {
+      if (bdLayer) bdLayer.hidden = true; // the service is down: leave the page as it was
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var out = e.target.closest && e.target.closest("[data-out]");
+    if (out && document.querySelector("[data-paper-id]")) track("site", "out_" + out.getAttribute("data-out"));
+  });
 
   // ---- Paper page: "Ask this paper" ----
   var ask = document.querySelector("[data-ask]");

@@ -187,7 +187,8 @@ def test_prepare_picks_asks_the_function_for_each_pick(monkeypatch, tmp_path):
     data = str(tmp_path)
     save_day([_paper("2610.00001"), _paper("2610.00002"), _paper("2610.00003")],
              [_paper("2610.00001"), _paper("2610.00002")], "2026-10-31", data_dir=data)
-    replies = [FakeResponse(200, {"id": "2610.00001", "status": "ready"}), FakeResponse(500)]
+    replies = [FakeResponse(200, {"id": "2610.00001", "status": "ready"}), FakeResponse(200, {"status": "ready"}),
+               FakeResponse(500), FakeResponse(200, {"status": "none"})]
     calls = []
 
     class Session:
@@ -197,8 +198,9 @@ def test_prepare_picks_asks_the_function_for_each_pick(monkeypatch, tmp_path):
 
     cfg = {"url": "https://x.supabase.co", "key": "k", "secret": "s3cret"}
     assert sync.prepare_picks(cfg, data_dir=data, session=Session()) == 1
-    assert [c[1] for c in calls] == [{"id": "2610.00001", "prepare": True}, {"id": "2610.00002", "prepare": True}]
-    assert all(c[0].endswith("/functions/v1/ask") and c[2]["x-sync-secret"] == "s3cret" for c in calls)
+    assert [c[1] for c in calls] == [{"id": "2610.00001", "prepare": True}] * 2 + [{"id": "2610.00002", "prepare": True}] * 2
+    assert [c[0].rsplit("/", 1)[1] for c in calls] == ["ask", "breakdown"] * 2
+    assert all(c[2]["x-sync-secret"] == "s3cret" for c in calls)
     assert sync.prepare_picks(cfg, data_dir=str(tmp_path / "empty"), session=Session()) == 0
 
 

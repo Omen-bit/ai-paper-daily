@@ -236,8 +236,9 @@ FULLTEXT_KEEP_DAYS = 30
 
 def prepare_picks(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
     """
-    Have the ask function read today's picks' full text from arXiv now, so the
-    first visitor to ask about them gets an answer straight away.
+    Have the functions read today's picks from arXiv now: ask saves the full text,
+    breakdown saves the paper-page breakdown. The first visitor then gets both
+    straight away. Returns how many picks have their full text ready for questions.
     """
     days = load_days(data_dir)
     if not days:
@@ -245,15 +246,16 @@ def prepare_picks(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
     ids = [f if isinstance(f, str) else (f or {}).get("id") for f in days[0].get("featured") or []]
     ready = 0
     for pid in filter(None, ids):
-        try:
-            resp = session.post(f"{cfg['url']}/functions/v1/ask", json={"id": pid, "prepare": True},
-                                headers={"x-sync-secret": cfg["secret"], "Content-Type": "application/json"},
-                                timeout=TIMEOUT)
-            status = (resp.json() or {}).get("status") if resp.status_code == 200 else f"HTTP {resp.status_code}"
-        except (requests.RequestException, ValueError) as exc:
-            status = f"failed ({str(exc)[:80]})"
-        print(f"[supabase] Full text for {pid}: {status}")
-        ready += status == "ready"
+        for fn, label in (("ask", "Full text"), ("breakdown", "Breakdown")):
+            try:
+                resp = session.post(f"{cfg['url']}/functions/v1/{fn}", json={"id": pid, "prepare": True},
+                                    headers={"x-sync-secret": cfg["secret"], "Content-Type": "application/json"},
+                                    timeout=TIMEOUT)
+                status = (resp.json() or {}).get("status") if resp.status_code == 200 else f"HTTP {resp.status_code}"
+            except (requests.RequestException, ValueError) as exc:
+                status = f"failed ({str(exc)[:80]})"
+            print(f"[supabase] {label} for {pid}: {status}")
+            ready += fn == "ask" and status == "ready"
     return ready
 
 

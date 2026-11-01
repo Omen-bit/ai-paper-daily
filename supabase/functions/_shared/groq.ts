@@ -24,10 +24,12 @@ export function requestBody(model: string, system: string, user: string, maxToke
   };
 }
 
-/** One JSON-mode Groq call, trying each model in turn. Returns the raw text or null. */
-export async function groq(system: string, user: string, maxTokens: number, temperature = 0.2, timeoutMs = 25000): Promise<string | null> {
+/** One JSON-mode Groq call, trying each model in turn. Returns the raw text or null.
+ * Pass models to try a cheaper one first for simple jobs. */
+export async function groq(system: string, user: string, maxTokens: number, temperature = 0.2, timeoutMs = 25000,
+                           models: string[] = MODELS): Promise<string | null> {
   if (!GROQ_KEY) return null;
-  for (const model of MODELS) {
+  for (const model of models) {
     try {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",

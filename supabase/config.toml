@@ -19,3 +19,6 @@ verify_jwt = false
 
 [functions.track]
 verify_jwt = false
+
+[functions.breakdown]
+verify_jwt = false
