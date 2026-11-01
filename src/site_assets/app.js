@@ -1213,24 +1213,37 @@
     }
   }
 
-  // ---- All papers: search, filter and sort over data/papers.json ----
+  // ---- All papers: cards, quick views and search over data/papers.json ----
+  // Short keys are documented in compact() in site_builder.py.
   var results = document.getElementById("results");
   if (!results) return;
 
-  var PAGE = 50;
+  var PAGE = 36;
   var q = document.getElementById("q");
   var cat = document.getElementById("cat");
-  var sort = document.getElementById("sort");
-  var feat = document.getElementById("feat");
   var meaning = document.getElementById("meaning");
+  var chips = Array.prototype.slice.call(document.querySelectorAll("[data-view]"));
   var SEARCH_URL = results.getAttribute("data-search-url");
   var onSite = {};          // ids that have a page on this site
   var searchToken = 0;      // drops answers to searches the visitor has already replaced
   var more = document.getElementById("more");
   var count = document.getElementById("count");
-  var all = [], matches = [], shown = 0;
+  var all = [], matches = [], shown = 0, newest = "";
+
+  var VIEWS = {
+    "": { label: "papers, newest first" },
+    week: { label: "most upvoted papers of the last 7 days",
+            keep: function (p) { return p.u > 0 && p.d >= weekAgo(); },
+            order: function (a, b) { return b.u - a.u; } },
+    nothf: { label: "papers not on Hugging Face yet", keep: function (p) { return p.h; } },
+    picks: { label: "of our daily picks", keep: function (p) { return p.f; } },
+    code: { label: "papers with code", keep: function (p) { return p.k; } },
+    easy: { label: "beginner-friendly papers", keep: function (p) { return p.l === "b"; } }
+  };
+  var LEVEL = { b: "Beginner", i: "Intermediate", a: "Advanced" };
 
   var params = new URLSearchParams(location.search);
+  var view = VIEWS[params.get("view") || ""] ? params.get("view") || "" : "";
   q.value = params.get("q") || "";
   cat.value = params.get("cat") || "";
   meaning.checked = params.get("m") === "1";
@@ -1238,63 +1251,82 @@
   var names = {};
   Array.prototype.forEach.call(cat.options, function (o) { if (o.value) names[o.value] = o.textContent; });
 
-  // "Oct 31", or "4 Mar 2025" for another year
   var thisYear = String(new Date().getFullYear());
-  function shortDate(iso) {
+  function shortDate(iso) {  // "Oct 31", or "4 Mar 2025" for another year
     var p = (iso || "").split("-");
     if (p.length !== 3) return iso;
     return p[0] === thisYear ? MONTHS[Number(p[1]) - 1] + " " + Number(p[2])
                              : Number(p[2]) + " " + MONTHS[Number(p[1]) - 1] + " " + p[0];
   }
+  // "This week" counts back from the newest paper, so a quiet weekend isn't empty
+  function weekAgo() {
+    var d = new Date((newest || new Date().toISOString().slice(0, 10)) + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() - 7);
+    return d.toISOString().slice(0, 10);
+  }
 
-  // Same markup as paper_row() in site_builder.py. Papers from the search
-  // archive have no page here, so they link to Hugging Face instead.
-  function row(p) {
+  function card(p) {
     var local = onSite[p.i];
     var href = local ? "paper/" + esc(p.i) + ".html" : "https://huggingface.co/papers/" + esc(p.i);
-    var authors = p.a.join(", ") + (p.n > p.a.length ? " + " + (p.n - p.a.length) + " more" : "");
-    var badges = (p.f === 2 ? '<span class="badge badge-hot">Trending</span>' : p.f ? '<span class="badge badge-pick">Top pick</span>' : "") + p.c.map(function (c) {
-      return '<a class="badge topic t-' + esc(c) + '" href="papers.html?cat=' + esc(c) + '">' + esc(names[c] || c) + "</a>";
-    }).join("");
-    return '<li class="row' + (readIds[p.i] ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
-      '<span class="row-date">' + esc(shortDate(p.d)) + "</span>" +
-      '<span class="row-title"><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></span>" +
-      '<span class="row-authors">' + esc(authors) + (local ? "" : '<span class="sep"></span><span class="ext">Hugging Face ↗</span>') + "</span>" +
-      '<div class="badges">' + badges + "</div></li>";
+    var topic = (p.c && p.c[0]) || "other-ml";
+    var isSaved = saved.some(function (s) { return s.id === p.i; });
+    var sig = "";
+    if (p.f === 1) sig += '<span class="sig sig-pick">★ Our pick</span>';
+    if (p.f === 2) sig += '<span class="sig sig-hot">Trending</span>';
+    if (p.u) sig += '<span class="sig" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
+    else if (p.h) sig += '<span class="sig sig-new" title="Not on the Hugging Face daily list">Not on HF yet</span>';
+    if (p.k) sig += '<span class="sig">' + "Code" + "</span>";
+    if (p.l) sig += '<span class="sig">' + LEVEL[p.l] + "</span>";
+    var first = (p.a && p.a[0]) || "";
+    var authors = esc(first) + (p.n > 1 ? " +" + (p.n - 1) : "");
+    return '<article class="pcard' + (readIds[p.i] ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
+      '<div class="pcard-top"><a class="topic t-' + esc(topic) + '" href="papers.html?cat=' + esc(topic) + '"><span class="dot"></span>' +
+        esc(names[topic] || topic) + '</a><span class="pcard-date">' + esc(shortDate(p.d)) + "</span>" +
+        (readIds[p.i] ? '<span class="pcard-read">Read</span>' : "") +
+        '<button class="quick-save" type="button" data-quick-save="' + esc(p.i) + '" data-title="' + esc(p.t) +
+        '" aria-pressed="' + isSaved + '" aria-label="Save this paper">' + (isSaved ? "✓" : "+") + "</button></div>" +
+      '<h3><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
+      (p.m ? '<p class="pcard-sum">' + esc(p.m) + "</p>" : "") +
+      '<div class="pcard-foot">' + sig + '<span class="pcard-auth">' + authors +
+        (local ? "" : ' · <span class="ext">HF ↗</span>') + "</span></div></article>";
   }
 
-  // A search function result in the short form row() expects
+  // A search function result in the short form card() expects
   function fromSearch(r) {
     var authors = r.authors || [];
+    var known = byId[r.id] || {};
     return { i: r.id, t: r.title, a: authors.slice(0, 3), n: authors.length,
              c: (r.categories && r.categories.length) ? r.categories : ["other-ml"],
-             d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: r.featured ? 1 : 0 };
+             d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: known.f || (r.featured ? 1 : 0),
+             m: known.m || "", u: known.u || r.hf_upvotes || 0, k: known.k, h: known.h, l: known.l, x: known.x };
   }
+  var byId = {};
 
   function render(reset) {
     if (reset) { results.innerHTML = ""; shown = 0; }
     results.removeAttribute("aria-busy");
     if (!matches.length) {
-      results.innerHTML = '<li class="empty"><strong>No papers match these filters.</strong>Try fewer words, or show every topic.' +
-        '<div class="empty-action"><button class="btn btn-outline btn-sm" type="button" data-clear>Clear all filters</button></div></li>';
+      results.innerHTML = '<div class="empty"><strong>No papers match.</strong>Try fewer words, another view, or every topic.' +
+        '<div class="empty-action"><button class="btn btn-outline btn-sm" type="button" data-clear>Clear all filters</button></div></div>';
     } else {
-      results.insertAdjacentHTML("beforeend", matches.slice(shown, shown + PAGE).map(row).join(""));
+      results.insertAdjacentHTML("beforeend", matches.slice(shown, shown + PAGE).map(card).join(""));
     }
     shown = Math.min(shown + PAGE, matches.length);
     more.hidden = shown >= matches.length;
     if (meaning.checked && q.value.trim().length >= 3) {
       count.textContent = matches.length + " papers closest in meaning, best match first";
     } else {
-      count.textContent = matches.length === all.length
-        ? all.length + " papers"
-        : matches.length + " of " + all.length + " papers";
+      var n = matches.length.toLocaleString();
+      count.textContent = view ? n + " " + VIEWS[view].label
+        : matches.length === all.length ? n + " papers, newest first" : n + " of " + all.length.toLocaleString() + " papers";
     }
   }
 
   function keepFiltered(list) {
+    var v = VIEWS[view];
     return list.filter(function (p) {
       if (cat.value && p.c.indexOf(cat.value) < 0) return false;
-      if (feat.checked && !p.f) return false;
+      if (v.keep && !v.keep(p)) return false;
       return true;
     });
   }
@@ -1302,7 +1334,7 @@
   function searchByMeaning() {
     var token = ++searchToken;
     results.setAttribute("aria-busy", "true");
-    results.innerHTML = new Array(6).join('<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>');
+    results.innerHTML = new Array(7).join('<div class="pcard skeleton" aria-hidden="true"><span></span><span></span><span></span></div>');
     count.textContent = "Searching by meaning…";
     fetch(SEARCH_URL, {
       method: "POST",
@@ -1324,8 +1356,12 @@
       });
   }
 
+  function paintChips() {
+    chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-view") === view ? "true" : "false"); });
+  }
+
   function apply() {
-    sort.disabled = meaning.checked;
+    paintChips();
     if (meaning.checked && q.value.trim().length >= 3) {
       searchByMeaning();
       syncUrl();
@@ -1333,14 +1369,12 @@
     }
     searchToken++;  // a word search replaces any meaning search still in flight
     var words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
-    matches = all.filter(function (p) {
-      if (cat.value && p.c.indexOf(cat.value) < 0) return false;
-      if (feat.checked && !p.f) return false;
+    matches = keepFiltered(all).filter(function (p) {
       if (!words.length) return true;
-      var hay = (p.t + " " + p.a.join(" ")).toLowerCase();
+      var hay = (p.t + " " + p.a.join(" ") + " " + (p.m || "")).toLowerCase();
       return words.every(function (w) { return hay.indexOf(w) >= 0; });
     });
-    if (sort.value === "score") matches.sort(function (a, b) { return b.s - a.s; });
+    if (VIEWS[view].order) matches.sort(VIEWS[view].order);
     render(true);
     syncUrl();
   }
@@ -1349,6 +1383,7 @@
     var u = new URLSearchParams();
     if (q.value) u.set("q", q.value);
     if (cat.value) u.set("cat", cat.value);
+    if (view) u.set("view", view);
     if (meaning.checked) u.set("m", "1");
     history.replaceState(null, "", u.toString() ? "?" + u : location.pathname);
   }
@@ -1358,11 +1393,14 @@
     clearTimeout(timer);
     timer = setTimeout(apply, meaning.checked ? 450 : 120);  // wait for a pause before asking the server
   });
-  [cat, sort, feat, meaning].forEach(function (el) { el.addEventListener("change", apply); });
+  [cat, meaning].forEach(function (el) { el.addEventListener("change", apply); });
+  chips.forEach(function (c) {
+    c.addEventListener("click", function () { view = c.getAttribute("data-view"); apply(); });
+  });
   more.addEventListener("click", function () { render(false); });
   results.addEventListener("click", function (e) {
     if (!e.target.closest || !e.target.closest("[data-clear]")) return;
-    q.value = ""; cat.value = ""; feat.checked = false; meaning.checked = false;
+    q.value = ""; cat.value = ""; view = ""; meaning.checked = false;
     apply();
     q.focus();
   });
@@ -1371,7 +1409,11 @@
     .then(function (r) { return r.json(); })
     .then(function (data) {
       all = data;
-      all.forEach(function (p) { if (!p.x) onSite[p.i] = true; });
+      all.forEach(function (p) {
+        byId[p.i] = p;
+        if (!p.x) onSite[p.i] = true;
+        if (p.d > newest) newest = p.d;
+      });
       apply();
     })
     .catch(function () {

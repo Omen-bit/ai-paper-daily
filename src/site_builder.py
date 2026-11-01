@@ -14,6 +14,7 @@ Pages:
 import hashlib
 import html
 import json
+import re
 import os
 import shutil
 import sys
@@ -429,14 +430,34 @@ def load_archive(export_dir: str = EXPORT_DIR) -> list[dict]:
 
 
 def archive_compact(row: dict) -> dict:
-    """A database paper with no page on this site, in the papers.json short form."""
+    """A database paper with no page on this site, in the papers.json short form (see compact)."""
     authors = row.get("authors") or []
-    return {
+    out = {
         "i": row["id"], "t": row.get("title") or row["id"], "a": authors[:3], "n": len(authors),
         "c": row.get("categories") or ["other-ml"],
         "d": (row.get("submitted") or row.get("first_seen") or "")[:10],
         "s": 0, "f": 0, "x": 1,
+        "m": row.get("lead") or "",
+        "u": int(row.get("hf_upvotes") or 0),
     }
+    if row.get("code_url"):
+        out["k"] = 1
+    if not out["u"] and row.get("source") == "arXiv":
+        out["h"] = 1
+    return out
+
+
+def lead_sentence(text: str, limit: int = 180) -> str:
+    """The first sentence of an abstract, cut at a word if it runs long. Stands in
+    for a one-line summary on cards until the paper has notes of its own."""
+    text = " ".join((text or "").split())
+    if not text:
+        return ""
+    m = re.search(r"(?<=[A-Za-z0-9)\]][.!?])\s+(?=[A-Z])", text)
+    first = text[:m.start()] if m else text
+    if len(first) > limit:
+        first = first[:limit - 1].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+    return first
 
 
 def most_read_list(most_read: list[dict], papers: dict, limit: int = 5) -> str:
@@ -554,7 +575,7 @@ SEARCH_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/search"
 # The "For you" function (supabase/functions/recommend), same rules as search
 RECOMMEND_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/recommend"
 
-SKELETON_ROWS = '<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>' * 6
+SKELETON_CARDS = "".join('<div class="pcard skeleton" aria-hidden="true"><span></span><span></span><span></span></div>' for _ in range(6))
 
 
 def papers_tabs(current: str, root: str = "") -> str:
@@ -563,26 +584,41 @@ def papers_tabs(current: str, root: str = "") -> str:
     return f'<nav class="tabs" aria-label="Papers views">{tab("papers.html", "All papers", "papers")}{tab("archive.html", "By day", "archive")}</nav>'
 
 
+# Quick views on the papers page: value, label
+PAPER_VIEWS = [
+    ("", "Latest"),
+    ("week", "Top this week"),
+    ("nothf", "Not on HF yet"),
+    ("picks", "Our picks"),
+    ("code", "Has code"),
+    ("easy", "Beginner-friendly"),
+]
+
+
 def build_papers_page() -> str:
     options = "".join(f'<option value="{esc(slug)}">{esc(name)}</option>'
                       for slug, name in CATEGORY_NAMES.items())
-    body = f"""<section class="page-head">
+    chips = "".join(f'<button class="chip" type="button" data-view="{v}" aria-pressed="{"true" if not v else "false"}">{esc(label)}</button>'
+                    for v, label in PAPER_VIEWS)
+    body = f"""<section class="page-head page-head-tight">
   {papers_tabs("papers")}
   <h1>All papers</h1>
-  <p>Every paper we have tracked, newest first. Search by title or author, or turn on Search by meaning to find papers about an idea in your own words.</p>
+  <p>Every AI paper we track, each with a one-line summary. Search by words, or describe an idea and search by meaning.</p>
 </section>
-<div class="toolbar">
-  <div class="field field-grow"><label class="field-label" for="q">Search</label>
-    <span class="input-wrap">{icon("search", 15)}<input class="input" id="q" type="search" placeholder="Title or author" autocomplete="off"></span></div>
-  <div class="field"><label class="field-label" for="cat">Topic</label>
-    <select class="select" id="cat"><option value="">All topics</option>{options}</select></div>
-  <div class="field"><label class="field-label" for="sort">Sort by</label>
-    <select class="select" id="sort"><option value="new">Newest first</option><option value="score">Highest score</option></select></div>
-  <label class="toggle"><input id="feat" type="checkbox"> Top picks only</label>
-  <label class="toggle toggle-meaning"><input id="meaning" type="checkbox"> Search by meaning</label>
+<div class="pbar">
+  <div class="pbar-search">
+    <label class="sr-only" for="q">Search papers</label>
+    <span class="input-wrap">{icon("search", 16)}<input class="input" id="q" type="search" placeholder="Search titles and authors, or describe an idea" autocomplete="off"></span>
+    <label class="toggle toggle-meaning"><input id="meaning" type="checkbox"> By meaning</label>
+  </div>
+  <div class="chips" role="group" aria-label="Show">
+    {chips}
+    <label class="sr-only" for="cat">Topic</label>
+    <select class="select chip-select" id="cat"><option value="">All topics</option>{options}</select>
+  </div>
 </div>
 <div class="result-meta"><span id="count">Loading papers…</span></div>
-<ul class="list" id="results" aria-busy="true" data-search-url="{SEARCH_URL}">{SKELETON_ROWS}</ul>
+<div class="cards" id="results" aria-busy="true" data-search-url="{SEARCH_URL}">{SKELETON_CARDS}</div>
 <div class="center"><button class="btn btn-outline" id="more" type="button" hidden>Show more</button></div>
 <noscript><p class="empty">Turn on JavaScript to search, or browse the <a href="archive.html">archive</a>.</p></noscript>"""
     return page("All papers", body, active="papers")
@@ -1011,8 +1047,14 @@ def related_papers(papers: dict, k: int = 4) -> dict[str, list[str]]:
 
 
 def compact(rec: dict) -> dict:
-    """The fields papers.html needs, with short keys to keep the file small."""
-    return {
+    """
+    The fields papers.html needs, with short keys to keep the file small:
+    i id, t title, a first authors, n author count, c topics, d date, s score,
+    f 1 our pick / 2 trending, m one-line summary, u HF upvotes, k has code,
+    h 1 when the paper is not on Hugging Face, l difficulty (b/i/a).
+    """
+    notes = rec.get("curator") or {}
+    out = {
         "i": rec["id"],
         "t": rec["title"],
         "a": rec.get("authors", [])[:3],
@@ -1021,7 +1063,16 @@ def compact(rec: dict) -> dict:
         "d": published(rec),
         "s": rec.get("score") or 0,
         "f": (2 if rec.get("slot") == "trending" else 1) if rec.get("featured") else 0,
+        "m": notes.get("tldr") or lead_sentence(rec.get("abstract") or ""),
+        "u": int(rec.get("hf_upvotes") or 0),
     }
+    if rec.get("code_url"):
+        out["k"] = 1
+    if not out["u"] and rec.get("source") == "arXiv":
+        out["h"] = 1
+    if notes.get("difficulty") in LEVELS:
+        out["l"] = notes["difficulty"][0]
+    return out
 
 
 # ---------------------------------------------------------------------------
