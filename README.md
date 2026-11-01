@@ -25,6 +25,8 @@
   <a href="#how-it-works">How it works</a>
   &nbsp;&middot;&nbsp;
   <a href="#run-it-yourself">Run it yourself</a>
+  &nbsp;&middot;&nbsp;
+  <a href="https://omen-bit.github.io/ai-paper-daily/feed.xml">RSS feed</a>
 </p>
 
 <br>
@@ -236,6 +238,8 @@ ai-paper-daily/
 │   ├── tech_trends.py          Technologies to watch
 │   ├── technologies.py         Technology catalogue
 │   ├── site_builder.py         Static site generator
+│   ├── discovery.py            RSS feed, sitemap and share images
+│   ├── share_fonts/            Fonts for the share images
 │   └── site_assets/            CSS, JavaScript and fonts
 ├── supabase/
 │   ├── schema.sql              Tables, vector search, rate limits

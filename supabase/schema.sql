@@ -220,7 +220,8 @@ grant execute on function public.most_read(int, int) to service_role;
 
 -- Anonymous site-wide counts that test whether the papers section is worth
 -- choosing over Hugging Face: clicks on our pick vs the trending card, the
--- "Seen this already?" answers, and new vs returning visitors.
+-- "Seen this already?" answers, new vs returning visitors, where each day's
+-- first visit came from (src_*), and sign-ups (subscribe_rss, subscribe_email).
 -- Totals per day only, no visitor data. Read them with site_report().
 create table if not exists public.site_stats (
   day   date not null default current_date,
@@ -234,7 +235,7 @@ create or replace function public.bump_site(what text)
 returns void
 language plpgsql security definer set search_path = '' as $$
 begin
-  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code))$' then
+  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code)|src_(direct|google|bing|duckduckgo|hn|reddit|x|linkedin|github|producthunt|discord|telegram|newsletter|rss|other)|subscribe_(rss|email))$' then
     raise exception 'unknown site event %', what;
   end if;
   insert into public.site_stats as s (day, event, n) values (current_date, what, 1)

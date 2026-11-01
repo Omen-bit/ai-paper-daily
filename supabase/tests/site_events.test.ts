@@ -5,10 +5,11 @@ import { readFileSync } from "node:fs";
 import { SITE_EVENTS, isSiteEvent } from "../functions/_shared/site_events.ts";
 
 test("accepts the events the page sends and nothing else", () => {
-  for (const e of ["visit_new", "visit_return_7d", "click_pick", "click_most_read", "seen_trending_no", "scout_dismiss", "breakdown_load", "out_pdf"]) {
+  for (const e of ["visit_new", "visit_return_7d", "click_pick", "click_most_read", "seen_trending_no", "scout_dismiss", "breakdown_load", "out_pdf",
+                   "src_hn", "src_direct", "src_other", "subscribe_rss", "subscribe_email"]) {
     assert.ok(isSiteEvent(e), e);
   }
-  for (const e of ["view", "click_", "seen_pick", "click_pick; drop table", ""]) {
+  for (const e of ["view", "click_", "seen_pick", "click_pick; drop table", "", "src_", "src_evil.com", "subscribe_"]) {
     assert.ok(!isSiteEvent(e), e);
   }
 });
@@ -18,5 +19,5 @@ test("every event passes the database check in schema.sql", () => {
   const pattern = sql.match(/what !~ '([^']+)'/)![1];
   const re = new RegExp(pattern);
   for (const e of SITE_EVENTS) assert.ok(re.test(e), e);
-  assert.equal(SITE_EVENTS.length, 24);
+  assert.equal(SITE_EVENTS.length, 41);
 });

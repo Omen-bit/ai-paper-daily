@@ -764,7 +764,52 @@
     store("apd.lastVisit", today);
     var gap = last ? (Date.parse(today) - Date.parse(last)) / 86400000 : -1;
     track("site", gap < 0 || isNaN(gap) ? "visit_new" : gap <= 7 ? "visit_return_7d" : "visit_return_old");
+    track("site", "src_" + visitSource());
   })();
+
+  // Where today's first visit came from: a ?ref= tag on our own links (rss,
+  // newsletter, a launch post), else the referring site's name. Only that
+  // one word is sent, never the address.
+  function visitSource() {
+    var known = ["google", "bing", "duckduckgo", "hn", "reddit", "x", "linkedin", "github",
+                 "producthunt", "discord", "telegram", "newsletter", "rss"];
+    var params = new URLSearchParams(location.search);
+    var tag = (params.get("ref") || params.get("utm_source") || "").toLowerCase();
+    if (tag) {
+      if (/buttondown|email|newsletter/.test(tag)) tag = "newsletter";
+      if (tag === "twitter") tag = "x";
+      if (tag === "hackernews" || tag === "ycombinator") tag = "hn";
+      return known.indexOf(tag) >= 0 ? tag : "other";
+    }
+    var host = "";
+    try { host = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : ""; } catch (e) { host = ""; }
+    if (!host || host === location.hostname) return "direct";
+    var rules = [
+      [/(^|\.)google\./, "google"], [/(^|\.)bing\.com$/, "bing"], [/(^|\.)duckduckgo\.com$/, "duckduckgo"],
+      [/^news\.ycombinator\.com$/, "hn"], [/(^|\.)reddit\.com$/, "reddit"],
+      [/^(t\.co|x\.com|twitter\.com|mobile\.twitter\.com)$/, "x"], [/(^|\.)(linkedin\.com|lnkd\.in)$/, "linkedin"],
+      [/(^|\.)github\.com$/, "github"], [/(^|\.)producthunt\.com$/, "producthunt"],
+      [/(^|\.)discord(app)?\.com$/, "discord"], [/^(t\.me|web\.telegram\.org)$/, "telegram"]
+    ];
+    for (var i = 0; i < rules.length; i++) if (rules[i][0].test(host)) return rules[i][1];
+    return "other";
+  }
+  // Drop the tag from the address bar, so a reader who shares the link doesn't pass it on
+  (function dropRefTag() {
+    if (!window.history || !history.replaceState || !/[?&](ref|utm_[a-z]+)=/.test(location.search)) return;
+    var params = new URLSearchParams(location.search);
+    ["ref", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(function (k) { params.delete(k); });
+    var q = params.toString();
+    history.replaceState(history.state, "", location.pathname + (q ? "?" + q : "") + location.hash);
+  })();
+
+  // Sign-ups: the RSS link and the email form, counted as totals like everything else
+  document.addEventListener("click", function (e) {
+    if (e.target.closest && e.target.closest('[data-subscribe="rss"]')) track("site", "subscribe_rss");
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-subscribe-form]"), function (form) {
+    form.addEventListener("submit", function () { track("site", "subscribe_email"); });
+  });
   document.addEventListener("click", function (e) {
     var card = e.target.closest && e.target.closest("article.pick[data-slot]");
     if (!card || !slotKey(card) || e.target.closest("[data-seen]")) return;

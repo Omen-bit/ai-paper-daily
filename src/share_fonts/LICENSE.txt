@@ -1,0 +1,4 @@
+TrueType copies of the fonts in site_assets/fonts, used only to draw the share
+images (og/*.png). They are not served to readers.
+- Geist and Geist Pixel (Square) by Vercel
+Licensed under the SIL Open Font License 1.1: https://openfontlicense.org

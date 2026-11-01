@@ -26,6 +26,7 @@ if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
 from classifier import CATEGORIES
+import discovery
 import tech_trends
 import trends
 
@@ -40,6 +41,16 @@ SITE_NAME = "AI Papers Daily"
 TAGLINE = ("We read every new AI paper on arXiv and Hugging Face, choose the ones you can "
            "build something with, and explain why they matter in plain language.")
 MORE_FROM_TODAY = 6  # non-featured papers shown on the home page
+
+# Where the site lives. Used for canonical links, share images, the RSS feed and
+# the sitemap. Override with the SITE_URL repository variable (for a custom domain).
+SITE_URL = (os.environ.get("SITE_URL") or "https://omen-bit.github.io/ai-paper-daily/").rstrip("/") + "/"
+# Google Search Console "HTML tag" code (only the content="..." part). Set it as the
+# GOOGLE_SITE_VERIFICATION repository variable; nothing is added while it is empty.
+GOOGLE_SITE_VERIFICATION = os.environ.get("GOOGLE_SITE_VERIFICATION", "").strip()
+# Buttondown username for the email sign-up box. Set it as the BUTTONDOWN_USER
+# repository variable; until then the box offers the RSS feed only.
+BUTTONDOWN_USER = re.sub(r"[^A-Za-z0-9_-]", "", os.environ.get("BUTTONDOWN_USER", ""))
 
 CATEGORY_NAMES = {slug: name for _, name, slug, _, _ in CATEGORIES}
 CATEGORY_NAMES["other-ml"] = "Other ML"
@@ -207,10 +218,27 @@ def trends_ready(rows: list[dict]) -> bool:
 
 
 def page(title: str, body: str, root: str = "", description: str = TAGLINE, active: str = "",
-         edition: str = "", body_class: str = "") -> str:
-    """Wrap body in the shared layout. root is the relative path to the site root."""
+         edition: str = "", body_class: str = "", path: str | None = None, image: str = "og/site.png",
+         og_type: str = "website") -> str:
+    """Wrap body in the shared layout. root is the relative path to the site root.
+    path is this page's address from the site root ("" for the home page); pages
+    without one (the reading list) are kept out of search engines."""
     edition = edition or EDITION
     full_title = f"{title} · {SITE_NAME}" if title != SITE_NAME else f"{SITE_NAME}: research papers worth building on"
+    if path is None:
+        seo = '<meta name="robots" content="noindex">'
+    else:
+        url = discovery.absolute(SITE_URL, path)
+        seo = (f'<link rel="canonical" href="{esc(url)}">\n'
+               f'<meta property="og:url" content="{esc(url)}">')
+    seo += (f'\n<meta property="og:type" content="{og_type}">'
+            f'\n<meta property="og:site_name" content="{SITE_NAME}">'
+            f'\n<meta property="og:image" content="{esc(discovery.absolute(SITE_URL, image))}">'
+            '\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">'
+            '\n<meta name="twitter:card" content="summary_large_image">'
+            f'\n<link rel="alternate" type="application/rss+xml" title="{SITE_NAME}: daily picks" href="{SITE_URL}feed.xml">')
+    if GOOGLE_SITE_VERIFICATION:
+        seo += f'\n<meta name="google-site-verification" content="{esc(GOOGLE_SITE_VERIFICATION)}">'
 
     def nav(href, label, key, extra=""):
         current = ' aria-current="page"' if key == active else ""
@@ -226,6 +254,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 <meta name="apd-track" content="{TRACK_URL}">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(description)}">
+{seo}
 <meta name="theme-color" content="#ff4f00">
 {THEME_SCRIPT}
 <link rel="preload" href="{root}assets/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
@@ -259,6 +288,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
   <div class="wrap foot-in">
     <span>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.</span>
     <span>Summaries are written by AI. Check the paper before you rely on them.</span>
+    <span><a href="{root}feed.xml" data-subscribe="rss">RSS feed</a>{f' · <a href="https://buttondown.com/{BUTTONDOWN_USER}" rel="noopener">Daily email</a>' if BUTTONDOWN_USER else ""}</span>
   </div>
 </footer>
 <script src="{root}assets/app.js?v={ASSET_V}" defer></script>
@@ -402,6 +432,26 @@ def home_row(rec: dict, n: int) -> str:
 </li>"""
 
 
+def subscribe_box(root: str = "") -> str:
+    """Ask readers to come back tomorrow: email (once Buttondown is set up) or RSS."""
+    rss = f'<a class="text-link" href="{root}feed.xml" data-subscribe="rss">{"Or follow by RSS" if BUTTONDOWN_USER else "Add the RSS feed"}</a>'
+    if BUTTONDOWN_USER:
+        action = f"https://buttondown.com/api/emails/embed-subscribe/{BUTTONDOWN_USER}"
+        form = f"""<form class="subscribe-form" action="{action}" method="post" target="_blank" data-subscribe-form>
+      <label class="sr-only" for="sub-email">Email address</label>
+      <input class="input" id="sub-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      <button class="btn btn-primary" type="submit">Subscribe</button>
+    </form>"""
+        lead = "One paper a day in your inbox, explained in plain language. Free, and you can leave any time."
+    else:
+        form = ""
+        lead = "Paste the feed link into Feedly, Inoreader or any feed reader to get each day’s picks."
+    return f"""<section class="subscribe" aria-labelledby="sub-title">
+  <div class="subscribe-copy"><h2 id="sub-title">Get tomorrow’s pick</h2><p>{lead}</p></div>
+  <div class="subscribe-act">{form}{rss}</div>
+</section>"""
+
+
 def section_head(title: str, sub: str = "", link: str = "") -> str:
     sub_html = f'<span class="sub">{sub}</span>' if sub else ""
     return f'<div class="block-head"><h2>{title}</h2>{sub_html}{link}</div>'
@@ -511,7 +561,7 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
     trend_rows = trend_rows if trend_rows is not None else trends.trend_rows([], papers)[0]
     if not days:
         body = '<section class="hero"><div><h1>No papers yet.</h1><p class="lead">The first edition arrives tomorrow morning.</p></div></section>'
-        return page(SITE_NAME, body, active="today")
+        return page(SITE_NAME, body, active="today", path="")
 
     latest = days[0]
     featured_ids = latest.get("featured", [])
@@ -547,6 +597,7 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   {section_head("Today’s picks", f"Chosen from {n_scanned:,} new papers")}
   <div class="picks">{cards}</div>
 </section>
+{subscribe_box()}
 <section class="block" data-foryou data-url="{RECOMMEND_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" hidden>
   {section_head("For you", "Recent papers close in meaning to what you’ve read. Worked out from this browser’s history only.")}
   <ol class="foryou" data-foryou-list aria-busy="true">{'<li class="foryou-item skeleton" aria-hidden="true"></li>' * 3}</ol>
@@ -563,7 +614,7 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   </aside>
 </section>
 {chart}"""
-    return page(SITE_NAME, body, active="today", edition=ticker(days))
+    return page(SITE_NAME, body, active="today", edition=ticker(days), path="")
 
 
 # The search function in Supabase (supabase/functions/search). Public by design:
@@ -618,7 +669,7 @@ def build_papers_page() -> str:
 <div class="cards" id="results" aria-busy="true" data-search-url="{SEARCH_URL}">{SKELETON_CARDS}</div>
 <div class="center"><button class="btn btn-outline" id="more" type="button" hidden>Show more</button></div>
 <noscript><p class="empty">Turn on JavaScript to search, or browse the <a href="archive.html">archive</a>.</p></noscript>"""
-    return page("All papers", body, active="papers")
+    return page("All papers", body, active="papers", path="papers.html")
 
 
 # Anonymous view counts and feedback (supabase/functions/track)
@@ -670,7 +721,7 @@ def build_scout_page() -> str:
   </section>
 </div>
 <noscript><p class="empty">Turn on JavaScript to use Project Scout.</p></noscript>"""
-    return page("Project Scout", body, active="scout", body_class="page-scout",
+    return page("Project Scout", body, active="scout", body_class="page-scout", path="scout.html",
                 description="Describe your project and get the AI papers most relevant to it, best first.")
 
 
@@ -679,7 +730,7 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
     if not trends_ready(rows):
         body = """<section class="page-head"><h1>Trends</h1>
   <p>Trends need at least three months of papers. They appear here once the history has loaded.</p></section>"""
-        return page("Trends", body, active="trends")
+        return page("Trends", body, active="trends", path="trends.html")
     names = CATEGORY_NAMES
     per = trends.topic_counts(rows, months)
     top = trends.top_topics(per, 5)
@@ -766,7 +817,7 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
   {section_head("The year in papers", "Papers per day. Stronger colour means a busier day.")}
   <div class="card pad">{trends.calendar(trends.daily_counts(rows), end)}</div>
 </section>"""
-    return page("Trends", body, active="trends",
+    return page("Trends", body, active="trends", path="trends.html",
                 description="Which AI technologies are growing in research right now: agents, reasoning, RAG and more, plus topic shares and code availability.")
 
 
@@ -786,7 +837,7 @@ def build_archive(days: list[dict], papers: dict) -> str:
   <p>{len(days)} days of papers, newest first. Each day lists its top picks and everything else we found.</p>
 </section>
 <ul class="list">{''.join(rows)}</ul>"""
-    return page("Archive", body, active="papers")
+    return page("Archive", body, active="papers", path="archive.html")
 
 
 def build_day(day: dict, papers: dict) -> str:
@@ -805,7 +856,7 @@ def build_day(day: dict, papers: dict) -> str:
 </section>
 <section class="block">{section_head("Picks that day")}<div class="picks">{cards}</div></section>
 {rest_html}"""
-    return page(nice_date(day["date"]), body, root="../", active="papers")
+    return page(nice_date(day["date"]), body, root="../", active="papers", path=f"day/{day['date']}.html")
 
 
 def bibtex(rec: dict) -> str:
@@ -861,7 +912,7 @@ def related_item(rec: dict, root: str) -> str:
 
 
 def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dict = None,
-                next_pick: dict = None, day_picks: list[str] = ()) -> str:
+                next_pick: dict = None, day_picks: list[str] = (), has_image: bool = False) -> str:
     notes = rec.get("curator") or {}
     summary = (rec.get("summary") or {}).get("text")
     abstract = rec.get("abstract") or ""
@@ -993,6 +1044,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       <button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, useful</button>
       <button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not for me</button>
     </div>
+    {subscribe_box("../")}
     {done}
     {related_html}
   </article>
@@ -1002,7 +1054,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
 </div>
 {ask_fab}"""
     desc = notes.get("tldr") or summary or abstract[:160]
-    return page(rec["title"], body, root="../", description=desc)
+    return page(rec["title"], body, root="../", description=desc, path=f"paper/{rec['id']}.html",
+                image=f"og/{rec['id']}.png" if has_image else "og/site.png", og_type="article")
 
 
 def build_saved_page() -> str:
@@ -1141,13 +1194,28 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
                 if len(ids) > 1:
                     next_pick[pid] = ids[(n + 1) % len(ids)]
 
+    # Preview images for links shared on X, LinkedIn, Reddit, WhatsApp and the rest
+    with_image = discovery.build_share_images(papers, category_name, os.path.join(site_dir, "og"))
+
     related = related_papers(papers)
     for rec in papers.values():
         prev_id, next_id = neighbours.get(rec["id"], (None, None))
         _write(os.path.join(site_dir, "paper", f"{rec['id']}.html"),
                build_paper(rec, [papers[i] for i in related.get(rec["id"], [])],
                            papers.get(prev_id), papers.get(next_id),
-                           papers.get(next_pick.get(rec["id"])), picks_of.get(rec["id"], [])))
+                           papers.get(next_pick.get(rec["id"])), picks_of.get(rec["id"], []),
+                           has_image=rec["id"] in with_image))
+
+    # RSS feed of the picks, and a sitemap of every public page for search engines
+    _write(os.path.join(site_dir, "feed.xml"), discovery.build_feed(papers, SITE_URL, SITE_NAME, TAGLINE))
+    newest = days[0]["date"] if days else ""
+    pages = [("", newest), ("papers.html", newest), ("scout.html", ""), ("archive.html", newest)]
+    if SHOW_TRENDS:
+        pages.append(("trends.html", newest))
+    pages += [(f"day/{d['date']}.html", d["date"]) for d in days]
+    pages += [(f"paper/{r['id']}.html", r.get("featured_on") or r.get("first_seen") or "")
+              for r in sorted(papers.values(), key=lambda r: r.get("first_seen") or "", reverse=True)]
+    _write(os.path.join(site_dir, "sitemap.xml"), discovery.build_sitemap(SITE_URL, pages))
 
     # Papers with a page here, plus the rest of the database's year (linking to Hugging Face)
     listing = [compact(r) for r in papers.values()]
