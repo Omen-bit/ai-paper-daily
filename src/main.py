@@ -49,7 +49,11 @@ def run() -> None:
     print(f"{'='*60}\n")
 
     # Papers featured in the last week are not picked again
-    recent_paper_ids = paper_store.recent_featured(7)
+    try:
+        recent_paper_ids = paper_store.recent_featured(7)
+    except Exception as exc:  # a damaged history file only means a pick could repeat
+        print(f"::warning::Could not read recent picks, repeats are possible today: {exc}")
+        recent_paper_ids = set()
 
     # --- Step 1: Fetch papers ---
     all_papers = fetch_all_papers()
@@ -79,8 +83,16 @@ def run() -> None:
         sys.exit(1)
 
     # --- Step 4: Curator notes, then "Why it matters" for any paper still missing it ---
-    selected = curate_papers(selected)
-    selected = summarize_papers(selected)
+    # Notes are a bonus: if Groq or the notes code fails outright, the edition still
+    # goes out with the picks and their abstracts rather than not at all
+    try:
+        selected = curate_papers(selected)
+    except Exception as exc:
+        print(f"::warning::Curator notes failed, publishing the picks without them: {exc}")
+    try:
+        selected = summarize_papers(selected)
+    except Exception as exc:
+        print(f"::warning::'Why it matters' summaries failed, publishing without them: {exc}")
 
     # --- Step 5: Save every candidate for the website ---
     paper_store.save_day(all_papers, selected, date_str)

@@ -1,36 +1,13 @@
 // Helpers shared by the public functions (search, and later For you and Project Scout).
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-// Only pages on these sites may call the public functions from a browser
-const ALLOWED_ORIGINS = [
-  "https://omen-bit.github.io",
-  "http://localhost:8000",
-  "http://127.0.0.1:8000",
-];
+import { ALLOWED_ORIGINS, corsHeaders, json } from "./respond.ts";
+export { corsHeaders, json, safely } from "./respond.ts";
 
 export const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   { auth: { persistSession: false } },
 );
-
-export function corsHeaders(req: Request): Record<string, string> {
-  const origin = req.headers.get("origin") ?? "";
-  return {
-    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "content-type",
-    "Access-Control-Max-Age": "86400",
-    "Vary": "Origin",
-  };
-}
-
-export function json(req: Request, body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders(req), "Content-Type": "application/json" },
-  });
-}
 
 /** Handles the CORS preflight and blocks other sites. Returns a response to send, or null to go on. */
 export function guard(req: Request): Response | null {

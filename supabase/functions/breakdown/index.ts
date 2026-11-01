@@ -7,7 +7,7 @@
 // The daily pipeline prepares today's picks in advance: {"id", "prepare": true} with
 // the x-sync-secret header.
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-import { db, guard, json, sameSecret, underLimit } from "../_shared/http.ts";
+import { db, guard, json, safely, sameSecret, underLimit } from "../_shared/http.ts";
 import { groq, hasGroq, MODELS } from "../_shared/groq.ts";
 import { htmlUrl } from "../_shared/fulltext.ts";
 import {
@@ -50,7 +50,7 @@ async function addSummary(id: string, row: Row): Promise<boolean> {
   return true;
 }
 
-Deno.serve(async (req) => {
+Deno.serve(safely("breakdown", async (req) => {
   const blocked = guard(req);
   if (blocked) return blocked;
   const body = await req.json().catch(() => ({}));
@@ -77,7 +77,11 @@ Deno.serve(async (req) => {
   if (!prepare && !(await underLimit(req, "breakdown", MAKES_PER_HOUR))) {
     return json(req, { error: "You've opened a lot of breakdowns in the last hour. Try again in a little while." }, 429);
   }
-  const { data: known } = await db.from("papers").select("id").eq("id", id).maybeSingle();
+  const { data: known, error: readError } = await db.from("papers").select("id").eq("id", id).maybeSingle();
+  if (readError) {
+    console.error("read paper", readError.message);
+    return json(req, { error: "The breakdown is unavailable for a moment. Please try again shortly.", retry: true }, 503);
+  }
   if (!known) return json(req, { error: "This paper isn't in our database yet. Try again tomorrow." }, 404);
 
   let res: Response;
@@ -100,4 +104,4 @@ Deno.serve(async (req) => {
     return reply(req, row, !done);
   }
   return reply(req, row);
-});
+}, "The breakdown is unavailable for a moment. Please try again shortly."));

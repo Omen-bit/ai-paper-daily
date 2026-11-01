@@ -9,7 +9,7 @@
 //   4. Groq scores each candidate's relevance (0-100) and writes why it fits
 //      (fallback: the fused order, marked as not checked)
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-import { db, guard, json, underLimit } from "../_shared/http.ts";
+import { db, guard, json, safely, underLimit } from "../_shared/http.ts";
 import { groq } from "../_shared/groq.ts";
 import {
   type Candidate, cleanDescription, coverageOf, descriptionProblem, fallbackRanking, fuseLists, type Match,
@@ -32,7 +32,7 @@ async function search(text: string, withKeywords: boolean): Promise<Match[]> {
   return (data ?? []) as Match[];
 }
 
-Deno.serve(async (req) => {
+Deno.serve(safely("scout", async (req) => {
   const blocked = guard(req);
   if (blocked) return blocked;
 
@@ -101,4 +101,4 @@ Deno.serve(async (req) => {
     console.error("scout failed", String(e));
     return json(req, { error: "Scout is unavailable right now. Try search by meaning on All papers." }, 500);
   }
-});
+}, "Scout is unavailable for a moment. Try again shortly, or use search by meaning on All papers."));

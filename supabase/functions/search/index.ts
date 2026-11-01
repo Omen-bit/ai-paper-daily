@@ -2,12 +2,12 @@
 // Turns the visitor's words into a vector with gte-small (the same model that
 // embedded the papers) and returns the closest papers.
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-import { db, guard, json, underLimit } from "../_shared/http.ts";
+import { db, guard, json, safely, underLimit } from "../_shared/http.ts";
 
 const model = new Supabase.ai.Session("gte-small");
 const SEARCHES_PER_HOUR = 120;
 
-Deno.serve(async (req) => {
+Deno.serve(safely("search", async (req) => {
   const blocked = guard(req);
   if (blocked) return blocked;
 
@@ -33,4 +33,4 @@ Deno.serve(async (req) => {
     return json(req, { error: "Search is unavailable right now. Keyword search still works." }, 500);
   }
   return json(req, { results: data ?? [] });
-});
+}, "Search by meaning is unavailable for a moment. Keyword search still works."));

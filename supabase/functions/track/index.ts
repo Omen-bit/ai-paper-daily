@@ -3,14 +3,14 @@
 // Stores totals per day only, never who sent them. The page sends a view once
 // per paper per browser, feedback once per paper, and a visit once per day.
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-import { db, guard, json, underLimit } from "../_shared/http.ts";
+import { db, guard, json, safely, underLimit } from "../_shared/http.ts";
 import { isSiteEvent } from "../_shared/site_events.ts";
 
 const EVENTS_PER_HOUR = 200;
 const ID = /^([0-9]{4}\.[0-9]{4,5}|scout)$/;
 const EVENTS = ["view", "useful", "not_useful"];
 
-Deno.serve(async (req) => {
+Deno.serve(safely("track", async (req) => {
   const blocked = guard(req);
   if (blocked) return blocked;
 
@@ -32,4 +32,4 @@ Deno.serve(async (req) => {
     return json(req, { ok: false }, 500);
   }
   return json(req, { ok: true });
-});
+}));

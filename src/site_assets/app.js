@@ -13,6 +13,24 @@
   function store(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* private mode: not remembered */ }
   }
+  // Calls to our server functions give up after a while, so a slow or stuck
+  // service never leaves a spinner running forever. The page then shows its
+  // usual "try again" message, and everything that doesn't need the server keeps working.
+  function callApi(url, options, ms) {
+    if (!window.AbortController) return fetch(url, options);
+    var ctl = new AbortController();
+    var timer = setTimeout(function () { ctl.abort(); }, ms);
+    options.signal = ctl.signal;
+    return fetch(url, options).then(function (r) { clearTimeout(timer); return r; },
+                                    function (e) { clearTimeout(timer); throw e; });
+  }
+  // An error worth showing as written: one our server sent in words. Anything else
+  // (a timeout, no connection, a broken reply) gets the caller's own friendly message.
+  function serverError(message) {
+    var e = new Error(message);
+    e.fromServer = true;
+    return e;
+  }
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -157,11 +175,11 @@
     var cached = load("apd.foryou", null);
     var idsReq = fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
     var recReq = cached && cached.key === fyKey ? Promise.resolve(cached.results) :
-      fetch(forYou.getAttribute("data-url"), {
+      callApi(forYou.getAttribute("data-url"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ids: fyIds, limit: 6, days: 30 })
-      }).then(function (r) { return r.ok ? r.json() : { results: [] }; })
+      }, 15000).then(function (r) { return r.ok ? r.json() : { results: [] }; })
         .then(function (d) {
           var results = d.results || [];
           store("apd.foryou", { key: fyKey, results: results });
@@ -244,11 +262,11 @@
   if (watchBox && watched.length && window.fetch) {
     var watchList = watchBox.querySelector("[data-watch-list]");
     var search = function (q, since) {
-      return fetch(watchBox.getAttribute("data-url"), {
+      return callApi(watchBox.getAttribute("data-url"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ q: q, limit: 10, since: since })
-      }).then(function (r) { return r.ok ? r.json() : { results: [] }; })
+      }, 20000).then(function (r) { return r.ok ? r.json() : { results: [] }; })
         .then(function (d) { return d.results || []; }).catch(function () { return []; });
     };
     var newFor = function (w) {
@@ -513,8 +531,13 @@
     var bdCall = function (extra) {
       var payload = { id: bdId, summary: bdWantSummary };
       for (var k in extra) payload[k] = extra[k];
-      return fetch(bdUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "failed"); return d; }); });
+      return callApi(bdUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }, 45000)
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (d) {
+            if (!r.ok || !d.status) throw serverError(d.error || "");
+            return d;
+          });
+        });
     };
     var quoted = function (title, q) {
       return '<h3>' + title + '</h3><blockquote class="bd-quote">' + esc(q.text) + '</blockquote>' +
@@ -562,7 +585,7 @@
       bdCall({}).then(paintBreakdown).catch(function (e) {
         bdBtn.disabled = false;
         bdBtn.textContent = "Try again";
-        bdNote.textContent = e.message && e.message !== "failed" ? e.message : "Couldn’t read the paper right now. Try again in a minute.";
+        bdNote.textContent = e.fromServer && e.message ? e.message : "Couldn’t read the paper right now. Try again in a minute.";
       });
     };
     bdBtn.addEventListener("click", bdMake);
@@ -636,19 +659,19 @@
       askLog.scrollTop = askLog.scrollHeight;
       askInput.value = "";
       askBtn.disabled = true;
-      fetch(ask.getAttribute("data-url"), {
+      callApi(ask.getAttribute("data-url"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: askPaper.getAttribute("data-paper-id"), question: question, previous: lastTurn })
-      }).then(function (r) {
+      }, 60000).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; });
       }).then(function (res) {
         clearTimeout(slow);
         var box = turn.querySelector(".ask-a");
         box.classList.remove("is-loading");
-        if (!res.ok) {
+        if (!res.ok || typeof res.data.answer !== "string") {
           box.classList.add("is-error");
-          box.textContent = res.data.error || "Couldn't answer that right now.";
+          box.textContent = res.data.error || "Couldn’t answer that right now. Try again in a minute.";
           return;
         }
         var d = res.data;
@@ -674,7 +697,8 @@
         var box = turn.querySelector(".ask-a");
         box.classList.remove("is-loading");
         box.classList.add("is-error");
-        box.textContent = "Couldn't reach the server. Check your connection and try again.";
+        box.textContent = navigator.onLine === false ? "You’re offline. Reconnect and ask again." :
+          "That took too long or the connection dropped. Please ask again.";
       }).then(function () { askBtn.disabled = false; });
     };
 
@@ -1296,14 +1320,15 @@
       goBtn.disabled = true;
       goBtn.textContent = "Finding papers…";
       var timer = loading();
-      fetch(scoutForm.getAttribute("data-url"), {
+      callApi(scoutForm.getAttribute("data-url"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ description: text })
-      }).then(function (r) {
+      }, 90000).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, status: r.status, data: d }; });
       }).then(function (res) {
         clearInterval(timer);
+        if (res.ok && !Array.isArray(res.data.plan)) res = { ok: false, status: 502, data: {} };  // a broken reply
         if (!res.ok) {
           if (res.status === 400 || /code|characters/.test(res.data.error || "")) showProblem(res.data.error || "");
           out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t find papers</span><p>' +
@@ -1315,7 +1340,8 @@
         out.scrollIntoView({ behavior: "smooth", block: "start" });
       }).catch(function () {
         clearInterval(timer);
-        out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t reach Scout</span><p>Check your connection and try again.</p></div>';
+        out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t reach Scout</span><p>' +
+          (navigator.onLine === false ? "You’re offline. Reconnect and try again." : "That took too long or the connection dropped. Please try again.") + "</p></div>";
       }).then(function () {
         goBtn.disabled = false;
         goBtn.textContent = "Find papers";
@@ -1462,15 +1488,15 @@
     results.setAttribute("aria-busy", "true");
     results.innerHTML = new Array(7).join('<div class="pcard skeleton" aria-hidden="true"><span></span><span></span><span></span></div>');
     count.textContent = "Searching by meaning…";
-    fetch(SEARCH_URL, {
+    callApi(SEARCH_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ q: q.value.trim(), limit: 50 })
-    })
-      .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
+    }, 20000)
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (body) { return { ok: r.ok, body: body }; }); })
       .then(function (res) {
         if (token !== searchToken) return;
-        if (!res.ok) throw new Error(res.body.error || "Search failed");
+        if (!res.ok || !Array.isArray(res.body.results)) throw serverError(res.body.error || "");
         matches = keepFiltered(res.body.results.map(fromSearch));
         render(true);
       })
@@ -1478,7 +1504,7 @@
         if (token !== searchToken) return;
         meaning.checked = false;
         apply();
-        count.textContent = (err.message || "Search by meaning is unavailable right now.") + " Showing word matches instead.";
+        count.textContent = (err.fromServer && err.message ? err.message : "Search by meaning is unavailable right now.") + " Showing word matches instead.";
       });
   }
 

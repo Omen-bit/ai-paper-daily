@@ -2,12 +2,12 @@
 // Takes the IDs this browser has opened (sent by the page, never stored) and
 // returns recent papers closest in meaning to them.
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-import { db, guard, json, underLimit } from "../_shared/http.ts";
+import { db, guard, json, safely, underLimit } from "../_shared/http.ts";
 
 const CALLS_PER_HOUR = 60;
 const ID = /^[0-9]{4}\.[0-9]{4,5}$/;
 
-Deno.serve(async (req) => {
+Deno.serve(safely("recommend", async (req) => {
   const blocked = guard(req);
   if (blocked) return blocked;
 
@@ -29,4 +29,4 @@ Deno.serve(async (req) => {
     return json(req, { error: "Recommendations are unavailable right now." }, 500);
   }
   return json(req, { results: data ?? [] });
-});
+}, "Recommendations are unavailable for a moment."));

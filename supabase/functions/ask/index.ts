@@ -6,7 +6,7 @@
 // The daily pipeline can also prepare a paper in advance: {"id", "prepare": true}
 // with the x-sync-secret header.
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-import { db, guard, json, sameSecret, underLimit } from "../_shared/http.ts";
+import { db, guard, json, safely, sameSecret, underLimit } from "../_shared/http.ts";
 import { groq, hasGroq } from "../_shared/groq.ts";
 import { ASK_PROMPT, askInput, cleanQuestion, DETAILS_HEADING, paperDetails, parseAnswer } from "../_shared/ask.ts";
 import {
@@ -59,7 +59,7 @@ async function ensureFullText(id: string): Promise<"ready" | "none"> {
   return "ready";
 }
 
-Deno.serve(async (req) => {
+Deno.serve(safely("ask", async (req) => {
   const blocked = guard(req);
   if (blocked) return blocked;
   const body = await req.json().catch(() => ({}));
@@ -82,7 +82,11 @@ Deno.serve(async (req) => {
   }
 
   const { data: paper, error } = await db.from("papers").select("title, abstract, authors, submitted").eq("id", id).maybeSingle();
-  if (error || !paper || !paper.abstract) {
+  if (error) {
+    console.error("read paper", error.message);
+    return json(req, { error: "Answers are unavailable for a moment. Please try again shortly.", retry: true }, 503);
+  }
+  if (!paper || !paper.abstract) {
     return json(req, { error: "This paper isn't in our database yet. Try again tomorrow." }, 404);
   }
   const previous = body.previous && typeof body.previous === "object" ? body.previous : undefined;
@@ -111,4 +115,4 @@ Deno.serve(async (req) => {
   if (!answer) return json(req, { error: "Couldn't answer that right now. Try asking it another way." }, 502);
   const section = !answer.quote ? null : details.includes(answer.quote) ? DETAILS_HEADING : "Abstract";
   return json(req, { ...answer, section, mode: "abstract" });
-});
+}, "Answers are unavailable for a moment. Please try again shortly."));

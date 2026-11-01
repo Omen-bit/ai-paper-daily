@@ -151,9 +151,20 @@ def load_days(data_dir: str = DATA_DIR) -> list[dict]:
         return []
     days = []
     for name in sorted(os.listdir(daily_dir), reverse=True):
-        if name.endswith(".json"):
+        if not name.endswith(".json"):
+            continue
+        # One damaged file must not stop the whole site from building
+        try:
             with open(os.path.join(daily_dir, name), encoding="utf-8") as f:
-                days.append(json.load(f))
+                day = json.load(f)
+            if not isinstance(day, dict) or not day.get("date"):
+                raise ValueError("no date")
+        except (OSError, ValueError) as exc:
+            print(f"  [site] WARNING: skipped {name}, it could not be read ({exc})")
+            continue
+        day["papers"] = [p for p in day.get("papers") or [] if isinstance(p, dict) and p.get("id") and p.get("title")]
+        day.setdefault("featured", [])
+        days.append(day)
     return days
 
 
@@ -1208,7 +1219,10 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     # Previous and next paper follow the order of the day the paper first appeared
     neighbours: dict[str, tuple] = {}
     for day in days:
-        _write(os.path.join(site_dir, "day", f"{day['date']}.html"), build_day(day, papers))
+        try:
+            _write(os.path.join(site_dir, "day", f"{day['date']}.html"), build_day(day, papers))
+        except Exception as exc:  # one bad day page must not stop the edition
+            print(f"  [site] WARNING: day page {day.get('date')} failed: {exc}")
         ids = [p["id"] for p in day["papers"] if papers.get(p["id"], {}).get("first_seen") == day["date"]]
         for n, pid in enumerate(ids):
             neighbours[pid] = (ids[n - 1] if n > 0 else None, ids[n + 1] if n + 1 < len(ids) else None)
@@ -1225,19 +1239,33 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
                     next_pick[pid] = ids[(n + 1) % len(ids)]
 
     # Preview images for links shared on X, LinkedIn, Reddit, WhatsApp and the rest
-    with_image = discovery.build_share_images(papers, category_name, os.path.join(site_dir, "og"))
+    try:
+        with_image = discovery.build_share_images(papers, category_name, os.path.join(site_dir, "og"))
+    except Exception as exc:  # pages fall back to no preview image
+        print(f"  [site] WARNING: share images failed: {exc}")
+        with_image = set()
 
     related = related_papers(papers)
+    failed = 0
     for rec in papers.values():
         prev_id, next_id = neighbours.get(rec["id"], (None, None))
-        _write(os.path.join(site_dir, "paper", f"{rec['id']}.html"),
-               build_paper(rec, [papers[i] for i in related.get(rec["id"], [])],
-                           papers.get(prev_id), papers.get(next_id),
-                           papers.get(next_pick.get(rec["id"])), picks_of.get(rec["id"], []),
-                           has_image=rec["id"] in with_image))
+        try:
+            html_out = build_paper(rec, [papers[i] for i in related.get(rec["id"], [])],
+                                   papers.get(prev_id), papers.get(next_id),
+                                   papers.get(next_pick.get(rec["id"])), picks_of.get(rec["id"], []),
+                                   has_image=rec["id"] in with_image)
+            _write(os.path.join(site_dir, "paper", f"{rec['id']}.html"), html_out)
+        except Exception as exc:  # one bad record must not stop the other pages
+            failed += 1
+            print(f"  [site] WARNING: paper page {rec.get('id')} failed: {exc}")
+    if failed:
+        print(f"  [site] WARNING: {failed} paper page(s) were skipped. The rest of the site is fine.")
 
     # RSS feed of the picks, and a sitemap of every public page for search engines
-    _write(os.path.join(site_dir, "feed.xml"), discovery.build_feed(papers, SITE_URL, SITE_NAME, TAGLINE))
+    try:
+        _write(os.path.join(site_dir, "feed.xml"), discovery.build_feed(papers, SITE_URL, SITE_NAME, TAGLINE))
+    except Exception as exc:  # readers keep yesterday's feed items; the site still publishes
+        print(f"  [site] WARNING: RSS feed failed: {exc}")
     newest = days[0]["date"] if days else ""
     pages = [("", newest), ("papers.html", newest), ("scout.html", ""), ("archive.html", newest)]
     if SHOW_TRENDS:

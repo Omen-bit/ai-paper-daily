@@ -114,9 +114,13 @@ def recent_featured(days: int = 7, data_dir: str = DATA_DIR) -> set[str]:
     path = os.path.join(data_dir, "index.json")
     if not os.path.exists(path):
         return set()
-    with open(path, encoding="utf-8") as f:
-        index = json.load(f)
-    return {pid for day in index.get("days", [])[:days] for pid in day.get("featured", [])}
+    try:
+        with open(path, encoding="utf-8") as f:
+            index = json.load(f)
+        return {pid for day in index.get("days", [])[:days] for pid in day.get("featured", [])}
+    except (OSError, ValueError, AttributeError, TypeError) as exc:
+        print(f"  [store] WARNING: could not read {path} ({exc}); recent picks may repeat today")
+        return set()
 
 
 def rebuild_index(data_dir: str = DATA_DIR) -> dict:
@@ -128,9 +132,14 @@ def rebuild_index(data_dir: str = DATA_DIR) -> dict:
         for name in sorted(os.listdir(daily_dir), reverse=True):
             if not name.endswith(".json"):
                 continue
-            with open(os.path.join(daily_dir, name), encoding="utf-8") as f:
-                day = json.load(f)
-            unique_ids.update(p["id"] for p in day.get("papers", []))
+            try:
+                with open(os.path.join(daily_dir, name), encoding="utf-8") as f:
+                    day = json.load(f)
+                day["date"]
+            except (OSError, ValueError, KeyError, TypeError) as exc:  # skip a damaged day, keep the rest
+                print(f"  [store] WARNING: skipped {name}, it could not be read ({exc})")
+                continue
+            unique_ids.update(p["id"] for p in day.get("papers", []) if isinstance(p, dict) and "id" in p)
             days.append({
                 "date": day["date"],
                 "paper_count": len(day.get("papers", [])),
