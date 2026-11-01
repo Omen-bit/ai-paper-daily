@@ -28,7 +28,7 @@ SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from site_builder import load_days, merge_papers, DATA_DIR, EXPORT_DIR  # noqa: E402
+from site_builder import load_days, merge_papers, lead_sentence, DATA_DIR, EXPORT_DIR  # noqa: E402
 from fetcher import fetch_hf_papers_for_date  # noqa: E402
 from classifier import classify_papers  # noqa: E402
 from curator import find_code_url  # noqa: E402
@@ -194,7 +194,8 @@ def export_papers(cfg: dict, out_dir: str = EXPORT_DIR, session=requests) -> int
     """
     Write build/supabase/papers.json: every paper in the database, without
     abstracts or vectors. The website lists them and draws the Trends charts.
-    Abstracts are read only to tag each paper with the technologies it is about.
+    Abstracts are read only to tag each paper with the technologies it is about
+    and to keep their first sentence as the paper card's summary.
     """
     papers, offset = [], 0
     while True:
@@ -203,7 +204,9 @@ def export_papers(cfg: dict, out_dir: str = EXPORT_DIR, session=requests) -> int
         resp.raise_for_status()
         page = resp.json() or []
         for row in page:
-            row["tech"] = tag_technologies(row.get("title") or "", row.pop("abstract", None))
+            abstract = row.pop("abstract", None)
+            row["tech"] = tag_technologies(row.get("title") or "", abstract)
+            row["lead"] = lead_sentence(abstract or "")  # the card's one-line summary
         papers.extend(page)
         if len(page) < EXPORT_PAGE:
             break
