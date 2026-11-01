@@ -2,9 +2,14 @@ name: Daily edition
 
 # Every morning: fetch and pick the papers, write their notes, sync the database,
 # then build the website and publish it to GitHub Pages.
+#
+# The main start is a workflow_dispatch sent at 01:30 UTC (07:00 IST) by an
+# outside scheduler (cron-job.org), because GitHub starts dispatched runs at once
+# but often runs its own schedule an hour or more late. The schedule below is
+# only a backup: it does nothing if today's edition already exists.
 on:
   schedule:
-    - cron: "30 1 * * *" # 01:30 UTC = 07:00 IST, after arXiv's daily release
+    - cron: "30 2 * * *" # backup, 08:00 IST
   workflow_dispatch:
 
 concurrency:
@@ -29,22 +34,35 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Skip the backup run if today's edition is out
+        id: check
+        run: |
+          today=$(date +'%Y-%m-%d')
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "data/daily/$today.json" ]; then
+            echo "Today's edition ($today) was already published by the on-time run. Nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.check.outputs.skip != 'true'
+        name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install dependencies
+      - if: steps.check.outputs.skip != 'true'
+        name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Pick today's papers
+      - if: steps.check.outputs.skip != 'true'
+        name: Pick today's papers
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODELS: ${{ vars.GROQ_MODELS }}
         run: python src/main.py
 
-      - name: Sync to Supabase
+      - if: steps.check.outputs.skip != 'true'
+        name: Sync to Supabase
         continue-on-error: true # the site still builds if Supabase is down
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -52,7 +70,8 @@ jobs:
           SYNC_SECRET: ${{ secrets.SYNC_SECRET }}
         run: python src/supabase_sync.py
 
-      - name: Build the website
+      - if: steps.check.outputs.skip != 'true'
+        name: Build the website
         env:
           # Optional repository variables (Settings > Secrets and variables > Actions > Variables)
           SITE_URL: ${{ vars.SITE_URL }}
@@ -60,7 +79,8 @@ jobs:
           BUTTONDOWN_USER: ${{ vars.BUTTONDOWN_USER }}
         run: python src/site_builder.py
 
-      - name: Commit the day's data
+      - if: steps.check.outputs.skip != 'true'
+        name: Commit the day's data
         run: |
           git config user.name "Omen-bit"
           git config user.email "darshanchougule821@gmail.com"
@@ -77,11 +97,13 @@ jobs:
           done
           exit 1
 
-      - name: Upload the website
+      - if: steps.check.outputs.skip != 'true'
+        name: Upload the website
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
-      - name: Publish to GitHub Pages
+      - if: steps.check.outputs.skip != 'true'
+        name: Publish to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
