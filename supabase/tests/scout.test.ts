@@ -2,8 +2,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  type Candidate, cleanDescription, descriptionProblem, fallbackReport, looksLikeCode, mergeMatches, type Need,
-  parseNeeds, parseReport, planInput, singleNeed,
+  type Candidate, cleanDescription, coverageOf, descriptionProblem, fallbackRanking, fuseLists, looksLikeCode,
+  type Match, type Need, parseNeeds, parseRanking, rankInput, singleNeed,
 } from "../functions/_shared/scout.ts";
 
 const PLAIN = [
@@ -44,72 +44,67 @@ test("needs need at least two usable items", () => {
   assert.equal(singleNeed(PLAIN[0])[0].id, "n1");
 });
 
-const m = (id: string, similarity: number, code_url: string | null = null) => ({ id, title: id, similarity, code_url });
+const m = (id: string, similarity = 0.8): Match => ({ id, title: `Paper ${id}`, similarity });
+const NEEDS: Need[] = [
+  { id: "n1", label: "Read the PDFs", query: "pdf document parsing" },
+  { id: "n2", label: "Find the passage", query: "dense passage retrieval" },
+  { id: "n3", label: "Cite the page", query: "attributed question answering" },
+];
 
-test("matches merge by need, reward repeats and drop weak ones", () => {
-  const merged = mergeMatches([[m("a", 0.80), m("b", 0.79)], [m("b", 0.78), m("c", 0.70)]], 10, ["n1", "n2"], 0.74);
-  assert.deepEqual(merged.map((c) => c.id), ["b", "a"]); // c is below the floor
-  assert.deepEqual(merged[0].needs, ["n1", "n2"]);
-  assert.equal(merged[0].hits, 2);
+test("rank fusion rewards papers found by several searches and remembers their needs", () => {
+  const fused = fuseLists([[m("a"), m("b"), m("c")], [m("b"), m("d")], [m("c"), m("b")]], ["n1", "n2", null]);
+  assert.equal(fused[0].id, "b");                       // in all three lists
+  assert.deepEqual(fused[0].needs, ["n1", "n2"]);       // the description search adds no need
+  assert.deepEqual(fused.find((c) => c.id === "c")!.needs, ["n1"]);
+  assert.equal(fuseLists([[m("a"), m("b")]], ["n1"], 1).length, 1);
 });
 
-const NEEDS: Need[] = [
-  { id: "n1", label: "Speech to text", query: "on-device speech recognition" },
-  { id: "n2", label: "Runs on Android", query: "mobile deployment of neural networks" },
-];
-const CANDS = (ids: string[]): Candidate[] => ids.map((id) => ({ ...m(id, 0.8), hits: 1, needs: ["n1"] }));
-
-test("only papers that fit are kept, and the verdict is worked out from them", () => {
+test("the ranking keeps only known papers that clear the bar, best first", () => {
+  const cands = fuseLists([[m("a"), m("b"), m("c"), m("d")]], ["n2"]);
   const raw = JSON.stringify({
     papers: [
-      { id: "c", fit: "partial", needs: ["n2"], stage: "core", reason: "Shows how to shrink a model for phones.", approach: "Quantises weights to 4 bits" },
-      { id: "zzz", fit: "direct", needs: ["n1"], stage: "start", reason: "Invented paper that is not a candidate." },
-      { id: "a", fit: "direct", needs: ["n1", "n9"], stage: "start", reason: "A small speech model that runs offline.", requires: "One GPU to train", result: "word ".repeat(40) },
-      { id: "b", fit: "none", needs: ["n1"], stage: "further", reason: "Rated not relevant by the planner." },
-      { id: "d", fit: "direct", needs: [], stage: "core", reason: "Serves no need, so it is dropped." },
+      { id: "b", score: 72, needs: ["n2"], why: "A retriever that handles long scanned documents well." },
+      { id: "a", score: 91, needs: ["n1", "n9"], why: "Turns PDFs into structured text with page numbers." },
+      { id: "c", score: 40, needs: ["n2"], why: "Too weak to show, so it is dropped here." },
+      { id: "zzz", score: 99, needs: ["n1"], why: "Not a candidate, so it must be ignored." },
+      { id: "d", score: 88, needs: [], why: "short" },
+      { id: "a", score: 95, needs: ["n1"], why: "A duplicate of a paper already kept above." },
     ],
-    coverage: [{ need: "n1", note: "Paper a covers offline speech." }, { need: "n2", note: "Only general phone tricks." }],
-    steps: [
-      { title: "Pick a small model", detail: "Start from the distilled model in paper a.", papers: ["a", "zzz"] },
-      { title: "Ship to Android", detail: "Package with an on-device runtime; no paper covers this.", papers: [] },
-    ],
-    you_need: ["A GPU for training", "LibriSpeech"], watch_out: ["Accents hurt accuracy."], try: ["android speech recognition"],
+    gaps: [{ need: "n3", try: ["citation grounding", "attributed QA"] }, { need: "n7", try: ["x y"] }],
   });
-  const r = parseReport(raw, CANDS(["a", "b", "c", "d"]), NEEDS)!;
-  assert.deepEqual(r.papers.map((p) => [p.id, p.fit, p.stage]), [["a", "direct", "start"], ["c", "partial", "core"]]);
+  const r = parseRanking(raw, cands, NEEDS)!;
+  assert.deepEqual(r.papers.map((p) => [p.id, p.score, p.fit]), [["a", 91, "strong"], ["b", 72, "related"]]);
   assert.deepEqual(r.papers[0].needs, ["n1"]);
-  assert.equal(r.papers[0].result, ""); // too long to be a real result
-  assert.deepEqual(r.coverage.map((c) => c.status), ["covered", "partly"]);
-  assert.equal(r.verdict, "partial");
-  assert.deepEqual(r.steps[0].papers, ["a"]);
-  assert.deepEqual(r.steps[1].papers, []);
-  assert.deepEqual(r.try, ["android speech recognition"]);
+  assert.deepEqual(r.gaps, [{ need: "n3", try: ["citation grounding", "attributed QA"] }]);
+  assert.equal(parseRanking("not json", cands, NEEDS), null);
 });
 
-test("no fitting papers gives an honest empty answer", () => {
-  const r = parseReport(JSON.stringify({ papers: [], coverage: [], steps: [{ title: "x", detail: "y", papers: [] }], try: ["speech apps"] }),
-    CANDS(["a"]), NEEDS)!;
-  assert.equal(r.verdict, "none");
-  assert.deepEqual(r.papers, []);
-  assert.deepEqual(r.steps, []);
-  assert.deepEqual(r.coverage.map((c) => c.status), ["missing", "missing"]);
-  assert.deepEqual(r.try, ["speech apps"]);
-  assert.equal(parseReport("not json", [], NEEDS), null);
+test("a paper with no needs from the ranker keeps the needs its searches found", () => {
+  const cands = fuseLists([[m("a")]], ["n2"]);
+  const r = parseRanking(JSON.stringify({ papers: [{ id: "a", score: 300, why: "Retrieval method built for long library catalogues." }] }), cands, NEEDS)!;
+  assert.deepEqual([r.papers[0].score, r.papers[0].needs], [100, ["n2"]]);
 });
 
-test("all needs covered by direct fits is a good match", () => {
-  const raw = JSON.stringify({ papers: [
-    { id: "a", fit: "direct", needs: ["n1"], stage: "start", reason: "Covers offline speech recognition well." },
-    { id: "b", fit: "direct", needs: ["n2"], stage: "core", reason: "Covers running models on Android phones." },
-  ] });
-  assert.equal(parseReport(raw, CANDS(["a", "b"]), NEEDS)!.verdict, "good");
+test("coverage says which needs have strong papers, only related ones, or nothing", () => {
+  const cov = coverageOf(NEEDS, [
+    { id: "a", score: 90, fit: "strong", needs: ["n1"], why: "" },
+    { id: "b", score: 60, fit: "related", needs: ["n1", "n2"], why: "" },
+  ]);
+  assert.deepEqual(cov.map((c) => [c.need, c.status, c.strong, c.related]),
+    [["n1", "covered", 1, 1], ["n2", "partial", 0, 1], ["n3", "missing", 0, 0]]);
 });
 
-test("without the planner the closest papers are partial fits", () => {
-  const fb = fallbackReport(mergeMatches([[m("a", .9), m("b", .8)], [m("c", .78)]], 10, ["n1", "n2"]), NEEDS);
-  assert.deepEqual(fb.papers.map((p) => p.stage), ["start", "start", "core"]);
-  assert.ok(fb.papers.every((p) => p.fit === "partial"));
-  assert.deepEqual(fb.coverage.map((c) => c.status), ["partly", "partly"]);
-  assert.equal(fallbackReport([], NEEDS).verdict, "none");
-  assert.match(planInput("Project", NEEDS, CANDS(["a"])), /n2: Runs on Android[\s\S]*code released: no/);
+test("without the ranker the fused order is shown, marked as not checked", () => {
+  const cands = fuseLists([[m("a"), m("b")]], ["n1"]);
+  const r = fallbackRanking(cands);
+  assert.deepEqual(r.papers.map((p) => [p.id, p.fit, p.score]), [["a", "unchecked", null], ["b", "unchecked", null]]);
+});
+
+test("the ranking request carries the needs and cut abstracts", () => {
+  const cands: Candidate[] = fuseLists([[m("a")]], ["n1"]);
+  cands[0].abstract = "word ".repeat(400);
+  const text = rankInput("My project", NEEDS, cands);
+  assert.match(text, /n3: Cite the page/);
+  assert.ok(text.length < 1200);
+  assert.deepEqual(singleNeed("x".repeat(400))[0].query.length, 300);
 });

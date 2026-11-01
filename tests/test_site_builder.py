@@ -272,7 +272,7 @@ def test_home_has_a_hidden_watched_projects_section(tmp_path):
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
     assert "data-watch " in home and "Your projects" in home and "/functions/v1/search" in home
     scout = open(os.path.join(site_dir, "scout.html"), encoding="utf-8").read()
-    assert "If nothing fits, it says so." in scout
+    assert "has no good paper, it says so." in scout and "page-scout" in scout
 
 
 def test_picks_show_when_the_paper_came_out(tmp_path):
@@ -289,3 +289,34 @@ def test_picks_show_when_the_paper_came_out(tmp_path):
     assert home.count("Older paper, trending now") == 1
     old = open(os.path.join(site_dir, "paper", "2608.2.html"), encoding="utf-8").read()
     assert "Trending since" in old
+
+
+def test_featured_cards_ask_if_the_paper_was_seen_before():
+    from site_builder import featured_card, seen_check
+    rec = {"id": "2610.00001", "title": "T", "abstract": "A.", "submitted": "2026-10-30", "slot": "pick"}
+    html = featured_card(rec, 1, "")
+    assert 'data-slot="pick"' in html and 'data-seen="2610.00001"' in html
+    assert seen_check(dict(rec, slot="most-read"))
+    assert seen_check(dict(rec, slot=None)) == ""  # editions from before slots existed
+
+
+def test_lead_sentence_takes_the_first_sentence_and_cuts_long_ones():
+    from site_builder import lead_sentence
+    assert lead_sentence("We build X. It is fast.") == "We build X."
+    assert lead_sentence("Scores rose 2.5 points on GPT-4. Then more.") == "Scores rose 2.5 points on GPT-4."
+    long = lead_sentence("word " * 80)
+    assert len(long) <= 180 and long.endswith("…")
+    assert lead_sentence("") == ""
+
+
+def test_cards_carry_summary_and_signals():
+    from site_builder import compact, archive_compact
+    rec = {"id": "2610.1", "title": "T", "authors": ["A"], "abstract": "First. Second.", "submitted": "2026-10-30",
+           "source": "arXiv", "hf_upvotes": 0, "featured": True, "slot": "pick", "code_url": "https://github.com/x",
+           "curator": {"tldr": "Short.", "difficulty": "beginner"}}
+    c = compact(rec)
+    assert (c["m"], c["u"], c["k"], c["h"], c["l"], c["f"]) == ("Short.", 0, 1, 1, "b", 1)
+    c2 = compact(dict(rec, curator=None, hf_upvotes=40, source="arXiv + HuggingFace"))
+    assert c2["m"] == "First." and c2["u"] == 40 and "h" not in c2
+    a = archive_compact({"id": "2601.2", "title": "T", "authors": [], "lead": "Lead.", "hf_upvotes": 7, "source": "HuggingFace"})
+    assert (a["m"], a["u"], a["x"]) == ("Lead.", 7, 1)

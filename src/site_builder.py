@@ -14,6 +14,7 @@ Pages:
 import hashlib
 import html
 import json
+import re
 import os
 import shutil
 import sys
@@ -352,7 +353,25 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
   {blurb}
   <p class="pick-date">Published {esc(nice_date(published(rec)))}{OLDER_FLAG if is_older(rec) else ""}</p>
   <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
+  {seen_check(rec)}
 </article>"""
+
+
+# Slots whose cards ask "Seen this already?". The answers, and the clicks on
+# each card, show whether readers get something from us that Hugging Face
+# didn't already give them.
+MEASURED_SLOTS = ("pick", "trending", "runner-up", "most-read")
+
+
+def seen_check(rec: dict) -> str:
+    slot = rec.get("slot")
+    if slot not in MEASURED_SLOTS:
+        return ""
+    return f"""<div class="seen" data-seen="{esc(rec['id'])}">
+    <span data-seen-q>Seen this paper before today?</span>
+    <button class="btn btn-outline btn-sm" type="button" data-seen-vote="yes" aria-pressed="false">Yes</button>
+    <button class="btn btn-outline btn-sm" type="button" data-seen-vote="no" aria-pressed="false">No, new to me</button>
+  </div>"""
 
 
 def paper_row(rec: dict, root: str) -> str:
@@ -411,14 +430,34 @@ def load_archive(export_dir: str = EXPORT_DIR) -> list[dict]:
 
 
 def archive_compact(row: dict) -> dict:
-    """A database paper with no page on this site, in the papers.json short form."""
+    """A database paper with no page on this site, in the papers.json short form (see compact)."""
     authors = row.get("authors") or []
-    return {
+    out = {
         "i": row["id"], "t": row.get("title") or row["id"], "a": authors[:3], "n": len(authors),
         "c": row.get("categories") or ["other-ml"],
         "d": (row.get("submitted") or row.get("first_seen") or "")[:10],
         "s": 0, "f": 0, "x": 1,
+        "m": row.get("lead") or "",
+        "u": int(row.get("hf_upvotes") or 0),
     }
+    if row.get("code_url"):
+        out["k"] = 1
+    if not out["u"] and row.get("source") == "arXiv":
+        out["h"] = 1
+    return out
+
+
+def lead_sentence(text: str, limit: int = 180) -> str:
+    """The first sentence of an abstract, cut at a word if it runs long. Stands in
+    for a one-line summary on cards until the paper has notes of its own."""
+    text = " ".join((text or "").split())
+    if not text:
+        return ""
+    m = re.search(r"(?<=[A-Za-z0-9)\]][.!?])\s+(?=[A-Z])", text)
+    first = text[:m.start()] if m else text
+    if len(first) > limit:
+        first = first[:limit - 1].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+    return first
 
 
 def most_read_list(most_read: list[dict], papers: dict, limit: int = 5) -> str:
@@ -475,13 +514,15 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
         featured = featured[:1] + [dict(papers[top["id"]], slot="most-read", readers=top["views"])]
     others = [papers[p["id"]] for p in latest["papers"] if p["id"] not in featured_ids][:MORE_FROM_TODAY]
     n_today = len(latest["papers"])
+    # Newer editions read every arXiv paper but store only the best ("scanned" counts them all)
+    n_scanned = max(latest.get("scanned") or 0, n_today)
     minutes = sum(pick_minutes(r) for r in featured)
 
     cards = "\n".join(featured_card(r, n, "") for n, r in enumerate(featured, 1))
     more = ""
     if others:
         rows = "\n".join(home_row(r, n) for n, r in enumerate(others, len(featured) + 1))
-        link = f'<a class="more" href="day/{esc(latest["date"])}.html">See all {n_today} papers from today</a>'
+        link = f'<a class="more" href="day/{esc(latest["date"])}.html">{"See all " if n_scanned == n_today else "See the top "}{n_today} papers from today</a>'
         more = f"""<div class="block">
     {section_head("Also new today", "Ranked by our score", link)}
     <ol class="list list-home">{rows}</ol>
@@ -502,7 +543,7 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   </div>
 </section>
 <section class="block" id="today">
-  {section_head("Today’s picks", f"Chosen from {n_today} new papers")}
+  {section_head("Today’s picks", f"Chosen from {n_scanned:,} new papers")}
   <div class="picks">{cards}</div>
 </section>
 <section class="block" data-foryou data-url="{RECOMMEND_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" hidden>
@@ -534,7 +575,7 @@ SEARCH_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/search"
 # The "For you" function (supabase/functions/recommend), same rules as search
 RECOMMEND_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/recommend"
 
-SKELETON_ROWS = '<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>' * 6
+SKELETON_CARDS = "".join('<div class="pcard skeleton" aria-hidden="true"><span></span><span></span><span></span></div>' for _ in range(6))
 
 
 def papers_tabs(current: str, root: str = "") -> str:
@@ -543,26 +584,41 @@ def papers_tabs(current: str, root: str = "") -> str:
     return f'<nav class="tabs" aria-label="Papers views">{tab("papers.html", "All papers", "papers")}{tab("archive.html", "By day", "archive")}</nav>'
 
 
+# Quick views on the papers page: value, label
+PAPER_VIEWS = [
+    ("", "Latest"),
+    ("week", "Top this week"),
+    ("nothf", "Not on HF yet"),
+    ("picks", "Our picks"),
+    ("code", "Has code"),
+    ("easy", "Beginner-friendly"),
+]
+
+
 def build_papers_page() -> str:
     options = "".join(f'<option value="{esc(slug)}">{esc(name)}</option>'
                       for slug, name in CATEGORY_NAMES.items())
-    body = f"""<section class="page-head">
+    chips = "".join(f'<button class="chip" type="button" data-view="{v}" aria-pressed="{"true" if not v else "false"}">{esc(label)}</button>'
+                    for v, label in PAPER_VIEWS)
+    body = f"""<section class="page-head page-head-tight">
   {papers_tabs("papers")}
   <h1>All papers</h1>
-  <p>Every paper we have tracked, newest first. Search by title or author, or turn on Search by meaning to find papers about an idea in your own words.</p>
+  <p>Every AI paper we track, each with a one-line summary. Search by words, or describe an idea and search by meaning.</p>
 </section>
-<div class="toolbar">
-  <div class="field field-grow"><label class="field-label" for="q">Search</label>
-    <span class="input-wrap">{icon("search", 15)}<input class="input" id="q" type="search" placeholder="Title or author" autocomplete="off"></span></div>
-  <div class="field"><label class="field-label" for="cat">Topic</label>
-    <select class="select" id="cat"><option value="">All topics</option>{options}</select></div>
-  <div class="field"><label class="field-label" for="sort">Sort by</label>
-    <select class="select" id="sort"><option value="new">Newest first</option><option value="score">Highest score</option></select></div>
-  <label class="toggle"><input id="feat" type="checkbox"> Top picks only</label>
-  <label class="toggle toggle-meaning"><input id="meaning" type="checkbox"> Search by meaning</label>
+<div class="pbar">
+  <div class="pbar-search">
+    <label class="sr-only" for="q">Search papers</label>
+    <span class="input-wrap">{icon("search", 16)}<input class="input" id="q" type="search" placeholder="Search titles and authors, or describe an idea" autocomplete="off"></span>
+    <label class="toggle toggle-meaning"><input id="meaning" type="checkbox"> By meaning</label>
+  </div>
+  <div class="chips" role="group" aria-label="Show">
+    {chips}
+    <label class="sr-only" for="cat">Topic</label>
+    <select class="select chip-select" id="cat"><option value="">All topics</option>{options}</select>
+  </div>
 </div>
 <div class="result-meta"><span id="count">Loading papers…</span></div>
-<ul class="list" id="results" aria-busy="true" data-search-url="{SEARCH_URL}">{SKELETON_ROWS}</ul>
+<div class="cards" id="results" aria-busy="true" data-search-url="{SEARCH_URL}">{SKELETON_CARDS}</div>
 <div class="center"><button class="btn btn-outline" id="more" type="button" hidden>Show more</button></div>
 <noscript><p class="empty">Turn on JavaScript to search, or browse the <a href="archive.html">archive</a>.</p></noscript>"""
     return page("All papers", body, active="papers")
@@ -590,7 +646,7 @@ def build_scout_page() -> str:
                        for e in SCOUT_EXAMPLES)
     body = f"""<section class="page-head scout-head">
   <h1>Project Scout</h1>
-  <p>Describe what you want to build. Scout checks more than 8,000 AI papers and tells you honestly which parts of your project they cover, how to build it, and which papers to read. If nothing fits, it says so.</p>
+  <p>Describe what you want to build. Scout searches more than 8,000 AI papers and shows the ones most relevant to your project, best first, with why each one fits. If a part of your project has no good paper, it says so.</p>
 </section>
 <div class="scout">
   <form class="card pad scout-form" data-scout data-url="{SCOUT_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" novalidate>
@@ -607,15 +663,15 @@ def build_scout_page() -> str:
       <span class="label">How it works</span>
       <ol class="how">
         <li><b>You describe</b> the project in a few sentences.</li>
-        <li><b>Scout splits it</b> into its parts and searches for each one by meaning.</li>
-        <li><b>You get a brief:</b> what’s covered, build steps, and a comparison of only the papers that fit.</li>
+        <li><b>Scout splits it</b> into the parts it needs, and searches each one by meaning and by keywords.</li>
+        <li><b>Every paper found is scored</b> for how well it fits your project. You get the best ones first, with why each fits.</li>
       </ol>
     </div>
   </section>
 </div>
 <noscript><p class="empty">Turn on JavaScript to use Project Scout.</p></noscript>"""
-    return page("Project Scout", body, active="scout",
-                description="Describe your project and get a reading plan of AI papers, in order.")
+    return page("Project Scout", body, active="scout", body_class="page-scout",
+                description="Describe your project and get the AI papers most relevant to it, best first.")
 
 
 def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[str] | None = None) -> str:
@@ -991,8 +1047,14 @@ def related_papers(papers: dict, k: int = 4) -> dict[str, list[str]]:
 
 
 def compact(rec: dict) -> dict:
-    """The fields papers.html needs, with short keys to keep the file small."""
-    return {
+    """
+    The fields papers.html needs, with short keys to keep the file small:
+    i id, t title, a first authors, n author count, c topics, d date, s score,
+    f 1 our pick / 2 trending, m one-line summary, u HF upvotes, k has code,
+    h 1 when the paper is not on Hugging Face, l difficulty (b/i/a).
+    """
+    notes = rec.get("curator") or {}
+    out = {
         "i": rec["id"],
         "t": rec["title"],
         "a": rec.get("authors", [])[:3],
@@ -1001,7 +1063,16 @@ def compact(rec: dict) -> dict:
         "d": published(rec),
         "s": rec.get("score") or 0,
         "f": (2 if rec.get("slot") == "trending" else 1) if rec.get("featured") else 0,
+        "m": notes.get("tldr") or lead_sentence(rec.get("abstract") or ""),
+        "u": int(rec.get("hf_upvotes") or 0),
     }
+    if rec.get("code_url"):
+        out["k"] = 1
+    if not out["u"] and rec.get("source") == "arXiv":
+        out["h"] = 1
+    if notes.get("difficulty") in LEVELS:
+        out["l"] = notes["difficulty"][0]
+    return out
 
 
 # ---------------------------------------------------------------------------

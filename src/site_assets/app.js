@@ -757,6 +757,51 @@
   }
   Array.prototype.forEach.call(document.querySelectorAll("[data-feedback]"), wireFeedback);
 
+  // ---- Site-wide counts: is our pick worth choosing over Hugging Face? ----
+  // Sent as totals only, with id "site": one visit per browser per day (new,
+  // back within a week, or back after longer), the first click on each
+  // featured card, and the answer to "Seen this paper before today?".
+  function slotKey(el) { return (el.getAttribute("data-slot") || "").replace(/-/g, "_"); }
+  (function countVisit() {
+    var today = new Date().toISOString().slice(0, 10);
+    var last = load("apd.lastVisit", "");
+    if (last === today) return;
+    store("apd.lastVisit", today);
+    var gap = last ? (Date.parse(today) - Date.parse(last)) / 86400000 : -1;
+    track("site", gap < 0 || isNaN(gap) ? "visit_new" : gap <= 7 ? "visit_return_7d" : "visit_return_old");
+  })();
+  document.addEventListener("click", function (e) {
+    var card = e.target.closest && e.target.closest("article.pick[data-slot]");
+    if (!card || !slotKey(card) || e.target.closest("[data-seen]")) return;
+    var clicked = load("apd.pickClicks", []);
+    var cid = card.getAttribute("data-id");
+    if (clicked.indexOf(cid) >= 0) return;
+    store("apd.pickClicks", [cid].concat(clicked).slice(0, 200));
+    track("site", "click_" + slotKey(card));
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-seen]"), function (box) {
+    var card = box.closest("article.pick[data-slot]");
+    var sid = box.getAttribute("data-seen");
+    var paint = function () {
+      var v = load("apd.seen", {})[sid];
+      Array.prototype.forEach.call(box.querySelectorAll("[data-seen-vote]"), function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-seen-vote") === v ? "true" : "false");
+        b.disabled = !!v;
+      });
+      if (v) box.querySelector("[data-seen-q]").textContent = "Thanks, noted.";
+    };
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-seen-vote]");
+      var answers = load("apd.seen", {});
+      if (!b || !card || answers[sid]) return;
+      answers[sid] = b.getAttribute("data-seen-vote");
+      store("apd.seen", answers);
+      track("site", "seen_" + slotKey(card) + "_" + answers[sid]);
+      paint();
+    });
+    paint();
+  });
+
   // ---- Trends: show every technology in the leaderboard ----
   Array.prototype.forEach.call(document.querySelectorAll("[data-board-all]"), function (btn) {
     var wrap = btn.closest(".tech-board-wrap");
@@ -861,8 +906,7 @@
     var goBtn = scoutForm.querySelector("[data-scout-go]");
     var out = document.querySelector("[data-scout-out]");
     var introHtml = out.innerHTML;
-    var STAGE_NAMES = { start: "Start here", core: "Build on", further: "Later" };
-    var STAGE_NOTES = { start: "The simplest approach that works", core: "The methods to build on", further: "Optional, once the basics work" };
+    var scoutWrap = scoutForm.closest(".scout") || document.body;
     var onSiteIds = null;
 
     var problemWith = function (text) {
@@ -898,200 +942,219 @@
         .then(function (list) { onSiteIds = {}; list.forEach(function (id) { onSiteIds[id] = true; }); return onSiteIds; });
     };
 
-    var FIT_NAMES = { direct: "Direct fit", partial: "Partial fit" };
-    var STATUS = { covered: ["✓", "Covered"], partly: ["~", "Partly covered"], missing: ["✕", "No paper found"] };
-    var VERDICT = {
-      good: ["Good match", "Our papers cover every part of this project."],
-      partial: ["Partly covered", "Some parts have papers that fit. The rest you’d build without one, or with a broader search."],
-      none: ["No good papers yet", "Nothing in our database really fits this project, so Scout isn’t showing any. That’s an honest answer, not an error."]
-    };
-    var pad2 = function (n) { return String(n).padStart(2, "0"); };
+    // ---- Results: the papers most relevant to the project, best first ----
+    var FIT_LABEL = { strong: "Strong match", related: "Related", unchecked: "Not checked" };
+    var NEED_COLORS = ["#3B5BDB", "#B4530F", "#7C3AED", "#0E7490"];
+    var STATUS_LABEL = { covered: "Covered", partial: "Gap", missing: "Gap" };
+    var FIRST_SHOWN = 10;
     var paperHref = function (p, onSite) {
       return onSite[p.id] ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
     };
+    var plural = function (n, one, many) { return n + " " + (n === 1 ? one : many); };
 
-    // One row of the reading-order panel. Which needs a paper serves is shown as
-    // Harvey balls (full: direct fit, half: partial fit, empty: not this paper).
-    var ballsFor = function (p, needs) {
-      return needs.map(function (nd) {
-        var serves = (p.needs || []).indexOf(nd.id) >= 0;
-        var kind = !serves ? "none" : p.fit === "direct" ? "full" : "half";
-        var words = !serves ? "not covered by this paper" : p.fit === "direct" ? "direct fit" : "partial fit";
-        return '<li class="syl-ball"><span class="hb hb-' + kind + '" aria-hidden="true"></span>' +
-          '<span class="syl-ball-label">' + esc(nd.label) + '</span><span class="sr-only">: ' + words + "</span></li>";
-      }).join("");
-    };
-    var planRow = function (p, n, onSite, needs) {
-      var local = onSite[p.id];
-      var isSaved = saved.some(function (s) { return s.id === p.id; });
-      var links = publishedLine(p) +
-        (p.code_url ? '<a class="text-link" href="' + esc(p.code_url) + '" rel="noopener">Get the code</a>' : "") +
-        (local ? "" : '<span class="syl-ext">On Hugging Face</span>');
-      return '<li class="syl-row" id="sp-' + pad2(n) + '" data-id="' + esc(p.id) + '">' +
-        '<span class="syl-n" aria-hidden="true">' + n + "</span>" +
-        '<div class="syl-paper"><a class="syl-title" href="' + paperHref(p, onSite) + '"' + (local ? "" : ' rel="noopener"') + ">" +
-        '<span class="sr-only">Paper ' + n + ": </span>" + esc(p.title) + "</a>" +
-        (p.reason ? '<p class="syl-reason">' + esc(p.reason) + "</p>" : "") +
-        (links ? '<div class="syl-links">' + links + "</div>" : "") + "</div>" +
-        (needs.length ? '<ul class="syl-needs" aria-label="What it covers">' + ballsFor(p, needs) + "</ul>" : "") +
-        '<button class="quick-save" type="button" data-quick-save="' + esc(p.id) + '" data-title="' + esc(p.title) + '" aria-pressed="' + isSaved +
-        '" aria-label="Save for later">' + (isSaved ? "✓" : "+") + "</button></li>";
-    };
-
-    var chipsFor = function (ids, numberOf) {
-      return ids.filter(function (id) { return numberOf[id]; }).map(function (id) {
-        return '<a class="pchip" href="#sp-' + pad2(numberOf[id]) + '" aria-label="Paper ' + numberOf[id] + '">' + numberOf[id] + "</a>";
-      }).join("");
-    };
-
-    var tryChips = function (list) {
-      if (!list || !list.length) return "";
-      return '<div class="try"><span class="label">Try searching for</span>' + list.map(function (t) {
-        return '<a class="qchip" href="papers.html?q=' + encodeURIComponent(t) + '&amp;m=1">' + esc(t) + "</a>";
-      }).join("") + "</div>";
-    };
-
-    var verdictCard = function (data, description, at, cov) {
-      var v = VERDICT[data.verdict];
-      var counts = { covered: 0, partly: 0, missing: 0 };
-      cov.forEach(function (c) { counts[c.status] = (counts[c.status] || 0) + 1; });
-      var meter = cov.length ? '<div class="cov-meter" role="img" aria-label="' + counts.covered + " of " + cov.length + ' needs covered">' +
-        cov.map(function (c) { return '<i class="s-' + esc(c.status) + '" title="' + esc(c.label) + ": " + STATUS[c.status][1] + '"></i>'; }).join("") + "</div>" +
-        '<p class="cov-count"><b>' + counts.covered + " of " + cov.length + "</b> needs covered" +
-        (counts.partly ? " · " + counts.partly + " partly" : "") + (counts.missing ? " · " + counts.missing + " with no paper" : "") + "</p>" : "";
-      return '<div class="card pad scout-verdict' + (v ? " v-" + esc(data.verdict) : "") + '">' +
-        '<div class="verdict-top"><span class="label">' + (at ? "Your last Scout, " + ago(at) : "Your project") + "</span>" +
-        (v ? '<span class="verdict-pill">' + v[0] + "</span>" : "") + "</div>" +
-        '<p class="verdict-summary">' + esc(data.summary || description) + "</p>" + meter +
-        (v ? '<p class="verdict-note">' + v[1] + "</p>" : "") +
-        (data.mode === "basic" && (data.plan || []).length ? '<p class="fine">The planner was unavailable, so these are the closest papers by meaning and haven’t been checked for fit.</p>' : "") +
-        '<div class="scout-actions">' +
-        ((data.plan || []).length ? '<button class="btn btn-primary btn-sm" type="button" data-scout-watch aria-pressed="false">Watch this project</button>' +
-          '<button class="btn btn-outline btn-sm" type="button" data-scout-copy><span>Copy as Markdown</span></button>' : "") +
-        '<button class="btn btn-outline btn-sm" type="button" data-scout-new>Start over</button></div></div>';
-    };
-
-    var coverageSection = function (cov, numberOf, plan, tries) {
-      if (!cov.length) return "";
-      var rows = cov.map(function (c) {
-        var ids = plan.filter(function (p) { return (p.needs || []).indexOf(c.need) >= 0; }).map(function (p) { return p.id; });
-        var s = STATUS[c.status] || STATUS.missing;
-        return '<li class="cov s-' + esc(c.status) + '"><span class="cov-icon" aria-hidden="true">' + s[0] + "</span>" +
-          '<div class="cov-body"><div class="cov-head"><b>' + esc(c.label) + '</b><span class="cov-status">' + s[1] + "</span></div>" +
-          (c.note ? "<p>" + esc(c.note) + "</p>" : "") + "</div>" +
-          '<span class="cov-papers">' + chipsFor(ids, numberOf) + "</span></li>";
-      }).join("");
-      return '<section class="scout-sec"><div class="sec-head"><h2>What your project needs</h2><span>Each part of your project, and whether a paper covers it</span></div>' +
-        '<ul class="card cov-list">' + rows + "</ul>" + tryChips(tries) + "</section>";
-    };
-
-    var buildSection = function (steps, numberOf) {
-      if (!steps || !steps.length) return "";
-      return '<section class="scout-sec"><div class="sec-head"><h2>How to build it</h2><span>Steps in order, with the papers for each</span></div><ol class="build">' +
-        steps.map(function (st, i) {
-          var chips = chipsFor(st.papers || [], numberOf);
-          return '<li class="build-step' + (chips ? "" : " no-paper") + '"><span class="build-n">' + (i + 1) + "</span>" +
-            '<div class="build-body"><b>' + esc(st.title) + "</b><p>" + esc(st.detail) + "</p>" +
-            '<div class="build-papers">' + (chips ? "<span>Papers</span>" + chips : "<span>No paper: you build this part yourself</span>") + "</div></div></li>";
-        }).join("") + "</ol></section>";
-    };
-
-    var compareSection = function (plan, numberOf, needNames) {
-      var useful = plan.filter(function (p) { return p.approach || p.result || p.requires || p.best_for; });
-      if (plan.length < 2 || !useful.length) return "";
-      var cell = function (label, text) { return '<td data-label="' + label + '">' + (text ? esc(text) : '<span class="muted">Not stated</span>') + "</td>"; };
-      return '<section class="scout-sec"><div class="sec-head"><h2>Compare at a glance</h2><span>From the abstracts, and the full paper where we have it</span></div>' +
-        '<div class="card compare-wrap"><table class="compare"><thead><tr><th scope="col">Paper</th><th scope="col">Approach</th><th scope="col">What it needs</th>' +
-        '<th scope="col">Key result</th><th scope="col">Best for</th><th scope="col">Code</th></tr></thead><tbody>' +
-        plan.map(function (p) {
-          return '<tr><th scope="row"><a class="pchip" href="#sp-' + pad2(numberOf[p.id]) + '">' + numberOf[p.id] + "</a>" +
-            '<span class="compare-title">' + esc(p.title) + "</span>" +
-            (p.fit ? '<span class="syl-fit"><i class="hb hb-' + (p.fit === "direct" ? "full" : "half") + '" aria-hidden="true"></i>' + FIT_NAMES[p.fit] + "</span>" : "") + "</th>" +
-            cell("Approach", p.approach) + cell("What it needs", p.requires) + cell("Key result", p.result) + cell("Best for", p.best_for) +
-            '<td data-label="Code">' + (p.code_url ? '<a href="' + esc(p.code_url) + '" rel="noopener">Repo ↗</a>' : '<span class="muted">None yet</span>') + "</td></tr>";
-        }).join("") + "</tbody></table></div></section>";
-    };
-
-    var extrasSection = function (data) {
-      var need = (data.you_need || []).map(function (t) { return '<li>' + esc(t) + "</li>"; }).join("");
-      var watch = (data.watch_out || []).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
-      if (!need && !watch) return "";
-      return '<section class="scout-extras">' +
-        (need ? '<div class="card pad"><span class="label">You’ll need</span><ul class="need-list">' + need + "</ul></div>" : "") +
-        (watch ? '<div class="card pad watch-out"><span class="label">Watch out for</span><ul>' + watch + "</ul></div>" : "") + "</section>";
+    // Plans saved by earlier versions of Scout, in today's shape
+    var upgrade = function (data) {
+      if (data.version === 3) return data;
+      var plan = (data.plan || []).map(function (p) {
+        return Object.assign({}, p, { score: null, fit: p.fit === "direct" ? "strong" : "related", why: p.reason || "" });
+      });
+      var cov = (data.needs || []).map(function (nd) {
+        var mine = plan.filter(function (p) { return (p.needs || []).indexOf(nd.id) >= 0; });
+        var strong = mine.filter(function (p) { return p.fit === "strong"; }).length;
+        return { need: nd.id, label: nd.label, status: strong ? "covered" : mine.length ? "partial" : "missing", strong: strong, related: mine.length - strong };
+      });
+      return Object.assign({}, data, { version: 3, plan: plan, coverage: cov, gaps: [] });
     };
 
     var asMarkdown = function (data, description) {
-      var plan = data.plan || [], lines = ["# " + (data.summary || description), ""];
-      var v = VERDICT[data.verdict];
-      if (v) lines.push("**" + v[0] + ".** " + v[1], "");
-      if ((data.coverage || []).length) {
-        lines.push("## What the project needs");
-        data.coverage.forEach(function (c) { lines.push("- " + (STATUS[c.status] || STATUS.missing)[0] + " **" + c.label + "**" + (c.note ? ": " + c.note : "")); });
-        lines.push("");
-      }
-      if ((data.steps || []).length) {
-        lines.push("## How to build it");
-        data.steps.forEach(function (st, i) { lines.push((i + 1) + ". **" + st.title + "**: " + st.detail); });
-        lines.push("");
-      }
-      lines.push("## Papers");
-      plan.forEach(function (p, i) {
-        lines.push((i + 1) + ". [" + p.title + "](https://arxiv.org/abs/" + p.id + ")" + (p.fit ? " (" + FIT_NAMES[p.fit] + ")" : "") +
-          (p.reason ? "\n   " + p.reason : "") + (p.code_url ? "\n   Code: " + p.code_url : ""));
+      var lines = ["# " + (data.summary || description), ""];
+      (data.coverage || []).forEach(function (c) {
+        lines.push("- **" + c.label + "**: " + (c.status === "covered" ? "covered" : "gap") + " (" + c.strong + " strong, " + c.related + " related)");
       });
-      if ((data.you_need || []).length) lines.push("", "## You’ll need", data.you_need.map(function (t) { return "- " + t; }).join("\n"));
-      if ((data.watch_out || []).length) lines.push("", "## Watch out for", data.watch_out.map(function (t) { return "- " + t; }).join("\n"));
+      lines.push("", "## Papers");
+      (data.plan || []).forEach(function (p, i) {
+        lines.push((i + 1) + ". [" + p.title + "](https://arxiv.org/abs/" + p.id + ")" + " (" + FIT_LABEL[p.fit] + (p.score != null ? ", " + p.score + "/100" : "") + ")" +
+          (p.why ? "\n   " + p.why : "") + (p.code_url ? "\n   Code: " + p.code_url : ""));
+      });
       lines.push("", "Made with Project Scout, AI Papers Daily");
       return lines.join("\n");
     };
 
-    var paintPlan = function (data, description, at) {
+    var paintPlan = function (raw, description, at) {
+      var data = upgrade(raw);
       siteIds().then(function (onSite) {
-        var plan = data.plan || [];
-        // Plans saved before Scout rated papers have no verdict or coverage
-        if (!data.version) data = Object.assign({}, data, { verdict: plan.length ? null : "none", coverage: [] });
-        var cov = data.coverage || [];
-        var needNames = {}, numberOf = {};
-        (data.needs || []).forEach(function (n) { needNames[n.id] = n.label; });
-        plan.forEach(function (p, i) { numberOf[p.id] = i + 1; });
-
-        // Number papers in the order they're shown
-        var n = 0;
-        ["start", "core", "further"].forEach(function (stage) {
-          plan.forEach(function (p) { if (p.stage === stage) numberOf[p.id] = ++n; });
-        });
         var needs = (data.needs || []).filter(function (nd) { return nd.label; });
-        var groups = "";
-        ["start", "core", "further"].forEach(function (stage) {
-          var items = plan.filter(function (p) { return p.stage === stage; });
-          if (!items.length) return;
-          groups += '<section class="syl-stage stage-' + stage + '"><h3 class="syl-stage-name">' + STAGE_NAMES[stage] +
-            "<small>" + STAGE_NOTES[stage] + "</small></h3>" +
-            '<ol class="syl-list">' + items.map(function (p) { return planRow(p, numberOf[p.id], onSite, needs); }).join("") + "</ol></section>";
-        });
-        var head = needs.length ? '<div class="syl-head" aria-hidden="true"><span>Read in this order</span><ul class="syl-needs">' +
-          needs.map(function (nd) { return "<li>" + esc(nd.label) + "</li>"; }).join("") + "</ul><span></span></div>" : "";
-        var key = needs.length ? '<p class="syl-key"><span><i class="hb hb-full"></i>Direct fit</span><span><i class="hb hb-half"></i>Partial fit</span>' +
-          '<span><i class="hb hb-none"></i>Not covered by this paper</span></p>' : "";
-        var papersSection = plan.length ? '<section class="scout-sec"><div class="sec-head"><h2>The papers</h2><span>' + plan.length +
-          (plan.length === 1 ? " paper fits" : " papers fit") + ", and the needs each one covers</span></div>" +
-          '<div class="card syllabus" style="--n-needs:' + needs.length + '">' + head + groups + key + "</div></section>" : "";
-        var noneHelp = data.verdict === "none" && !cov.length ? '<div class="card pad empty-card"><p>Try naming the task and the data, for example “summarise legal contracts” instead of “legal AI app”.</p>' + tryChips(data.try) + "</div>" : "";
+        var colorOf = {}, labelOf = {};
+        needs.forEach(function (nd, i) { colorOf[nd.id] = NEED_COLORS[i % NEED_COLORS.length]; labelOf[nd.id] = nd.label; });
+        var cov = data.coverage || [];
+        var state = { need: "", code: false, recent: false, all: false, dismissed: (raw.dismissed || []).slice() };
+        var sixMonthsAgo = new Date(Date.now() - 182 * 864e5).toISOString().slice(0, 10);
 
-        out.innerHTML = verdictCard(data, description, at, cov) +
-          coverageSection(cov, numberOf, plan, data.verdict === "good" ? [] : data.try) +
-          buildSection(data.steps, numberOf) +
-          papersSection +
-          compareSection(plan.slice().sort(function (a, b) { return numberOf[a.id] - numberOf[b.id]; }), numberOf, needNames) +
-          extrasSection(data) + noneHelp +
-          '<div class="feedback" data-feedback="scout"><span data-feedback-q>Was this useful?</span>' +
-          '<button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, useful</button>' +
-          '<button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not really</button></div>';
+        var needTag = function (id) {
+          return labelOf[id] ? '<span class="sx-tag" style="--n:' + colorOf[id] + '">' + esc(labelOf[id]) + "</span>" : "";
+        };
+        var entry = function (p) {
+          var local = onSite[p.id];
+          var isSaved = saved.some(function (s) { return s.id === p.id; });
+          var score = p.score != null ? p.score : "–";
+          var meta = (p.submitted || p.first_seen ? "<span>" + esc(shortDay(p.submitted || p.first_seen)) + " " + String(p.submitted || p.first_seen).slice(0, 4) + "</span>" : "") +
+            (p.code_url ? '<a class="sx-code" href="' + esc(p.code_url) + '" rel="noopener">Code</a>' : "") +
+            (p.hf_upvotes ? '<span class="sx-up">▲ ' + p.hf_upvotes + "</span>" : "") +
+            (local ? "" : '<span class="sx-up">On Hugging Face</span>');
+          return '<article class="sx-entry fit-' + esc(p.fit) + (readIds[p.id] ? " is-read" : "") + '" data-id="' + esc(p.id) + '">' +
+            '<div class="sx-score"><b>' + score + "</b>" + (p.score != null ? '<i style="--w:' + p.score + '%"></i>' : "") +
+            '<span class="sx-fit">' + FIT_LABEL[p.fit] + "</span></div>" +
+            '<div class="sx-body"><h3><a href="' + paperHref(p, onSite) + '"' + (local ? "" : ' rel="noopener"') + ' data-sx-open>' + esc(p.title) + "</a></h3>" +
+            (p.why ? '<p class="sx-why">' + esc(p.why) + "</p>" : "") +
+            '<div class="sx-row">' + (p.needs || []).map(needTag).join("") + '<span class="sx-meta">' + meta + "</span>" +
+            '<span class="sx-acts"><button class="sx-act" type="button" data-sx-save aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? "Saved" : "Save") + '">' +
+            (isSaved ? "★" : "☆") + "<span>" + (isSaved ? " Saved" : " Save") + "</span></button>" +
+            '<a class="sx-act" href="papers.html?q=' + encodeURIComponent(p.title) + '&amp;m=1" data-sx-more>More like this</a>' +
+            '<button class="sx-act sx-ghost" type="button" data-sx-dismiss aria-label="Not relevant">✕<span> Not relevant</span></button></span></div></div></article>';
+        };
+
+        var needRows = cov.map(function (c) {
+          var sub = c.strong ? plural(c.strong, "strong paper", "strong papers") + (c.related ? ", " + c.related + " related" : "")
+            : c.related ? "Only " + plural(c.related, "related paper", "related papers") : "No papers yet";
+          return '<li><button class="sx-need" type="button" data-sx-need="' + esc(c.need) + '" aria-pressed="false" style="--n:' + colorOf[c.need] + '">' +
+            '<span class="sx-sq"></span><span class="sx-nl">' + esc(c.label) + '</span><span class="sx-st st-' + esc(c.status) + '">' + STATUS_LABEL[c.status] + "</span>" +
+            '<span class="sx-nsub">' + sub + "</span></button></li>";
+        }).join("");
+        var chips = '<button class="sx-chip" type="button" data-sx-need="" aria-pressed="true">All<b>' + (data.plan || []).length + "</b></button>" +
+          cov.map(function (c) {
+            return '<button class="sx-chip" type="button" data-sx-need="' + esc(c.need) + '" aria-pressed="false"><span class="sx-dot st-' + esc(c.status) + '"></span>' +
+              esc(c.label) + "<b>" + (c.strong + c.related) + "</b></button>";
+          }).join("") + '<button class="sx-chip" type="button" data-sx-toggle="code" aria-pressed="false">Code released</button>';
+        var hasPlan = (data.plan || []).length > 0;
+
+        out.innerHTML = '<div class="sx">' +
+          '<aside class="sx-brief">' +
+          '<p class="sx-kicker">' + (at ? "Your last Scout, " + esc(ago(at)) : "Your project") + "</p>" +
+          '<p class="sx-prompt"><span class="sx-ptext">' + esc(description) + "</span></p>" +
+          '<div class="sx-pfoot"><span>' + (data.searched ? "Searched " + Number(data.searched).toLocaleString() + " papers" : "") + "</span>" +
+          '<button type="button" data-sx-edit>Edit and search again</button></div>' +
+          (cov.length ? '<p class="sx-kicker sx-hide-sm">What it needs</p><ul class="sx-needs">' + needRows + "</ul>" : "") +
+          '<div class="sx-filters"><label><input type="checkbox" data-sx-toggle="code"> Code released</label>' +
+          '<label><input type="checkbox" data-sx-toggle="recent"> Last 6 months</label></div>' +
+          (cov.length ? '<div class="sx-chips">' + chips + "</div>" : "") +
+          '<div class="sx-tools">' + (hasPlan ? '<button class="btn btn-primary btn-sm" type="button" data-scout-watch aria-pressed="false">Watch this project</button>' +
+            '<button class="btn btn-outline btn-sm" type="button" data-scout-copy><span>Copy as Markdown</span></button>' : "") +
+          '<button class="btn btn-outline btn-sm" type="button" data-scout-new>Start over</button></div>' +
+          "</aside>" +
+          '<section class="sx-results"><div class="sx-head"><h2>Papers to build on</h2><p data-sx-count></p></div>' +
+          (data.mode === "basic" && hasPlan ? '<p class="sx-note">Relevance scoring was unavailable, so these are the closest papers by search and haven’t been checked for fit.</p>' : "") +
+          '<div data-sx-list></div>' +
+          '<div class="feedback" data-feedback="scout"><span data-feedback-q>Were these papers relevant?</span>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, relevant</button>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not really</button></div>' +
+          "</section></div>";
+
+        var listEl = out.querySelector("[data-sx-list]");
+        var countEl2 = out.querySelector("[data-sx-count]");
+        var gapsHtml = function () {
+          return cov.filter(function (c) { return c.status !== "covered" && (!state.need || state.need === c.need); }).map(function (c) {
+            var g = (data.gaps || []).filter(function (x) { return x.need === c.need; })[0];
+            var tries = (g && g.try || []).map(function (t) {
+              return '<a class="qchip" href="papers.html?q=' + encodeURIComponent(t) + '&amp;m=1">' + esc(t) + "</a>";
+            }).join("");
+            return '<div class="sx-gap"><p><b>No strong paper for “' + esc(c.label) + '” yet.</b> ' +
+              (c.related ? "The related papers above are the closest we have." : "Nothing in our database covers this part.") + "</p>" +
+              (tries ? '<div class="sx-try"><span>Try searching for</span>' + tries + "</div>" : "") + "</div>";
+          }).join("");
+        };
+        var render = function () {
+          var shown = (data.plan || []).filter(function (p) {
+            if (state.dismissed.indexOf(p.id) >= 0) return false;
+            if (state.need && (p.needs || []).indexOf(state.need) < 0) return false;
+            if (state.code && !p.code_url) return false;
+            if (state.recent && String(p.submitted || p.first_seen || "") < sixMonthsAgo) return false;
+            return true;
+          });
+          var strong = shown.filter(function (p) { return p.fit !== "related"; });
+          var related = shown.filter(function (p) { return p.fit === "related"; });
+          var limit = state.all ? Infinity : FIRST_SHOWN;
+          var html = strong.slice(0, limit).map(entry).join("");
+          var left = Math.max(0, limit - strong.length);
+          if (related.length && left > 0) {
+            html += '<div class="sx-split">Related <small>Close to your project, but would need adapting</small></div>' +
+              related.slice(0, left).map(entry).join("");
+          }
+          var hidden = shown.length - Math.min(shown.length, limit);
+          if (hidden > 0) html += '<button class="sx-more" type="button" data-sx-all>Show ' + plural(hidden, "more paper", "more papers") + "</button>";
+          if (!shown.length) {
+            html = '<div class="sx-empty"><b>' + (hasPlan ? "No papers match these filters." : "No relevant papers in our database yet.") + "</b>" +
+              (hasPlan ? "Clear a filter to see them again." : "Try naming the task and the data, for example “summarise legal contracts” instead of “legal AI app”.") + "</div>";
+          }
+          listEl.innerHTML = html + gapsHtml();
+          var nStrong = strong.length, nRel = related.length;
+          countEl2.textContent = data.mode === "basic" ? plural(shown.length, "paper", "papers") : nStrong + " strong, " + nRel + " related";
+          Array.prototype.forEach.call(out.querySelectorAll("[data-sx-need]"), function (b) {
+            b.setAttribute("aria-pressed", b.getAttribute("data-sx-need") === state.need ? "true" : "false");
+          });
+          Array.prototype.forEach.call(out.querySelectorAll("[data-sx-toggle]"), function (el) {
+            var on = !!state[el.getAttribute("data-sx-toggle")];
+            if (el.type === "checkbox") el.checked = on; else el.setAttribute("aria-pressed", on ? "true" : "false");
+          });
+        };
+        var remember = function () {
+          var last = load("apd.scout", null);
+          if (last && last.description === description) { last.data.dismissed = state.dismissed; store("apd.scout", last); }
+        };
+
+        // One handler per paint (assigned, not added), so an older result's state can't answer clicks
+        out.onclick = function (e) {
+          var t = e.target.closest ? e.target : null;
+          if (!t) return;
+          var needBtn = t.closest("[data-sx-need]");
+          if (needBtn) {
+            var id = needBtn.getAttribute("data-sx-need");
+            state.need = state.need === id ? "" : id;
+            render(); return;
+          }
+          var tog = t.closest("button[data-sx-toggle]");
+          if (tog) { var k = tog.getAttribute("data-sx-toggle"); state[k] = !state[k]; render(); return; }
+          if (t.closest("[data-sx-all]")) { state.all = true; render(); return; }
+          var undo = t.closest("[data-sx-undo]");
+          if (undo) { var u = undo.getAttribute("data-sx-undo"); state.dismissed = state.dismissed.filter(function (x) { return x !== u; }); remember(); render(); return; }
+          var card = t.closest(".sx-entry");
+          if (!card) return;
+          var pid = card.getAttribute("data-id");
+          var p = (data.plan || []).filter(function (x) { return x.id === pid; })[0];
+          if (t.closest("[data-sx-open]")) { track("site", "scout_click"); return; }
+          if (t.closest("[data-sx-more]")) { track("site", "scout_more"); return; }
+          if (t.closest("[data-sx-dismiss]")) {
+            state.dismissed.push(pid); remember(); track("site", "scout_dismiss");
+            card.outerHTML = '<p class="sx-removed">Removed “' + esc(p ? p.title : pid) + '”. <button type="button" data-sx-undo="' + esc(pid) + '">Undo</button></p>';
+            return;
+          }
+          var sv = t.closest("[data-sx-save]");
+          if (sv && p) {
+            var on = saved.some(function (s) { return s.id === pid; });
+            saved = on ? saved.filter(function (s) { return s.id !== pid; }) : [{ id: pid, t: p.title, at: Date.now() }].concat(saved);
+            store("apd.saved", saved);
+            if (!on) track("site", "scout_save");
+            sv.setAttribute("aria-pressed", on ? "false" : "true");
+            sv.setAttribute("aria-label", on ? "Save" : "Saved");
+            sv.innerHTML = (on ? "☆" : "★") + "<span>" + (on ? " Save" : " Saved") + "</span>";
+            showSavedCount();
+          }
+        };
+        Array.prototype.forEach.call(out.querySelectorAll("input[data-sx-toggle]"), function (cb) {
+          cb.addEventListener("change", function () { state[cb.getAttribute("data-sx-toggle")] = cb.checked; render(); });
+        });
+        render();
+
         wireFeedback(out.querySelector("[data-feedback]"));
         out.querySelector("[data-scout-new]").addEventListener("click", function () {
           try { localStorage.removeItem("apd.scout"); } catch (e) { /* private mode */ }
+          scoutWrap.classList.remove("has-results");
+          out.onclick = null;
           out.innerHTML = introHtml; desc.value = ""; paintCount(); desc.focus();
+        });
+        out.querySelector("[data-sx-edit]").addEventListener("click", function () {
+          scoutWrap.classList.remove("has-results");
+          desc.value = description; paintCount(); desc.focus();
+          scoutForm.scrollIntoView({ behavior: "smooth", block: "start" });
         });
         var copyBtn = out.querySelector("[data-scout-copy]");
         if (copyBtn) copyBtn.addEventListener("click", function () {
@@ -1099,14 +1162,14 @@
         });
         var watchBtn = out.querySelector("[data-scout-watch]");
         if (watchBtn && window.apdWatch) window.apdWatch.wire(watchBtn, data, description);
-        markRead(out);
+        scoutWrap.classList.add("has-results");
       });
     };
 
     var scoutNames = {};
     try { scoutNames = JSON.parse(scoutForm.getAttribute("data-names")) || {}; } catch (e) { /* slugs */ }
 
-    var LOADING = ["Reading your description…", "Searching papers from a few angles…", "Putting them in order…"];
+    var LOADING = ["Reading your description…", "Searching by meaning and by keywords…", "Scoring each paper for your project…"];
     var loading = function () {
       var step = 0;
       out.innerHTML = '<div class="card pad scout-loading" aria-busy="true"><span class="label" data-loading-text>' + LOADING[0] + "</span>" +
@@ -1135,7 +1198,7 @@
         clearInterval(timer);
         if (!res.ok) {
           if (res.status === 400 || /code|characters/.test(res.data.error || "")) showProblem(res.data.error || "");
-          out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t make a plan</span><p>' +
+          out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t find papers</span><p>' +
             esc(res.data.error || "Scout is unavailable right now. Try again in a minute.") + "</p></div>";
           return;
         }
@@ -1168,24 +1231,37 @@
     }
   }
 
-  // ---- All papers: search, filter and sort over data/papers.json ----
+  // ---- All papers: cards, quick views and search over data/papers.json ----
+  // Short keys are documented in compact() in site_builder.py.
   var results = document.getElementById("results");
   if (!results) return;
 
-  var PAGE = 50;
+  var PAGE = 36;
   var q = document.getElementById("q");
   var cat = document.getElementById("cat");
-  var sort = document.getElementById("sort");
-  var feat = document.getElementById("feat");
   var meaning = document.getElementById("meaning");
+  var chips = Array.prototype.slice.call(document.querySelectorAll("[data-view]"));
   var SEARCH_URL = results.getAttribute("data-search-url");
   var onSite = {};          // ids that have a page on this site
   var searchToken = 0;      // drops answers to searches the visitor has already replaced
   var more = document.getElementById("more");
   var count = document.getElementById("count");
-  var all = [], matches = [], shown = 0;
+  var all = [], matches = [], shown = 0, newest = "";
+
+  var VIEWS = {
+    "": { label: "papers, newest first" },
+    week: { label: "most upvoted papers of the last 7 days",
+            keep: function (p) { return p.u > 0 && p.d >= weekAgo(); },
+            order: function (a, b) { return b.u - a.u; } },
+    nothf: { label: "papers not on Hugging Face yet", keep: function (p) { return p.h; } },
+    picks: { label: "of our daily picks", keep: function (p) { return p.f; } },
+    code: { label: "papers with code", keep: function (p) { return p.k; } },
+    easy: { label: "beginner-friendly papers", keep: function (p) { return p.l === "b"; } }
+  };
+  var LEVEL = { b: "Beginner", i: "Intermediate", a: "Advanced" };
 
   var params = new URLSearchParams(location.search);
+  var view = VIEWS[params.get("view") || ""] ? params.get("view") || "" : "";
   q.value = params.get("q") || "";
   cat.value = params.get("cat") || "";
   meaning.checked = params.get("m") === "1";
@@ -1193,63 +1269,82 @@
   var names = {};
   Array.prototype.forEach.call(cat.options, function (o) { if (o.value) names[o.value] = o.textContent; });
 
-  // "Oct 31", or "4 Mar 2025" for another year
   var thisYear = String(new Date().getFullYear());
-  function shortDate(iso) {
+  function shortDate(iso) {  // "Oct 31", or "4 Mar 2025" for another year
     var p = (iso || "").split("-");
     if (p.length !== 3) return iso;
     return p[0] === thisYear ? MONTHS[Number(p[1]) - 1] + " " + Number(p[2])
                              : Number(p[2]) + " " + MONTHS[Number(p[1]) - 1] + " " + p[0];
   }
+  // "This week" counts back from the newest paper, so a quiet weekend isn't empty
+  function weekAgo() {
+    var d = new Date((newest || new Date().toISOString().slice(0, 10)) + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() - 7);
+    return d.toISOString().slice(0, 10);
+  }
 
-  // Same markup as paper_row() in site_builder.py. Papers from the search
-  // archive have no page here, so they link to Hugging Face instead.
-  function row(p) {
+  function card(p) {
     var local = onSite[p.i];
     var href = local ? "paper/" + esc(p.i) + ".html" : "https://huggingface.co/papers/" + esc(p.i);
-    var authors = p.a.join(", ") + (p.n > p.a.length ? " + " + (p.n - p.a.length) + " more" : "");
-    var badges = (p.f === 2 ? '<span class="badge badge-hot">Trending</span>' : p.f ? '<span class="badge badge-pick">Top pick</span>' : "") + p.c.map(function (c) {
-      return '<a class="badge topic t-' + esc(c) + '" href="papers.html?cat=' + esc(c) + '">' + esc(names[c] || c) + "</a>";
-    }).join("");
-    return '<li class="row' + (readIds[p.i] ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
-      '<span class="row-date">' + esc(shortDate(p.d)) + "</span>" +
-      '<span class="row-title"><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></span>" +
-      '<span class="row-authors">' + esc(authors) + (local ? "" : '<span class="sep"></span><span class="ext">Hugging Face ↗</span>') + "</span>" +
-      '<div class="badges">' + badges + "</div></li>";
+    var topic = (p.c && p.c[0]) || "other-ml";
+    var isSaved = saved.some(function (s) { return s.id === p.i; });
+    var sig = "";
+    if (p.f === 1) sig += '<span class="sig sig-pick">★ Our pick</span>';
+    if (p.f === 2) sig += '<span class="sig sig-hot">Trending</span>';
+    if (p.u) sig += '<span class="sig" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
+    else if (p.h) sig += '<span class="sig sig-new" title="Not on the Hugging Face daily list">Not on HF yet</span>';
+    if (p.k) sig += '<span class="sig">' + "Code" + "</span>";
+    if (p.l) sig += '<span class="sig">' + LEVEL[p.l] + "</span>";
+    var first = (p.a && p.a[0]) || "";
+    var authors = esc(first) + (p.n > 1 ? " +" + (p.n - 1) : "");
+    return '<article class="pcard' + (readIds[p.i] ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
+      '<div class="pcard-top"><a class="topic t-' + esc(topic) + '" href="papers.html?cat=' + esc(topic) + '"><span class="dot"></span>' +
+        esc(names[topic] || topic) + '</a><span class="pcard-date">' + esc(shortDate(p.d)) + "</span>" +
+        (readIds[p.i] ? '<span class="pcard-read">Read</span>' : "") +
+        '<button class="quick-save" type="button" data-quick-save="' + esc(p.i) + '" data-title="' + esc(p.t) +
+        '" aria-pressed="' + isSaved + '" aria-label="Save this paper">' + (isSaved ? "✓" : "+") + "</button></div>" +
+      '<h3><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
+      (p.m ? '<p class="pcard-sum">' + esc(p.m) + "</p>" : "") +
+      '<div class="pcard-foot">' + sig + '<span class="pcard-auth">' + authors +
+        (local ? "" : ' · <span class="ext">HF ↗</span>') + "</span></div></article>";
   }
 
-  // A search function result in the short form row() expects
+  // A search function result in the short form card() expects
   function fromSearch(r) {
     var authors = r.authors || [];
+    var known = byId[r.id] || {};
     return { i: r.id, t: r.title, a: authors.slice(0, 3), n: authors.length,
              c: (r.categories && r.categories.length) ? r.categories : ["other-ml"],
-             d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: r.featured ? 1 : 0 };
+             d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: known.f || (r.featured ? 1 : 0),
+             m: known.m || "", u: known.u || r.hf_upvotes || 0, k: known.k, h: known.h, l: known.l, x: known.x };
   }
+  var byId = {};
 
   function render(reset) {
     if (reset) { results.innerHTML = ""; shown = 0; }
     results.removeAttribute("aria-busy");
     if (!matches.length) {
-      results.innerHTML = '<li class="empty"><strong>No papers match these filters.</strong>Try fewer words, or show every topic.' +
-        '<div class="empty-action"><button class="btn btn-outline btn-sm" type="button" data-clear>Clear all filters</button></div></li>';
+      results.innerHTML = '<div class="empty"><strong>No papers match.</strong>Try fewer words, another view, or every topic.' +
+        '<div class="empty-action"><button class="btn btn-outline btn-sm" type="button" data-clear>Clear all filters</button></div></div>';
     } else {
-      results.insertAdjacentHTML("beforeend", matches.slice(shown, shown + PAGE).map(row).join(""));
+      results.insertAdjacentHTML("beforeend", matches.slice(shown, shown + PAGE).map(card).join(""));
     }
     shown = Math.min(shown + PAGE, matches.length);
     more.hidden = shown >= matches.length;
     if (meaning.checked && q.value.trim().length >= 3) {
       count.textContent = matches.length + " papers closest in meaning, best match first";
     } else {
-      count.textContent = matches.length === all.length
-        ? all.length + " papers"
-        : matches.length + " of " + all.length + " papers";
+      var n = matches.length.toLocaleString();
+      count.textContent = view ? n + " " + VIEWS[view].label
+        : matches.length === all.length ? n + " papers, newest first" : n + " of " + all.length.toLocaleString() + " papers";
     }
   }
 
   function keepFiltered(list) {
+    var v = VIEWS[view];
     return list.filter(function (p) {
       if (cat.value && p.c.indexOf(cat.value) < 0) return false;
-      if (feat.checked && !p.f) return false;
+      if (v.keep && !v.keep(p)) return false;
       return true;
     });
   }
@@ -1257,7 +1352,7 @@
   function searchByMeaning() {
     var token = ++searchToken;
     results.setAttribute("aria-busy", "true");
-    results.innerHTML = new Array(6).join('<li class="row skeleton" aria-hidden="true"><span></span><span></span></li>');
+    results.innerHTML = new Array(7).join('<div class="pcard skeleton" aria-hidden="true"><span></span><span></span><span></span></div>');
     count.textContent = "Searching by meaning…";
     fetch(SEARCH_URL, {
       method: "POST",
@@ -1279,8 +1374,12 @@
       });
   }
 
+  function paintChips() {
+    chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-view") === view ? "true" : "false"); });
+  }
+
   function apply() {
-    sort.disabled = meaning.checked;
+    paintChips();
     if (meaning.checked && q.value.trim().length >= 3) {
       searchByMeaning();
       syncUrl();
@@ -1288,14 +1387,12 @@
     }
     searchToken++;  // a word search replaces any meaning search still in flight
     var words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
-    matches = all.filter(function (p) {
-      if (cat.value && p.c.indexOf(cat.value) < 0) return false;
-      if (feat.checked && !p.f) return false;
+    matches = keepFiltered(all).filter(function (p) {
       if (!words.length) return true;
-      var hay = (p.t + " " + p.a.join(" ")).toLowerCase();
+      var hay = (p.t + " " + p.a.join(" ") + " " + (p.m || "")).toLowerCase();
       return words.every(function (w) { return hay.indexOf(w) >= 0; });
     });
-    if (sort.value === "score") matches.sort(function (a, b) { return b.s - a.s; });
+    if (VIEWS[view].order) matches.sort(VIEWS[view].order);
     render(true);
     syncUrl();
   }
@@ -1304,6 +1401,7 @@
     var u = new URLSearchParams();
     if (q.value) u.set("q", q.value);
     if (cat.value) u.set("cat", cat.value);
+    if (view) u.set("view", view);
     if (meaning.checked) u.set("m", "1");
     history.replaceState(null, "", u.toString() ? "?" + u : location.pathname);
   }
@@ -1313,11 +1411,14 @@
     clearTimeout(timer);
     timer = setTimeout(apply, meaning.checked ? 450 : 120);  // wait for a pause before asking the server
   });
-  [cat, sort, feat, meaning].forEach(function (el) { el.addEventListener("change", apply); });
+  [cat, meaning].forEach(function (el) { el.addEventListener("change", apply); });
+  chips.forEach(function (c) {
+    c.addEventListener("click", function () { view = c.getAttribute("data-view"); apply(); });
+  });
   more.addEventListener("click", function () { render(false); });
   results.addEventListener("click", function (e) {
     if (!e.target.closest || !e.target.closest("[data-clear]")) return;
-    q.value = ""; cat.value = ""; feat.checked = false; meaning.checked = false;
+    q.value = ""; cat.value = ""; view = ""; meaning.checked = false;
     apply();
     q.focus();
   });
@@ -1326,7 +1427,11 @@
     .then(function (r) { return r.json(); })
     .then(function (data) {
       all = data;
-      all.forEach(function (p) { if (!p.x) onSite[p.i] = true; });
+      all.forEach(function (p) {
+        byId[p.i] = p;
+        if (!p.x) onSite[p.i] = true;
+        if (p.d > newest) newest = p.d;
+      });
       apply();
     })
     .catch(function () {

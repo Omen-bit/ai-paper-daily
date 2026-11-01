@@ -120,7 +120,7 @@ The site itself is static. Its live features call **Supabase Edge Functions** di
 | `recommend` | For you | Finds papers close to the ones you have read |
 | `scout` | Project Scout | Plans several searches with an LLM, matches papers and orders them into a reading plan |
 | `ask` | Ask this paper | Reads the full paper from arXiv once, stores it in sections, then answers from the best-matching sections and quotes its source |
-| `track` | Most read | Counts anonymous views and "worth it" votes |
+| `track` | Most read, site numbers | Counts anonymous views, "worth it" votes, clicks on each pick, "seen it before?" answers and returning visitors |
 | `embed` | Daily sync | Turns each paper into a `gte-small` vector (pipeline only) |
 
 <details>
@@ -133,7 +133,20 @@ The site itself is static. Its live features call **Supabase Edge Functions** di
 - **Builder value.** Released code, benchmarks, surveys and position papers.
 - **Readers.** Once the site has enough views, the week's most read paper takes the second slot.
 
-Papers featured in the last seven editions are not picked again.
+Papers featured in the last seven editions are not picked again. The pipeline reads every new paper in the tracked arXiv categories each day (often over 1,000) and stores the best 200 of them in `data/`.
+</details>
+
+<details>
+<summary><strong>Is the pick worth reading? How it is measured</strong></summary>
+<br>
+
+The site counts, as daily totals with no visitor data:
+
+- clicks on today's pick against clicks on the Trending card,
+- answers to "Seen this paper before today?" on each pick,
+- visits from new readers, readers back within a week, and readers back after longer.
+
+To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 </details>
 
 <details>
