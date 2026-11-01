@@ -18,6 +18,11 @@ DATA_DIR = os.path.join(ROOT_DIR, "data")
 
 SCHEMA_VERSION = 1
 
+# The pipeline reads every new arXiv paper (often 1,000+ a day) but only the
+# best of them are written to data/, so the repo stays small. The rest were
+# still considered for the day's picks.
+KEEP_PER_DAY = 200
+
 
 def _category_slugs(categories: list) -> list[str]:
     """Categories arrive as classifier dicts or as bare slugs (from older records)."""
@@ -73,10 +78,11 @@ def _write_json(path: str, data) -> None:
 
 
 def save_day(all_papers: list[dict], selected: list[dict], date_str: str,
-             data_dir: str = DATA_DIR) -> str:
+             data_dir: str = DATA_DIR, keep: int = KEEP_PER_DAY) -> str:
     """
-    Write data/daily/<date>.json with every candidate paper of the run.
-    Featured papers come first, then the rest by score.
+    Write data/daily/<date>.json with the day's featured papers first, then the
+    best of the other candidates by score, up to `keep` records in all.
+    "scanned" records how many papers the run considered.
     """
     featured_ids = [p["id"] for p in selected]
     # The selected list carries the summaries, so prefer it over all_papers
@@ -85,18 +91,21 @@ def save_day(all_papers: list[dict], selected: list[dict], date_str: str,
 
     records = [to_record(p, date_str, p["id"] in featured_ids) for p in by_id.values()]
     records.sort(key=lambda r: (not r["featured"], -(r["score"] or 0)))
+    scanned = len(records)
+    records = records[:max(keep, len(featured_ids))]
 
     day = {
         "schema_version": SCHEMA_VERSION,
         "date": date_str,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "featured": featured_ids,
+        "scanned": scanned,
         "papers": records,
     }
     path = os.path.join(data_dir, "daily", f"{date_str}.json")
     _write_json(path, day)
     rebuild_index(data_dir)
-    print(f"  [store] Saved {len(records)} paper records to {path}")
+    print(f"  [store] Saved the best {len(records)} of {scanned} papers to {path}")
     return path
 
 

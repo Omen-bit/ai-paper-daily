@@ -77,74 +77,95 @@ def _fetch_with_retry(fetch_fn, source_name: str):
     return None
 
 
-def fetch_arxiv_papers(max_results: int = 150, lookback_hours: int = None) -> list[dict]:
+# arXiv's API returns at most 2000 results per call and asks for a pause of
+# about 3 seconds between calls. A normal weekday brings 600 to 1,200 new
+# papers across our categories, and a Monday window up to about 3,000.
+ARXIV_PAGE_SIZE = 500
+ARXIV_MAX_RESULTS = 4000
+ARXIV_PAGE_PAUSE = 3      # seconds between pages
+ARXIV_PAGE_TIMEOUT = 60   # a page of 500 entries is slower than one small query
+
+
+def _parse_arxiv_entry(entry) -> dict:
+    """One feedparser entry as a pipeline paper."""
+    submitted_dt = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+    arxiv_id = _strip_version(entry.id.split("/abs/")[-1])
+    return {
+        "id": arxiv_id,
+        "title": " ".join(entry.title.replace("\n", " ").split()),
+        "authors": [a.name for a in entry.authors],
+        "abstract": " ".join(entry.summary.replace("\n", " ").split()),
+        "url": f"https://arxiv.org/abs/{arxiv_id}",
+        "pdf_url": f"https://arxiv.org/pdf/{arxiv_id}",
+        "submitted": submitted_dt.strftime("%Y-%m-%d"),
+        "submitted_dt": submitted_dt,
+        "arxiv_categories": [tag.term for tag in entry.tags if "." in tag.term],
+        "source": "arXiv",
+        "hf_upvotes": 0,
+    }
+
+
+def fetch_arxiv_papers(max_results: int = ARXIV_MAX_RESULTS, lookback_hours: int = None,
+                       page_size: int = ARXIV_PAGE_SIZE, sleep=time.sleep) -> list[dict]:
     """
-    Fetch recent papers from arXiv across all tracked categories.
-    Uses dynamic lookback window (96h on weekends/Mondays, 48h on weekdays).
+    Fetch every recent paper in the tracked arXiv categories, page by page,
+    newest first, until a page reaches past the lookback window.
+    Uses a dynamic lookback window (96h on weekends/Mondays, 48h on weekdays).
+    max_results is a safety cap, not the expected count.
     Strips version suffixes from arXiv IDs before returning.
     """
     if lookback_hours is None:
         lookback_hours = get_default_lookback_hours()
 
     query = "+OR+".join([f"cat:{cat}" for cat in ARXIV_CATEGORIES])
-    url = (
-        f"{ARXIV_API_BASE}?search_query={query}"
-        f"&sortBy=submittedDate&sortOrder=descending"
-        f"&max_results={max_results}"
-    )
-
-    print(f"  [arxiv] Fetching from {len(ARXIV_CATEGORIES)} categories (last {lookback_hours}h window)...")
-
-    def _do_fetch():
-        # feedparser does its own HTTP; wrap in requests first to get retry on transport errors
-        resp = requests.get(
-            url,
-            timeout=REQUEST_TIMEOUT,
-            headers={"User-Agent": USER_AGENT},
-        )
-        if resp.status_code == 429:
-            raise Exception(f"429 rate limited by arXiv")
-        if resp.status_code >= 500:
-            raise Exception(f"{resp.status_code} server error from arXiv")
-        return feedparser.parse(resp.text)
-
-    feed = _fetch_with_retry(_do_fetch, "arxiv")
-    if feed is None:
-        return []
-
     cutoff = datetime.now(timezone.utc) - timedelta(hours=lookback_hours)
-    papers = []
+    print(f"  [arxiv] Fetching every paper from {len(ARXIV_CATEGORIES)} categories (last {lookback_hours}h window)...")
 
-    for entry in feed.entries:
-        try:
-            submitted_dt = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
-            if submitted_dt < cutoff:
+    papers: list[dict] = []
+    seen: set[str] = set()
+    start = 0
+    while start < max_results:
+        size = min(page_size, max_results - start)
+        url = (
+            f"{ARXIV_API_BASE}?search_query={query}"
+            f"&sortBy=submittedDate&sortOrder=descending"
+            f"&start={start}&max_results={size}"
+        )
+
+        def _do_fetch(url=url):
+            resp = requests.get(url, timeout=ARXIV_PAGE_TIMEOUT, headers={"User-Agent": USER_AGENT})
+            if resp.status_code == 429:
+                raise Exception("429 rate limited by arXiv")
+            if resp.status_code >= 500:
+                raise Exception(f"{resp.status_code} server error from arXiv")
+            return feedparser.parse(resp.text)
+
+        feed = _fetch_with_retry(_do_fetch, "arxiv")
+        if feed is None:
+            # Keep what earlier pages returned rather than losing the whole day
+            break
+        entries = list(feed.entries)
+        if not entries:
+            break
+
+        reached_cutoff = False
+        for entry in entries:
+            try:
+                paper = _parse_arxiv_entry(entry)
+            except Exception as exc:
+                print(f"  [arxiv] Skipping entry due to parse error: {exc}")
                 continue
+            if paper["submitted_dt"] < cutoff:
+                reached_cutoff = True
+                continue
+            if paper["id"] not in seen:
+                seen.add(paper["id"])
+                papers.append(paper)
 
-            raw_id = entry.id.split("/abs/")[-1]
-            arxiv_id = _strip_version(raw_id)
-
-            abstract = " ".join(entry.summary.replace("\n", " ").split())
-            title = " ".join(entry.title.replace("\n", " ").split())
-
-            paper = {
-                "id": arxiv_id,
-                "title": title,
-                "authors": [a.name for a in entry.authors],
-                "abstract": abstract,
-                "url": f"https://arxiv.org/abs/{arxiv_id}",
-                "pdf_url": f"https://arxiv.org/pdf/{arxiv_id}",
-                "submitted": submitted_dt.strftime("%Y-%m-%d"),
-                "submitted_dt": submitted_dt,
-                "arxiv_categories": [tag.term for tag in entry.tags if "." in tag.term],
-                "source": "arXiv",
-                "hf_upvotes": 0,
-            }
-            papers.append(paper)
-
-        except Exception as exc:
-            print(f"  [arxiv] Skipping entry due to parse error: {exc}")
-            continue
+        if reached_cutoff or len(entries) < size:
+            break
+        start += size
+        sleep(ARXIV_PAGE_PAUSE)
 
     print(f"  [arxiv] {len(papers)} papers fetched from last {lookback_hours}h")
     return papers
@@ -256,7 +277,7 @@ def parse_hf_items(data: list) -> list[dict]:
     return papers
 
 
-def fetch_all_papers(max_arxiv: int = 150) -> list[dict]:
+def fetch_all_papers(max_arxiv: int = ARXIV_MAX_RESULTS) -> list[dict]:
     """
     Fetch from both sources, deduplicate by arXiv ID (version-stripped), return unified list.
     """
