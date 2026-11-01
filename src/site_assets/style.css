@@ -197,6 +197,12 @@ button, input, select { font: inherit; color: inherit; }
 .pick-foot { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-top: 4px; font-size: 13px; color: var(--muted); position: relative; z-index: 1; }
 .pick.is-first .pick-foot { color: color-mix(in srgb, var(--bg) 65%, transparent); }
 .pick-foot .mins { margin-left: auto; }
+/* "Seen this paper before today?" sits above the card-wide link so its buttons stay clickable */
+.seen { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); }
+.seen span { margin-right: auto; }
+.seen .btn { height: 32px; }
+.seen .btn:disabled { cursor: default; opacity: 1; }
+.seen .btn:disabled:not([aria-pressed="true"]) { opacity: .45; }
 .topic { display: inline-flex; align-items: center; font-weight: 500; }
 .mins { font: 400 13px var(--pixel); }
 .has-code { display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); }

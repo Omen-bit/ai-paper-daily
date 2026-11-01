@@ -757,6 +757,51 @@
   }
   Array.prototype.forEach.call(document.querySelectorAll("[data-feedback]"), wireFeedback);
 
+  // ---- Site-wide counts: is our pick worth choosing over Hugging Face? ----
+  // Sent as totals only, with id "site": one visit per browser per day (new,
+  // back within a week, or back after longer), the first click on each
+  // featured card, and the answer to "Seen this paper before today?".
+  function slotKey(el) { return (el.getAttribute("data-slot") || "").replace(/-/g, "_"); }
+  (function countVisit() {
+    var today = new Date().toISOString().slice(0, 10);
+    var last = load("apd.lastVisit", "");
+    if (last === today) return;
+    store("apd.lastVisit", today);
+    var gap = last ? (Date.parse(today) - Date.parse(last)) / 86400000 : -1;
+    track("site", gap < 0 || isNaN(gap) ? "visit_new" : gap <= 7 ? "visit_return_7d" : "visit_return_old");
+  })();
+  document.addEventListener("click", function (e) {
+    var card = e.target.closest && e.target.closest("article.pick[data-slot]");
+    if (!card || !slotKey(card) || e.target.closest("[data-seen]")) return;
+    var clicked = load("apd.pickClicks", []);
+    var cid = card.getAttribute("data-id");
+    if (clicked.indexOf(cid) >= 0) return;
+    store("apd.pickClicks", [cid].concat(clicked).slice(0, 200));
+    track("site", "click_" + slotKey(card));
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-seen]"), function (box) {
+    var card = box.closest("article.pick[data-slot]");
+    var sid = box.getAttribute("data-seen");
+    var paint = function () {
+      var v = load("apd.seen", {})[sid];
+      Array.prototype.forEach.call(box.querySelectorAll("[data-seen-vote]"), function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-seen-vote") === v ? "true" : "false");
+        b.disabled = !!v;
+      });
+      if (v) box.querySelector("[data-seen-q]").textContent = "Thanks, noted.";
+    };
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-seen-vote]");
+      var answers = load("apd.seen", {});
+      if (!b || !card || answers[sid]) return;
+      answers[sid] = b.getAttribute("data-seen-vote");
+      store("apd.seen", answers);
+      track("site", "seen_" + slotKey(card) + "_" + answers[sid]);
+      paint();
+    });
+    paint();
+  });
+
   // ---- Trends: show every technology in the leaderboard ----
   Array.prototype.forEach.call(document.querySelectorAll("[data-board-all]"), function (btn) {
     var wrap = btn.closest(".tech-board-wrap");

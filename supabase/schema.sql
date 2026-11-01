@@ -167,6 +167,42 @@ revoke all on function public.most_read(int, int) from public, anon, authenticat
 grant execute on function public.bump_stat(text, text) to service_role;
 grant execute on function public.most_read(int, int) to service_role;
 
+-- Anonymous site-wide counts that test whether the papers section is worth
+-- choosing over Hugging Face: clicks on our pick vs the trending card, the
+-- "Seen this already?" answers, and new vs returning visitors.
+-- Totals per day only, no visitor data. Read them with site_report().
+create table if not exists public.site_stats (
+  day   date not null default current_date,
+  event text not null,
+  n     integer not null default 0,
+  primary key (day, event)
+);
+alter table public.site_stats enable row level security;
+
+create or replace function public.bump_site(what text)
+returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no))$' then
+    raise exception 'unknown site event %', what;
+  end if;
+  insert into public.site_stats as s (day, event, n) values (current_date, what, 1)
+  on conflict (day, event) do update set n = s.n + 1;
+end $$;
+
+-- Totals over the last few days. In the SQL editor: select * from site_report(28);
+create or replace function public.site_report(days int default 28)
+returns table (event text, total bigint)
+language sql stable security definer set search_path = '' as $$
+  select s.event, sum(s.n) from public.site_stats s
+  where s.day > current_date - days
+  group by s.event order by s.event;
+$$;
+revoke all on function public.bump_site(text) from public, anon, authenticated;
+revoke all on function public.site_report(int) from public, anon, authenticated;
+grant execute on function public.bump_site(text) to service_role;
+grant execute on function public.site_report(int) to service_role;
+
 -- Full text for "Ask this paper". A paper is read from arXiv the first time someone
 -- asks about it (or in advance for the daily picks), split into sections, and kept.
 -- Papers nobody asks about for 30 days are removed by prune_fulltext().

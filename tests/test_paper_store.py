@@ -79,3 +79,13 @@ def test_index_counts_unique_papers_newest_first(tmp_path):
     index = rebuild_index(str(tmp_path))
     assert [d["date"] for d in index["days"]] == ["2026-10-31", "2026-10-30"]
     assert index["total_papers"] == 3  # "b" appears on both days
+
+
+def test_save_day_keeps_only_the_best_but_counts_everything(tmp_path):
+    papers = [_paper(f"p{i}", score=i) for i in range(10)]
+    selected = [papers[0]]  # the lowest score is still kept because it is featured
+    save_day(papers, selected, "2026-10-31", data_dir=str(tmp_path), keep=4)
+
+    day = json.loads((tmp_path / "daily" / "2026-10-31.json").read_text(encoding="utf-8"))
+    assert day["scanned"] == 10
+    assert [p["id"] for p in day["papers"]] == ["p0", "p9", "p8", "p7"]

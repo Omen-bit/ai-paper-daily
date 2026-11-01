@@ -52,7 +52,7 @@ def run() -> None:
     recent_paper_ids = paper_store.recent_featured(7)
 
     # --- Step 1: Fetch papers ---
-    all_papers = fetch_all_papers(max_arxiv=150)
+    all_papers = fetch_all_papers()
 
     if not all_papers:
         print("\n⚠️ No papers fetched today (arXiv may not have published yet - common on weekends).")

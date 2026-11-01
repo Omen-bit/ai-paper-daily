@@ -289,3 +289,12 @@ def test_picks_show_when_the_paper_came_out(tmp_path):
     assert home.count("Older paper, trending now") == 1
     old = open(os.path.join(site_dir, "paper", "2608.2.html"), encoding="utf-8").read()
     assert "Trending since" in old
+
+
+def test_featured_cards_ask_if_the_paper_was_seen_before():
+    from site_builder import featured_card, seen_check
+    rec = {"id": "2610.00001", "title": "T", "abstract": "A.", "submitted": "2026-10-30", "slot": "pick"}
+    html = featured_card(rec, 1, "")
+    assert 'data-slot="pick"' in html and 'data-seen="2610.00001"' in html
+    assert seen_check(dict(rec, slot="most-read"))
+    assert seen_check(dict(rec, slot=None)) == ""  # editions from before slots existed

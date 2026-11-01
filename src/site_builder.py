@@ -352,7 +352,25 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
   {blurb}
   <p class="pick-date">Published {esc(nice_date(published(rec)))}{OLDER_FLAG if is_older(rec) else ""}</p>
   <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
+  {seen_check(rec)}
 </article>"""
+
+
+# Slots whose cards ask "Seen this already?". The answers, and the clicks on
+# each card, show whether readers get something from us that Hugging Face
+# didn't already give them.
+MEASURED_SLOTS = ("pick", "trending", "runner-up", "most-read")
+
+
+def seen_check(rec: dict) -> str:
+    slot = rec.get("slot")
+    if slot not in MEASURED_SLOTS:
+        return ""
+    return f"""<div class="seen" data-seen="{esc(rec['id'])}">
+    <span data-seen-q>Seen this paper before today?</span>
+    <button class="btn btn-outline btn-sm" type="button" data-seen-vote="yes" aria-pressed="false">Yes</button>
+    <button class="btn btn-outline btn-sm" type="button" data-seen-vote="no" aria-pressed="false">No, new to me</button>
+  </div>"""
 
 
 def paper_row(rec: dict, root: str) -> str:
@@ -475,13 +493,15 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
         featured = featured[:1] + [dict(papers[top["id"]], slot="most-read", readers=top["views"])]
     others = [papers[p["id"]] for p in latest["papers"] if p["id"] not in featured_ids][:MORE_FROM_TODAY]
     n_today = len(latest["papers"])
+    # Newer editions read every arXiv paper but store only the best ("scanned" counts them all)
+    n_scanned = max(latest.get("scanned") or 0, n_today)
     minutes = sum(pick_minutes(r) for r in featured)
 
     cards = "\n".join(featured_card(r, n, "") for n, r in enumerate(featured, 1))
     more = ""
     if others:
         rows = "\n".join(home_row(r, n) for n, r in enumerate(others, len(featured) + 1))
-        link = f'<a class="more" href="day/{esc(latest["date"])}.html">See all {n_today} papers from today</a>'
+        link = f'<a class="more" href="day/{esc(latest["date"])}.html">{"See all " if n_scanned == n_today else "See the top "}{n_today} papers from today</a>'
         more = f"""<div class="block">
     {section_head("Also new today", "Ranked by our score", link)}
     <ol class="list list-home">{rows}</ol>
@@ -502,7 +522,7 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   </div>
 </section>
 <section class="block" id="today">
-  {section_head("Today’s picks", f"Chosen from {n_today} new papers")}
+  {section_head("Today’s picks", f"Chosen from {n_scanned:,} new papers")}
   <div class="picks">{cards}</div>
 </section>
 <section class="block" data-foryou data-url="{RECOMMEND_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" hidden>
