@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "date": "2026-11-01",
- "generated_at": "2026-11-01T13:19:43.575705+00:00",
+ "generated_at": "2026-11-01T15:19:14.875807+00:00",
  "featured": [
   "2610.40614",
   "2610.37161"
@@ -43,22 +43,22 @@
    "featured": true,
    "slot": "pick",
    "summary": {
-    "text": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
+    "text": "Builders can create interactive, large-scale virtual environments without heavy memory or compute costs.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
     "tldr": "L3G-World uses a latent 3D Gaussian memory to generate spatially consistent worlds in real time.",
-    "whats_new": "It introduces a compact Gaussian memory that grows with scene extent and renders directly into latent space, avoiding re-encoding. This yields far fewer primitives and faster updates/rendering.",
-    "key_result": "L3G-World runs at 9 FPS with up to 38.6× fewer 3D primitives, 3.2× faster memory updates, and 359× faster memory rendering versus the best prior baseline.",
-    "why_it_matters": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
+    "whats_new": "Introduces a compact latent 3D Gaussian memory that grows with scene extent and renders directly into diffusion latent space, avoiding re-encoding.",
+    "key_result": "Achieves real-time world generation at 9 FPS with up to 38.6× fewer 3D primitives, 3.2× faster updates, and 359× faster rendering versus prior baselines.",
+    "why_it_matters": "Builders can create interactive, large-scale virtual environments without heavy memory or compute costs.",
     "difficulty": "advanced",
-    "difficulty_reason": "Requires expertise in diffusion transformers and 3D Gaussian representations.",
-    "check_question": "How does L3G-World keep memory size manageable while maintaining real-time performance?",
-    "check_answer": "Memory grows with scene extent, not stream length, using Gaussians that store VAE latents and can be rendered directly, avoiding re-encoding.",
+    "difficulty_reason": "Requires diffusion transformer expertise and GPU resources for real-time rendering.",
+    "check_question": "How does L3G-World keep memory growth limited while maintaining spatial consistency?",
+    "check_answer": "Memory grows with scene extent, not stream length, by spawning and refining Gaussians only in newly observed regions.",
     "build_ideas": [
-     "Generate endless game levels that adapt to player movement in real time.",
-     "Create virtual walkthroughs of architectural designs with instant scene updates.",
-     "Develop an AI-driven film set that expands dynamically as the story progresses."
+     "Create a real-time open-world game prototype using L3G-World for terrain generation.",
+     "Develop an interactive VR exploration app that expands environments on the fly.",
+     "Build a procedural city generator that updates instantly as users navigate."
     ]
    },
    "code_url": "https://github.com/cvlab-kaist/L3G-World",
@@ -93,7 +93,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 36,
+   "hf_upvotes": 37,
    "score": 33,
    "badges": [
     "Trending",
@@ -103,22 +103,22 @@
    "featured": true,
    "slot": "trending",
    "summary": {
-    "text": "Provides developers with a massive, high‑quality task dataset for training agents that can perform real‑world professional work.",
+    "text": "Provides developers with a massive, high‑quality task set for training agents that can perform real‑world professional work.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
     "tldr": "WorkFactory builds coherent professional tasks from intents, enabling scalable training of work agents.",
     "whats_new": "Introduces an information-level planning graph and probe‑execution repair loop to generate executable tasks at large scale.",
-    "key_result": "WorkPilot-35B-A3B raises performance from 879 to 1565 Elo on GDPval-AA v2.1.",
-    "why_it_matters": "Provides developers with a massive, high‑quality task dataset for training agents that can perform real‑world professional work.",
+    "key_result": "WorkPilot-35B-A3B raises performance from 879 to 1565 Elo on GDPval‑AA v2.1.",
+    "why_it_matters": "Provides developers with a massive, high‑quality task set for training agents that can perform real‑world professional work.",
     "difficulty": "advanced",
     "difficulty_reason": "Requires large‑scale model fine‑tuning and handling of complex task graphs.",
     "check_question": "What mechanism does WorkFactory use to detect and fix missing information in generated tasks?",
-    "check_answer": "It runs probe executions that identify support failures and then repairs the task while preserving the intended work.",
+    "check_answer": "It runs probe executions that identify support failures and then applies repairs while preserving the intended work.",
     "build_ideas": [
-     "Create a virtual assistant that automates specific occupational workflows using WorkPilot models.",
-     "Develop a benchmark suite that evaluates agent performance on the 112k generated tasks.",
-     "Fine‑tune a smaller model on a subset of occupations for domain‑specific automation."
+     "Generate domain‑specific assistants using WorkPilot models for customer support.",
+     "Create a task‑generation pipeline that converts user intents into executable workflows.",
+     "Benchmark new LLMs on the WorkFactory task suite to evaluate professional competence."
     ]
    },
    "code_url": "https://github.com/IQuestLab/WorkFactory",
