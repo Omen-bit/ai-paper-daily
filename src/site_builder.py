@@ -276,6 +276,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
       {nav("saved.html", "Saved", "saved", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
     <div class="header-actions">
+      {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump><span class="nav-long">Get it by email</span><span class="nav-short">Subscribe</span></a>' if BUTTONDOWN_USER else ""}
       <a class="cmdk" href="{root}papers.html" data-search-trigger>{icon("search", 15)}<span>Search papers or an idea</span><kbd>/</kbd></a>
       <button class="icon-button" type="button" data-theme-toggle aria-label="Switch light or dark theme" data-tip="Switch theme">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
     </div>
@@ -433,23 +434,51 @@ def home_row(rec: dict, n: int) -> str:
 
 
 def subscribe_box(root: str = "") -> str:
-    """Ask readers to come back tomorrow: email (once Buttondown is set up) or RSS."""
+    """Ask readers to come back tomorrow: email (once Buttondown is set up) or RSS.
+    With email, app.js sends the form in the background and swaps in the "check your
+    inbox" step, and readers who already signed up see one small line instead."""
     rss = f'<a class="text-link" href="{root}feed.xml" data-subscribe="rss">{"Or follow by RSS" if BUTTONDOWN_USER else "Add the RSS feed"}</a>'
-    if BUTTONDOWN_USER:
-        action = f"https://buttondown.com/api/emails/embed-subscribe/{BUTTONDOWN_USER}"
-        form = f"""<form class="subscribe-form" action="{action}" method="post" target="_blank" data-subscribe-form>
+    if not BUTTONDOWN_USER:
+        return f"""<section class="subscribe" id="subscribe" aria-labelledby="sub-title">
+  <div class="subscribe-copy"><h2 id="sub-title">Get tomorrow’s pick</h2><p>Paste the feed link into Feedly, Inoreader or any feed reader to get each day’s picks.</p></div>
+  <div class="subscribe-act">{rss}</div>
+</section>"""
+    action = f"https://buttondown.com/api/emails/embed-subscribe/{BUTTONDOWN_USER}"
+    return f"""<section class="subscribe" id="subscribe" aria-labelledby="sub-title" data-sub-box>
+  <div class="subscribe-copy"><h2 id="sub-title">Get tomorrow’s pick</h2><p>One paper a day in your inbox, explained in plain language. Free, and you can leave any time.</p></div>
+  <div class="subscribe-act" data-sub-ask>
+    <form class="subscribe-form" action="{action}" method="post" target="_blank" data-subscribe-form>
       <label class="sr-only" for="sub-email">Email address</label>
       <input class="input" id="sub-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      <input type="hidden" name="embed" value="1">
       <button class="btn btn-primary" type="submit">Subscribe</button>
-    </form>"""
-        lead = "One paper a day in your inbox, explained in plain language. Free, and you can leave any time."
-    else:
-        form = ""
-        lead = "Paste the feed link into Feedly, Inoreader or any feed reader to get each day’s picks."
-    return f"""<section class="subscribe" aria-labelledby="sub-title">
-  <div class="subscribe-copy"><h2 id="sub-title">Get tomorrow’s pick</h2><p>{lead}</p></div>
-  <div class="subscribe-act">{form}{rss}</div>
+    </form>
+    {rss}
+  </div>
+  <div class="sub-done" data-sub-done role="status" aria-live="polite" hidden>
+    <span class="sub-tick" aria-hidden="true">✓</span>
+    <div><strong>Almost done. Check your inbox.</strong>
+      <p>We sent a confirm link to <span data-sub-email>your email</span>. Not there in a minute? Look in Spam or Promotions, or <button class="link-button" type="button" data-sub-resend>send it again</button>.</p></div>
+  </div>
+</section>
+<p class="sub-mini" data-sub-mini hidden><span class="sub-tick" aria-hidden="true">✓</span>You’re subscribed. Tomorrow’s pick arrives by email.</p>"""
+
+
+def build_subscribed_page() -> str:
+    """Where the confirm link in the Buttondown email lands (set it as the
+    confirmation redirect in Buttondown): what happens next, and something to do now."""
+    body = """<section class="youre-in" data-sub-confirmed>
+  <span class="sub-tick sub-tick-lg" aria-hidden="true">✓</span>
+  <h1>You’re in.</h1>
+  <p class="lead">Your subscription to AI Papers Daily is confirmed. Here’s what happens next.</p>
+  <ol class="expect">
+    <li><b>1</b><div><strong>Tomorrow around 7am IST</strong><span>Your first email: the day’s best new AI paper, explained in plain language.</span></div></li>
+    <li><b>2</b><div><strong>Every day after that</strong><span>One pick plus the trending paper. Unsubscribe with one click at the bottom of any email.</span></div></li>
+    <li><b>3</b><div><strong>Don’t want to wait?</strong><span>Read today’s pick now, or describe your project in Scout and get the papers that fit it.</span></div></li>
+  </ol>
+  <p class="youre-in-actions"><a class="btn btn-primary" href="index.html#today">Read today’s pick</a><a class="btn btn-outline" href="scout.html">Try Scout</a></p>
 </section>"""
+    return page("You’re in", body, description="Your subscription to AI Papers Daily is confirmed.")
 
 
 def section_head(title: str, sub: str = "", link: str = "") -> str:
@@ -1174,6 +1203,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     _write(os.path.join(site_dir, "scout.html"), build_scout_page())
     _write(os.path.join(site_dir, "archive.html"), build_archive(days, papers))
     _write(os.path.join(site_dir, "saved.html"), build_saved_page())
+    _write(os.path.join(site_dir, "subscribed.html"), build_subscribed_page())
 
     # Previous and next paper follow the order of the day the paper first appeared
     neighbours: dict[str, tuple] = {}

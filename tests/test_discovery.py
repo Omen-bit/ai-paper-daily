@@ -94,3 +94,21 @@ def test_search_console_tag_only_when_set(monkeypatch):
     assert "google-site-verification" not in site_builder.page("T", "", path="")
     monkeypatch.setattr(site_builder, "GOOGLE_SITE_VERIFICATION", "abc123")
     assert '<meta name="google-site-verification" content="abc123">' in site_builder.page("T", "", path="")
+
+
+def test_email_signup_stays_on_the_site_once_buttondown_is_set(tmp_path, monkeypatch):
+    monkeypatch.setattr(site_builder, "BUTTONDOWN_USER", "aipapers")
+    site_dir = _build(tmp_path)
+    index = _read(site_dir, "index.html")
+    assert "data-sub-box" in index and "data-sub-done" in index and "data-sub-mini" in index
+    assert 'data-sub-jump' in index and "Get it by email" in index  # header button
+    assert 'name="embed" value="1"' in index
+
+    youre_in = _read(site_dir, "subscribed.html")
+    assert "You’re in." in youre_in and "data-sub-confirmed" in youre_in
+    assert "noindex" in youre_in  # a thank-you page has no place in search results
+
+
+def test_no_header_button_without_buttondown(tmp_path):
+    site_dir = _build(tmp_path)
+    assert "data-sub-jump" not in _read(site_dir, "index.html")

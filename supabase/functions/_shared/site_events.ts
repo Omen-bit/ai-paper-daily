@@ -17,7 +17,7 @@ export const SITE_EVENTS: string[] = [
   // Where each day's first visit came from (the ?ref= tag or the referring site)
   ...SOURCES.map((s) => `src_${s}`),
   // Sign-ups: the RSS link clicked, the email form sent
-  "subscribe_rss", "subscribe_email",
+  "subscribe_rss", "subscribe_email", "subscribe_confirmed",
 ];
 
 export function isSiteEvent(event: string): boolean {

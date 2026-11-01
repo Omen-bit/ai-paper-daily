@@ -548,6 +548,27 @@ mark.flash { background: var(--yellow); color: #111; transition: background .4s;
 .subscribe-act { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; flex: 1 1 320px; justify-content: flex-end; }
 .subscribe-form { display: flex; gap: 8px; flex: 1 1 300px; max-width: 420px; }
 .subscribe-form .input { min-width: 0; }
+.hdr-sub { height: 40px; padding: 0 14px; font-size: 14px; white-space: nowrap; }
+.hdr-sub[hidden] { display: none; }
+.sub-done { display: flex; gap: 12px; align-items: flex-start; flex: 1 1 320px; max-width: 480px; font-size: 14px; }
+.sub-done[hidden], .sub-mini[hidden], .subscribe[hidden], .subscribe-act[hidden] { display: none; }
+.sub-done p { margin: 2px 0 0; color: var(--muted); }
+.sub-tick { flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #1f9d55; color: #fff; font-size: 14px; font-weight: 700; }
+.sub-tick-lg { width: 44px; height: 44px; font-size: 22px; }
+.link-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.link-button:disabled { cursor: default; text-decoration: none; }
+.sub-mini { display: flex; align-items: center; gap: 10px; margin: 8px 0 16px; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--r); font-size: 14px; color: var(--muted); }
+.paper .sub-mini { margin-top: 20px; }
+.sub-mini .sub-tick { width: 22px; height: 22px; font-size: 12px; }
+.youre-in { max-width: 640px; margin: 56px auto; }
+.youre-in h1 { margin: 16px 0; font: 400 clamp(40px, 5vw, 72px)/.95 var(--pixel); letter-spacing: -.02em; }
+.youre-in .lead { font-size: 18px; color: var(--muted); }
+.expect { display: grid; gap: 12px; margin: 28px 0; padding: 0; list-style: none; }
+.expect li { display: flex; gap: 14px; padding: 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.expect b { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--on-accent); }
+.expect span { display: block; color: var(--muted); font-size: 14px; }
+.youre-in-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 680px) { .hdr-sub { height: 36px; padding: 0 12px; font-size: 13px; } }
 @media (max-width: 560px) {
   .subscribe { padding: 16px; }
   .subscribe-act { justify-content: flex-start; }

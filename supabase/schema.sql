@@ -235,7 +235,7 @@ create or replace function public.bump_site(what text)
 returns void
 language plpgsql security definer set search_path = '' as $$
 begin
-  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code)|src_(direct|google|bing|duckduckgo|hn|reddit|x|linkedin|github|producthunt|discord|telegram|newsletter|rss|other)|subscribe_(rss|email))$' then
+  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code)|src_(direct|google|bing|duckduckgo|hn|reddit|x|linkedin|github|producthunt|discord|telegram|newsletter|rss|other)|subscribe_(rss|email|confirmed))$' then
     raise exception 'unknown site event %', what;
   end if;
   insert into public.site_stats as s (day, event, n) values (current_date, what, 1)

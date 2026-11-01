@@ -807,9 +807,77 @@
   document.addEventListener("click", function (e) {
     if (e.target.closest && e.target.closest('[data-subscribe="rss"]')) track("site", "subscribe_rss");
   });
+
+  // ---- Email sign-up without leaving the page ----
+  // The form goes to Buttondown in the background; the box then asks the reader to
+  // confirm from their inbox. "apd.subscribed" remembers it in this browser only, so
+  // the box shrinks to one line and the header button goes away on later visits.
+  var subbed = load("apd.subscribed", null);
+  function showSubscribed() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-sub-box]"), function (box) {
+      box.hidden = true;
+      var mini = box.nextElementSibling;
+      if (mini && mini.hasAttribute("data-sub-mini")) mini.hidden = false;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-sub-jump]"), function (a) { a.hidden = true; });
+  }
+  if (document.querySelector("[data-sub-confirmed]")) {
+    // The confirm link in the email lands here
+    if (!subbed || !subbed.confirmed) track("site", "subscribe_confirmed");
+    subbed = { at: (subbed && subbed.at) || Date.now(), confirmed: true };
+    store("apd.subscribed", subbed);
+  }
+  if (subbed) showSubscribed();
+
+  function sendSignup(form) {
+    // Sent like a normal form post. Buttondown's endpoint gives no readable reply to
+    // other sites, so a sent request counts as done; if the network fails we fall
+    // back to its own page in a new tab
+    var data = new URLSearchParams(new FormData(form));
+    return fetch(form.action, { method: "POST", mode: "no-cors", body: data });
+  }
   Array.prototype.forEach.call(document.querySelectorAll("[data-subscribe-form]"), function (form) {
-    form.addEventListener("submit", function () { track("site", "subscribe_email"); });
+    var box = form.closest("[data-sub-box]");
+    form.addEventListener("submit", function (e) {
+      if (!window.fetch || !window.FormData || !box) return; // old browsers: Buttondown's page in a new tab
+      e.preventDefault();
+      var email = form.querySelector('input[type="email"]').value.trim();
+      var button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      sendSignup(form).then(function () {
+        track("site", "subscribe_email");
+        store("apd.subscribed", { at: Date.now(), confirmed: false });
+        box.querySelector("[data-sub-email]").textContent = email;
+        box.querySelector("[data-sub-ask]").hidden = true;
+        box.querySelector("[data-sub-done]").hidden = false;
+        Array.prototype.forEach.call(document.querySelectorAll("[data-sub-jump]"), function (a) { a.hidden = true; });
+      }, function () {
+        button.disabled = false;
+        form.submit();
+      });
+    });
+    var resend = box && box.querySelector("[data-sub-resend]");
+    if (resend) resend.addEventListener("click", function () {
+      resend.disabled = true;
+      sendSignup(form).then(function () { resend.textContent = "sent again"; }, function () { resend.disabled = false; });
+    });
   });
+
+  // Header button: jump to the sign-up box on this page, or the home page's
+  Array.prototype.forEach.call(document.querySelectorAll("[data-sub-jump]"), function (a) {
+    a.addEventListener("click", function (e) {
+      var box = document.getElementById("subscribe");
+      if (!box || box.hidden) return;
+      e.preventDefault();
+      box.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+      var input = box.querySelector('input[type="email"]');
+      if (input) input.focus({ preventScroll: true });
+    });
+  });
+  if (location.hash === "#subscribe") {
+    var jumpInput = document.querySelector('#subscribe:not([hidden]) input[type="email"]');
+    if (jumpInput) setTimeout(function () { jumpInput.focus({ preventScroll: true }); }, 300);
+  }
   document.addEventListener("click", function (e) {
     var card = e.target.closest && e.target.closest("article.pick[data-slot]");
     if (!card || !slotKey(card) || e.target.closest("[data-seen]")) return;
