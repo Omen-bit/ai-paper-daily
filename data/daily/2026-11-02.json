@@ -1,99 +1,93 @@
 {
  "schema_version": 1,
  "date": "2026-11-02",
- "generated_at": "2026-11-02T05:24:11.229529+00:00",
+ "generated_at": "2026-11-02T05:31:59.226089+00:00",
  "featured": [
-  "2610.40647",
-  "2610.39497"
+  "2610.40614",
+  "2610.32411"
  ],
- "scanned": 916,
+ "scanned": 913,
  "papers": [
   {
-   "id": "2610.40647",
-   "title": "Read, Allocate, Route: Role-Coupled Tokenization for Pixel-Space Generative Transformers",
+   "id": "2610.40614",
+   "title": "L3G-World: Real-Time Infinite World Generation with Latent 3D Gaussian Memory",
    "authors": [
-    "Jiongfan Yang",
-    "Weichen Fan",
-    "Haiwen Diao",
-    "Zhongang Cai",
-    "Ziwei Liu"
+    "Jinhyeok Choi",
+    "JoungBin Lee",
+    "Jongmin Lee",
+    "Minkyeong Jeon",
+    "Jiyoung Kim",
+    "Kaeun Han",
+    "Yoonjin Yoon",
+    "Seungryong Kim"
    ],
-   "abstract": "Pixel-space generative Transformers typically use one token per image patch, so capturing finer detail requires more tokens and makes global attention increasingly expensive. We observe that finer detail does not necessarily require more global communication: low-frequency structure benefits from global exchange, while high-frequency detail can be modeled locally. Based on this insight, we introduce SpecSlot, a pixel-space rectified-flow Transformer that decouples output detail from the length of the global attention sequence. SpecSlot expands each spatial anchor into multiple slots, each assigned a disjoint band of DCT coefficients; this separates anchor density from spectral subdivision. Only the lowest-frequency slot from each anchor participates in global attention, while all slots interact locally. This allows the model to increase spectral detail without enlarging the global sequence. A spatial head further adds a local correction to the spectral prediction, while the generative state, target, and loss remain in pixel space. On ImageNet-256, SpecSlot achieves a comparable final FID to a FLOPs-matched JiT control while converging faster. On ImageNet-512, it improves FID by 2.84 over the control with 3.9% fewer FLOPs, and comes within only 0.69 FID of JiT-B/16 at 38.2% lower cost. On text-to-image generation, SpecSlot surpasses JiT-B/8 on DPG-Bench by 1.06 at 40.6% lower forward cost.",
-   "url": "https://arxiv.org/abs/2610.40647",
-   "pdf_url": "https://arxiv.org/pdf/2610.40647",
+   "abstract": "Interactive world models generate visual content conditioned on user actions, yet maintaining spatial consistency over long-horizon exploration in real time remains challenging. Existing approaches rely on either temporal context or explicit 3D memory, both of which scale poorly because memory grows with the length of the generated stream. Moreover, explicit 3D memories condition latent video generators by re-encoding RGB renderings, which precludes real-time generation. In this paper, we introduce a Latent 3D Gaussian Memory (L3G) that combines the efficiency of feed-forward reconstruction with a compact, rapidly renderable scene representation. Building on this memory, we propose L3G-World, in which a memory updater and a video diffusion transformer (DiT) alternate autoregressively to generate spatially consistent worlds. The memory updater spawns Gaussians in newly observed regions and refines existing ones, so that the memory grows with scene extent rather than stream length. Each Gaussian further stores a VAE latent feature, allowing the memory to be rendered directly into the DiT's latent space without VAE re-encoding. Experiments show that L3G-World achieves state-of-the-art generation quality and long-horizon spatial consistency, with up to $38.6\\times$ fewer 3D primitives, $3.2\\times$ faster memory updates, and $359\\times$ faster memory rendering relative to the most efficient prior 3D-memory baseline for each metric, enabling real-time world generation at 9 FPS.",
+   "url": "https://arxiv.org/abs/2610.40614",
+   "pdf_url": "https://arxiv.org/pdf/2610.40614",
    "submitted": "2026-10-29",
    "arxiv_categories": [
-    "cs.CV",
-    "cs.AI",
-    "cs.LG",
-    "cs.NE"
+    "cs.CV"
    ],
    "categories": [
-    "llms",
-    "generative-ai"
+    "generative-ai",
+    "computer-vision"
    ],
    "source": "arXiv + HuggingFace",
-   "hf_upvotes": 25,
-   "score": 34,
+   "hf_upvotes": 44,
+   "score": 39,
    "badges": [
     "Top Pick",
-    "Trending on HF"
+    "Trending on HF",
+    "Novel Method"
    ],
    "featured": true,
    "slot": "pick",
    "summary": {
-    "text": "Builders can generate higher‑resolution images with less compute by avoiding long global attention sequences.",
+    "text": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
-    "tldr": "SpecSlot adds spectral slots to Transformers, letting high-frequency detail be modeled locally while keeping global attention cheap.",
-    "whats_new": "It introduces disjoint DCT‑coefficient slots per spatial anchor, separating global low‑frequency attention from local high‑frequency processing.",
-    "key_result": "On ImageNet‑512, SpecSlot improves FID by 2.84 over the control with 3.9% fewer FLOPs.",
-    "why_it_matters": "Builders can generate higher‑resolution images with less compute by avoiding long global attention sequences.",
+    "tldr": "L3G-World uses a latent 3D Gaussian memory to generate infinite, spatially consistent worlds in real time.",
+    "whats_new": "Introduces a compact latent 3D Gaussian memory that grows with scene extent and renders directly into diffusion transformer latent space, avoiding re-encoding.",
+    "key_result": "Achieves real-time world generation at 9 FPS with up to 38.6× fewer 3D primitives, 3.2× faster updates, and 359× faster rendering versus prior baselines.",
+    "why_it_matters": "Builders can create interactive, large-scale virtual environments without prohibitive memory or latency costs.",
     "difficulty": "advanced",
-    "difficulty_reason": "requires custom Transformer architecture and spectral slot implementation.",
-    "check_question": "How does SpecSlot limit global attention to only part of the token sequence?",
-    "check_answer": "Only the lowest‑frequency slot from each spatial anchor participates in global attention; all other slots interact locally.",
+    "difficulty_reason": "Requires expertise in diffusion models, 3D Gaussian representations, and high‑performance GPU implementation.",
+    "check_question": "How does the L3G memory avoid scaling with the length of the generated video stream?",
+    "check_answer": "The memory grows with the spatial extent of the scene, not the stream length, by spawning Gaussians only in newly observed regions.",
     "build_ideas": [
-     "Create a high‑resolution image synthesis API using SpecSlot for faster inference.",
-     "Implement a text‑to‑image service that leverages the local‑global split to reduce cost.",
-     "Develop a plug‑in for existing diffusion pipelines that swaps in SpecSlot for cheaper high‑detail generation."
+     "Create a procedurally generated game level that updates as the player explores.",
+     "Develop a VR walkthrough that expands infinitely while maintaining visual coherence.",
+     "Build a real-time simulation for robotics training in ever‑growing 3D spaces."
     ]
    },
-   "code_url": "https://github.com/JiongfanYang/SpecSlot",
+   "code_url": "https://github.com/cvlab-kaist/L3G-World",
    "first_seen": "2026-11-02"
   },
   {
-   "id": "2610.39497",
-   "title": "Does Scaling Toward AGI Depend on What System-1 Lets System-2 Execute?",
+   "id": "2610.32411",
+   "title": "A Broader Look into MLLM's Retrieval Heads",
    "authors": [
-    "Qi Wang",
-    "Yun Qu",
-    "Lizhou Cai",
-    "Heming Zou",
-    "Haoang Chi",
-    "Yiqin Lv",
-    "Xiang Li",
-    "Haiyan Feng",
-    "Mengyu Ge",
-    "Yize Geng",
-    "Yuhang Jiang",
-    "Yixiu Mao",
-    "Xiangyang Ji"
+    "Jia Wang",
+    "Yuqing Li",
+    "Jiangnan Li",
+    "Zheng Lin",
+    "Mo Yu"
    ],
-   "abstract": "Progress toward artificial general intelligence (AGI) has largely relied on scaling a resource-intensive executive, System-2, through larger models, more data and compute, longer reasoning, and more agents. We ask whether the next stage may come instead from co-designing it with System-1, a lightweight, semantically aware predictor that evaluates candidate interactions before execution, so that System-2 acts only on those worth their cost. Our answer is a qualified yes. We study \\textit{conditional interaction}, a predict--gate--execute--update loop: System-1 estimates each candidate's utility, System-2 executes those admitted by an adaptive threshold, and the outcomes update System-1. The loop spans training, test-time reasoning, adaptive decision-making, and agentic tool use, with utility and cost defined by the application. Under ideal screening and equal execution costs, execution compute falls by a factor approaching $1/ρ_u$, where $ρ_u$ is the density of utility-relevant interactions (cost-weighted when costs differ); prediction errors, exploration, and distribution shift reduce the saving. We bound selection regret by predictor error and the utility margin. These results motivate our central hypothesis: $ρ_u$ is a measurable coordinate of scaling efficiency and makes informative compute a better description of scaling than total compute.",
-   "url": "https://arxiv.org/abs/2610.39497",
-   "pdf_url": "https://arxiv.org/pdf/2610.39497",
-   "submitted": "2026-10-29",
+   "abstract": "Locating relevant evidence in long inputs is a core capability of Multimodal Large Language Models. Prior studies attribute this capability to retrieval heads, a sparse set of attention heads that transfer information from the context to the output. However, these analyses are confined to a limited set of modalities and the corresponding models. Moreover, how retrieval heads can be leveraged to enhance the model calls for further exploration. In this paper, we ask whether this mechanism expands together with the input modalities of the model. Taking audio-visual input as a newly added modality, we construct paired inputs in which the same answer is either spoken or shown on screen. With the evidence content fixed, retrieval heads remain sparse in the new modality and are shared to a large extent across modalities. Across 18 language, vision-language, and omni-modal checkpoints, omni-modal models largely preserve the retrieval heads of their backbones. Ablating these heads eliminates nearly all audio-visual retrieval. The heads shared across modalities make up fewer than 2\\% of all heads, yet ablating them also degrades document understanding, spatial perception, and visual mathematics. Building on these findings, we turn retrieval heads into a target of optimization by training their attention with a ranking objective. This raises the page Recall@1 of Qwen3-VL-8B on MMDocIR by 6.03 points and improves document retrieval across three model families. Functional attention heads can thus serve both as a lens on multimodal models and as a target for improving them.",
+   "url": "https://arxiv.org/abs/2610.32411",
+   "pdf_url": "https://arxiv.org/pdf/2610.32411",
+   "submitted": "2026-10-22",
    "arxiv_categories": [
-    "cs.AI"
+    "cs.CL"
    ],
    "categories": [
-    "reasoning-agents"
+    "llms",
+    "multimodal"
    ],
-   "source": "arXiv + HuggingFace",
-   "hf_upvotes": 31,
-   "score": 33,
+   "source": "HuggingFace",
+   "hf_upvotes": 30,
+   "score": 31,
    "badges": [
     "Trending",
     "Trending on HF"
@@ -101,22 +95,22 @@
    "featured": true,
    "slot": "trending",
    "summary": {
-    "text": "Builders can cut expensive inference costs by letting a cheap model filter actions before running large models.",
+    "text": "Understanding and improving retrieval heads can directly enhance multimodal model performance on real-world tasks.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
-    "tldr": "Co-design System-1 predictor with System-2 to screen interactions, reducing execution compute proportional to utility density.",
-    "whats_new": "Introduces a conditional interaction loop where a lightweight predictor gates costly execution, and provides theoretical bounds on compute savings and selection regret.",
-    "key_result": "Execution compute falls by a factor approaching 1/ρ_u under ideal screening and equal execution costs, where ρ_u is the density of utility-relevant interactions.",
-    "why_it_matters": "Builders can cut expensive inference costs by letting a cheap model filter actions before running large models.",
+    "tldr": "The paper studies multimodal retrieval heads, shows they stay sparse across modalities, and improves them with a ranking loss.",
+    "whats_new": "It extends analysis to audio-visual inputs and demonstrates that optimizing retrieval heads boosts document retrieval performance.",
+    "key_result": "Training retrieval heads with a ranking objective raises Qwen3-VL-8B's page Recall@1 on MMDocIR by 6.03 points.",
+    "why_it_matters": "Understanding and improving retrieval heads can directly enhance multimodal model performance on real-world tasks.",
     "difficulty": "intermediate",
-    "difficulty_reason": "Requires integrating two models and measuring utility density, but no massive new compute",
-    "check_question": "What factor does execution compute reduce by according to the paper’s ideal screening scenario?",
-    "check_answer": "It reduces by a factor approaching 1 divided by ρ_u, the density of utility‑relevant interactions.",
+    "difficulty_reason": "Requires multimodal model fine‑tuning and ranking loss implementation.",
+    "check_question": "What effect does training retrieval heads with a ranking objective have on Qwen3-VL-8B's Recall@1?",
+    "check_answer": "It increases the page Recall@1 on MMDocIR by 6.03 points.",
     "build_ideas": [
-     "Implement a predictor‑gate system for tool‑using agents to prune low‑value API calls",
-     "Create a chatbot that uses a small model to decide when to invoke a large language model",
-     "Design a reinforcement‑learning pipeline where a lightweight net screens candidate policies before costly rollout"
+     "Fine‑tune a multimodal model's retrieval heads for better document search.",
+     "Create a tool that visualizes shared retrieval heads across modalities.",
+     "Develop an audio‑visual QA system that leverages optimized retrieval heads."
     ]
    },
    "code_url": null,
@@ -174,7 +168,7 @@
     "audio-speech"
    ],
    "source": "arXiv + HuggingFace",
-   "hf_upvotes": 5,
+   "hf_upvotes": 6,
    "score": 34,
    "badges": [
     "Trending on HF",
@@ -381,40 +375,6 @@
    "first_seen": "2026-11-02"
   },
   {
-   "id": "2610.32411",
-   "title": "A Broader Look into MLLM's Retrieval Heads",
-   "authors": [
-    "Jia Wang",
-    "Yuqing Li",
-    "Jiangnan Li",
-    "Zheng Lin",
-    "Mo Yu"
-   ],
-   "abstract": "Locating relevant evidence in long inputs is a core capability of Multimodal Large Language Models. Prior studies attribute this capability to retrieval heads, a sparse set of attention heads that transfer information from the context to the output. However, these analyses are confined to a limited set of modalities and the corresponding models. Moreover, how retrieval heads can be leveraged to enhance the model calls for further exploration. In this paper, we ask whether this mechanism expands together with the input modalities of the model. Taking audio-visual input as a newly added modality, we construct paired inputs in which the same answer is either spoken or shown on screen. With the evidence content fixed, retrieval heads remain sparse in the new modality and are shared to a large extent across modalities. Across 18 language, vision-language, and omni-modal checkpoints, omni-modal models largely preserve the retrieval heads of their backbones. Ablating these heads eliminates nearly all audio-visual retrieval. The heads shared across modalities make up fewer than 2\\% of all heads, yet ablating them also degrades document understanding, spatial perception, and visual mathematics. Building on these findings, we turn retrieval heads into a target of optimization by training their attention with a ranking objective. This raises the page Recall@1 of Qwen3-VL-8B on MMDocIR by 6.03 points and improves document retrieval across three model families. Functional attention heads can thus serve both as a lens on multimodal models and as a target for improving them.",
-   "url": "https://arxiv.org/abs/2610.32411",
-   "pdf_url": "https://arxiv.org/pdf/2610.32411",
-   "submitted": "2026-10-22",
-   "arxiv_categories": [
-    "cs.CL"
-   ],
-   "categories": [
-    "llms",
-    "multimodal"
-   ],
-   "source": "HuggingFace",
-   "hf_upvotes": 30,
-   "score": 31,
-   "badges": [
-    "Trending on HF"
-   ],
-   "featured": false,
-   "slot": null,
-   "summary": null,
-   "curator": null,
-   "code_url": null,
-   "first_seen": "2026-11-02"
-  },
-  {
    "id": "2610.35138",
    "title": "Co-Design Bench: Multimodal Collaborative Coding Evaluation for Agentic Models",
    "authors": [
@@ -563,7 +523,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 10,
+   "hf_upvotes": 11,
    "score": 29,
    "badges": [
     "Trending on HF",
@@ -641,7 +601,7 @@
     "reasoning-agents"
    ],
    "source": "arXiv + HuggingFace",
-   "hf_upvotes": 6,
+   "hf_upvotes": 7,
    "score": 28,
    "badges": [
     "Trending on HF",
@@ -1419,7 +1379,7 @@
     "reasoning-agents"
    ],
    "source": "HuggingFace",
-   "hf_upvotes": 1,
+   "hf_upvotes": 2,
    "score": 22,
    "badges": [
     "Trending on HF"
@@ -7557,6 +7517,51 @@
    "categories": [
     "computer-vision",
     "multimodal"
+   ],
+   "source": "arXiv",
+   "hf_upvotes": 0,
+   "score": 12,
+   "badges": [],
+   "featured": false,
+   "slot": null,
+   "summary": null,
+   "curator": null,
+   "code_url": null,
+   "first_seen": "2026-11-02"
+  },
+  {
+   "id": "2610.39714",
+   "title": "MoLRSI: A Recursive Self-Improving AI agent for Molecular Discovery",
+   "authors": [
+    "Yikun Zhang",
+    "Xiwei Cheng",
+    "Mingze Yuan",
+    "Yu Zhang",
+    "Brian Shim",
+    "Aarti Krishnan",
+    "Daniel Rosen",
+    "Kunyang Sun",
+    "Yingze Wang",
+    "Zhenfeng Deng",
+    "Botao Yu",
+    "Bingxu Liu",
+    "David Liu",
+    "Tianyu Liu",
+    "Yuanqi Du",
+    "Nir Hacohen",
+    "James J. Collins",
+    "Wengong Jin"
+   ],
+   "abstract": "Molecular discovery requires navigating vast combinatorial search spaces while balancing competing biological objectives. AI agents can automate expert-defined molecular design protocols, but automation alone does not address how to optimize workflows for new tasks or improve their development through experience. Here we introduce MoLRSI, an AI agent that combines systematic optimization of workflows and model architectures with persistent cross-task memory to recursively improve its search policy for molecular discovery. Workflow performance, refinement outcomes, and execution feedback guide subsequent searches, allowing the agent to improve both its workflows and its strategy for developing them. We evaluate MoLRSI in two challenging molecular discovery settings that require balancing competing properties. In antibiotic discovery, MoLRSI developed a screening workflow balancing antibacterial activity, cytotoxicity and structural novelty, achieving an experimental hit rate of 15.9%, compared with 8.7% for a previous expert-led workflow using the same training data and screening library. In de novo peptide-MHC binder design, MoLRSI developed workflows that jointly consider target binding and specificity, producing eight experimentally validated hits against MART-1 and SARS-CoV-1 pMHCs with preferential binding over tested off-targets while Claude Science completely failed. These findings demonstrate how experience-guided workflow optimization can address competing discovery objectives while improving the search strategies used in subsequent campaigns.",
+   "url": "https://arxiv.org/abs/2610.39714",
+   "pdf_url": "https://arxiv.org/pdf/2610.39714",
+   "submitted": "2026-10-29",
+   "arxiv_categories": [
+    "cs.AI"
+   ],
+   "categories": [
+    "alignment",
+    "reasoning-agents"
    ],
    "source": "arXiv",
    "hf_upvotes": 0,
