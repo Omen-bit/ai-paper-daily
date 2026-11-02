@@ -51,6 +51,10 @@ GOOGLE_SITE_VERIFICATION = os.environ.get("GOOGLE_SITE_VERIFICATION", "").strip(
 # Buttondown username for the email sign-up box. Set it as the BUTTONDOWN_USER
 # repository variable; until then the box offers the RSS feed only.
 BUTTONDOWN_USER = re.sub(r"[^A-Za-z0-9_-]", "", os.environ.get("BUTTONDOWN_USER", ""))
+# Umami Cloud website ID (a UUID from cloud.umami.is > Settings > Websites) for visitor
+# analytics: visitors, pages, sources, countries and key actions. No cookies.
+# Set it as the UMAMI_WEBSITE_ID repository variable; nothing is added while it is empty.
+UMAMI_WEBSITE_ID = re.sub(r"[^a-f0-9-]", "", os.environ.get("UMAMI_WEBSITE_ID", "").strip().lower())
 
 CATEGORY_NAMES = {slug: name for _, name, slug, _, _ in CATEGORIES}
 CATEGORY_NAMES["other-ml"] = "Other ML"
@@ -250,6 +254,11 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
             f'\n<link rel="alternate" type="application/rss+xml" title="{SITE_NAME}: daily picks" href="{SITE_URL}feed.xml">')
     if GOOGLE_SITE_VERIFICATION:
         seo += f'\n<meta name="google-site-verification" content="{esc(GOOGLE_SITE_VERIFICATION)}">'
+    if UMAMI_WEBSITE_ID:
+        # app.js sends the page view itself (auto-track off), so it can read the ?ref=
+        # tag before tidying it out of the address bar.
+        seo += (f'\n<script id="umami" defer src="https://cloud.umami.is/script.js"'
+                f' data-website-id="{UMAMI_WEBSITE_ID}" data-auto-track="false"></script>')
 
     def nav(href, label, key, extra=""):
         current = ' aria-current="page"' if key == active else ""

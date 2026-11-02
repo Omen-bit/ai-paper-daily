@@ -77,6 +77,7 @@ jobs:
           SITE_URL: ${{ vars.SITE_URL }}
           GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
           BUTTONDOWN_USER: ${{ vars.BUTTONDOWN_USER }}
+          UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
         run: python src/site_builder.py
 
       - if: steps.check.outputs.skip != 'true'

@@ -351,3 +351,16 @@ def test_tidy_tex_makes_abstract_maths_readable():
     from site_builder import tidy_tex
     assert tidy_tex(r"up to $38.6\times$ fewer and $\geq 90\%$") == "up to 38.6× fewer and ≥ 90%"
     assert tidy_tex("costs $5 and $6 per hour") == "costs $5 and $6 per hour"
+
+
+def test_umami_script_only_when_a_website_id_is_set(tmp_path, monkeypatch):
+    import site_builder
+    site_dir = tmp_path / "site"
+    build_site(str(tmp_path / "missing"), str(site_dir))
+    assert "umami" not in (site_dir / "index.html").read_text(encoding="utf-8")
+
+    monkeypatch.setattr(site_builder, "UMAMI_WEBSITE_ID", "0a1b2c3d-1111-2222-3333-444455556666")
+    build_site(str(tmp_path / "missing"), str(site_dir))
+    index = (site_dir / "index.html").read_text(encoding="utf-8")
+    assert 'data-website-id="0a1b2c3d-1111-2222-3333-444455556666"' in index
+    assert 'data-auto-track="false"' in index

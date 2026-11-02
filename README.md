@@ -197,6 +197,8 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 Without Supabase the daily edition and site still work; search, Scout, Ask, For you and Most read need it.
 
 To use different Groq models, set a `GROQ_MODELS` repository variable (or Supabase secret) to a comma-separated list, best first.
+
+For visitor analytics, add the site in a free [Umami Cloud](https://cloud.umami.is) account and set its website ID as the `UMAMI_WEBSITE_ID` repository variable (and pass it to the build step in `daily-digest.yml`). It counts visitors, pages, sources (including `?ref=` tags), countries and key actions such as Scout searches and sign-ups, with no cookies. The site's own daily totals stay in Supabase too: `select * from site_report(28);`.
 </details>
 
 <details>

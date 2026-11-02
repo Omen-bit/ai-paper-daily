@@ -1,6 +1,6 @@
-// AI Papers Daily: the only script on the site. No libraries.
+// AI Papers Daily: the site's own script. No libraries.
 // Everything personal (reading history, saved papers, text size, theme) stays in
-// this browser's localStorage. Nothing is sent anywhere.
+// this browser's localStorage. Only anonymous counts are sent (see "Anonymous counts").
 (function () {
   "use strict";
   var root = document.documentElement;
@@ -659,6 +659,7 @@
       askLog.scrollTop = askLog.scrollHeight;
       askInput.value = "";
       askBtn.disabled = true;
+      goal("ask_question", "Ask this paper");
       callApi(ask.getAttribute("data-url"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -731,7 +732,10 @@
   // Only the paper ID and the kind of event are sent. Each browser counts a
   // paper once, and only after 15 seconds on its page.
   var trackMeta = document.querySelector('meta[name="apd-track"]');
+  // Site-wide actions that also show up as events in Umami
+  var GOALS = /^(scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code)|subscribe_(rss|email|confirmed)|click_(pick|trending|runner_up|most_read))$/;
   function track(id, event) {
+    if (id === "site" && GOALS.test(event)) goal(event);
     if (!trackMeta || !window.fetch || /localhost|127\.0\.0\.1/.test(location.hostname) && !window.APD_TRACK_LOCAL) return;
     fetch(trackMeta.content, {
       method: "POST", keepalive: true,
@@ -790,6 +794,25 @@
     track("site", gap < 0 || isNaN(gap) ? "visit_new" : gap <= 7 ? "visit_return_7d" : "visit_return_old");
     track("site", "src_" + visitSource());
   })();
+
+  // ---- Umami: visitors, pages, sources and key actions (no cookies) ----
+  // The page view is sent from here rather than by Umami on its own, with the
+  // address as it arrived (?ref= and utm_ tags included), because dropRefTag()
+  // below tidies the tags out of the address bar. Umami lists the tags under
+  // Query parameters / UTM, and the referring site under Referrers.
+  var arrivedAt = location.pathname + location.search;
+  function withCounter(fn) {
+    var script = document.getElementById("umami");
+    if (!script) return;
+    if (window.umami && window.umami.track) { fn(window.umami); return; }
+    script.addEventListener("load", function () { if (window.umami && window.umami.track) fn(window.umami); });
+  }
+  function goal(name) {
+    withCounter(function (u) { u.track(name); });
+  }
+  withCounter(function (u) {
+    u.track(function (props) { props.url = arrivedAt; props.referrer = document.referrer; return props; });
+  });
 
   // Where today's first visit came from: a ?ref= tag on our own links (rss,
   // newsletter, a launch post), else the referring site's name. Only that
@@ -1334,6 +1357,7 @@
     };
 
     var post = function (body) {
+      goal("scout_search", "Scout search");
       return callApi(scoutForm.getAttribute("data-url"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1632,6 +1656,7 @@
     results.setAttribute("aria-busy", "true");
     results.innerHTML = new Array(7).join('<div class="pcard skeleton" aria-hidden="true"><span></span><span></span><span></span></div>');
     count.textContent = "Searching by meaning…";
+    goal("search_meaning", "Search by meaning");
     callApi(SEARCH_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
