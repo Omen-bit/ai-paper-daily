@@ -1183,6 +1183,45 @@ body.focus .ask-fab { display: none; }
 .sx-empty b { display: block; margin-bottom: 4px; font-size: 17px; color: var(--ink); }
 .sx-results .feedback { margin-top: 32px; }
 
+/* Scout, step 2: the project split into parts, editable before searching */
+.parts { max-width: 760px; padding: 28px; }
+.parts-title { margin: 0; font: 400 clamp(26px, 3vw, 36px)/1.05 var(--pixel); letter-spacing: -.01em; }
+.parts-summary { margin: 12px 0 0; font-size: 17px; line-height: 1.5; }
+.parts-help { margin: 8px 0 0; max-width: 62ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
+.parts-list { list-style: none; margin: 22px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.parts-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 40px; gap: 14px; align-items: start; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.parts-n { display: grid; place-items: center; width: 28px; height: 28px; margin-top: 22px; border-radius: 6px; background: var(--n); color: #fff; font: 400 14px var(--pixel); }
+.parts-fields { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 12px; }
+.parts-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.parts-lab { font-size: 13px; font-weight: 500; color: var(--muted); }
+.parts-name { font-weight: 600; }
+.parts-del { width: 40px; height: 44px; margin-top: 22px; border: 1px solid transparent; border-radius: 10px; background: none; color: var(--muted); font-size: 15px; cursor: pointer; }
+.parts-del:hover:not(:disabled) { border-color: var(--line); color: var(--ink); }
+.parts-del:disabled { opacity: .3; cursor: default; }
+.parts-add { margin-top: 14px; padding: 10px 14px; border: 1.5px dashed var(--line); border-radius: 10px; background: none; color: var(--ink); font: 500 14px var(--sans); cursor: pointer; }
+.parts-add:hover { border-color: var(--ink); }
+.parts-error { margin: 14px 0 0; }
+.parts-error[hidden] { display: none; }
+.parts-acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.sx-needs-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 22px; }
+.sx-needs-head .sx-kicker { margin-bottom: 10px; }
+.sx-edit-parts { padding: 0; border: 0; background: none; color: var(--ink); font: 500 13px var(--sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.sx-try .text-link { font-size: 13px; }
+.sx-scope { margin: 16px 0 0; max-width: 72ch; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+.sx-scope b { color: var(--ink); font-weight: 600; }
+@media (max-width: 680px) {
+  .parts { padding: 20px; }
+  .parts-row { grid-template-columns: minmax(0, 1fr) 40px; gap: 10px; }
+  .parts-n { display: none; }
+  .parts-fields { grid-template-columns: 1fr; gap: 10px; }
+  .parts-field:first-child .parts-lab { color: var(--n); font-weight: 600; }
+  .parts-acts .btn { flex: 1 1 100%; justify-content: center; }
+}
+@media (max-width: 820px) {
+  .sx-needs-head { padding-top: 10px; justify-content: flex-end; }
+  .sx-needs-head .sx-kicker { display: none; }
+}
+
 /* Phones: the project as a compact bar, needs as chips, quieter entries */
 @media (max-width: 820px) {
   .sx { grid-template-columns: 1fr; gap: 0; }

@@ -754,7 +754,7 @@ def build_scout_page() -> str:
       <span class="label">How it works</span>
       <ol class="how">
         <li><b>You describe</b> the project in a few sentences.</li>
-        <li><b>Scout splits it</b> into the parts it needs, and searches each one by meaning and by keywords.</li>
+        <li><b>Scout splits it</b> into the parts it needs. You can check and edit the parts, then it searches each one by meaning and by keywords.</li>
         <li><b>Every paper found is scored</b> for how well it fits your project. You get the best ones first, with why each fits.</li>
       </ol>
     </div>

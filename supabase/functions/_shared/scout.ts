@@ -27,7 +27,10 @@ export type Match = {
 export type Candidate = Match & { fused: number; needs: string[]; abstract?: string };
 export type Need = { id: string; label: string; query: string };
 export type Ranked = { id: string; score: number | null; fit: Fit; needs: string[]; why: string };
-export type Coverage = { need: string; label: string; status: "covered" | "partial" | "missing"; strong: number; related: number };
+export type Coverage = {
+  need: string; label: string; status: "covered" | "partial" | "missing"; strong: number; related: number;
+  considered: number; // candidate papers this need's search brought in, all read by the ranker
+};
 export type Gap = { need: string; try: string[] };
 export type Ranking = { papers: Ranked[]; gaps: Gap[] };
 
@@ -199,14 +202,62 @@ export function fallbackRanking(candidates: Candidate[], limit = 12): Ranking {
   };
 }
 
-/** Need by need: covered by a strong match, only related papers, or nothing. */
-export function coverageOf(needs: Need[], papers: Ranked[]): Coverage[] {
+/**
+ * Need by need: covered by a strong match, only related papers, or nothing.
+ * "considered" says how many candidates that need's search found, so an empty
+ * result can say how much was read before nothing was kept.
+ */
+export function coverageOf(needs: Need[], papers: Ranked[], candidates: Candidate[] = []): Coverage[] {
   return needs.map((n) => {
     const mine = papers.filter((p) => p.needs.includes(n.id));
     const strong = mine.filter((p) => p.fit === "strong").length;
     const related = mine.length - strong;
-    return { need: n.id, label: n.label, status: strong ? "covered" : mine.length ? "partial" : "missing", strong, related };
+    const considered = candidates.filter((c) => c.needs.includes(n.id)).length;
+    return { need: n.id, label: n.label, status: strong ? "covered" : mine.length ? "partial" : "missing", strong, related, considered };
   });
+}
+
+// What Scout searches, shown beside an empty result so "nobody has studied this"
+// can be told apart from "outside what we hold". Keep in step with ARXIV_CATEGORIES
+// in src/fetcher.py and the Hugging Face backfill in src/supabase_sync.py.
+export const SOURCES = [
+  "arXiv (cs.AI, cs.LG, cs.CL, cs.CV, cs.NE, cs.RO, stat.ML)",
+  "Hugging Face Daily Papers",
+];
+export type Library = { papers: number | null; from: string | null; to: string | null; sources: string[] };
+
+export const MAX_NEEDS = 4;
+const NEED_LABEL_WORDS = 8;
+const NEED_QUERY_WORDS = 14;
+
+/**
+ * Parts the visitor checked or edited before searching: 1 to MAX_NEEDS items of
+ * {label, query}. Empty rows are skipped and a missing label falls back to the query.
+ * Returns an error message instead when nothing usable is left.
+ */
+export function userNeeds(raw: unknown): { needs: Need[] } | { error: string } {
+  if (!Array.isArray(raw)) return { error: "Send the parts of your project as a list." };
+  const needs: Need[] = [];
+  const seen = new Set<string>();
+  for (const item of raw.slice(0, 8) as Record<string, unknown>[]) {
+    if (!item || typeof item !== "object") continue;
+    const query = clean(item.query).slice(0, 160);
+    let label = clean(item.label).slice(0, 80);
+    if (!query) continue;
+    if (words(query) > NEED_QUERY_WORDS) return { error: `Keep each search phrase under ${NEED_QUERY_WORDS + 1} words.` };
+    if (query.length < 3) return { error: "Each search phrase needs a few words." };
+    if (looksLikeCode(String(item.query ?? "")) || looksLikeCode(String(item.label ?? ""))) {
+      return { error: "Describe each part in plain words, not code." };
+    }
+    if (!label) label = query;
+    if (words(label) > NEED_LABEL_WORDS) label = label.split(/\s+/).slice(0, NEED_LABEL_WORDS).join(" ");
+    if (seen.has(query.toLowerCase())) continue;
+    seen.add(query.toLowerCase());
+    needs.push({ id: `n${needs.length + 1}`, label, query });
+  }
+  if (!needs.length) return { error: "Add at least one part with a search phrase." };
+  if (needs.length > MAX_NEEDS) return { error: `Scout searches at most ${MAX_NEEDS} parts. Remove one and try again.` };
+  return { needs };
 }
 
 export const NEEDS_PROMPT = `You help a developer find AI research papers for their project.

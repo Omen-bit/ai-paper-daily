@@ -1165,7 +1165,8 @@
           '<p class="sx-prompt"><span class="sx-ptext">' + esc(description) + "</span></p>" +
           '<div class="sx-pfoot"><span>' + (data.searched ? "Searched " + Number(data.searched).toLocaleString() + " papers" : "") + "</span>" +
           '<button type="button" data-sx-edit>Edit and search again</button></div>' +
-          (cov.length ? '<p class="sx-kicker sx-hide-sm">What it needs</p><ul class="sx-needs">' + needRows + "</ul>" : "") +
+          (cov.length ? '<div class="sx-needs-head"><p class="sx-kicker sx-hide-sm">What it needs</p>' +
+            '<button type="button" class="sx-edit-parts" data-sx-parts>Edit parts</button></div><ul class="sx-needs">' + needRows + "</ul>" : "") +
           '<div class="sx-filters"><label><input type="checkbox" data-sx-toggle="code"> Code released</label>' +
           '<label><input type="checkbox" data-sx-toggle="recent"> Last 6 months</label></div>' +
           (cov.length ? '<div class="sx-chips">' + chips + "</div>" : "") +
@@ -1184,15 +1185,30 @@
         var listEl = out.querySelector("[data-sx-list]");
         var countEl2 = out.querySelector("[data-sx-count]");
         var gapsHtml = function () {
-          return cov.filter(function (c) { return c.status !== "covered" && (!state.need || state.need === c.need); }).map(function (c) {
+          var gaps = cov.filter(function (c) { return c.status !== "covered" && (!state.need || state.need === c.need); }).map(function (c) {
             var g = (data.gaps || []).filter(function (x) { return x.need === c.need; })[0];
             var tries = (g && g.try || []).map(function (t) {
               return '<a class="qchip" href="papers.html?q=' + encodeURIComponent(t) + '&amp;m=1">' + esc(t) + "</a>";
             }).join("");
-            return '<div class="sx-gap"><p><b>No strong paper for “' + esc(c.label) + '” yet.</b> ' +
-              (c.related ? "The related papers above are the closest we have." : "Nothing in our database covers this part.") + "</p>" +
-              (tries ? '<div class="sx-try"><span>Try searching for</span>' + tries + "</div>" : "") + "</div>";
+            var need = needs.filter(function (nd) { return nd.id === c.need; })[0];
+            var why = c.related ? "The related papers above are the closest we have."
+              : c.considered ? "Scout read the " + plural(c.considered, "closest paper", "closest papers") + " for this part, and none fit your project well enough to show."
+              : "Nothing in our library covers this part.";
+            var scholar = need && need.query ? '<a class="text-link" href="https://scholar.google.com/scholar?q=' + encodeURIComponent(need.query) + '" rel="noopener">Search all research on Google Scholar</a>' : "";
+            return '<div class="sx-gap"><p><b>No strong paper for “' + esc(c.label) + '” yet.</b> ' + why + "</p>" +
+              (tries || scholar ? '<div class="sx-try">' + (tries ? "<span>Try searching for</span>" + tries : "") + scholar + "</div>" : "") + "</div>";
           }).join("");
+          return gaps ? gaps + scopeNote() : "";
+        };
+        // What the library holds, so a gap reads as "not in our library", not "nobody has studied this"
+        var scopeNote = function () {
+          var lib = data.library || {};
+          var n = lib.papers || data.searched;
+          var range = lib.from && lib.to ? ", published between " + esc(longDay(lib.from)) + " and " + esc(longDay(lib.to)) : "";
+          var sources = (lib.sources || []).length ? esc(lib.sources.join(" and ")) : "arXiv and Hugging Face Daily Papers";
+          return '<p class="sx-scope"><b>A gap means nothing in our library fits, not that nobody has studied it.</b> ' +
+            "Scout only searches " + (n ? Number(n).toLocaleString() + " " : "the ") + "AI papers from " + sources + range + ". " +
+            "Older work, and research outside these areas, isn’t included.</p>";
         };
         var render = function () {
           var shown = (data.plan || []).filter(function (p) {
@@ -1283,6 +1299,12 @@
           out.onclick = null;
           out.innerHTML = introHtml; desc.value = ""; paintCount(); desc.focus();
         });
+        var partsBtn = out.querySelector("[data-sx-parts]");
+        if (partsBtn) partsBtn.addEventListener("click", function () {
+          scoutWrap.classList.remove("has-results");
+          out.onclick = null;
+          paintSplit({ summary: data.summary, needs: data.needs, planned: true }, description, true);
+        });
         out.querySelector("[data-sx-edit]").addEventListener("click", function () {
           scoutWrap.classList.remove("has-results");
           desc.value = description; paintCount(); desc.focus();
@@ -1302,50 +1324,172 @@
     try { scoutNames = JSON.parse(scoutForm.getAttribute("data-names")) || {}; } catch (e) { /* slugs */ }
 
     var LOADING = ["Reading your description…", "Searching by meaning and by keywords…", "Scoring each paper for your project…"];
-    var loading = function () {
-      var step = 0;
-      out.innerHTML = '<div class="card pad scout-loading" aria-busy="true"><span class="label" data-loading-text>' + LOADING[0] + "</span>" +
+    var loading = function (from, only) {
+      var step = from || 0;
+      out.innerHTML = '<div class="card pad scout-loading" aria-busy="true"><span class="label" data-loading-text>' + LOADING[step] + "</span>" +
         '<span class="pixbar pixbar-run" aria-hidden="true">' + new Array(9).join("<i></i>") + "</span></div>" +
         '<div class="plan-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>';
       var label = out.querySelector("[data-loading-text]");
-      return setInterval(function () { step = Math.min(step + 1, LOADING.length - 1); label.textContent = LOADING[step]; }, 2500);
+      return setInterval(function () { if (only) return; step = Math.min(step + 1, LOADING.length - 1); label.textContent = LOADING[step]; }, 2500);
     };
 
+    var post = function (body) {
+      return callApi(scoutForm.getAttribute("data-url"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }, 90000).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, status: r.status, data: d }; });
+      });
+    };
+    var failed = function (title, res) {
+      out.innerHTML = '<div class="card pad empty-card"><span class="label">' + title + "</span><p>" +
+        esc((res && res.data && res.data.error) || "Scout is unavailable right now. Try again in a minute.") + "</p></div>";
+    };
+    var offline = function () {
+      out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t reach Scout</span><p>' +
+        (navigator.onLine === false ? "You’re offline. Reconnect and try again." : "That took too long or the connection dropped. Please try again.") + "</p></div>";
+    };
+    var busy = function (on, label) {
+      goBtn.disabled = on;
+      goBtn.textContent = on ? label : "Find papers";
+    };
+
+    // ---- Step 2: show how Scout split the project, and let the visitor edit it ----
+    var MAX_PARTS = 4;
+    var firstWords = function (text, n) { return text.split(/\s+/).slice(0, n).join(" "); };
+    var paintSplit = function (split, description, fromResults) {
+      var parts = (split.needs || []).map(function (nd) { return { label: nd.label || "", query: nd.query || "" }; });
+      var guessed = !parts.length;
+      if (guessed) parts = [{ label: "Your project", query: firstWords(description, 12) }];
+      var summary = split.summary || "";
+
+      var row = function (p, i) {
+        var n = i + 1;
+        return '<li class="parts-row" style="--n:' + NEED_COLORS[i % NEED_COLORS.length] + '">' +
+          '<span class="parts-n" aria-hidden="true">' + n + "</span>" +
+          '<div class="parts-fields">' +
+          '<label class="parts-field"><span class="parts-lab">Part ' + n + '</span>' +
+          '<input class="input parts-name" type="text" maxlength="60" value="' + esc(p.label) + '" data-part-label="' + i + '" placeholder="For example: Speech to text"></label>' +
+          '<label class="parts-field"><span class="parts-lab">Searches for</span>' +
+          '<input class="input parts-query" type="text" maxlength="160" value="' + esc(p.query) + '" data-part-query="' + i + '" placeholder="A few words a paper on this part would use"></label>' +
+          "</div>" +
+          '<button class="parts-del" type="button" data-part-del="' + i + '" aria-label="Remove part ' + n + '"' + (parts.length < 2 ? " disabled" : "") + ">✕</button></li>";
+      };
+      var paint = function () {
+        out.innerHTML = '<div class="card pad parts" data-parts>' +
+          '<h2 class="parts-title">How Scout split your project</h2>' +
+          (summary ? '<p class="parts-summary">' + esc(summary) + "</p>" : "") +
+          '<p class="parts-help">' + (guessed
+            ? "Scout couldn’t split this one automatically, so it will search your description as a single part. Add the parts your project depends on for better results."
+            : "Scout searches each part on its own, then scores every paper it finds against your whole project. Rename a part, change what it searches for, remove one, or add a part it missed.") + "</p>" +
+          '<ol class="parts-list">' + parts.map(row).join("") + "</ol>" +
+          (parts.length < MAX_PARTS ? '<button class="parts-add" type="button" data-part-add>+ Add a part</button>' : '<p class="fine">Scout searches up to ' + MAX_PARTS + " parts.</p>") +
+          '<p class="field-error parts-error" data-split-error role="alert" hidden></p>' +
+          '<div class="parts-acts"><button class="btn btn-primary" type="button" data-split-go>Find papers for ' + (parts.length === 1 ? "this part" : "these " + parts.length + " parts") + "</button>" +
+          '<button class="btn btn-outline" type="button" data-split-back>' + (fromResults ? "Back to results" : "Change description") + "</button></div></div>";
+        wire();
+      };
+      var collect = function () {
+        Array.prototype.forEach.call(out.querySelectorAll("[data-part-label]"), function (el) { parts[+el.getAttribute("data-part-label")].label = el.value; });
+        Array.prototype.forEach.call(out.querySelectorAll("[data-part-query]"), function (el) { parts[+el.getAttribute("data-part-query")].query = el.value; });
+      };
+      var problemOf = function (list) {
+        var filled = list.filter(function (p) { return p.query.trim(); });
+        if (!filled.length) return "Add at least one part with something to search for.";
+        for (var k = 0; k < list.length; k++) {
+          var q = list[k].query.trim();
+          if (!q && list[k].label.trim()) return "Part " + (k + 1) + " needs something to search for.";
+          if (q && q.split(/\s+/).length > 14) return "Keep the search for part " + (k + 1) + " under 15 words.";
+          if (looksLikeCode(list[k].query) || looksLikeCode(list[k].label)) return "Describe part " + (k + 1) + " in plain words, not code.";
+        }
+        return "";
+      };
+      var showErr = function (msg) {
+        var el = out.querySelector("[data-split-error]");
+        el.textContent = msg; el.hidden = !msg;
+      };
+      var wire = function () {
+        var box = out.querySelector("[data-parts]");
+        box.addEventListener("input", function () { showErr(""); });
+        box.addEventListener("focusout", function (e) {
+          if (e.target.matches && e.target.matches("[data-part-query]")) { collect(); var m = problemOf(parts.filter(function (p) { return p.query.trim(); })); if (m) showErr(m); }
+        });
+        var add = out.querySelector("[data-part-add]");
+        if (add) add.addEventListener("click", function () {
+          collect(); parts.push({ label: "", query: "" }); paint();
+          var inputs = out.querySelectorAll("[data-part-label]");
+          inputs[inputs.length - 1].focus();
+        });
+        Array.prototype.forEach.call(out.querySelectorAll("[data-part-del]"), function (b) {
+          b.addEventListener("click", function () {
+            collect(); parts.splice(+b.getAttribute("data-part-del"), 1); paint();
+            var first = out.querySelector("[data-part-label]");
+            if (first) first.focus();
+          });
+        });
+        out.querySelector("[data-split-back]").addEventListener("click", function () {
+          if (fromResults) { var last = load("apd.scout", null); if (last && last.data) { paintPlan(last.data, last.description || description, last.at); return; } }
+          out.innerHTML = introHtml; desc.focus();
+        });
+        out.querySelector("[data-split-go]").addEventListener("click", function () {
+          collect();
+          var msg = problemOf(parts);
+          if (msg) { showErr(msg); return; }
+          var send = parts.filter(function (p) { return p.query.trim(); }).map(function (p) {
+            return { label: p.label.trim() || p.query.trim(), query: p.query.trim() };
+          });
+          runSearch(description, { summary: summary, needs: send });
+        });
+      };
+      paint();
+      out.scrollIntoView({ behavior: "smooth", block: "start" });
+      var firstInput = out.querySelector("[data-part-label]");
+      if (firstInput && guessed) firstInput.focus();
+    };
+
+    // ---- Step 3: search with the checked parts, then show the papers ----
+    var runSearch = function (text, split) {
+      busy(true, "Finding papers…");
+      var timer = loading(1);
+      post({ description: text, summary: split.summary, needs: split.needs }).then(function (res) {
+        clearInterval(timer);
+        if (res.ok && !Array.isArray(res.data.plan)) res = { ok: false, status: 502, data: {} };  // a broken reply
+        if (!res.ok) {
+          if (res.status === 400 && /characters/.test(res.data.error || "")) showProblem(res.data.error || "");
+          if (res.status === 400 && res.data.error && !/characters|looks like code/.test(res.data.error)) {
+            paintSplit(split, text, false);
+            var el = out.querySelector("[data-split-error]");
+            el.textContent = res.data.error; el.hidden = false;
+            return;
+          }
+          failed("Couldn’t find papers", res);
+          return;
+        }
+        store("apd.scout", { description: text, data: res.data, at: Date.now() });
+        paintPlan(res.data, text, 0);
+        out.scrollIntoView({ behavior: "smooth", block: "start" });
+      }).catch(function () { clearInterval(timer); offline(); }).then(function () { busy(false); });
+    };
+
+    // ---- Step 1: the description, split into parts by Scout ----
     scoutForm.addEventListener("submit", function (e) {
       e.preventDefault();
       var text = desc.value.replace(/\s+/g, " ").trim();
       var problem = problemWith(text);
       if (problem) { showProblem(problem); desc.focus(); return; }
       showProblem("");
-      goBtn.disabled = true;
-      goBtn.textContent = "Finding papers…";
-      var timer = loading();
-      callApi(scoutForm.getAttribute("data-url"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: text })
-      }, 90000).then(function (r) {
-        return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, status: r.status, data: d }; });
-      }).then(function (res) {
+      busy(true, "Reading your project…");
+      var timer = loading(0, true);
+      post({ description: text, step: "split" }).then(function (res) {
         clearInterval(timer);
-        if (res.ok && !Array.isArray(res.data.plan)) res = { ok: false, status: 502, data: {} };  // a broken reply
         if (!res.ok) {
           if (res.status === 400 || /code|characters/.test(res.data.error || "")) showProblem(res.data.error || "");
-          out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t find papers</span><p>' +
-            esc(res.data.error || "Scout is unavailable right now. Try again in a minute.") + "</p></div>";
+          failed("Couldn’t read your project", res);
           return;
         }
-        store("apd.scout", { description: text, data: res.data, at: Date.now() });
-        paintPlan(res.data, text, 0);
-        out.scrollIntoView({ behavior: "smooth", block: "start" });
-      }).catch(function () {
-        clearInterval(timer);
-        out.innerHTML = '<div class="card pad empty-card"><span class="label">Couldn’t reach Scout</span><p>' +
-          (navigator.onLine === false ? "You’re offline. Reconnect and try again." : "That took too long or the connection dropped. Please try again.") + "</p></div>";
-      }).then(function () {
-        goBtn.disabled = false;
-        goBtn.textContent = "Find papers";
-      });
+        paintSplit(res.data || {}, text, false);
+      }).catch(function () { clearInterval(timer); offline(); }).then(function () { busy(false); });
     });
 
     // Bring back the last plan from this browser

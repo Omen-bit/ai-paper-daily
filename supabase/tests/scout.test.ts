@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   type Candidate, cleanDescription, coverageOf, descriptionProblem, fallbackRanking, fuseLists, looksLikeCode,
-  type Match, type Need, parseNeeds, parseRanking, rankInput, singleNeed,
+  MAX_NEEDS, type Match, type Need, parseNeeds, parseRanking, rankInput, singleNeed, userNeeds,
 } from "../functions/_shared/scout.ts";
 
 const PLAIN = [
@@ -107,4 +107,33 @@ test("the ranking request carries the needs and cut abstracts", () => {
   assert.match(text, /n3: Cite the page/);
   assert.ok(text.length < 1200);
   assert.deepEqual(singleNeed("x".repeat(400))[0].query.length, 300);
+});
+
+test("coverage says how many papers each need's search brought in", () => {
+  const cands = fuseLists([[m("a"), m("b")], [m("b")], []], ["n1", "n2", "n3"]);
+  const cov = coverageOf(NEEDS, [{ id: "a", score: 90, fit: "strong", needs: ["n1"], why: "" }], cands);
+  assert.deepEqual(cov.map((c) => [c.need, c.status, c.considered]), [["n1", "covered", 2], ["n2", "missing", 1], ["n3", "missing", 0]]);
+  assert.equal(coverageOf(NEEDS, [])[0].considered, 0); // older callers without candidates
+});
+
+test("parts edited by the visitor are cleaned, numbered and checked", () => {
+  const ok = userNeeds([
+    { label: "  Speech to text ", query: "on-device speech recognition" },
+    { label: "", query: "small language models on phones" },          // label falls back to the query
+    { label: "Dup", query: "On-device speech recognition" },           // same search twice
+    { label: "Empty", query: "   " },                                  // empty rows are skipped
+  ]);
+  assert.ok("needs" in ok);
+  if ("needs" in ok) {
+    assert.deepEqual(ok.needs.map((n) => [n.id, n.label, n.query]), [
+      ["n1", "Speech to text", "on-device speech recognition"],
+      ["n2", "small language models on phones", "small language models on phones"],
+    ]);
+  }
+  assert.match((userNeeds([]) as { error: string }).error, /at least one/);
+  assert.match((userNeeds("x") as { error: string }).error, /list/);
+  assert.match((userNeeds([{ label: "x", query: "import torch\nmodel = torch.load('x')" }]) as { error: string }).error, /plain words/);
+  assert.match((userNeeds([{ label: "x", query: "word ".repeat(20) }]) as { error: string }).error, /under/);
+  const many = Array.from({ length: MAX_NEEDS + 1 }, (_, i) => ({ label: `Part ${i}`, query: `search phrase number ${i}` }));
+  assert.match((userNeeds(many) as { error: string }).error, /at most/);
 });
