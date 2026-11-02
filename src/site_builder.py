@@ -257,7 +257,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     if UMAMI_WEBSITE_ID:
         # app.js sends the page view itself (auto-track off), so it can read the ?ref=
         # tag before tidying it out of the address bar.
-        seo += (f'\n<script id="umami" defer src="https://cloud.umami.is/script.js"'
+        seo += (f'\n<script id="umami-script" defer src="https://cloud.umami.is/script.js"'
                 f' data-website-id="{UMAMI_WEBSITE_ID}" data-auto-track="false"></script>')
 
     def nav(href, label, key, extra=""):

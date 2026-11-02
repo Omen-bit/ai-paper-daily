@@ -802,7 +802,8 @@
   // Query parameters / UTM, and the referring site under Referrers.
   var arrivedAt = location.pathname + location.search;
   function withCounter(fn) {
-    var script = document.getElementById("umami");
+    // Not id="umami": an element with that id would take over window.umami
+    var script = document.getElementById("umami-script");
     if (!script) return;
     if (window.umami && window.umami.track) { fn(window.umami); return; }
     script.addEventListener("load", function () { if (window.umami && window.umami.track) fn(window.umami); });
