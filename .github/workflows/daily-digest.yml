@@ -80,6 +80,14 @@ jobs:
         run: python src/site_builder.py
 
       - if: steps.check.outputs.skip != 'true'
+        name: Email today's edition
+        continue-on-error: true # the site still publishes if Buttondown is down
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+          BUTTONDOWN_SEND: ${{ vars.BUTTONDOWN_SEND }} # "draft" to review before sending
+        run: python src/send_newsletter.py
+
+      - if: steps.check.outputs.skip != 'true'
         name: Commit the day's data
         run: |
           git config user.name "Omen-bit"
