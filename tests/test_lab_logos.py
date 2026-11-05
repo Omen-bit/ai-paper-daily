@@ -49,7 +49,7 @@ def test_most_square_image_wins(monkeypatch):
 def test_refresh_prefers_hugging_face_avatar_and_saves(tmp_path, monkeypatch):
     monkeypatch.setattr(lab_logos, "_download", lambda url: _png(80, 80))
     monkeypatch.setattr(lab_logos, "wikidata_entity", lambda names: "")
-    n = lab_logos.refresh({"Tiny Lab": "/avatars/tiny.png", "Nobody": ""}, today=date(2026, 1, 5), logo_dir=str(tmp_path))
+    n = lab_logos.refresh({"Tiny Lab": "https://cdn-avatars.huggingface.co/v1/production/uploads/a/tiny.png", "Nobody": ""}, today=date(2026, 1, 5), logo_dir=str(tmp_path))
     assert n == 2
     idx = json.load(open(tmp_path / "index.json"))
     assert idx["Tiny Lab"]["file"] == "tiny-lab.png" and idx["Tiny Lab"]["source"] == "Hugging Face"
@@ -66,3 +66,19 @@ def test_site_uses_official_logo(monkeypatch):
     assert site_builder.compact(rec, {"org": "NVIDIA"})["oi"] == "nvidia.png"
     html = site_builder.build_paper(rec, links={"org": "NVIDIA"})
     assert '<img src="../assets/logos/nvidia.png"' in html and "has-img" in html
+
+
+def test_generated_hugging_face_avatars_are_not_logos():
+    assert lab_logos.is_uploaded_avatar("https://cdn-avatars.huggingface.co/v1/production/uploads/6/x.png")
+    assert not lab_logos.is_uploaded_avatar("/avatars/0f3c2a.svg")
+    assert not lab_logos.is_uploaded_avatar("https://huggingface.co/avatars/0f3c2a.svg")
+    assert not lab_logos.is_uploaded_avatar("")
+
+
+def test_old_entries_are_checked_again(tmp_path, monkeypatch):
+    (tmp_path / "old-lab.png").write_bytes(_png(10, 10))
+    (tmp_path / "index.json").write_text(json.dumps({"Old Lab": {"file": "old-lab.png", "checked": "2026-01-01"}}))
+    monkeypatch.setattr(lab_logos, "wikidata_entity", lambda names: "")
+    assert lab_logos.refresh({"Old Lab": "/avatars/abc.svg"}, today=date(2026, 1, 2), logo_dir=str(tmp_path)) == 1
+    assert not (tmp_path / "old-lab.png").exists()
+    assert lab_logos.index(str(tmp_path / "index.json")) == {}

@@ -34,6 +34,8 @@ RETRY_DAYS = 30      # look again for labs where nothing was found
 MAX_LOOKUPS = int(os.environ.get("LOGO_MAX_LOOKUPS", "60"))
 # Wikidata properties, in order of preference when two images are equally square
 PROPS = ("P2910", "P154", "P158")  # icon, logo image, seal image
+# Bump to look every lab up again after a change in how logos are chosen
+VERSION = 2
 
 
 def slug(name: str) -> str:
@@ -110,6 +112,15 @@ def hf_avatar_url(avatar: str) -> str:
     return avatar if avatar.startswith("http") else "https://huggingface.co" + ("" if avatar.startswith("/") else "/") + avatar
 
 
+def is_uploaded_avatar(avatar: str) -> bool:
+    """
+    True for a logo the organization uploaded itself. An organization that never uploaded one gets a
+    generated pattern from huggingface.co/avatars/..., which is not its logo, so it is skipped.
+    """
+    url = hf_avatar_url(avatar)
+    return bool(url) and "/avatars/" not in url.split("?")[0].replace("cdn-avatars", "")
+
+
 # --- Wikidata -------------------------------------------------------------
 
 WIKIDATA_API = "https://www.wikidata.org/w/api.php"
@@ -182,7 +193,7 @@ def pick_wikidata(images: list[tuple[str, str]]) -> tuple[str, str]:
 # --- Refresh --------------------------------------------------------------
 
 def due(entry: dict | None, today: date) -> bool:
-    if not entry:
+    if not entry or entry.get("v") != VERSION:
         return True
     if entry.get("file"):
         return False
@@ -194,7 +205,7 @@ def due(entry: dict | None, today: date) -> bool:
 
 def find_logo(lab: str, aliases: list[str], avatar: str = "") -> tuple[bytes, str]:
     """(PNG bytes, where it came from) for a lab, or (b'', '') when no official logo was found."""
-    if avatar:
+    if avatar and is_uploaded_avatar(avatar):
         try:
             return to_square_png(_download(hf_avatar_url(avatar))), "Hugging Face"
         except Exception as exc:
@@ -224,7 +235,7 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
         if not due(idx.get(lab), today):
             continue
         aliases = [a for a in lab_names.LABS.get(lab, []) if len(a) >= 4 and not re.fullmatch(r"[a-z0-9\-]+", a)]
-        entry = {"checked": today.isoformat()}
+        entry = {"checked": today.isoformat(), "v": VERSION}
         try:
             png, source = find_logo(lab, aliases, avatar)
             if png:
@@ -233,6 +244,11 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
                 with open(os.path.join(logo_dir, file), "wb") as f:
                     f.write(png)
                 entry.update(file=file, source=source)
+            else:
+                old = os.path.join(logo_dir, slug(lab) + ".png")
+                if os.path.exists(old):
+                    os.remove(old)  # a logo chosen by an older rule that no longer qualifies
+                print(f"  [logos] No official logo found for {lab}")
         except Exception as exc:
             print(f"  [logos] Lookup failed for {lab}: {str(exc)[:100]}")
             entry = dict(idx.get(lab) or {})  # try again next run
