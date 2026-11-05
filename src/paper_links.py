@@ -112,10 +112,11 @@ def s2_lineage(arxiv_id: str) -> dict:
             "refs_n": len(refs), "refs": refs[:SHOW], "cites": cites[:SHOW]}
 
 
-def hf_paper_org(arxiv_id: str) -> str:
-    """The organization that claimed the paper on Hugging Face Papers, or ''."""
+def hf_paper_org(arxiv_id: str) -> tuple[str, str]:
+    """The organization that claimed the paper on Hugging Face Papers and its logo, or ('', '')."""
     data = _get(f"https://huggingface.co/api/papers/{arxiv_id}") or {}
-    return labs.from_hf_org(data.get("organization"))
+    org = data.get("organization")
+    return labs.from_hf_org(org), labs.hf_avatar(org)
 
 
 def openalex_org(arxiv_id: str) -> str:
@@ -147,12 +148,14 @@ def refresh_orgs(papers: dict, links: dict, today: date | None = None,
         if not org_due(rec, entry, today):
             continue
         entry = dict(entry)
-        org, ok = "", False
+        org, avatar, ok = "", "", False
         code = rec.get("code_url") or _abstract_code(rec.get("abstract") or "")
         for name, find in (("Hugging Face", hf_paper_org), ("code", lambda _: labs.from_code_url(code)),
                            ("OpenAlex", openalex_org)):
             try:
                 org = find(pid)
+                if isinstance(org, tuple):
+                    org, avatar = org
                 ok = True
             except Exception as exc:
                 print(f"  [links] {name} lab lookup failed for {pid}: {str(exc)[:100]}")
@@ -160,11 +163,53 @@ def refresh_orgs(papers: dict, links: dict, today: date | None = None,
                 break
         if org:
             entry["org"] = org
+            if avatar:
+                entry["org_avatar"] = avatar
         if ok:
             entry["org_checked"] = today.isoformat()
         links[pid] = entry
         done += 1
     return done
+
+
+def backfill_avatars(papers: dict, links: dict, max_lookups: int = ORG_MAX_LOOKUPS) -> int:
+    """Labs found before logos were collected: ask Hugging Face once for the claiming org's avatar."""
+    done = 0
+    for rec in paper_order(papers):
+        if done >= max_lookups:
+            break
+        entry = links.get(rec["id"])
+        if not entry or not entry.get("org") or entry.get("org_avatar") or entry.get("avatar_checked"):
+            continue
+        try:
+            org, avatar = hf_paper_org(rec["id"])
+            if avatar and org == entry["org"]:
+                entry["org_avatar"] = avatar
+            entry["avatar_checked"] = 1
+        except Exception as exc:
+            print(f"  [links] Hugging Face avatar lookup failed for {rec['id']}: {str(exc)[:100]}")
+        done += 1
+    return done
+
+
+def refresh_logos(papers: dict, links: dict, max_lookups: int | None = None) -> None:
+    """Each lab's official logo (lab_logos.py), saved once in data/logos/."""
+    import lab_logos
+    import site_builder
+    backfill_avatars(papers, links)
+    save(links)
+    seen = {}
+    for rec in paper_order(papers):
+        entry = links.get(rec["id"]) or {}
+        lab = site_builder.lab_of(rec, entry)
+        if lab and not seen.get(lab):
+            seen[lab] = rec.get("org_avatar") or entry.get("org_avatar") or ""
+    try:
+        kw = {"max_lookups": max_lookups} if max_lookups else {}
+        m = lab_logos.refresh(seen, **kw)
+        print(f"[links] Looked up logos for {m} labs; {len(lab_logos.index())} of {len(seen)} labs have one.")
+    except Exception as exc:
+        print(f"[links] Logo lookup stopped: {str(exc)[:120]}")
 
 
 def load(path: str = LINKS_FILE) -> dict:
@@ -252,6 +297,7 @@ def run() -> None:
     k = refresh_orgs(papers, links)
     save(links)
     found = sum(1 for v in links.values() if v.get("org"))
+    refresh_logos(papers, links)
     print(f"[links] Looked up {n} papers and {k} labs; {len(links)} have links saved, {found} with a lab.")
 
 

@@ -18,6 +18,7 @@ import re
 import os
 import shutil
 import sys
+import urllib.parse
 from datetime import date, timedelta
 
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,6 +29,7 @@ if SRC_DIR not in sys.path:
 from classifier import CATEGORIES
 import discovery
 import labs
+import lab_logos
 import tech_trends
 import trends
 
@@ -208,6 +210,8 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
 
 # Edition strip shown on every page; set by build_site
 EDITION = ""
+# Lab name -> its official logo file in assets/logos/ (lab_logos.py); set by build_site
+LOGOS: dict[str, str] = {}
 
 # Runs before first paint so a saved dark theme never flashes white
 def _asset_version() -> str:
@@ -690,7 +694,8 @@ SKELETON_CARDS = "".join('<div class="pcard skeleton" aria-hidden="true"><span><
 def papers_tabs(current: str, root: str = "") -> str:
     """All papers and the day-by-day archive are two views of the same papers."""
     tab = lambda href, label, key: (f'<a href="{root}{href}"{" aria-current=page" if key == current else ""}>{label}</a>')
-    return f'<nav class="tabs" aria-label="Papers views">{tab("papers.html", "All papers", "papers")}{tab("archive.html", "By day", "archive")}</nav>'
+    return (f'<nav class="tabs" aria-label="Papers views">{tab("papers.html", "All papers", "papers")}'
+            f'{tab("labs.html", "By lab", "labs")}{tab("archive.html", "By day", "archive")}</nav>')
 
 
 # Quick views on the papers page: value, label
@@ -880,6 +885,62 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
 </section>"""
     return page("Trends", body, active="trends", path="trends.html",
                 description="Which AI technologies are growing in research right now: agents, reasoning, RAG and more, plus topic shares and code availability.")
+
+
+LAB_KINDS = [("", "All"), ("company", "Companies"), ("university", "Universities"), ("lab", "Labs and startups")]
+
+
+def lab_href(lab: str, root: str = "") -> str:
+    return f"{root}papers.html?lab={urllib.parse.quote(lab)}"
+
+
+def build_labs_page(papers: dict, links: dict) -> str:
+    """Every lab or company we know a paper came from: most papers first, with its topics and newest papers."""
+    by_lab: dict[str, list[dict]] = {}
+    for rec in papers.values():
+        lab = lab_of(rec, links.get(rec["id"]))
+        if lab:
+            by_lab.setdefault(lab, []).append(rec)
+    newest = lambda r: (r.get("first_seen") or "", published(r))
+    ranked = sorted(by_lab.items(), key=lambda kv: (-len(kv[1]), -max(int(r.get("hf_upvotes") or 0) for r in kv[1]), kv[0].lower()))
+    n_papers = sum(len(v) for v in by_lab.values())
+
+    def card(lab: str, recs: list[dict]) -> str:
+        recs = sorted(recs, key=newest, reverse=True)
+        topics = {}
+        for r in recs:
+            for t in (r.get("categories") or ["other-ml"])[:1]:
+                topics[t] = topics.get(t, 0) + 1
+        top = sorted(topics.items(), key=lambda kv: (-kv[1], kv[0]))[:2]
+        chips = "".join(f'<span class="sig sig-topic t-{esc(t)}"><span class="dot"></span>{esc(category_name(t))}'
+                        f'{f" <b>{n}</b>" if n > 1 else ""}</span>' for t, n in top)
+        items = "".join(f'<li><a href="paper/{esc(r["id"])}.html">{esc(r["title"])}</a>'
+                        f'<time datetime="{esc(published(r))}">{esc(nice_date(published(r), with_year=False))}</time></li>'
+                        for r in recs[:3])
+        upvotes = sum(int(r.get("hf_upvotes") or 0) for r in recs)
+        stats = f'{len(recs)} paper{"" if len(recs) == 1 else "s"}' + (f" · ▲ {upvotes:,} upvotes" if upvotes else "")
+        more = (f'<a class="lab-all" href="{esc(lab_href(lab))}">See all {len(recs)} papers →</a>' if len(recs) > 3
+                else f'<a class="lab-all" href="{esc(lab_href(lab))}">Show as cards →</a>')
+        return f"""<article class="lab-card" data-kind="{labs.kind(lab)}">
+  <header class="lab-head">{lab_mark(lab, "")}<div><h2><a href="{esc(lab_href(lab))}">{esc(lab)}</a></h2><p>{esc(stats)}</p></div></header>
+  <div class="lab-topics">{chips}</div>
+  <ol class="lab-papers">{items}</ol>
+  {more}
+</article>"""
+
+    kinds = "".join(f'<button class="chip" type="button" data-lab-kind="{k}" aria-pressed="{"true" if not k else "false"}">{esc(label)}</button>'
+                    for k, label in LAB_KINDS)
+    cards = "".join(card(lab, recs) for lab, recs in ranked)
+    body = f"""<section class="page-head page-head-tight">
+  {papers_tabs("labs")}
+  <h1>By lab</h1>
+  <p>The companies, universities and labs behind the papers, with the most papers first. A lab shows here when Hugging Face, the paper's code or its authors' listed institutions name it, so it grows every day.</p>
+</section>
+<div class="pbar"><div class="chips" role="group" aria-label="Show">{kinds}</div></div>
+<div class="result-meta"><span data-lab-count>{len(ranked)} labs behind {n_papers} papers</span></div>
+<div class="lab-grid" data-labs>{cards or '<p class="empty">No labs found yet. They fill in with each daily update.</p>'}</div>"""
+    return page("Papers by lab", body, active="papers", path="labs.html",
+                description="The companies, universities and labs behind new AI papers, with their latest work.")
 
 
 def build_archive(days: list[dict], papers: dict) -> str:
@@ -1246,7 +1307,10 @@ def lab_of(rec: dict, links: dict | None = None) -> str:
 
 
 def lab_mark(lab: str, root: str = "../") -> str:
-    """The lab's square mark: its logo on its brand colour, or its initials when there's no logo."""
+    """The lab's square mark: its official logo when we have one, else an outline logo or its initials on its brand colour."""
+    if LOGOS.get(lab):
+        return (f'<span class="org-mark has-img" aria-hidden="true"><img src="{root}assets/logos/{esc(LOGOS[lab])}" '
+                f'alt="" width="40" height="40" loading="lazy" decoding="async"></span>')
     logo, colour = labs.brand(lab)
     style = f' style="--lab:#{colour};--lab-ink:#{labs.ink_on(colour)}"' if colour else ""
     if logo:
@@ -1281,7 +1345,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     by = esc(", ".join(authors[:3]))
     lab = lab_of(rec, links)
     if lab:
-        lab_line = f'<p class="np-lab">{lab_mark(lab)}<b class="org-name">{esc(lab)}</b></p>'
+        lab_line = (f'<p class="np-lab">{lab_mark(lab)}<a class="org-name" href="{esc(lab_href(lab, "../"))}" '
+                    f'title="More papers from {esc(lab)}">{esc(lab)}</a></p>')
     else:
         lab_line = ""
     if len(authors) > 3:
@@ -1587,6 +1652,8 @@ def compact(rec: dict, links: dict | None = None) -> dict:
     lab = lab_of(rec, links)
     if lab:
         out["o"] = lab
+        if LOGOS.get(lab):
+            out["oi"] = LOGOS[lab]
         logo, colour = labs.brand(lab)
         if logo:
             out["ol"] = logo
@@ -1607,7 +1674,7 @@ def _write(path: str, content: str) -> None:
 
 def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: str = EXPORT_DIR) -> int:
     """Rebuild site_dir from scratch. Returns the number of paper pages written."""
-    global EDITION
+    global EDITION, LOGOS
     days = load_days(data_dir)
     papers = merge_papers(days)
     EDITION = ticker(days)
@@ -1615,6 +1682,12 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     if os.path.isdir(site_dir):
         shutil.rmtree(site_dir)
     shutil.copytree(ASSETS_DIR, os.path.join(site_dir, "assets"))
+    logo_index = os.path.join(data_dir, "logos", "index.json")
+    LOGOS = lab_logos.index(logo_index)
+    if LOGOS:
+        os.makedirs(os.path.join(site_dir, "assets", "logos"), exist_ok=True)
+        for file in set(LOGOS.values()):
+            shutil.copy2(os.path.join(data_dir, "logos", file), os.path.join(site_dir, "assets", "logos", file))
 
     archive = load_archive(export_dir)
     rows, source = trends.trend_rows(archive, papers)
@@ -1659,6 +1732,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
 
     related = related_papers(papers)
     links = load_links(data_dir)
+    _write(os.path.join(site_dir, "labs.html"), build_labs_page(papers, links))
     failed = 0
     for rec in papers.values():
         prev_id, next_id = neighbours.get(rec["id"], (None, None))
@@ -1680,7 +1754,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     except Exception as exc:  # readers keep yesterday's feed items; the site still publishes
         print(f"  [site] WARNING: RSS feed failed: {exc}")
     newest = days[0]["date"] if days else ""
-    pages = [("", newest), ("papers.html", newest), ("scout.html", ""), ("archive.html", newest)]
+    pages = [("", newest), ("papers.html", newest), ("scout.html", ""), ("archive.html", newest), ("labs.html", newest)]
     if SHOW_TRENDS:
         pages.append(("trends.html", newest))
     pages += [(f"day/{d['date']}.html", d["date"]) for d in days]

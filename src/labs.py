@@ -126,6 +126,24 @@ BRANDS = {
 }
 
 
+UNIVERSITIES = {
+    "Stanford", "MIT", "UC Berkeley", "Carnegie Mellon", "Princeton", "Harvard", "University of Washington",
+    "NYU", "Oxford", "Cambridge", "ETH Zurich", "EPFL", "University of Toronto", "Tsinghua University",
+    "Peking University", "Shanghai Jiao Tong University", "Zhejiang University", "Fudan University", "CUHK",
+    "HKUST", "HKU", "NTU Singapore", "NUS", "KAIST", "Renmin University", "USTC",
+}
+_ACADEMIC = re.compile(r"\b(universit\w*|college|institute of technology|école|school of|academy of sciences|polytechnic)\b", re.I)
+
+
+def kind(name: str) -> str:
+    """'university' for universities, 'company' for known companies, 'lab' for everything else (research labs, startups)."""
+    if name in UNIVERSITIES or _ACADEMIC.search(name or ""):
+        return "university"
+    if name in BRANDS:
+        return "lab" if name in ("Mila", "Ai2", "Shanghai AI Lab") else "company"
+    return "lab"
+
+
 def brand(name: str) -> tuple[str, str]:
     """(logo id or '', brand colour as hex without #) for a lab; unknown labs get ('', '')."""
     return BRANDS.get(name, ("", ""))
@@ -199,6 +217,11 @@ def from_hf_org(org) -> str:
         if hit:
             return hit
     return _clean(org.get("fullname") or org.get("name") or "")
+
+
+def hf_avatar(org) -> str:
+    """The logo a Hugging Face organization uploaded, as given in its 'avatar' field, or ''."""
+    return (org.get("avatar") or "") if isinstance(org, dict) else ""
 
 
 def from_code_url(url: str) -> str:

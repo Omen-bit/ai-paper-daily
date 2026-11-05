@@ -87,7 +87,7 @@ def test_lab_on_card_and_page():
     assert (card["o"], card["ol"], card["oc"]) == ("Google DeepMind", "deepmind", "4285F4")
     assert site_builder.compact(rec, {"org": "Hugging Face"})["oc"] == "FFD21E/1a1a1a"
     html = site_builder.build_paper(rec, links={"org": "Google DeepMind"})
-    assert '<b class="org-name">Google DeepMind</b>' in html and "labs.svg" in html and "#lab-deepmind" in html
+    assert ">Google DeepMind</a>" in html and "papers.html?lab=Google%20DeepMind" in html and "labs.svg" in html and "#lab-deepmind" in html
     html = site_builder.build_paper(rec, links={"org": "Tsinghua University"})
     assert ">TU</span>" in html and "--lab:#660874" in html
     assert ">Tiny</span>" in site_builder.build_paper(rec, links={"org": "Tiny"})
@@ -113,3 +113,20 @@ def test_saved_names_are_tidied_on_the_page():
     assert site_builder.lab_of(rec, {"org": "Adobe Systems"}) == "Adobe"
     assert site_builder.lab_of(rec, {"org": "jingdong"}) == "JD.com"
     assert site_builder.lab_of(rec, {"org": "Philo Labs"}) == "Philo Labs"
+
+
+def test_labs_page_groups_and_links():
+    papers = {
+        "1": {"id": "1", "title": "One", "categories": ["llms"], "first_seen": "2026-01-03", "submitted": "2026-01-02", "hf_upvotes": 5},
+        "2": {"id": "2", "title": "Two", "categories": ["llms"], "first_seen": "2026-01-04", "submitted": "2026-01-03"},
+        "3": {"id": "3", "title": "Three", "categories": ["computer-vision"], "first_seen": "2026-01-04", "submitted": "2026-01-03"},
+        "4": {"id": "4", "title": "Four", "first_seen": "2026-01-04"},
+    }
+    links = {"1": {"org": "NVIDIA"}, "2": {"org": "NVIDIA"}, "3": {"org": "Tsinghua University"}}
+    html = site_builder.build_labs_page(papers, links)
+    assert "2 labs behind 3 papers" in html
+    assert html.index(">NVIDIA</a>") < html.index(">Tsinghua University</a>")  # most papers first
+    assert 'data-kind="company"' in html and 'data-kind="university"' in html
+    assert 'href="papers.html?lab=Tsinghua%20University"' in html
+    assert html.index("Two") < html.index("One")  # newest paper first
+    assert labs.kind("Some Robotics Startup") == "lab" and labs.kind("University of Somewhere") == "university"

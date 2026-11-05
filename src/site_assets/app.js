@@ -1627,6 +1627,26 @@
   // ---- All papers: cards, quick views and search over data/papers.json ----
   // Short keys are documented in compact() in site_builder.py.
   var results = document.getElementById("results");
+  // By lab page: show companies, universities or other labs
+  (function () {
+    var grid = document.querySelector("[data-labs]");
+    if (!grid) return;
+    var kinds = Array.prototype.slice.call(document.querySelectorAll("[data-lab-kind]"));
+    var count = document.querySelector("[data-lab-count]");
+    var all = count.textContent;
+    kinds.forEach(function (b) {
+      b.addEventListener("click", function () {
+        var k = b.getAttribute("data-lab-kind"), n = 0;
+        kinds.forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+        Array.prototype.forEach.call(grid.querySelectorAll(".lab-card"), function (c) {
+          c.hidden = !!k && c.getAttribute("data-kind") !== k;
+          if (!c.hidden) n++;
+        });
+        count.textContent = k ? n + " " + b.textContent.toLowerCase() : all;
+      });
+    });
+  })();
+
   if (!results) return;
 
   var PAGE = 36;
@@ -1658,6 +1678,7 @@
   q.value = params.get("q") || "";
   cat.value = params.get("cat") || "";
   meaning.checked = params.get("m") === "1";
+  var lab = params.get("lab") || "";  // ?lab=NVIDIA, from the By lab page and the lab names on cards
 
   var names = {};
   Array.prototype.forEach.call(cat.options, function (o) { if (o.value) names[o.value] = o.textContent; });
@@ -1745,6 +1766,10 @@
     return css ? css.getAttribute("href").replace("style.css", "labs.svg") : "assets/labs.svg";
   })();
   function labMark(p) {
+    if (p.oi) {
+      return '<span class="org-mark has-img" aria-hidden="true"><img src="' + esc(LABS_SVG.replace(/labs\.svg(\?.*)?$/, "logos/") + p.oi) +
+        '" alt="" width="40" height="40" loading="lazy" decoding="async"></span>';
+    }
     var c = (p.oc || "").split("/");
     var style = c[0] ? ' style="--lab:#' + esc(c[0]) + ";--lab-ink:#" + esc(c[1] || "fff") + '"' : "";
     var inner;
@@ -1801,7 +1826,7 @@
         '<div class="pc-stat"><b>' + (stat.html ? stat.value : esc(stat.value)) + "</b><span>" + esc(stat.caption) + "</span></div>" +
       "</div>" +
       '<div class="pc-body">' + /* display: contents, its children sit on the card's subgrid rows */
-        '<p class="pcard-by">' + (p.o ? labMark(p) + '<b class="org-name">' + esc(p.o) + "</b>" + (authors ? '<span class="by-sep">·</span>' : "") : "") +
+        '<p class="pcard-by">' + (p.o ? labMark(p) + '<a class="org-name" href="papers.html?lab=' + encodeURIComponent(p.o) + '" title="More papers from ' + esc(p.o) + '">' + esc(p.o) + "</a>" + (authors ? '<span class="by-sep">·</span>' : "") : "") +
           '<span class="by-auth">' + authors + "</span></p>" +
         '<h3 title="' + esc(p.t) + '"><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
         // Fixed-size text areas (2-line title, 2-line summary, one byline, one chip row) keep every card the same shape
@@ -1823,7 +1848,7 @@
              c: (r.categories && r.categories.length) ? r.categories : ["other-ml"],
              d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: known.f || (r.featured ? 1 : 0),
              w: known.w || String(r.first_seen || "").slice(0, 10), ac: known.ac,
-             m: known.m || "", u: known.u || r.hf_upvotes || 0, k: known.k, h: known.h, l: known.l, x: known.x, o: known.o, ol: known.ol, oc: known.oc };
+             m: known.m || "", u: known.u || r.hf_upvotes || 0, k: known.k, h: known.h, l: known.l, x: known.x, o: known.o, ol: known.ol, oc: known.oc, oi: known.oi };
   }
   var byId = {};
 
@@ -1847,12 +1872,24 @@
       count.textContent = view ? n + " " + VIEWS[view].label
         : matches.length === all.length ? n + " papers, newest first" : n + " of " + all.length.toLocaleString() + " papers";
     }
+    if (lab) {
+      if (!(meaning.checked && q.value.trim().length >= 3)) {
+        count.textContent = matches.length.toLocaleString() + (view ? " " + VIEWS[view].label : matches.length === 1 ? " paper" : " papers") + " from";
+      }
+      var pill = document.createElement("button");
+      pill.type = "button"; pill.className = "lab-filter"; pill.setAttribute("data-clear-lab", "");
+      pill.setAttribute("aria-label", "Show papers from every lab");
+      pill.textContent = lab + " ×";
+      count.appendChild(document.createTextNode(" "));
+      count.appendChild(pill);
+    }
   }
 
   function keepFiltered(list) {
     var v = VIEWS[view];
     return list.filter(function (p) {
       if (cat.value && p.c.indexOf(cat.value) < 0) return false;
+      if (lab && p.o !== lab) return false;
       if (v.keep && !v.keep(p)) return false;
       return true;
     });
@@ -1913,6 +1950,7 @@
     if (cat.value) u.set("cat", cat.value);
     if (view) u.set("view", view);
     if (meaning.checked) u.set("m", "1");
+    if (lab) u.set("lab", lab);
     history.replaceState(null, "", u.toString() ? "?" + u : location.pathname);
   }
 
@@ -1926,9 +1964,14 @@
     c.addEventListener("click", function () { view = c.getAttribute("data-view"); apply(); });
   });
   more.addEventListener("click", function () { render(false); });
+  count.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest("[data-clear-lab]")) return;
+    lab = "";
+    apply();
+  });
   results.addEventListener("click", function (e) {
     if (!e.target.closest || !e.target.closest("[data-clear]")) return;
-    q.value = ""; cat.value = ""; view = ""; meaning.checked = false;
+    q.value = ""; cat.value = ""; view = ""; meaning.checked = false; lab = "";
     apply();
     q.focus();
   });
@@ -1949,4 +1992,5 @@
       results.innerHTML = "";
       count.textContent = "We could not load the paper list. Reload the page to try again.";
     });
+
 })();

@@ -1514,3 +1514,37 @@ a.try-tile:hover { border-color: var(--ink); }
   .np-mbar .btn { flex: 1; height: 44px; justify-content: center; }
   .np-mbar .btn-icon { flex: 0 0 48px; padding: 0; }
 }
+
+/* ---------- Lab names as links, and the By lab page ---------- */
+.pcard-by a.org-name { position: relative; z-index: 1; text-decoration: none; }
+.pcard-by a.org-name:hover, .np-lab a.org-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.np-lab a.org-name { text-decoration: none; }
+.lab-filter { margin-left: 4px; height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 12.5px var(--sans); cursor: pointer; vertical-align: middle; }
+.lab-filter:hover { border-color: var(--ink); }
+.lab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; padding-bottom: 48px; }
+.lab-card { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.lab-card[hidden] { display: none; }
+.lab-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lab-head > div { min-width: 0; }
+.lab-head .org-mark { width: 40px; height: 40px; border-radius: 10px; font-size: 15px; }
+.lab-head .org-mark .lm-3 { font-size: 13px; }
+.lab-head .org-mark .lm-4 { font-size: 11px; }
+.lab-head h2 { margin: 0; font: 600 18px/1.25 var(--sans); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lab-head h2 a { color: var(--ink); text-decoration: none; }
+.lab-head h2 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.lab-head p { margin: 2px 0 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lab-topics { display: flex; flex-wrap: nowrap; gap: 6px; height: 26px; overflow: hidden; }
+.lab-topics .sig { flex: none; }
+.lab-topics .sig b { font-weight: 600; color: var(--ink); }
+.lab-papers { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border-top: 1px solid var(--line-2); }
+.lab-papers li { display: flex; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line-2); min-width: 0; }
+.lab-papers a { flex: 1; min-width: 0; color: var(--ink); text-decoration: none; font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lab-papers a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.lab-papers time { flex: none; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lab-all { margin-top: auto; align-self: flex-start; font: 600 13.5px var(--sans); color: var(--ink); text-decoration: none; }
+.lab-all:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Official logos keep their own colours, so they sit on a white tile in both themes */
+.org-mark.has-img { background: #fff; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+[data-theme="dark"] .org-mark.has-img { box-shadow: none; }
+.org-mark.has-img img { display: block; width: 80%; height: 80%; object-fit: contain; }

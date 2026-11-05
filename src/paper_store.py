@@ -70,6 +70,7 @@ def to_record(paper: dict, date_str: str, featured: bool) -> dict:
         "curator": paper.get("curator"),
         "code_url": paper.get("code_url") or None,
         "org": paper.get("org") or labs.detect(paper) or None,
+        "org_avatar": labs.hf_avatar(paper.get("hf_org")) or None,
         "first_seen": date_str,
     }
 
