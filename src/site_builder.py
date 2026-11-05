@@ -1240,8 +1240,9 @@ def try_it_html(rec: dict, links: dict) -> str:
 
 def lab_of(rec: dict, links: dict | None = None) -> str:
     """The lab or company behind a paper: saved with the record, found later by paper_links, or the code's owner."""
-    return (rec.get("org") or (links or {}).get("org")
-            or labs.from_code_url(rec.get("code_url") or code_link(rec) or "") or "")
+    lab = (rec.get("org") or (links or {}).get("org")
+           or labs.from_code_url(rec.get("code_url") or code_link(rec) or "") or "")
+    return labs.canonical(lab) or lab  # names saved before an alias was added still get their logo
 
 
 def lab_mark(lab: str, root: str = "../") -> str:

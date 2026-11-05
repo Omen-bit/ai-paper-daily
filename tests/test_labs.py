@@ -105,3 +105,11 @@ def test_every_logo_is_in_the_sprite():
 
 def test_initials():
     assert [labs.initials(n) for n in ("OpenAI", "MIT", "Tsinghua University", "Salesforce")] == ["OA", "MIT", "TU", "S"]
+
+
+def test_saved_names_are_tidied_on_the_page():
+    rec = {"id": "x", "title": "T"}
+    assert site_builder.lab_of(rec, {"org": "KAIST AI"}) == "KAIST"
+    assert site_builder.lab_of(rec, {"org": "Adobe Systems"}) == "Adobe"
+    assert site_builder.lab_of(rec, {"org": "jingdong"}) == "JD.com"
+    assert site_builder.lab_of(rec, {"org": "Philo Labs"}) == "Philo Labs"
