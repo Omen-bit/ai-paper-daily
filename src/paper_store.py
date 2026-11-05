@@ -12,6 +12,8 @@ import json
 import os
 from datetime import datetime, timezone
 
+import labs
+
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SRC_DIR)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
@@ -67,6 +69,7 @@ def to_record(paper: dict, date_str: str, featured: bool) -> dict:
         "summary": summary,
         "curator": paper.get("curator"),
         "code_url": paper.get("code_url") or None,
+        "org": paper.get("org") or labs.detect(paper) or None,
         "first_seen": date_str,
     }
 

@@ -4,6 +4,8 @@ What surrounds each paper on its page, gathered once a day by the pipeline:
   - Hugging Face: models, datasets and demo apps (Spaces) that link the paper
   - GitHub: stars on the paper's code
   - Semantic Scholar: the papers it builds on, and later papers that cite it
+  - the lab or company behind it: the Hugging Face organization that claimed it,
+    else the authors' institutions on OpenAlex (see labs.py)
 
 Everything is saved in data/links.json, keyed by arXiv ID, and the site builder
 reads it. Plain HTTP calls, no AI. Each service is optional: when one is down or
@@ -19,6 +21,9 @@ import time
 from datetime import date, timedelta
 
 import requests
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import labs  # noqa: E402
 
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SRC_DIR)
@@ -38,6 +43,8 @@ MAX_LOOKUPS = int(os.environ.get("LINKS_MAX_LOOKUPS", "120"))
 RECHECK_DAYS = 7
 RECHECK_UNTIL_AGE = 60
 SHOW = 3  # items kept per list
+# Lab lookups per run (two quick calls each), so the backlog of older papers fills in within days
+ORG_MAX_LOOKUPS = int(os.environ.get("ORG_MAX_LOOKUPS", "300"))
 
 
 def _abstract_code(abstract: str) -> str:
@@ -103,6 +110,61 @@ def s2_lineage(arxiv_id: str) -> dict:
     return {"found": True, "cited_by": data.get("citationCount") or len(cites),
             "influential": data.get("influentialCitationCount") or 0,
             "refs_n": len(refs), "refs": refs[:SHOW], "cites": cites[:SHOW]}
+
+
+def hf_paper_org(arxiv_id: str) -> str:
+    """The organization that claimed the paper on Hugging Face Papers, or ''."""
+    data = _get(f"https://huggingface.co/api/papers/{arxiv_id}") or {}
+    return labs.from_hf_org(data.get("organization"))
+
+
+def openalex_org(arxiv_id: str) -> str:
+    """The authors' most common institution on OpenAlex (arXiv DOIs are 10.48550/arXiv.<id>)."""
+    url = f"https://api.openalex.org/works/doi:10.48550/arXiv.{arxiv_id}?select=authorships"
+    key = os.environ.get("OPENALEX_API_KEY")
+    if key:
+        url += f"&api_key={key}"
+    return labs.from_institutions(labs.openalex_institutions(_get(url) or {}))
+
+
+def org_due(rec: dict, entry: dict, today: date) -> bool:
+    """Look for the lab once, and again weekly while a young paper still has none."""
+    if rec.get("org") or entry.get("org"):
+        return False
+    return due({"checked": entry.get("org_checked")}, rec.get("submitted") or rec.get("first_seen") or "", today)
+
+
+def refresh_orgs(papers: dict, links: dict, today: date | None = None,
+                 max_lookups: int = ORG_MAX_LOOKUPS) -> int:
+    """Fill links[id]["org"] for papers whose record has no lab. Returns how many were looked up."""
+    today = today or date.today()
+    done = 0
+    for rec in paper_order(papers):
+        if done >= max_lookups:
+            break
+        pid = rec["id"]
+        entry = links.get(pid) or {}
+        if not org_due(rec, entry, today):
+            continue
+        entry = dict(entry)
+        org, ok = "", False
+        code = rec.get("code_url") or _abstract_code(rec.get("abstract") or "")
+        for name, find in (("Hugging Face", hf_paper_org), ("code", lambda _: labs.from_code_url(code)),
+                           ("OpenAlex", openalex_org)):
+            try:
+                org = find(pid)
+                ok = True
+            except Exception as exc:
+                print(f"  [links] {name} lab lookup failed for {pid}: {str(exc)[:100]}")
+            if org:
+                break
+        if org:
+            entry["org"] = org
+        if ok:
+            entry["org_checked"] = today.isoformat()
+        links[pid] = entry
+        done += 1
+    return done
 
 
 def load(path: str = LINKS_FILE) -> dict:
@@ -187,7 +249,10 @@ def run() -> None:
     links = {k: v for k, v in links.items() if k in papers}
     n = refresh(papers, links)
     save(links)
-    print(f"[links] Looked up {n} papers; {len(links)} have links saved.")
+    k = refresh_orgs(papers, links)
+    save(links)
+    found = sum(1 for v in links.values() if v.get("org"))
+    print(f"[links] Looked up {n} papers and {k} labs; {len(links)} have links saved, {found} with a lab.")
 
 
 if __name__ == "__main__":

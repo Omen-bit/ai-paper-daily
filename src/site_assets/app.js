@@ -1722,10 +1722,11 @@
   // Each card shows one row of chips; drop the ones that would be cut off at the edge
   function fitChips() {
     Array.prototype.forEach.call(results.querySelectorAll(".pcard-tags"), function (row) {
-      var kids = row.children, width = row.clientWidth;
+      // Measure on screen: a chip that ends past the row's right edge is hidden, and so is every chip after it
+      var kids = row.children, right = row.getBoundingClientRect().right + 0.5, cut = false;
       for (var i = 0; i < kids.length; i++) {
         kids[i].hidden = false;
-        if (kids[i].offsetLeft - row.offsetLeft + kids[i].offsetWidth > width) kids[i].hidden = true;
+        if (cut || kids[i].getBoundingClientRect().right > right) { kids[i].hidden = true; cut = true; }
       }
     });
   }
@@ -1736,6 +1737,27 @@
   function infoChip(cls, label, tip) {
     return '<button class="sig sig-info ' + cls + '" type="button" aria-label="' + esc(label) + ': what this means">' + esc(label) +
       '<span class="sig-i" aria-hidden="true">i</span><span class="sig-tip" role="tooltip">' + tip + "</span></button>";
+  }
+
+  // The lab's square mark, drawn like site_builder.lab_mark: its logo on its brand colour, or its initials
+  var LABS_SVG = (function () {
+    var css = document.querySelector('link[href*="assets/style.css"]');
+    return css ? css.getAttribute("href").replace("style.css", "labs.svg") : "assets/labs.svg";
+  })();
+  function labMark(p) {
+    var c = (p.oc || "").split("/");
+    var style = c[0] ? ' style="--lab:#' + esc(c[0]) + ";--lab-ink:#" + esc(c[1] || "fff") + '"' : "";
+    var inner;
+    if (p.ol) {
+      inner = '<svg viewBox="0 0 24 24"><use href="' + esc(LABS_SVG) + "#lab-" + esc(p.ol) + '"></use></svg>';
+    } else {
+      var words = p.o.replace(/[^A-Za-z0-9 ]/g, "").split(" ").filter(Boolean), mark;
+      if (words.length === 1 && words[0].length <= 4) mark = words[0];
+      else if (words.length === 1) { var caps = words[0].replace(/[^A-Z]/g, ""); mark = caps.length >= 2 ? caps.slice(0, 2) : words[0][0].toUpperCase(); }
+      else mark = (words[0][0] + words[1][0]).toUpperCase();
+      inner = '<span class="lm-' + Math.min(mark.length, 4) + '">' + esc(mark) + "</span>";
+    }
+    return '<span class="org-mark' + (p.ol ? " has-logo" : "") + '"' + style + ' aria-hidden="true">' + inner + "</span>";
   }
 
   function card(p) {
@@ -1773,21 +1795,21 @@
     return '<article class="pcard t-' + esc(topic) + (read ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
       '<div class="pc-cover">' +
         '<div class="pc-cover-top"><a class="pc-topic" href="papers.html?cat=' + esc(topic) + '"><span class="dot"></span>' +
-          esc(names[topic] || topic) + "</a>" + badge + "</div>" +
+          esc(names[topic] || topic) + "</a>" + badge +
+          (local ? "" : '<span class="pc-ext" title="Opens on Hugging Face">HF ↗</span>') + "</div>" +
         '<div class="pc-word" aria-hidden="true">' + esc(COVER_WORD[topic] || "ML") + "</div>" +
         '<div class="pc-stat"><b>' + (stat.html ? stat.value : esc(stat.value)) + "</b><span>" + esc(stat.caption) + "</span></div>" +
       "</div>" +
       '<div class="pc-body">' + /* display: contents, its children sit on the card's subgrid rows */
+        '<p class="pcard-by">' + (p.o ? labMark(p) + '<b class="org-name">' + esc(p.o) + "</b>" + (authors ? '<span class="by-sep">·</span>' : "") : "") +
+          '<span class="by-auth">' + authors + "</span></p>" +
         '<h3 title="' + esc(p.t) + '"><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
         // Fixed-size text areas (2-line title, 2-line summary, one byline, one chip row) keep every card the same shape
         '<p class="pcard-sum">' + esc(p.m || "") + "</p>" +
-        '<p class="pcard-by">' + (p.o ? '<span class="org-mark" aria-hidden="true">' + esc(p.o.replace(/[^A-Za-z0-9 ]/g, "").split(" ").filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join("").toUpperCase()) +
-          '</span><b class="org-name">' + esc(p.o) + "</b>" + (authors ? '<span class="by-sep">·</span>' : "") : "") +
-          '<span class="by-auth">' + authors + "</span></p>" +
         '<div class="pcard-tags">' + chips + "</div>" +
         '<div class="pcard-foot"><p class="pcard-dates"><span class="date-pill is-pub"><span class="dp-k">Published</span><time datetime="' + esc(p.d) + '">' + esc(shortDate(p.d)) + "</time></span>" +
           (p.w && p.w !== p.d ? '<span class="date-pill is-added' + (relDay(p.w) === "today" ? " is-today" : "") + '"><span class="dp-k">Added</span><time datetime="' + esc(p.w) + '">' + esc(relDay(p.w)) + "</time></span>" : "") + "</p>" +
-          (local ? "" : '<span class="ext" title="Opens on Hugging Face">HF ↗</span>') +
+
           '<button class="quick-save" type="button" data-quick-save="' + esc(p.i) + '" data-title="' + esc(p.t) +
           '" aria-pressed="' + isSaved + '" aria-label="Save this paper">' + (isSaved ? "✓" : "+") + "</button></div>" +
       "</div></article>";
@@ -1801,7 +1823,7 @@
              c: (r.categories && r.categories.length) ? r.categories : ["other-ml"],
              d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: known.f || (r.featured ? 1 : 0),
              w: known.w || String(r.first_seen || "").slice(0, 10), ac: known.ac,
-             m: known.m || "", u: known.u || r.hf_upvotes || 0, k: known.k, h: known.h, l: known.l, x: known.x };
+             m: known.m || "", u: known.u || r.hf_upvotes || 0, k: known.k, h: known.h, l: known.l, x: known.x, o: known.o, ol: known.ol, oc: known.oc };
   }
   var byId = {};
 
@@ -1814,6 +1836,7 @@
     } else {
       results.insertAdjacentHTML("beforeend", matches.slice(shown, shown + PAGE).map(card).join(""));
       fitChips();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitChips);
     }
     shown = Math.min(shown + PAGE, matches.length);
     more.hidden = shown >= matches.length;

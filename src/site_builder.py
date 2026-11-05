@@ -27,6 +27,7 @@ if SRC_DIR not in sys.path:
 
 from classifier import CATEGORIES
 import discovery
+import labs
 import tech_trends
 import trends
 
@@ -212,7 +213,7 @@ EDITION = ""
 def _asset_version() -> str:
     """Changes whenever style.css or app.js changes, so browsers never keep an old copy."""
     h = hashlib.sha1()
-    for name in ("style.css", "app.js"):
+    for name in ("style.css", "app.js", "labs.svg"):
         with open(os.path.join(ASSETS_DIR, name), "rb") as f:
             h.update(f.read())
     return h.hexdigest()[:10]
@@ -1237,6 +1238,24 @@ def try_it_html(rec: dict, links: dict) -> str:
             f'<div class="try">{html_tiles}</div></section>')
 
 
+def lab_of(rec: dict, links: dict | None = None) -> str:
+    """The lab or company behind a paper: saved with the record, found later by paper_links, or the code's owner."""
+    return (rec.get("org") or (links or {}).get("org")
+            or labs.from_code_url(rec.get("code_url") or code_link(rec) or "") or "")
+
+
+def lab_mark(lab: str, root: str = "../") -> str:
+    """The lab's square mark: its logo on its brand colour, or its initials when there's no logo."""
+    logo, colour = labs.brand(lab)
+    style = f' style="--lab:#{colour};--lab-ink:#{labs.ink_on(colour)}"' if colour else ""
+    if logo:
+        inner = f'<svg viewBox="0 0 24 24"><use href="{root}assets/labs.svg?v={ASSET_V}#lab-{logo}"></use></svg>'
+    else:
+        mark = labs.initials(lab)
+        inner = f'<span class="lm-{min(len(mark), 4)}">{esc(mark)}</span>'
+    return f'<span class="org-mark{" has-logo" if logo else ""}"{style} aria-hidden="true">{inner}</span>'
+
+
 def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dict = None,
                 next_pick: dict = None, day_picks: list[str] = (), has_image: bool = False,
                 links: dict | None = None, papers: dict | None = None) -> str:
@@ -1259,6 +1278,11 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     stat, stat_cap = cover_stat(rec)
     authors = rec.get("authors") or []
     by = esc(", ".join(authors[:3]))
+    lab = lab_of(rec, links)
+    if lab:
+        lab_line = f'<p class="np-lab">{lab_mark(lab)}<b class="org-name">{esc(lab)}</b></p>'
+    else:
+        lab_line = ""
     if len(authors) > 3:
         by += (f' <details class="np-more"><summary>+{len(authors) - 3} more</summary>'
                f'<span>{esc(", ".join(authors[3:]))}</span></details>')
@@ -1294,7 +1318,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     <div class="pc-stat"><b>{stat}</b><span>{esc(stat_cap)}</span></div>
   </div>
   <div class="np-head">
-    <h1>{title}</h1>
+    {lab_line}<h1>{title}</h1>
     <div class="np-by">{by}</div>
     <div class="np-row">{dates}<span class="sig mono">arXiv {pid}</span>{pick_on}</div>
     <div class="np-row np-actions">
@@ -1530,13 +1554,13 @@ def related_papers(papers: dict, k: int = 4) -> dict[str, list[str]]:
     return result
 
 
-def compact(rec: dict) -> dict:
+def compact(rec: dict, links: dict | None = None) -> dict:
     """
     The fields papers.html needs, with short keys to keep the file small:
     i id, t title, a first authors, n author count, c topics, d published (arXiv) date,
     w the day we added it, s score,
     f 1 our pick / 2 trending, m one-line summary, u HF upvotes, k has code,
-    h 1 when the paper is not on Hugging Face, l difficulty (b/i/a).
+    h 1 when the paper is not on Hugging Face, l difficulty (b/i/a), o lab or company.
     """
     notes = rec.get("curator") or {}
     out = {
@@ -1559,6 +1583,14 @@ def compact(rec: dict) -> dict:
         out["h"] = 1
     if notes.get("difficulty") in LEVELS:
         out["l"] = notes["difficulty"][0]
+    lab = lab_of(rec, links)
+    if lab:
+        out["o"] = lab
+        logo, colour = labs.brand(lab)
+        if logo:
+            out["ol"] = logo
+        if colour:
+            out["oc"] = colour + ("" if labs.ink_on(colour) == "fff" else "/1a1a1a")
     return out
 
 
@@ -1656,7 +1688,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     _write(os.path.join(site_dir, "sitemap.xml"), discovery.build_sitemap(SITE_URL, pages))
 
     # Papers with a page here, plus the rest of the database's year (linking to Hugging Face)
-    listing = [compact(r) for r in papers.values()]
+    listing = [compact(r, links.get(r["id"])) for r in papers.values()]
     listing += [archive_compact(r) for r in archive if r["id"] not in papers]
     # Newest batch first; inside a day, papers people are upvoting lead, then our score
     listing.sort(key=lambda p: (p["w"], p["u"], p["s"], p["d"]), reverse=True)

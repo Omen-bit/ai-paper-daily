@@ -164,3 +164,10 @@ def test_fetch_arxiv_keeps_earlier_pages_when_a_later_one_fails():
          patch("fetcher.feedparser.parse", return_value=MagicMock(entries=first)):
         papers = fetch_arxiv_papers(lookback_hours=48, page_size=2, sleep=lambda s: None)
     assert len(papers) == 2
+
+
+def test_hf_items_keep_the_claiming_org():
+    from fetcher import parse_hf_items
+    items = [{"paper": {"id": "2601.00009v2", "title": "T", "summary": "S", "authors": [{"name": "A"}]},
+              "organization": {"name": "nvidia", "fullname": "NVIDIA"}, "upvotes": 4}]
+    assert parse_hf_items(items)[0]["hf_org"] == {"name": "nvidia", "fullname": "NVIDIA"}

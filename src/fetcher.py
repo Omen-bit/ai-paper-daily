@@ -102,6 +102,8 @@ def _parse_arxiv_entry(entry) -> dict:
         "arxiv_categories": [tag.term for tag in entry.tags if "." in tag.term],
         "source": "arXiv",
         "hf_upvotes": 0,
+        "arxiv_comment": " ".join((entry.get("arxiv_comment") or "").split()),
+        "arxiv_affiliation": " ".join((entry.get("arxiv_affiliation") or "").split()),
     }
 
 
@@ -265,6 +267,8 @@ def parse_hf_items(data: list) -> list[dict]:
                 "source": "HuggingFace",
                 "hf_upvotes": upvotes,
                 "github_repo": paper_info.get("githubRepo") or "",
+                # The lab or company that claimed the paper on Hugging Face, when one did
+                "hf_org": item.get("organization") or paper_info.get("organization") or None,
             }
 
             if paper["title"] and paper["abstract"]:
@@ -306,6 +310,8 @@ def fetch_all_papers(max_arxiv: int = ARXIV_MAX_RESULTS) -> list[dict]:
             paper_map[pid]["source"] = "arXiv + HuggingFace"
             if p.get("github_repo"):
                 paper_map[pid]["github_repo"] = p["github_repo"]
+            if p.get("hf_org"):
+                paper_map[pid]["hf_org"] = p["hf_org"]
         else:
             paper_map[pid] = p
 
