@@ -131,7 +131,9 @@
  },
  "Google": {
   "checked": "2026-11-05",
-  "v": 3
+  "file": "google.png",
+  "source": "GitHub",
+  "v": 4
  },
  "HKU": {
   "checked": "2026-11-05",
@@ -189,7 +191,7 @@
  },
  "NTU Singapore": {
   "checked": "2026-11-05",
-  "v": 3
+  "v": 4
  },
  "NVIDIA": {
   "checked": "2026-11-05",
@@ -247,7 +249,9 @@
  },
  "Sookmyung Women's University": {
   "checked": "2026-11-05",
-  "v": 3
+  "file": "sookmyung-women-s-university.png",
+  "source": "website https://e.sookmyung.ac.kr/",
+  "v": 4
  },
  "SpeedAI": {
   "checked": "2026-11-05",

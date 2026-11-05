@@ -42,7 +42,7 @@ MAX_LOOKUPS = int(os.environ.get("LOGO_MAX_LOOKUPS", "60"))
 # Wikidata properties, in order of preference when two images are equally square
 PROPS = ("P2910", "P154", "P158")  # icon, logo image, seal image
 # Bump to look every lab up again after a change in how logos are chosen
-VERSION = 3
+VERSION = 4  # 4: labs missed because the network failed are tried again
 
 
 def slug(name: str) -> str:
@@ -200,7 +200,11 @@ def pick_wikidata(images: list[tuple[str, str]]) -> tuple[str, str]:
 # --- Refresh --------------------------------------------------------------
 
 def due(entry: dict | None, today: date) -> bool:
-    if not entry or entry.get("v") != VERSION:
+    if not entry:
+        return True
+    if entry.get("file") and entry.get("v", 0) >= 3:  # chosen by the current rules
+        return False
+    if entry.get("v") != VERSION:
         return True
     if entry.get("file"):
         return False
@@ -319,11 +323,14 @@ def logo_dev(site: str) -> bytes:
 def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] = ()) -> tuple[bytes, str]:
     """(PNG bytes, where it came from) for a lab, or (b'', '') when no official logo was found."""
     names = [lab] + aliases
+    errors = []
 
     def attempt(label, fn):
         try:
             return fn()
         except Exception as exc:
+            if isinstance(exc, requests.exceptions.RequestException):
+                errors.append(label)
             print(f"  [logos] {label} failed for {lab}: {type(exc).__name__}: {str(exc)[:100]}")
             return None
 
@@ -353,6 +360,9 @@ def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] 
         png = attempt("Logo.dev", lambda: logo_dev(site))
         if png:
             return png, "Logo.dev"
+    if errors:
+        # The network failed somewhere, so "no logo" isn't known yet: try again on the next run
+        raise ConnectionError("lookups failed: " + ", ".join(errors))
     return b"", ""
 
 

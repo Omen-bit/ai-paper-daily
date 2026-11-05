@@ -49,6 +49,7 @@ def test_most_square_image_wins(monkeypatch):
 def test_refresh_prefers_hugging_face_avatar_and_saves(tmp_path, monkeypatch):
     monkeypatch.setattr(lab_logos, "_download", lambda url: _png(80, 80))
     monkeypatch.setattr(lab_logos, "wikidata_entity", lambda names: "")
+    monkeypatch.setattr(lab_logos, "ror_lookup", lambda names: ("", ""))
     n = lab_logos.refresh({"Tiny Lab": "https://cdn-avatars.huggingface.co/v1/production/uploads/a/tiny.png", "Nobody": ""}, today=date(2026, 1, 5), logo_dir=str(tmp_path))
     assert n == 2
     idx = json.load(open(tmp_path / "index.json"))
@@ -79,6 +80,7 @@ def test_old_entries_are_checked_again(tmp_path, monkeypatch):
     (tmp_path / "old-lab.png").write_bytes(_png(10, 10))
     (tmp_path / "index.json").write_text(json.dumps({"Old Lab": {"file": "old-lab.png", "checked": "2026-01-01"}}))
     monkeypatch.setattr(lab_logos, "wikidata_entity", lambda names: "")
+    monkeypatch.setattr(lab_logos, "ror_lookup", lambda names: ("", ""))
     assert lab_logos.refresh({"Old Lab": "/avatars/abc.svg"}, today=date(2026, 1, 2), logo_dir=str(tmp_path)) == 1
     assert not (tmp_path / "old-lab.png").exists()
     assert lab_logos.index(str(tmp_path / "index.json")) == {}
@@ -130,3 +132,12 @@ def test_refresh_accepts_github_hints(tmp_path, monkeypatch):
     monkeypatch.setattr(lab_logos, "find_logo", lambda lab, aliases, avatar="", owners=(): seen.append(owners) or (b"", ""))
     lab_logos.refresh({"Lab": {"avatar": "", "github": ["lab-org"]}}, today=date(2026, 1, 2), logo_dir=str(tmp_path))
     assert seen == [["lab-org"]]
+
+
+def test_network_failure_is_retried_next_run(tmp_path, monkeypatch):
+    def down(*a, **k):
+        raise lab_logos.requests.exceptions.ConnectionError("offline")
+    for name in ("ror_lookup", "wikidata_entity"):
+        monkeypatch.setattr(lab_logos, name, down)
+    lab_logos.refresh({"Lab": ""}, today=date(2026, 1, 2), logo_dir=str(tmp_path))
+    assert lab_logos.due(lab_logos.load_index(str(tmp_path / "index.json")).get("Lab"), date(2026, 1, 3))
