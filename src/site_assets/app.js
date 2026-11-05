@@ -1586,30 +1586,74 @@
     return d.toISOString().slice(0, 10);
   }
 
+  // Text covers: a tinted band per topic that stands in for a thumbnail, with no image to load
+  var COVER_WORD = {
+    "llms": "LLM", "generative-ai": "GEN AI", "computer-vision": "VISION", "audio-speech": "AUDIO",
+    "alignment": "ALIGN", "reasoning-agents": "AGENTS", "ml-theory": "THEORY", "ai-science": "SCIENCE",
+    "code-ai": "CODE", "safety-privacy": "SAFETY", "efficient-ai": "EFF AI", "multimodal": "MULTI", "other-ml": "ML"
+  };
+  // Words that can follow a number and say what it measures ("4x faster", "38% less")
+  var STAT_WORDS = /^(faster|slower|less|more|fewer|smaller|larger|bigger|cheaper|better|higher|lower|speedup|speed-up|reduction|improvement|gain|memory|compute|accuracy|cost|latency|throughput|parameters|params|tokens|weights|compression|error|errors)$/i;
+  var STAT_STOP = /^(with|than|on|in|for|by|and|at|to|without|of|over|while|from|across|the|a|an|vs)$/i;
+  // The cover's headline number, read from the summary or title: "4×", "−38%", "2-bit"
+  function coverStat(p) {
+    var texts = [p.m || "", p.t || ""];
+    for (var i = 0; i < texts.length; i++) {
+      var m = /(^|[\s(])([−-]?\d+(?:\.\d+)?)(\s?[x×%]|-bit)(?=[\s,.;:)]|$)/i.exec(texts[i]);
+      if (!m) continue;
+      var unit = m[3].trim().toLowerCase();
+      var value = m[2].replace("-", "−") + (unit === "x" ? "×" : unit);
+      var words = texts[i].slice(m.index + m[0].length).replace(/^[\s,;:]+/, "").split(/\s+/);
+      var caption = [];
+      for (var w = 0; w < words.length && caption.length < 2; w++) {
+        var word = words[w].replace(/[.,;:)]+$/, "");
+        if (!word || STAT_STOP.test(word)) break;
+        if (!caption.length && !STAT_WORDS.test(word)) break;
+        caption.push(word.toLowerCase());
+        if (/[.,;:)]$/.test(words[w])) break;
+      }
+      return { value: value, caption: caption.length ? caption.join(" ") : "key result" };
+    }
+    if (p.u) return { value: '<small aria-hidden="true">▲</small>' + p.u, caption: "upvotes on HF", html: true };
+    if (p.d && p.d === newest) return { value: "New", caption: "in today’s batch" };
+    return { value: esc(shortDate(p.d)), caption: "published", html: true };
+  }
+
   function card(p) {
     var local = onSite[p.i];
+    var read = readIds[p.i];
     var href = local ? "paper/" + esc(p.i) + ".html" : "https://huggingface.co/papers/" + esc(p.i);
     var topic = (p.c && p.c[0]) || "other-ml";
     var isSaved = saved.some(function (s) { return s.id === p.i; });
-    var sig = "";
-    if (p.f === 1) sig += '<span class="sig sig-pick">★ Our pick</span>';
-    if (p.f === 2) sig += '<span class="sig sig-hot">Trending</span>';
-    if (p.u) sig += '<span class="sig" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
-    else if (p.h) sig += '<span class="sig sig-new" title="Not on the Hugging Face daily list">Not on HF yet</span>';
-    if (p.k) sig += '<span class="sig">' + "Code" + "</span>";
-    if (p.l) sig += '<span class="sig">' + LEVEL[p.l] + "</span>";
-    var first = (p.a && p.a[0]) || "";
-    var authors = esc(first) + (p.n > 1 ? " +" + (p.n - 1) : "");
-    return '<article class="pcard' + (readIds[p.i] ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
-      '<div class="pcard-top"><a class="topic t-' + esc(topic) + '" href="papers.html?cat=' + esc(topic) + '"><span class="dot"></span>' +
-        esc(names[topic] || topic) + '</a><span class="pcard-date">' + esc(shortDate(p.d)) + "</span>" +
-        (readIds[p.i] ? '<span class="pcard-read">Read</span>' : "") +
-        '<button class="quick-save" type="button" data-quick-save="' + esc(p.i) + '" data-title="' + esc(p.t) +
-        '" aria-pressed="' + isSaved + '" aria-label="Save this paper">' + (isSaved ? "✓" : "+") + "</button></div>" +
-      '<h3><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
-      (p.m ? '<p class="pcard-sum">' + esc(p.m) + "</p>" : "") +
-      '<div class="pcard-foot">' + sig + '<span class="pcard-auth">' + authors +
-        (local ? "" : ' · <span class="ext">HF ↗</span>') + "</span></div></article>";
+    var stat = coverStat(p);
+    var badge = "";
+    if (p.f === 1) badge = '<span class="pc-badge pc-badge-pick">★ Our pick</span>';
+    else if (p.f === 2) badge = '<span class="pc-badge pc-badge-hot">Trending</span>';
+    else if (p.h) badge = '<span class="pc-badge" title="Not on the Hugging Face daily list">Not on HF yet</span>';
+    var chips = "";
+    if (p.u && stat.caption !== "upvotes on HF") chips += '<span class="sig sig-up" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
+    if (p.k) chips += '<span class="sig">Code</span>';
+    if (p.l) chips += '<span class="sig">' + LEVEL[p.l] + "</span>";
+    if (read) chips += '<span class="pcard-read">✓ Read</span>';
+    var authors = (p.a || []).slice(0, 2).map(esc).join(", ");
+    var extra = (p.n || 0) - Math.min(2, (p.a || []).length);
+    if (extra > 0) authors += " +" + extra;
+    return '<article class="pcard t-' + esc(topic) + (read ? " is-read" : "") + '" data-id="' + esc(p.i) + '">' +
+      '<div class="pc-cover">' +
+        '<div class="pc-cover-top"><a class="pc-topic" href="papers.html?cat=' + esc(topic) + '"><span class="dot"></span>' +
+          esc(names[topic] || topic) + "</a>" + badge + "</div>" +
+        '<div class="pc-word" aria-hidden="true">' + esc(COVER_WORD[topic] || "ML") + "</div>" +
+        '<div class="pc-stat"><b>' + (stat.html ? stat.value : esc(stat.value)) + "</b><span>" + esc(stat.caption) + "</span></div>" +
+      "</div>" +
+      '<div class="pc-body">' +
+        '<h3><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
+        (p.m ? '<p class="pcard-sum">' + esc(p.m) + "</p>" : "") +
+        (authors ? '<p class="pcard-auth">' + authors + "</p>" : "") +
+        '<div class="pcard-foot"><time datetime="' + esc(p.d) + '">' + esc(shortDate(p.d)) + "</time>" + chips +
+          (local ? "" : '<span class="ext" title="Opens on Hugging Face">HF ↗</span>') +
+          '<button class="quick-save" type="button" data-quick-save="' + esc(p.i) + '" data-title="' + esc(p.t) +
+          '" aria-pressed="' + isSaved + '" aria-label="Save this paper">' + (isSaved ? "✓" : "+") + "</button></div>" +
+      "</div></article>";
   }
 
   // A search function result in the short form card() expects
