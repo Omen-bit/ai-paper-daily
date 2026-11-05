@@ -82,3 +82,51 @@ def test_old_entries_are_checked_again(tmp_path, monkeypatch):
     assert lab_logos.refresh({"Old Lab": "/avatars/abc.svg"}, today=date(2026, 1, 2), logo_dir=str(tmp_path)) == 1
     assert not (tmp_path / "old-lab.png").exists()
     assert lab_logos.index(str(tmp_path / "index.json")) == {}
+
+
+def test_ror_exact_name_gives_wikidata_and_site(monkeypatch):
+    data = {"items": [
+        {"names": [{"value": "Korea University"}], "external_ids": [{"type": "wikidata", "preferred": "Q1"}]},
+        {"names": [{"value": "Korea Advanced Institute of Science and Technology"}, {"value": "KAIST"}],
+         "external_ids": [{"type": "wikidata", "all": ["Q30"], "preferred": None}],
+         "links": [{"type": "website", "value": "https://www.kaist.ac.kr"}]},
+    ]}
+    monkeypatch.setattr(lab_logos, "_get_json", lambda url, params=None: data)
+    assert lab_logos.ror_lookup(["KAIST"]) == ("Q30", "https://www.kaist.ac.kr")
+    assert lab_logos.ror_lookup(["Nowhere Lab"]) == ("", "")
+
+
+def test_site_icons_best_first():
+    html = ('<link rel="icon" href="/fav-32.png" sizes="32x32"><link rel="icon" href="/logo.svg">'
+            '<link rel="apple-touch-icon" href="/touch.png" sizes="180x180"><link rel="icon" href="/fav-192.png" sizes="192x192">')
+    urls = lab_logos.site_icon_urls("https://lab.example/en/", html)
+    assert urls[:3] == ["https://lab.example/touch.png", "https://lab.example/fav-192.png", "https://lab.example/fav-32.png"]
+    assert "https://lab.example/logo.svg" not in urls and urls[-1] == "https://lab.example/favicon.ico"
+
+
+def test_github_org_must_carry_the_lab_name(monkeypatch):
+    class R:
+        def __init__(self, data): self.status_code, self._d = 200, data
+        def json(self): return self._d
+    users = {"someone": {"type": "User", "login": "someone", "avatar_url": "https://a/1"},
+             "acme-ai": {"type": "Organization", "login": "acme-ai", "name": "Acme AI", "avatar_url": "https://a/2?v=4"}}
+    monkeypatch.setattr(lab_logos.requests, "get", lambda url, **kw: R(users[url.rsplit("/", 1)[1]]))
+    assert lab_logos.github_avatar(["someone", "acme-ai"], ["Acme AI"]) == "https://a/2?v=4&s=128"
+    assert lab_logos.github_avatar(["someone"], ["Someone"]) == ""
+
+
+def test_find_logo_falls_through_sources(monkeypatch):
+    calls = []
+    monkeypatch.setattr(lab_logos, "ror_lookup", lambda names: ("", "https://lab.example"))
+    monkeypatch.setattr(lab_logos, "wikidata_entity", lambda names: calls.append("wd") or "")
+    monkeypatch.setattr(lab_logos, "github_avatar", lambda owners, names: calls.append("gh") or "")
+    monkeypatch.setattr(lab_logos, "website_icon", lambda site: b"PNG")
+    assert lab_logos.find_logo("Lab", [], "/avatars/x.svg", ["lab"]) == (b"PNG", "website https://lab.example")
+    assert calls == ["wd", "gh"]
+
+
+def test_refresh_accepts_github_hints(tmp_path, monkeypatch):
+    seen = []
+    monkeypatch.setattr(lab_logos, "find_logo", lambda lab, aliases, avatar="", owners=(): seen.append(owners) or (b"", ""))
+    lab_logos.refresh({"Lab": {"avatar": "", "github": ["lab-org"]}}, today=date(2026, 1, 2), logo_dir=str(tmp_path))
+    assert seen == [["lab-org"]]

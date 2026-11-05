@@ -202,8 +202,13 @@ def refresh_logos(papers: dict, links: dict, max_lookups: int | None = None) -> 
     for rec in paper_order(papers):
         entry = links.get(rec["id"]) or {}
         lab = site_builder.lab_of(rec, entry)
-        if lab and not seen.get(lab):
-            seen[lab] = rec.get("org_avatar") or entry.get("org_avatar") or ""
+        if not lab:
+            continue
+        hint = seen.setdefault(lab, {"avatar": "", "github": []})
+        hint["avatar"] = hint["avatar"] or rec.get("org_avatar") or entry.get("org_avatar") or ""
+        m = re.search(r"github\.com/([\w.\-]+)/", rec.get("code_url") or _abstract_code(rec.get("abstract") or ""))
+        if m and m.group(1) not in hint["github"]:
+            hint["github"].append(m.group(1))
     try:
         kw = {"max_lookups": max_lookups} if max_lookups else {}
         m = lab_logos.refresh(seen, **kw)

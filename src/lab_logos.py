@@ -4,10 +4,17 @@ Each lab's own logo, in its own colours, saved once as a small square PNG in dat
 
 Where a logo comes from, best first:
   1. the avatar the lab uploaded to its Hugging Face organization page
-  2. Wikidata, for the entity whose name or alias is exactly the lab's name:
-     its icon (P2910), logo (P154) or, for universities, seal (P158), whichever is closest to square,
-     downloaded as a 128 px rendering from Wikimedia Commons
-A lab with neither keeps the mark the site draws itself (Simple Icons outline or initials).
+  2. Wikidata: its icon (P2910), logo (P154) or, for universities, seal (P158), whichever is closest
+     to square, as a 128 px rendering from Wikimedia Commons. The Wikidata entry is found through
+     ROR, the open registry of research organizations (exact for universities and institutes),
+     else by an exact name or alias match on an organization
+  3. the avatar of the lab's GitHub organization, when the paper's code lives there and the
+     organization's name is the lab's name
+  4. the app icon on the lab's official website (apple-touch-icon or a large icon), the site
+     coming from ROR or Wikidata
+  5. optional: Logo.dev, when LOGO_DEV_TOKEN is set (its free plan asks for a credit link)
+A lab with none keeps the mark the site draws itself (Simple Icons outline or initials).
+Every source is free to use without a key except Logo.dev; ROR and Wikidata are CC0.
 Logos are trademarks of their owners and are shown only to say who wrote a paper.
 
 paper_links.py calls refresh() once a day; the site builder reads index() and copies the files.
@@ -35,7 +42,7 @@ MAX_LOOKUPS = int(os.environ.get("LOGO_MAX_LOOKUPS", "60"))
 # Wikidata properties, in order of preference when two images are equally square
 PROPS = ("P2910", "P154", "P158")  # icon, logo image, seal image
 # Bump to look every lab up again after a change in how logos are chosen
-VERSION = 2
+VERSION = 3
 
 
 def slug(name: str) -> str:
@@ -203,18 +210,149 @@ def due(entry: dict | None, today: date) -> bool:
         return True
 
 
-def find_logo(lab: str, aliases: list[str], avatar: str = "") -> tuple[bytes, str]:
-    """(PNG bytes, where it came from) for a lab, or (b'', '') when no official logo was found."""
-    if avatar and is_uploaded_avatar(avatar):
+# --- ROR (ror.org, CC0) ------------------------------------------------------
+
+def ror_lookup(names: list[str]) -> tuple[str, str]:
+    """(Wikidata id, website) of the ROR organization whose name, alias or acronym is exactly one of the names."""
+    wanted = {n.strip().lower() for n in names if n and len(n.strip()) >= 3}
+    for name in names:
+        if not name or len(name.strip()) < 3:
+            continue
+        data = _get_json("https://api.ror.org/v2/organizations", {"query": name}) or {}
+        for org in (data.get("items") or [])[:10]:
+            texts = [n.get("value") or "" for n in org.get("names") or []]
+            if not any(t.strip().lower() in wanted for t in texts):
+                continue
+            qid = ""
+            for ext in org.get("external_ids") or []:
+                if ext.get("type") == "wikidata":
+                    qid = ext.get("preferred") or (ext.get("all") or [""])[0]
+            site = next((l.get("value") for l in org.get("links") or [] if l.get("type") == "website"), "")
+            return qid or "", site or ""
+    return "", ""
+
+
+def wikidata_website(qid: str) -> str:
+    data = _get_json(WIKIDATA_API, {"action": "wbgetentities", "ids": qid, "props": "claims", "format": "json"}) or {}
+    claims = ((data.get("entities") or {}).get(qid) or {}).get("claims") or {}
+    for claim in claims.get("P856") or []:
+        value = ((claim.get("mainsnak") or {}).get("datavalue") or {}).get("value")
+        if isinstance(value, str) and value.startswith("http"):
+            return value
+    return ""
+
+
+# --- GitHub organization ---------------------------------------------------
+
+def github_avatar(owners: list[str], names: list[str]) -> str:
+    """The avatar of a GitHub organization among the paper's code owners whose name is the lab's name."""
+    wanted = {re.sub(r"[^a-z0-9]", "", n.lower()) for n in names if n}
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/vnd.github+json"}
+    if os.environ.get("GITHUB_TOKEN"):
+        headers["Authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"
+    for owner in owners[:5]:
+        r = requests.get(f"https://api.github.com/users/{owner}", timeout=TIMEOUT, headers=headers)
+        if r.status_code != 200:
+            continue
+        data = r.json()
+        names_here = {re.sub(r"[^a-z0-9]", "", (data.get(k) or "").lower()) for k in ("login", "name")}
+        if data.get("type") == "Organization" and names_here & wanted and data.get("avatar_url"):
+            return data["avatar_url"] + ("&" if "?" in data["avatar_url"] else "?") + "s=128"
+    return ""
+
+
+# --- The lab's own website ------------------------------------------------
+
+_LINK_TAG = re.compile(r"<link\b[^>]*>", re.I)
+_ATTR = re.compile(r'([a-zA-Z-]+)\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)')
+
+
+def site_icon_urls(page_url: str, html: str) -> list[str]:
+    """Icon links in a page, best first: apple-touch-icon, then the largest declared icon. SVG is skipped."""
+    from urllib.parse import urljoin
+    found = []
+    for tag in _LINK_TAG.findall(html[:200_000]):
+        attrs = {k.lower(): v.strip("\"'") for k, v in _ATTR.findall(tag)}
+        rel, href = attrs.get("rel", "").lower(), attrs.get("href", "")
+        if "icon" not in rel or not href or href.lower().split("?")[0].endswith(".svg"):
+            continue
+        sizes = [int(n) for n in re.findall(r"(\d+)x\d+", attrs.get("sizes", ""))] or [0]
+        rank = (1 if "apple-touch-icon" in rel else 0, max(sizes))
+        found.append((rank, urljoin(page_url, href)))
+    found.sort(key=lambda x: x[0], reverse=True)
+    urls = [u for _, u in found]
+    for path in ("/apple-touch-icon.png", "/favicon.ico"):
+        urls.append(urljoin(page_url, path))
+    return urls
+
+
+def website_icon(site: str) -> bytes:
+    """The website's own app icon as a square PNG, when one at least 48 px wide exists."""
+    from PIL import Image
+    r = requests.get(site, timeout=TIMEOUT, headers={"User-Agent": USER_AGENT})
+    r.raise_for_status()
+    for url in site_icon_urls(r.url, r.text)[:6]:
         try:
-            return to_square_png(_download(hf_avatar_url(avatar))), "Hugging Face"
+            raw = _download(url)
+            img = Image.open(io.BytesIO(raw))
+            if hasattr(img, "ico"):  # an .ico holds several sizes; use the largest
+                img.size = max(img.ico.sizes())
+            if min(img.size) >= 48:
+                out = io.BytesIO()
+                img.convert("RGBA").save(out, "PNG")
+                return to_square_png(out.getvalue())
+        except Exception:
+            continue
+    return b""
+
+
+def logo_dev(site: str) -> bytes:
+    """Logo.dev, only when LOGO_DEV_TOKEN is set."""
+    token = os.environ.get("LOGO_DEV_TOKEN")
+    if not token or not site:
+        return b""
+    from urllib.parse import urlparse
+    domain = urlparse(site).netloc.removeprefix("www.")
+    return to_square_png(_download(f"https://img.logo.dev/{domain}?token={token}&size=128&format=png"))
+
+
+def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] = ()) -> tuple[bytes, str]:
+    """(PNG bytes, where it came from) for a lab, or (b'', '') when no official logo was found."""
+    names = [lab] + aliases
+
+    def attempt(label, fn):
+        try:
+            return fn()
         except Exception as exc:
-            print(f"  [logos] Hugging Face avatar failed for {lab}: {str(exc)[:100]}")
-    qid = wikidata_entity([lab] + aliases)
+            print(f"  [logos] {label} failed for {lab}: {type(exc).__name__}: {str(exc)[:100]}")
+            return None
+
+    if avatar and is_uploaded_avatar(avatar):
+        png = attempt("Hugging Face", lambda: to_square_png(_download(hf_avatar_url(avatar))))
+        if png:
+            return png, "Hugging Face"
+    qid, site = attempt("ROR", lambda: ror_lookup(names)) or ("", "")
+    qid = qid or attempt("Wikidata search", lambda: wikidata_entity(names)) or ""
     if qid:
-        url, prop = pick_wikidata(wikidata_images(qid))
+        url, prop = attempt("Wikidata images", lambda: pick_wikidata(wikidata_images(qid))) or ("", "")
         if url:
-            return to_square_png(_download(url)), f"Wikidata {qid} {prop}"
+            png = attempt("Wikimedia download", lambda: to_square_png(_download(url)))
+            if png:
+                return png, f"Wikidata {qid} {prop}"
+        site = site or attempt("Wikidata website", lambda: wikidata_website(qid)) or ""
+    if owners:
+        url = attempt("GitHub", lambda: github_avatar(list(owners), names))
+        if url:
+            png = attempt("GitHub download", lambda: to_square_png(_download(url)))
+            if png:
+                return png, "GitHub"
+    if site:
+        png = attempt("website icon", lambda: website_icon(site))
+        if png:
+            return png, f"website {site}"
+        png = attempt("Logo.dev", lambda: logo_dev(site))
+        if png:
+            return png, "Logo.dev"
     return b"", ""
 
 
@@ -229,7 +367,9 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
     path = os.path.join(logo_dir, "index.json")
     idx = load_index(path)
     done = 0
-    for lab, avatar in labs_seen.items():
+    for lab, hint in labs_seen.items():
+        # hint: a Hugging Face avatar URL, or {"avatar": ..., "github": [owners of the papers' code]}
+        avatar, owners = (hint.get("avatar") or "", hint.get("github") or []) if isinstance(hint, dict) else (hint or "", [])
         if done >= max_lookups:
             break
         if not due(idx.get(lab), today):
@@ -237,7 +377,7 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
         aliases = [a for a in lab_names.LABS.get(lab, []) if len(a) >= 4 and not re.fullmatch(r"[a-z0-9\-]+", a)]
         entry = {"checked": today.isoformat(), "v": VERSION}
         try:
-            png, source = find_logo(lab, aliases, avatar)
+            png, source = find_logo(lab, aliases, avatar, owners)
             if png:
                 file = slug(lab) + ".png"
                 os.makedirs(logo_dir, exist_ok=True)
