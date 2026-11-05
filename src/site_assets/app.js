@@ -343,21 +343,81 @@
     readIds[id] = true;
 
     // Save for later
-    var saveBtn = document.querySelector("[data-save]");
+    var saveBtns = document.querySelectorAll("[data-save]");
     var paintSave = function () {
       var on = saved.some(function (s) { return s.id === id; });
-      saveBtn.setAttribute("aria-pressed", on ? "true" : "false");
-      saveBtn.querySelector("span").textContent = on ? "Saved" : "Save";
+      Array.prototype.forEach.call(saveBtns, function (b) {
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+        var label = b.querySelector("span");
+        if (label) label.textContent = on ? "Saved" : "Save";
+      });
     };
-    saveBtn.addEventListener("click", function () {
+    Array.prototype.forEach.call(saveBtns, function (b) { b.addEventListener("click", function () {
       var on = saved.some(function (s) { return s.id === id; });
       saved = on ? saved.filter(function (s) { return s.id !== id; })
                  : [{ id: id, t: title, at: Date.now() }].concat(saved);
       store("apd.saved", saved);
       paintSave();
       showSavedCount();
-    });
+    }); });
     paintSave();
+
+    // "Added" date reads as today or yesterday by the reader's own calendar
+    Array.prototype.forEach.call(document.querySelectorAll("[data-added]"), function (pill) {
+      var iso = pill.getAttribute("data-added"), now = new Date();
+      var key = function (d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); };
+      var word = iso === key(now) ? "today" : (now.setDate(now.getDate() - 1), iso === key(now)) ? "yesterday" : "";
+      if (!word) return;
+      pill.querySelector("time").textContent = word;
+      if (word === "today") pill.classList.add("is-today");
+    });
+
+    // How deep to explain it: New to this, Practitioner or Researcher, remembered across papers
+    var levelBox = document.querySelector("[data-levels]");
+    if (levelBox) {
+      var levelOut = document.querySelector("[data-level-out]");
+      var paintLevel = function (lv) {
+        var tpl = document.querySelector('[data-level-text="' + lv + '"]');
+        if (!tpl) return;
+        levelOut.innerHTML = tpl.innerHTML;
+        Array.prototype.forEach.call(levelBox.querySelectorAll("[data-level]"), function (b) {
+          b.setAttribute("aria-pressed", b.getAttribute("data-level") === lv ? "true" : "false");
+        });
+      };
+      levelBox.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-level]");
+        if (!b) return;
+        store("apd.level", b.getAttribute("data-level"));
+        paintLevel(b.getAttribute("data-level"));
+      });
+      var savedLevel = load("apd.level", "standard");
+      if (savedLevel !== "standard") paintLevel(savedLevel);
+    }
+
+    // Definitions: hover or focus opens them; a tap toggles them on touch screens
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest && e.target.closest(".term");
+      Array.prototype.forEach.call(document.querySelectorAll(".term.is-open"), function (o) { if (o !== t) o.classList.remove("is-open"); });
+      if (t) t.classList.toggle("is-open");
+    });
+
+    // Skim colours in the abstract, on by default, remembered
+    var skimBtn = document.querySelector("[data-skim-toggle]");
+    if (skimBtn) {
+      var skimAbs = document.querySelector(".np-abs"), skimLegend = document.querySelector("[data-skim-legend]");
+      var paintSkim = function (on) {
+        skimAbs.classList.toggle("no-skim", !on);
+        skimLegend.classList.toggle("no-skim", !on);
+        skimBtn.setAttribute("aria-pressed", on ? "true" : "false");
+        skimBtn.textContent = on ? "Hide colours" : "Show colours";
+      };
+      paintSkim(load("apd.skim", true));
+      skimBtn.addEventListener("click", function () {
+        var on = skimBtn.getAttribute("aria-pressed") !== "true";
+        store("apd.skim", on);
+        paintSkim(on);
+      });
+    }
 
     // Share: the system share sheet on phones, copy the link elsewhere
     document.querySelector("[data-share]").addEventListener("click", function () {
@@ -526,7 +586,7 @@
     var bdOut = bd.querySelector("[data-bd-out]");
     var bdBtn = bd.querySelector("[data-bd-load]");
     var bdNote = bd.querySelector("[data-bd-note]");
-    var bdShort = document.querySelector("[data-bd-short]");
+    var bdShort = document.querySelector("[data-bd-short-box]");
     var bdLayer = bd.closest("[data-layer]");
     var bdCall = function (extra) {
       var payload = { id: bdId, summary: bdWantSummary };
@@ -565,6 +625,16 @@
       }
       if (b.limitations) html += quoted("Limitations", b.limitations);
       if (b.conclusion) html += quoted("Conclusion", b.conclusion);
+      // One tab per section, so the page stays short
+      var parts = html.split(/(?=<h3>)/).filter(Boolean);
+      if (parts.length > 1) {
+        var names = parts.map(function (h) { var m = /<h3>([^<]*)<\/h3>/.exec(h); return m ? m[1] : ""; });
+        html = '<div class="bd-tabs" role="tablist" aria-label="Parts of the paper">' + names.map(function (n, i) {
+          return '<button type="button" role="tab" id="bdt-' + i + '" aria-controls="bdp-' + i + '" aria-selected="' + (i === 0) + '">' + esc(n.replace(/^What they contribute$/, "Contributions").replace(/^Links in the paper$/, "Links")) + "</button>";
+        }).join("") + "</div>" + parts.map(function (h, i) {
+          return '<div class="bd-panel" role="tabpanel" id="bdp-' + i + '" aria-labelledby="bdt-' + i + '"' + (i ? " hidden" : "") + ">" + h + "</div>";
+        }).join("");
+      }
       if (b.links && b.links.length) {
         html += '<h3>Links in the paper</h3><ul class="bd-links">' + b.links.map(function (u) {
           return '<li><a href="' + esc(u) + '" rel="noopener" data-out="code">' + esc(u.replace(/^https?:\/\/(www\.)?/, "")) + "</a></li>";
@@ -572,30 +642,47 @@
       }
       bdOut.innerHTML = html;
       bdBtn.hidden = true;
-      bdNote.textContent = "Copied from the paper by our code, not written by AI. Tables may lose some formatting.";
+      bdNote.textContent = html ? "Copied from the paper by our code, not written by AI. Tables may lose some formatting." :
+        "We couldn’t find these sections in the paper’s web version. The PDF has everything.";
       if (d.summary && bdShort) {
         bdShort.querySelector("[data-bd-short-text]").textContent = d.summary;
-        bdShort.hidden = false;
+        var src = bdShort.querySelector("[data-bd-short-src]");
+        if (src) src.textContent = "Written by AI from the full paper. Every number in it was checked against the paper.";
       }
     };
     var bdMake = function () {
+      bdNote.textContent = "Reading the paper on arXiv. This happens once, then it’s saved for everyone.";
       bdBtn.disabled = true;
       bdBtn.textContent = "Reading the paper on arXiv…";
       track("site", "breakdown_load");
       bdCall({}).then(paintBreakdown).catch(function (e) {
+        bdOut.innerHTML = "";
+        bdBtn.hidden = false;
         bdBtn.disabled = false;
         bdBtn.textContent = "Try again";
         bdNote.textContent = e.fromServer && e.message ? e.message : "Couldn’t read the paper right now. Try again in a minute.";
       });
     };
     bdBtn.addEventListener("click", bdMake);
+    bdOut.addEventListener("click", function (e) {
+      var tab = e.target.closest('[role="tab"]');
+      if (!tab) return;
+      Array.prototype.forEach.call(bdOut.querySelectorAll('[role="tab"]'), function (t) {
+        var on = t === tab;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+      });
+    });
+    bdOut.innerHTML = '<div class="bd-skel" aria-hidden="true"><span style="width:92%"></span><span style="width:78%"></span><span style="width:85%"></span></div>';
     bdCall({ peek: true }).then(function (d) {
-      if (d.status === "missing") { bdBtn.hidden = false; return; }
+      // Not read yet: read it now, once for everyone (the AI summary inside is capped per day)
+      if (d.status === "missing") { bdMake(); return; }
       paintBreakdown(d);
       // Saved before anyone asked for a summary: make it now (once per paper, capped per day)
       if (d.status === "ready" && d.summaryLater && bdWantSummary) bdCall({}).then(function (x) { if (x.summary) paintBreakdown(x); }).catch(function () {});
     }).catch(function () {
       if (bdLayer) bdLayer.hidden = true; // the service is down: leave the page as it was
+      bdOut.innerHTML = "";
     });
   }
   document.addEventListener("click", function (e) {
@@ -708,14 +795,17 @@
     var openAsk = function (focus) {
       ask.classList.add("is-open");
       if (askFab) askFab.setAttribute("aria-expanded", "true");
-      if (focus) askInput.focus();
+      // Ask sits inline on the page: bring it into view
+      if (ask.scrollIntoView) ask.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (focus) askInput.focus({ preventScroll: true });
     };
     var closeAsk = function () {
       ask.classList.remove("is-open");
       if (askFab) { askFab.setAttribute("aria-expanded", "false"); askFab.focus(); }
     };
     if (askFab) askFab.addEventListener("click", function () { openAsk(true); });
-    ask.querySelector("[data-ask-close]").addEventListener("click", closeAsk);
+    var askClose = ask.querySelector("[data-ask-close]");
+    if (askClose) askClose.addEventListener("click", closeAsk);
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && ask.classList.contains("is-open")) closeAsk();
     });

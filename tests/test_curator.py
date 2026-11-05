@@ -117,3 +117,23 @@ def test_summarizer_keeps_curator_line():
         gs.summarize_papers([paper])
     get_summary.assert_not_called()
     assert paper["why_it_matters"] == "Kept."
+
+
+def test_reading_levels_and_terms_are_checked_against_the_paper():
+    abstract = "We compress each frame 300 times and learn a latent action space from video."
+    good = dict(GOOD, tldr="It learns a latent action space from video.",
+                tldr_simple="It learns how things move by watching videos.",
+                tldr_expert="Video features compressed 300 times give a latent action space.",
+                terms=[{"term": "latent action space", "meaning": "A few numbers that describe what moved between frames."},
+                       {"term": "made-up term", "meaning": "This term is not in the paper at all."},
+                       "not a dict"])
+    notes = curator.parse_notes(json.dumps(good), abstract)
+    assert notes["tldr_simple"] and notes["tldr_expert"]
+    assert [t["term"] for t in notes["terms"]] == ["latent action space"]
+
+
+def test_reading_level_with_a_new_number_is_dropped():
+    abstract = "We compress each frame 300 times."
+    bad = dict(GOOD, tldr_expert="Frames are compressed 500 times with a new tokenizer.")
+    notes = curator.parse_notes(json.dumps(bad), abstract)
+    assert notes is not None and notes["tldr_expert"] is None and notes["terms"] == []

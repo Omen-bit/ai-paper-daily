@@ -217,7 +217,7 @@ def test_published_dates_and_database_archive(tmp_path):
     assert [(p["i"], p["d"], p.get("x", 0)) for p in listing] == [("2610.1", "2026-10-28", 0), ("2503.7", "2025-03-04", 1)]
     assert listing[1]["n"] == 4 and len(listing[1]["a"]) == 3
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
-    assert "<dt>Published</dt><dd>28 Oct 2026</dd>" in page
+    assert '<span class="dp-k">Published</span><time datetime="2026-10-28">' in page
     assert not os.path.exists(os.path.join(site_dir, "paper", "2503.7.html"))
 
 
@@ -374,3 +374,61 @@ def test_umami_script_only_when_a_website_id_is_set(tmp_path, monkeypatch):
     index = (site_dir / "index.html").read_text(encoding="utf-8")
     assert 'data-website-id="0a1b2c3d-1111-2222-3333-444455556666"' in index
     assert 'data-auto-track="false"' in index
+
+
+def test_tidy_tex_handles_bold_numbers_and_arrows():
+    from site_builder import tidy_tex
+    text = r"by $\boldsymbol{300\times}$ ($\boldsymbol{1{,}200 \rightarrow 4}$ tokens)"
+    assert tidy_tex(text) == "by 300× (1,200 → 4 tokens)"
+
+
+def test_key_numbers_come_from_the_abstract_and_skip_names():
+    from site_builder import key_numbers
+    abstract = ("Agents need stable websites. We build a suite of 153 websites with 3,518 tasks. "
+                "A Qwen3-8B agent trained on it cuts errors from 9.9% to 1.0% and runs 4.3x faster.")
+    values = [n["value"] for n in key_numbers(abstract)]
+    assert "9.9% → 1.0%" in values and "4.3×" in values
+    assert "8B" not in values and "1.0%" not in values
+    assert len(values) == 3
+    for n in key_numbers(abstract):
+        assert n["context"] and len(n["context"].split()) <= 18
+
+
+def test_skim_labels_problem_method_and_result():
+    from site_builder import skim_label
+    assert skim_label("Large models are costly to serve.", 0) == "goal"
+    assert skim_label("We propose FastServe, a scheduler for long prompts.", 1) == "method"
+    assert skim_label("FastServe achieves 2x higher throughput than vLLM.", 3) == "result"
+    assert skim_label("The scheduler has three parts.", 4) == ""
+
+
+def test_paper_page_shows_links_lineage_and_terms(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    notes = {"tldr": "It learns a latent action space from videos.", "whats_new": "New bit.", "why_it_matters": "Matters.",
+             "build_ideas": ["Build one.", "Build two."], "difficulty": "advanced",
+             "tldr_simple": "It learns how things move from videos.", "tldr_expert": "Diffusion features give a latent action space.",
+             "terms": [{"term": "latent action space", "meaning": "Numbers that describe what moved between frames."}]}
+    a = _paper("2610.1", 9, curator=notes, code_url="https://github.com/a/b")
+    save_day([a], [a], "2026-10-31", data_dir=data_dir)
+    links = {"2610.1": {"checked": "2026-10-31", "stars": 1234,
+                        "hf": {"models": {"n": 2, "top": [{"id": "org/model-x", "likes": 5}]},
+                               "datasets": {"n": 0, "top": []}, "spaces": {"n": 0, "top": []}},
+                        "s2": {"found": True, "cited_by": 0, "refs": [{"title": "Older <work>", "year": 2024, "arxiv": "2401.1", "cites": 99}],
+                               "cites": []}}}
+    with open(os.path.join(data_dir, "links.json"), "w", encoding="utf-8") as f:
+        json.dump(links, f)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    assert "Where it fits" in page and "Older &lt;work&gt;" in page and "No papers cite it yet" in page
+    assert "Try it" in page and "org/model-x" in page and "★ 1.2k" in page and "0 demos" in page
+    assert 'class="term"' in page and "Numbers that describe what moved" in page
+    assert 'data-level="simple"' in page and 'data-level-text="expert"' in page
+
+
+def test_paper_page_without_links_leaves_those_parts_out(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [_paper("2610.1")], "2026-10-31", data_dir=data_dir)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    assert "Where it fits" not in page and "Try it" not in page
+    assert "data-breakdown" in page and "np-mbar" in page

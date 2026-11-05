@@ -135,6 +135,8 @@ The site itself is static. Its live features call **Supabase Edge Functions** di
 - **Builder value.** Released code, benchmarks, surveys and position papers.
 - **Readers.** Once the site has enough views, the week's most read paper takes the second slot.
 
+Each paper page shows the notes in one panel (with New to this / Practitioner / Researcher versions for the picks), key numbers copied from the abstract, the abstract coloured by problem, method and result, the full-paper breakdown, where the paper fits (Semantic Scholar citations) and the code, models and demos that use it (GitHub and Hugging Face). `paper_links.py` gathers the last two into `data/links.json` each morning, with no AI.
+
 Papers featured in the last seven editions are not picked again. The pipeline reads every new paper in the tracked arXiv categories each day (often over 1,000) and stores the best 200 of them in `data/`.
 </details>
 
@@ -235,6 +237,7 @@ ai-paper-daily/
 │   ├── curator.py              Notes for each pick
 │   ├── groq_summarizer.py      Groq client with model fallback
 │   ├── paper_store.py          Daily JSON records in data/
+│   ├── paper_links.py          Code, models and citations for paper pages
 │   ├── supabase_sync.py        Upload, embed and export papers
 │   ├── trends.py               Trend maths and SVG charts
 │   ├── tech_trends.py          Technologies to watch

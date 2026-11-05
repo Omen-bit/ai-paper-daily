@@ -30,6 +30,10 @@ LIMITS = {
     "build_idea": 25,
     "check_question": 30,
     "check_answer": 40,
+    "tldr_simple": 35,
+    "tldr_expert": 40,
+    "term": 5,
+    "meaning": 30,
 }
 
 SYSTEM_PROMPT = """You are the Curator for AI Papers Daily, a site for people who read AI papers and build projects from them.
@@ -44,6 +48,9 @@ Read the paper's title and abstract and return reading notes as one JSON object 
 "difficulty_reason": one short phrase, at most 20 words, explaining the difficulty (for example the compute or background needed).
 "check_question": one short question, at most 25 words, that checks whether a reader understood the paper's main idea. Its answer must be in the abstract.
 "check_answer": the answer to check_question in one or two sentences, at most 35 words.
+"tldr_simple": the tldr again for someone new to AI, at most 30 words, with no jargon and no acronyms.
+"tldr_expert": the tldr again for a researcher in the field, at most 35 words, naming the exact technique and setting.
+"terms": a list of up to 3 objects {"term": ..., "meaning": ...} for technical terms a newcomer would not know. Each term must appear word for word in the tldr or the abstract. Each meaning is one plain sentence, at most 25 words.
 
 Rules: use only facts from the abstract and never invent numbers, datasets or links. Write in plain language and avoid hype words such as "groundbreaking" or "revolutionary". Return only the JSON object."""
 
@@ -71,7 +78,31 @@ def _sentence(value, limit: int) -> Optional[str]:
     return text
 
 
-def parse_notes(raw: str) -> Optional[dict]:
+def _numbers_known(text: str, source: str) -> bool:
+    """True when every number in text also appears in source."""
+    plain = source.replace(",", "")
+    return all(n.replace(",", "") in plain for n in re.findall(r"\d[\d,.]*\d|\d", text))
+
+
+def _terms(value, source: str) -> list[dict]:
+    """Up to three {term, meaning} pairs whose term really appears in the paper's text."""
+    out = []
+    for item in value if isinstance(value, list) else []:
+        if not isinstance(item, dict):
+            continue
+        term = " ".join(str(item.get("term") or "").split()).strip().strip('"')
+        if not (3 <= len(term) <= 60) or len(term.split()) > LIMITS["term"]:
+            continue
+        meaning = _sentence(item.get("meaning"), LIMITS["meaning"])
+        if not meaning or term.lower() not in source.lower():
+            continue
+        if any(t["term"].lower() == term.lower() for t in out):
+            continue
+        out.append({"term": term, "meaning": meaning})
+    return out[:3]
+
+
+def parse_notes(raw: str, abstract: str = "") -> Optional[dict]:
     """
     Turn the model's reply into clean notes, or None if it is unusable.
     Required: tldr, whats_new, why_it_matters, 2+ build ideas, a known difficulty.
@@ -101,6 +132,12 @@ def parse_notes(raw: str) -> Optional[dict]:
         "check_question": _sentence(data.get("check_question"), LIMITS["check_question"]),
         "check_answer": _sentence(data.get("check_answer"), LIMITS["check_answer"]),
     }
+    # The other reading levels may not add facts: every number in them must be in the abstract
+    source_text = (abstract or "") + " " + (notes["tldr"] or "")
+    for key in ("tldr_simple", "tldr_expert"):
+        text = _sentence(data.get(key), LIMITS[key])
+        notes[key] = text if text and _numbers_known(text, source_text) else None
+    notes["terms"] = _terms(data.get("terms"), source_text)
     # The question is only useful with its answer, so keep both or neither
     if not (notes["check_question"] and notes["check_answer"]):
         notes["check_question"] = notes["check_answer"] = None
@@ -128,7 +165,7 @@ def _ask(model: str, title: str, abstract: str) -> Optional[str]:
         ],
         response_format={"type": "json_object"},
         temperature=0.2,
-        **gs.call_options(model, 750),
+        **gs.call_options(model, 1100),
     )
     choice = response.choices[0]
     if choice.finish_reason == "length":
@@ -159,7 +196,7 @@ def curate(paper: dict) -> tuple[Optional[dict], str]:
             print(f"  [curator] {model} failed: {error_str[:120]}")
             time.sleep(1)
             continue
-        notes = parse_notes(raw)
+        notes = parse_notes(raw, paper.get("abstract", ""))
         if notes:
             return notes, f"groq:{model}"
         print(f"  [curator] {model} returned notes that failed the checks")
