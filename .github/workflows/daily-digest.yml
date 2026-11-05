@@ -11,6 +11,11 @@ on:
   schedule:
     - cron: "30 2 * * *" # backup, 08:00 IST
   workflow_dispatch:
+    inputs:
+      rebuild_only:
+        description: "Rebuild the website only (keep today's picks)"
+        type: boolean
+        default: false
 
 concurrency:
   group: daily-edition
@@ -54,12 +59,19 @@ jobs:
         name: Install dependencies
         run: pip install -r requirements.txt
 
-      - if: steps.check.outputs.skip != 'true'
+      - if: steps.check.outputs.skip != 'true' && inputs.rebuild_only != true
         name: Pick today's papers
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODELS: ${{ vars.GROQ_MODELS }}
         run: python src/main.py
+
+      - if: steps.check.outputs.skip != 'true'
+        name: Find code, models and citations for paper pages
+        continue-on-error: true # pages leave these parts out if a service is down
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # higher rate limit for GitHub stars
+        run: python src/paper_links.py
 
       - if: steps.check.outputs.skip != 'true'
         name: Sync to Supabase
@@ -80,7 +92,7 @@ jobs:
           UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
         run: python src/site_builder.py
 
-      - if: steps.check.outputs.skip != 'true'
+      - if: steps.check.outputs.skip != 'true' && inputs.rebuild_only != true
         name: Email today's edition
         continue-on-error: true # the site still publishes if Buttondown is down
         env:
