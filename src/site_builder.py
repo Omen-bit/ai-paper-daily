@@ -543,6 +543,7 @@ def archive_compact(row: dict) -> dict:
         "i": row["id"], "t": row.get("title") or row["id"], "a": authors[:3], "n": len(authors),
         "c": row.get("categories") or ["other-ml"],
         "d": (row.get("submitted") or row.get("first_seen") or "")[:10],
+        "w": (row.get("first_seen") or row.get("submitted") or "")[:10],
         "s": 0, "f": 0, "x": 1,
         "m": row.get("lead") or "",
         "u": int(row.get("hf_upvotes") or 0),
@@ -1166,7 +1167,8 @@ def related_papers(papers: dict, k: int = 4) -> dict[str, list[str]]:
 def compact(rec: dict) -> dict:
     """
     The fields papers.html needs, with short keys to keep the file small:
-    i id, t title, a first authors, n author count, c topics, d date, s score,
+    i id, t title, a first authors, n author count, c topics, d published (arXiv) date,
+    w the day we added it, s score,
     f 1 our pick / 2 trending, m one-line summary, u HF upvotes, k has code,
     h 1 when the paper is not on Hugging Face, l difficulty (b/i/a).
     """
@@ -1178,6 +1180,8 @@ def compact(rec: dict) -> dict:
         "n": len(rec.get("authors", [])),
         "c": rec.get("categories") or ["other-ml"],
         "d": published(rec),
+        "w": (rec.get("first_seen") or published(rec))[:10],
+        "ac": ((rec.get("arxiv_categories") or [""])[0] or ""),
         "s": rec.get("score") or 0,
         "f": (2 if rec.get("slot") == "trending" else 1) if rec.get("featured") else 0,
         "m": notes.get("tldr") or lead_sentence(rec.get("abstract") or ""),
@@ -1287,7 +1291,8 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     # Papers with a page here, plus the rest of the database's year (linking to Hugging Face)
     listing = [compact(r) for r in papers.values()]
     listing += [archive_compact(r) for r in archive if r["id"] not in papers]
-    listing.sort(key=lambda p: (p["d"], p["s"]), reverse=True)
+    # Newest batch first; inside a day, papers people are upvoting lead, then our score
+    listing.sort(key=lambda p: (p["w"], p["u"], p["s"], p["d"]), reverse=True)
     _write(os.path.join(site_dir, "data", "papers.json"),
            json.dumps(listing, ensure_ascii=False, separators=(",", ":")))
     # Which papers have a page here; other "For you" results link to Hugging Face

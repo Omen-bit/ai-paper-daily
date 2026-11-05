@@ -1554,7 +1554,7 @@
   var VIEWS = {
     "": { label: "papers, newest first" },
     week: { label: "most upvoted papers of the last 7 days",
-            keep: function (p) { return p.u > 0 && p.d >= weekAgo(); },
+            keep: function (p) { return p.u > 0 && (p.w || p.d) >= weekAgo(); },
             order: function (a, b) { return b.u - a.u; } },
     nothf: { label: "papers not on Hugging Face yet", keep: function (p) { return p.h; } },
     picks: { label: "of our daily picks", keep: function (p) { return p.f; } },
@@ -1615,8 +1615,37 @@
       return { value: value, caption: caption.length ? caption.join(" ") : "key result" };
     }
     if (p.u) return { value: '<small aria-hidden="true">▲</small>' + p.u, caption: "upvotes on HF", html: true };
-    if (p.d && p.d === newest) return { value: "New", caption: "in today’s batch" };
+    if ((p.w || p.d) === newest) return { value: "New", caption: "in the latest batch" };
     return { value: esc(shortDate(p.d)), caption: "published", html: true };
+  }
+
+  // "today", "yesterday", or a short date, by the visitor's own calendar
+  function relDay(iso) {
+    var now = new Date(), pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    var key = function (d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
+    if (iso === key(now)) return "today";
+    now.setDate(now.getDate() - 1);
+    if (iso === key(now)) return "yesterday";
+    return shortDate(iso);
+  }
+
+  // Each card shows one row of chips; drop the ones that would be cut off at the edge
+  function fitChips() {
+    Array.prototype.forEach.call(results.querySelectorAll(".pcard-tags"), function (row) {
+      var kids = row.children, width = row.clientWidth;
+      for (var i = 0; i < kids.length; i++) {
+        kids[i].hidden = false;
+        if (kids[i].offsetLeft - row.offsetLeft + kids[i].offsetWidth > width) kids[i].hidden = true;
+      }
+    });
+  }
+  var fitTimer;
+  window.addEventListener("resize", function () { clearTimeout(fitTimer); fitTimer = setTimeout(fitChips, 150); });
+
+  // A chip with a small ⓘ that explains it on hover, focus or tap
+  function infoChip(cls, label, tip) {
+    return '<button class="sig sig-info ' + cls + '" type="button" aria-label="' + esc(label) + ': what this means">' + esc(label) +
+      '<span class="sig-i" aria-hidden="true">i</span><span class="sig-tip" role="tooltip">' + tip + "</span></button>";
   }
 
   function card(p) {
@@ -1632,9 +1661,22 @@
     else if (p.h) badge = '<span class="pc-badge" title="Not on the Hugging Face daily list">Not on HF yet</span>';
     var chips = "";
     if (p.u && stat.caption !== "upvotes on HF") chips += '<span class="sig sig-up" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
+    var used = [];
+    if (p.um) used.push(p.um + (p.um === 1 ? " model" : " models"));
+    if (p.us) used.push(p.us + (p.us === 1 ? " Space" : " Spaces"));
+    if (used.length) chips += infoChip("sig-used", "Used in " + used.join(" · "),
+      "<b>Models</b> are AI models shared on Hugging Face whose page links this paper, usually because they were built with its method." +
+      " <b>Spaces</b> are demo apps on Hugging Face that use it. Higher numbers mean more people are building on this work.");
+    if (p.gs) chips += infoChip("", "★ " + (p.gs >= 1000 ? (p.gs / 1000).toFixed(1).replace(/\.0$/, "") + "k" : p.gs),
+      "Stars on the paper’s code on GitHub. Developers star a project to bookmark or follow it, so it shows how much interest the code has.");
     if (p.k) chips += '<span class="sig">Code</span>';
     if (p.l) chips += '<span class="sig">' + LEVEL[p.l] + "</span>";
     if (read) chips += '<span class="pcard-read">✓ Read</span>';
+    // Other topics the paper belongs to fill the chip row when there are few signals
+    (p.c || []).slice(1, 3).forEach(function (t) {
+      chips += '<a class="sig sig-topic t-' + esc(t) + '" href="papers.html?cat=' + esc(t) + '"><span class="dot"></span>' + esc(names[t] || t) + "</a>";
+    });
+    if (!chips && p.ac) chips += '<span class="sig sig-arxiv" title="arXiv subject category">arXiv ' + esc(p.ac) + "</span>";
     var authors = (p.a || []).slice(0, 2).map(esc).join(", ");
     var extra = (p.n || 0) - Math.min(2, (p.a || []).length);
     if (extra > 0) authors += " +" + extra;
@@ -1645,11 +1687,16 @@
         '<div class="pc-word" aria-hidden="true">' + esc(COVER_WORD[topic] || "ML") + "</div>" +
         '<div class="pc-stat"><b>' + (stat.html ? stat.value : esc(stat.value)) + "</b><span>" + esc(stat.caption) + "</span></div>" +
       "</div>" +
-      '<div class="pc-body">' +
-        '<h3><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
-        (p.m ? '<p class="pcard-sum">' + esc(p.m) + "</p>" : "") +
-        (authors ? '<p class="pcard-auth">' + authors + "</p>" : "") +
-        '<div class="pcard-foot"><time datetime="' + esc(p.d) + '">' + esc(shortDate(p.d)) + "</time>" + chips +
+      '<div class="pc-body">' + /* display: contents, its children sit on the card's subgrid rows */
+        '<h3 title="' + esc(p.t) + '"><a href="' + href + '"' + (local ? "" : ' rel="noopener"') + ">" + esc(p.t) + "</a></h3>" +
+        // Fixed-size text areas (2-line title, 2-line summary, one byline, one chip row) keep every card the same shape
+        '<p class="pcard-sum">' + esc(p.m || "") + "</p>" +
+        '<p class="pcard-by">' + (p.o ? '<span class="org-mark" aria-hidden="true">' + esc(p.o.replace(/[^A-Za-z0-9 ]/g, "").split(" ").filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join("").toUpperCase()) +
+          '</span><b class="org-name">' + esc(p.o) + "</b>" + (authors ? '<span class="by-sep">·</span>' : "") : "") +
+          '<span class="by-auth">' + authors + "</span></p>" +
+        '<div class="pcard-tags">' + chips + "</div>" +
+        '<div class="pcard-foot"><p class="pcard-dates"><span class="date-pill is-pub"><span class="dp-k">Published</span><time datetime="' + esc(p.d) + '">' + esc(shortDate(p.d)) + "</time></span>" +
+          (p.w && p.w !== p.d ? '<span class="date-pill is-added' + (relDay(p.w) === "today" ? " is-today" : "") + '"><span class="dp-k">Added</span><time datetime="' + esc(p.w) + '">' + esc(relDay(p.w)) + "</time></span>" : "") + "</p>" +
           (local ? "" : '<span class="ext" title="Opens on Hugging Face">HF ↗</span>') +
           '<button class="quick-save" type="button" data-quick-save="' + esc(p.i) + '" data-title="' + esc(p.t) +
           '" aria-pressed="' + isSaved + '" aria-label="Save this paper">' + (isSaved ? "✓" : "+") + "</button></div>" +
@@ -1663,6 +1710,7 @@
     return { i: r.id, t: r.title, a: authors.slice(0, 3), n: authors.length,
              c: (r.categories && r.categories.length) ? r.categories : ["other-ml"],
              d: String(r.submitted || r.first_seen || "").slice(0, 10), s: 0, f: known.f || (r.featured ? 1 : 0),
+             w: known.w || String(r.first_seen || "").slice(0, 10), ac: known.ac,
              m: known.m || "", u: known.u || r.hf_upvotes || 0, k: known.k, h: known.h, l: known.l, x: known.x };
   }
   var byId = {};
@@ -1675,6 +1723,7 @@
         '<div class="empty-action"><button class="btn btn-outline btn-sm" type="button" data-clear>Clear all filters</button></div></div>';
     } else {
       results.insertAdjacentHTML("beforeend", matches.slice(shown, shown + PAGE).map(card).join(""));
+      fitChips();
     }
     shown = Math.min(shown + PAGE, matches.length);
     more.hidden = shown >= matches.length;
@@ -1778,7 +1827,7 @@
       all.forEach(function (p) {
         byId[p.i] = p;
         if (!p.x) onSite[p.i] = true;
-        if (p.d > newest) newest = p.d;
+        if ((p.w || p.d) > newest) newest = p.w || p.d;
       });
       apply();
     })

@@ -324,6 +324,16 @@ def test_cards_carry_summary_and_signals():
     assert (a["m"], a["u"], a["x"]) == ("Lead.", 7, 1)
 
 
+def test_cards_know_when_a_paper_was_published_and_when_we_added_it():
+    from site_builder import compact, archive_compact
+    rec = {"id": "2611.1", "title": "T", "authors": ["A"], "abstract": "First.", "submitted": "2026-11-03",
+           "first_seen": "2026-11-05", "arxiv_categories": ["cs.CL", "cs.LG"], "hf_upvotes": 3}
+    c = compact(rec)
+    assert (c["d"], c["w"], c["ac"]) == ("2026-11-03", "2026-11-05", "cs.CL")
+    a = archive_compact({"id": "2601.2", "title": "T", "authors": [], "submitted": "2026-01-02", "first_seen": "2026-01-04"})
+    assert (a["d"], a["w"]) == ("2026-01-02", "2026-01-04")
+
+
 def test_paper_page_has_the_breakdown_and_asks_for_a_summary_only_without_notes(tmp_path):
     data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
     a = _paper("2610.1", 9, curator={"tldr": "Short take."})
