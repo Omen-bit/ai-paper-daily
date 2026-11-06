@@ -14,3 +14,5 @@ Thumbs.db
 *.log
 # Built website (published by the workflow, not committed)
 site/
+# Backtest cache of Hugging Face upvotes
+.cache/

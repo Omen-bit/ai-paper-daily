@@ -146,6 +146,8 @@ The site itself is static. Its live features call **Supabase Edge Functions** st
 
 Papers featured in the last seven editions are not picked again. The pipeline reads every new paper in the tracked arXiv categories each day (often over 1,000) and keeps the best 200 in `data/`.
 
+To check how good the picks turn out, `python scripts/backtest_picker.py` replays every saved day and compares each pick with the papers' Hugging Face upvotes a few days later (hit rate in the day's top 10, rank in the pool, and share of the best paper's upvotes).
+
 Each morning `paper_links.py` also gathers citations, code, models and labs into `data/links.json`, and lab logos into `data/logos/`, with no AI. A lab comes from evidence that names it directly: the organization that claimed the paper on Hugging Face, the owner of its GitHub code, the arXiv comment field, or the authors' institutions on OpenAlex. Logos come from Hugging Face, Wikidata, GitHub or the lab's own website.
 </details>
 
@@ -219,6 +221,8 @@ ai-paper-daily/
 │   ├── schema.sql              Tables, vector search, rate limits
 │   ├── functions/              search, recommend, scout, ask, breakdown, track, embed
 │   └── tests/                  Edge Function tests
+├── scripts/
+│   └── backtest_picker.py      Replays saved days to measure the picker
 ├── tests/                      Python tests
 ├── data/                       Daily editions, links and lab logos, updated by the workflow
 └── docs/                       Logo and screenshots
