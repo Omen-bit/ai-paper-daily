@@ -4,7 +4,6 @@ Unit tests for fetcher.py retry backoff, version stripping, deduplication, and f
 """
 import sys
 import os
-import pytest
 from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))

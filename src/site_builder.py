@@ -105,14 +105,6 @@ def format_authors(authors: list, limit: int = 4) -> str:
     return ", ".join(authors[:limit]) + f" + {len(authors) - limit} more"
 
 
-def long_date(iso: str) -> str:
-    """'2026-10-31' -> 'Saturday 31 October 2026'."""
-    try:
-        d = date.fromisoformat(iso)
-    except (TypeError, ValueError):
-        return iso or ""
-    return f"{d:%A} {d.day} {d:%B %Y}"
-
 
 def nice_date(iso: str, with_year: bool = True) -> str:
     """'2026-10-31' -> '31 Oct 2026', or 'Oct 31' without the year (the year
@@ -994,9 +986,6 @@ def bibtex(rec: dict) -> str:
             f"  url = {{https://arxiv.org/abs/{rec['id']}}}\n}}")
 
 
-def reading_minutes(text: str) -> int:
-    return max(1, round(len((text or "").split()) / 230))
-
 
 _TEX = [(r"\\times", "×"), (r"\\%", "%"), (r"\\approx", "≈"), (r"\\sim", "~"), (r"\\pm", "±"),
         (r"\\(?:leq|le)\b", "≤"), (r"\\(?:geq|ge)\b", "≥"), (r"\\(?:rightarrow|to)\b", "→"), (r"\\leftarrow\b", "←"),
@@ -1188,11 +1177,6 @@ COVER_WORD = {"llms": "LLM", "generative-ai": "GEN AI", "computer-vision": "VISI
               "alignment": "ALIGN", "reasoning-agents": "AGENTS", "ml-theory": "THEORY", "ai-science": "SCIENCE",
               "code-ai": "CODE", "safety-privacy": "SAFETY", "efficient-ai": "EFF AI", "multimodal": "MULTI", "other-ml": "ML"}
 
-
-def related_item(rec: dict, root: str) -> str:
-    topic = (rec.get("categories") or ["other-ml"])[0]
-    return (f'<li><a href="{root}paper/{esc(rec["id"])}.html">{esc(rec["title"])}</a>'
-            f'<span class="t-{esc(topic)}"><span class="dot"></span>{esc(category_name(topic))}</span></li>')
 
 
 _CODE_LINK = re.compile(r"https?://(?:www\.)?(?:github\.com|gitlab\.com)/[\w.\-]+/[\w.\-]+", re.I)

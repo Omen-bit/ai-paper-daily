@@ -6,7 +6,6 @@ Strips arXiv version suffixes (v1, v2) before deduplication.
 """
 
 import re
-import sys
 import time
 import requests
 import feedparser

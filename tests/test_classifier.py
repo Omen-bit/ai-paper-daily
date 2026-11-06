@@ -8,7 +8,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from classifier import classify_paper, MIN_CATEGORY_SCORE
+from classifier import classify_paper
 
 # Each entry: (title, abstract, expected_primary_slug)
 EXAMPLES = [

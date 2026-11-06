@@ -443,11 +443,6 @@ def curate_with_log(paper: dict) -> tuple[Optional[dict], str, dict]:
     return None, "none", log
 
 
-def curate(paper: dict) -> tuple[Optional[dict], str]:
-    """Return (notes, source). notes is None when no model gave usable output."""
-    notes, source, _ = curate_with_log(paper)
-    return notes, source
-
 
 def curate_papers(papers: list[dict]) -> list[dict]:
     """

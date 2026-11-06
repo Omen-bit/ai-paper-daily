@@ -139,25 +139,6 @@ def movers(rows: list[dict], months: list[str], recent: int = 3) -> list[dict]:
     return sorted(out, key=lambda x: -x["delta"])
 
 
-def weekly_pulse(rows: list[dict], today: str | None = None) -> list[dict]:
-    """Topic shares for the last 7 days against the 28 days before (a steadier baseline)."""
-    if not rows:
-        return []
-    end = date.fromisoformat(today or max(r["day"] for r in rows))
-    week_start, base_start = end - timedelta(days=6), end - timedelta(days=34)
-    week, base = Counter(), Counter()
-    for r in rows:
-        d = date.fromisoformat(r["day"])
-        target = week if week_start <= d <= end else base if base_start <= d < week_start else None
-        if target is not None:
-            for c in r["cats"]:
-                target[c] += 1 / len(r["cats"])
-    s_week, s_base = shares(week), shares(base)
-    steady = sum(base.values()) >= 60 and sum(week.values()) >= 20
-    out = [{"topic": t, "share": s, "base": s_base.get(t), "delta": (s - s_base[t]) if steady and t in s_base else None,
-            "count": round(week[t])} for t, s in s_week.items()]
-    return sorted(out, key=lambda x: -x["share"])
-
 
 def code_share(rows: list[dict], months: list[str]) -> list[tuple[str, float, int]]:
     """Per month: the share of papers that link to code, and how many papers there were."""
@@ -239,29 +220,6 @@ def _spark(values: list[float], w: int = 120, h: int = 32, cls: str = "spark", l
             f'<polygon class="spark-area" points="{area}"/><polyline class="spark-line" points="{line}"/>'
             f'<circle class="spark-end" cx="{lx:.1f}" cy="{ly:.1f}" r="3"/></svg>')
 
-
-def pulse_rows(pulse: list[dict], names: dict, limit: int = 6, root: str = "") -> str:
-    """Home page: this week's share per topic, with a tick at the 4-week baseline."""
-    rows = pulse[:limit]
-    if not rows:
-        return '<p class="empty-note">Topic shares appear after a few days of papers.</p>'
-    top = max(max(r["share"], r["base"] or 0) for r in rows) or 1
-    out = []
-    for r in rows:
-        w = r["share"] / top * 100
-        tick = f'<i class="pulse-base" style="left:{(r["base"] or 0) / top * 100:.1f}%"></i>' if r["base"] is not None else ""
-        if r["delta"] is None:
-            change = '<span class="pulse-ch">—</span>'
-        else:
-            cls = "up" if r["delta"] > 0.0005 else "down" if r["delta"] < -0.0005 else "flat"
-            change = f'<span class="pulse-ch {cls}">{pts(r["delta"])}</span>'
-        label = (f'{esc(names.get(r["topic"], r["topic"]))}: {pct(r["share"])} of papers this week'
-                 + (f', {pct(r["base"])} in the 4 weeks before' if r["base"] is not None else ""))
-        out.append(f'''<li><a href="{root}papers.html?cat={esc(r["topic"])}" aria-label="{esc(label)}">
-  <span class="pulse-name"><span class="topic t-{esc(r["topic"])}"><span class="dot"></span>{esc(names.get(r["topic"], r["topic"]))}</span></span>
-  <span class="pulse-track"><span class="pulse-fill" style="width:{w:.1f}%"></span>{tick}</span>
-  <span class="pulse-pct">{pct(r["share"])}</span>{change}</a></li>''')
-    return f'<ol class="pulse2">{"".join(out)}</ol>'
 
 
 def spread_labels(want: list[float], gap: float, top: float, bottom: float) -> list[float]:
@@ -349,19 +307,6 @@ def share_table(per_month: dict[str, Counter], months: list[str], topics: list[s
     return f'<table class="data-table"><thead><tr><th scope=col>Month</th>{head}</tr></thead><tbody>{"".join(body)}</tbody></table>'
 
 
-def mover_cards(items: list[dict], names: dict, months: list[str]) -> str:
-    cards = []
-    for it in items:
-        cls = "up" if it["delta"] > 0.0005 else "down" if it["delta"] < -0.0005 else "flat"
-        change = pts(it["delta"]) if it["enough"] else "—"
-        cards.append(f'''<li class="mover {cls}">
-  <a href="papers.html?cat={esc(it["topic"])}"><span class="topic t-{esc(it["topic"])}"><span class="dot"></span>{esc(names.get(it["topic"], it["topic"]))}</span></a>
-  <div class="mover-nums"><strong>{pct(it["now"], 1)}</strong><span class="pulse-ch {cls}">{change}</span></div>
-  {_spark(it["line"], cls="spark mover-spark", lo=0, hi=max(max(it["line"]) * 1.15, 0.01))}
-  <span class="mover-axis"><span>{_month_label(months[0])}</span><span>{_month_label(months[-1])}</span></span>
-</li>''')
-    return f'<ol class="movers">{"".join(cards)}</ol>'
-
 
 def calendar(counts: Counter, end: str, weeks: int = 53) -> str:
     """A year of days as squares, darker when more papers came out. Weeks run Monday to Sunday."""
@@ -398,40 +343,6 @@ def calendar(counts: Counter, end: str, weeks: int = 53) -> str:
     return (f'<div class="cal-wrap">{svg}</div><div class="cal-legend"><span>Fewer</span>{legend}<span>More</span>'
             f'<span class="cal-note">Busiest day: {busiest[1].day} {MONTHS[busiest[1].month - 1]} {busiest[1].year}, {busiest[0]} papers</span></div>')
 
-
-def code_chart(series: list[tuple[str, float, int]]) -> str:
-    """Share of papers with code, month by month, as one line with a value on hover."""
-    if not series:
-        return ""
-    W, H, L, R, T, B = 1000, 240, 44, 24, 24, 30
-    pw, ph = W - L - R, H - T - B
-    top = max(0.2, max(v for _, v, _ in series))
-    mx = min(1.0, (int(top * 10) + 1) / 10)
-    tick = 0.1 if mx <= 0.6 else 0.2
-    x = lambda i: L + pw * i / max(1, len(series) - 1)
-    y = lambda v: T + ph * (1 - v / mx)
-    grid = "".join(f'<line x1="{L}" x2="{W - R}" y1="{y(v):.1f}" y2="{y(v):.1f}"/>'
-                   f'<text x="{L - 8}" y="{y(v) + 4:.1f}" text-anchor="end">{int(round(v * 100))}%</text>'
-                   for v in [round(tick * k, 2) for k in range(int(round(mx / tick)) + 1)])
-    line = " ".join(f"{x(i):.1f},{y(v):.1f}" for i, (_, v, _) in enumerate(series))
-    area = f"{x(0):.1f},{y(0):.1f} {line} {x(len(series) - 1):.1f},{y(0):.1f}"
-    pts_ = []
-    for i, (m, v, n) in enumerate(series):
-        label = f"{_month_label(m, True)}: {pct(v)} of {n} papers link to code"
-        tw = 250
-        tx = min(max(x(i) - tw / 2, L), W - R - tw)
-        pts_.append(f'<g class="pt" tabindex="0" aria-label="{esc(label)}">'
-                    f'<rect class="hit" x="{x(i) - pw / len(series) / 2:.1f}" y="{T}" width="{pw / len(series):.1f}" height="{ph}"/>'
-                    f'<circle cx="{x(i):.1f}" cy="{y(v):.1f}" r="4"/>'
-                    f'<g class="tip"><rect x="{tx:.1f}" y="{y(v) - 40:.1f}" width="{tw}" height="26" rx="6"/>'
-                    f'<text x="{tx + tw / 2:.1f}" y="{y(v) - 23:.1f}" text-anchor="middle">{esc(label)}</text></g></g>')
-    lm, lv, _ = series[-1]
-    end_label = f'<text class="end-label" x="{x(len(series) - 1) - 8:.1f}" y="{y(lv) - 12:.1f}" text-anchor="end">{pct(lv)}</text>'
-    xl = "".join(f'<text x="{x(i):.1f}" y="{H - 8}" text-anchor="middle">{_month_label(m, i == 0 or m.endswith("-01"))}</text>'
-                 for i, (m, _, _) in enumerate(series) if i % 2 == 0 or i == len(series) - 1)
-    return (f'<svg class="chart code-chart" viewBox="0 0 {W} {H}" role="img" aria-label="Share of papers that link to code, by month">'
-            f'<g class="grid">{grid}</g><polygon class="code-area" points="{area}"/><polyline class="code-line" points="{line}"/>'
-            f'{end_label}<g class="xlab">{xl}</g><g>{"".join(pts_)}</g></svg>')
 
 
 def word_rows(words: list[dict], months: list[str]) -> str:

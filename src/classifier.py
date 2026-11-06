@@ -12,8 +12,6 @@ Design notes:
 """
 
 import re
-from typing import Optional
-
 
 # Minimum score a category must reach to be assigned to a paper.
 MIN_CATEGORY_SCORE = 2
@@ -263,15 +261,3 @@ def classify_papers(papers: list[dict]) -> list[dict]:
         paper["categories"] = classify_paper(paper)
     return papers
 
-
-def get_all_category_slugs() -> list[str]:
-    """Return list of all category slugs."""
-    return [slug for _, _, slug, _, _ in CATEGORIES]
-
-
-def get_category_display(slug: str) -> Optional[tuple]:
-    """Get emoji and display name for a category slug."""
-    for emoji, name, s, _, _ in CATEGORIES:
-        if s == slug:
-            return emoji, name
-    return None
