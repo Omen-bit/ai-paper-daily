@@ -197,7 +197,8 @@ def verify(findings: list[dict], read_file: Callable[[str], Optional[list[str]]]
 def fingerprint(f: dict) -> str:
     """Stable across runs: the file, and the code or check title, not the line number (lines move)."""
     what = (f.get("code") or "").strip() if f.get("severity") != "check" else f.get("title", "")
-    key = f"{f.get('file', '')}|{re.sub(r'\s+', ' ', what)}"
+    what = re.sub(r"\s+", " ", what)
+    key = f"{f.get('file', '')}|{what}"
     return hashlib.sha1(key.encode()).hexdigest()[:12]
 
 
