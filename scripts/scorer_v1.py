@@ -6,7 +6,6 @@ Nothing in the pipeline imports it.
 """
 
 import re
-from typing import Optional
 
 
 # Known top-tier institutions for bonus scoring

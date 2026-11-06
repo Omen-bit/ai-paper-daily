@@ -187,6 +187,19 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 </details>
 
 <details>
+<summary><strong>Code review agent</strong></summary>
+<br>
+
+Every Monday a GitHub Actions workflow (`code-review-agent.yml`) runs `scripts/code_review_agent.py`, a LangGraph graph:
+
+```
+collect -> review -> verify -> dedupe -> file
+```
+
+It collects the last 7 days of commits and runs pytest, the Supabase function tests and ruff (bug rules only). The LLM then reads each changed file's diff and lists likely bugs, each naming a line and the code on it. Findings whose code isn't really on that line are dropped, and failing checks rank first. Anything the agent filed before, open or closed, is skipped. It opens at most 3 issues labelled `agent-found`, each with the evidence and a suggested fix, using the workflow's own `GITHUB_TOKEN`. Run the workflow by hand with **dry run** ticked, or `python scripts/code_review_agent.py --dry-run` locally, to see what it would file.
+</details>
+
+<details>
 <summary><strong>Are Scout and Ask getting better? Eval sets</strong></summary>
 <br>
 
@@ -214,7 +227,7 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 | Layer | Built with |
 | :-- | :-- |
 | Pipeline | Python 3.11, [LangGraph](https://langchain-ai.github.io/langgraph/) (the daily run is a StateGraph), arXiv API, Hugging Face Daily Papers, Semantic Scholar, OpenAlex |
-| Agents and tracing | LangChain (the pairwise judge, with model fallback), LangGraph.js (Project Scout), LangSmith tracing and experiments (optional) |
+| Agents and tracing | LangChain (the pairwise judge, with model fallback), LangGraph.js (Project Scout), a LangGraph code review agent, LangSmith tracing and experiments (optional) |
 | Language model | [Groq](https://groq.com) running `gpt-oss-120b`, with `gpt-oss-20b` as fallback |
 | Database and search | [Supabase](https://supabase.com) Postgres, pgvector, Edge Functions (Deno, TypeScript) |
 | Website | Static HTML, CSS and vanilla JavaScript, hand-drawn SVG charts |
@@ -261,7 +274,8 @@ ai-paper-daily/
 │   └── tests/                  Edge Function tests
 ├── scripts/
 │   ├── backtest_picker.py      Replays saved days to measure the picker
-│   └── run_evals.py            Scores Scout and Ask on the eval sets
+│   ├── run_evals.py            Scores Scout and Ask on the eval sets
+│   └── code_review_agent.py    Weekly review that opens issues (LangGraph)
 ├── evals/                      Eval sets for Scout and Ask, and saved results
 ├── tests/                      Python tests
 ├── data/                       Daily editions, links and lab logos, updated by the workflow

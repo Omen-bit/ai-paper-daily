@@ -1,0 +1,55 @@
+name: 🔍 Code review agent
+
+# Once a week: review the last 7 days of changes, run the checks, ask the LLM
+# for likely bugs, keep only findings that point at real code, and open at most
+# 3 issues labelled agent-found. Nothing already filed (open or closed) is filed
+# again. Run it by hand with "dry run" ticked to see what it would file.
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays, 09:30 IST
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: print the issues instead of opening them"
+        type: boolean
+        default: true
+      since_days:
+        description: "Review the commits of the last N days"
+        default: "7"
+        required: true
+
+concurrency:
+  group: code-review-agent
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write # open issues and create the agent-found label
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the whole history, to diff the last N days
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements-dev.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # The same pinned versions as supabase/functions/_shared/langgraph.ts, for the function tests
+      - run: npm install --no-save --no-package-lock @langchain/langgraph@1.5.1 @langchain/langgraph-sdk@1.12.5 @langchain/langgraph-checkpoint@1.2.0 @langchain/core@1.3.0 zod@4.6.7
+      - name: Review and file issues
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODELS: ${{ vars.GROQ_MODELS }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+          LANGSMITH_TRACING: ${{ secrets.LANGSMITH_API_KEY != '' }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGSMITH_PROJECT: ai-paper-daily
+        run: python scripts/code_review_agent.py --since-days "${{ inputs.since_days || 7 }}"
