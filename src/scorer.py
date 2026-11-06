@@ -16,6 +16,7 @@ scripts/backtest_picker.py measures the picker against later upvotes.
 
 import math
 import re
+from typing import Optional
 
 import labs
 
@@ -147,10 +148,11 @@ def _other_topic(paper: dict, pick: dict) -> bool:
     return not a or not b or a != b
 
 
-def select_daily(papers: list[dict]) -> list[dict]:
+def select_daily(papers: list[dict], prefer: Optional[str] = None) -> list[dict]:
     """
     Pick the day's two papers, each for a different reason:
-      1. "pick": the best paper by score.
+      1. "pick": the best paper by score, or the paper with id `prefer` when it is
+         among them (the LLM judge's choice from the shortlist, see judge.py).
       2. "trending": the most upvoted of the rest, from a different topic than the pick
          when one has enough upvotes. When nothing has enough upvotes, the best-scored
          paper from another topic ("runner-up").
@@ -159,6 +161,9 @@ def select_daily(papers: list[dict]) -> list[dict]:
     if not papers:
         return []
     ranked = sorted((score_paper(p) for p in papers), key=_rank_key)
+    if prefer:
+        chosen = next((i for i, p in enumerate(ranked) if p.get("id") == prefer), 0)
+        ranked.insert(0, ranked.pop(chosen))
     top = ranked[0]
     top["badges"] = ([("⭐", "Top Pick")] + top["badges"])[:4]
     top["slot"] = "pick"

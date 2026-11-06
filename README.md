@@ -109,8 +109,9 @@ Every morning at 01:30 UTC (07:00 IST) the **Daily edition** workflow fetches ev
 flowchart LR
     A["arXiv<br/>7 ML categories"] --> C["Classify<br/>13 research topics"]
     B["Hugging Face<br/>Daily Papers"] --> C
-    C --> D["Score<br/>top pick + trending"]
-    D --> E["Write notes<br/>Groq"]
+    C --> D["Score<br/>shortlist of 6"]
+    D --> J2["LLM judge<br/>pairwise, LangChain"]
+    J2 --> E["Write notes<br/>Groq"]
     E --> F[("data/<br/>daily JSON")]
     F --> L["Links and labs<br/>code, citations, logos"]
     F --> G["Sync + embed"]
@@ -149,6 +150,8 @@ Every point comes from evidence about the paper, never from buzzwords in its abs
 The best-scored paper is the pick. The most upvoted of the rest becomes Trending, from a different topic than the pick whenever one has enough upvotes.
 Once the site has enough views, the home page shows the week's most read paper in the second slot instead.
 
+The scorer then shortlists its top 6, and an LLM judge compares them two at a time (15 comparisons), judging novelty, evidence, reproducibility and usefulness to builders. The paper that wins the most comparisons is the pick. Without a Groq key, or with `PICK_JUDGE=off`, the best score is the pick. `python scripts/backtest_picker.py --judge` compares the judge with the scorer.
+
 By default the picks come from the papers fetched that morning. Set the repository variable `PICK_FROM` to `yesterday` to pick from the previous day's papers instead, once their upvotes have had a day to build up. Run `python scripts/backtest_picker.py --day-late` first to compare the two.
 
 Papers featured in the last seven editions are not picked again. The pipeline reads every new paper in the tracked arXiv categories each day (often over 1,000) and keeps the best 200 in `data/`.
@@ -186,7 +189,8 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 
 | Layer | Built with |
 | :-- | :-- |
-| Pipeline | Python 3.11, arXiv API, Hugging Face Daily Papers, Semantic Scholar, OpenAlex |
+| Pipeline | Python 3.11, [LangGraph](https://langchain-ai.github.io/langgraph/) (the daily run is a StateGraph), arXiv API, Hugging Face Daily Papers, Semantic Scholar, OpenAlex |
+| Agents and tracing | LangChain (the pairwise judge, with model fallback), LangSmith tracing (optional) |
 | Language model | [Groq](https://groq.com) running `gpt-oss-120b`, with `gpt-oss-20b` as fallback |
 | Database and search | [Supabase](https://supabase.com) Postgres, pgvector, Edge Functions (Deno, TypeScript) |
 | Website | Static HTML, CSS and vanilla JavaScript, hand-drawn SVG charts |
@@ -206,6 +210,8 @@ ai-paper-daily/
 │   └── tests.yml               Python and TypeScript tests on every push
 ├── src/
 │   ├── main.py                 Pipeline entry point
+│   ├── pipeline_graph.py       The daily run as a LangGraph graph
+│   ├── judge.py                LLM judge: compares the shortlist two at a time
 │   ├── fetcher.py              arXiv and Hugging Face fetcher
 │   ├── classifier.py           Research topic classifier
 │   ├── scorer.py               Scoring: top pick and trending

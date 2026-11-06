@@ -5,3 +5,5 @@ httpx==0.28.1
 python-dateutil==2.9.0
 python-dotenv==1.0.1
 pillow==12.3.0
+langgraph==1.2.20
+langchain-openai==1.7.4

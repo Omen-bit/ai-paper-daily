@@ -7,6 +7,7 @@ some days later as the measure of "best".
     python scripts/backtest_picker.py              # later upvotes from Hugging Face (needs internet)
     python scripts/backtest_picker.py --offline    # later upvotes from the saved files only (rough)
     python scripts/backtest_picker.py --day-late   # also try picking from yesterday's papers
+    python scripts/backtest_picker.py --judge      # also the LLM judge (needs GROQ_API_KEY)
     python scripts/backtest_picker.py --json out.json
 
 For each day and each picker it records:
@@ -37,6 +38,12 @@ SCRIPTS_DIR = os.path.join(ROOT_DIR, "scripts")
 for _path in (SRC_DIR, SCRIPTS_DIR):
     if _path not in sys.path:
         sys.path.insert(0, _path)
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(ROOT_DIR, ".env"))
+except ImportError:
+    pass
 
 import paper_store  # noqa: E402
 import scorer  # noqa: E402
@@ -200,6 +207,18 @@ def pick_upvotes_now(pool: list[dict]) -> list[str]:
     return [p["id"] for p in ranked[:2]]
 
 
+def pick_judge(pool: list[dict], day_date: str = "") -> list[str]:
+    """The scorer's shortlist, then the LLM judge (judge.py) for the pick. Needs GROQ_API_KEY."""
+    import judge
+    ranked = sorted((scorer.score_paper(dict(p)) for p in copy.deepcopy(pool)), key=scorer._rank_key)
+    verdict = judge.judge(ranked[:judge.SHORTLIST], seed=day_date)
+    prefer = verdict["winner"] if verdict else None
+    return [p["id"] for p in scorer.select_daily(copy.deepcopy(pool), prefer=prefer)]
+
+
+pick_judge.wants_date = True  # the day's date seeds the judge's side shuffling
+
+
 # Phase 2 and the LLM judge add their pickers here
 PICKERS: dict[str, Callable[[list[dict]], list[str]]] = {
     "current": pick_current,
@@ -253,7 +272,7 @@ def run_backtest(days: list[dict], later: dict[str, int], pickers: dict = PICKER
         results = []
         for day in mature:
             with contextlib.redirect_stdout(io.StringIO()) if quiet else contextlib.nullcontext():
-                ids = picker(day["pool"])
+                ids = picker(day["pool"], day["date"]) if getattr(picker, "wants_date", False) else picker(day["pool"])
             if not ids:
                 continue
             r = judge(ids[0], day["pool"], later, top_k)
@@ -316,6 +335,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--min-age", type=int, default=MIN_AGE_DAYS, help="skip days younger than this (default 3)")
     ap.add_argument("--day-late", action="store_true",
                     help="also run the current picker on yesterday's papers (PICK_FROM=yesterday)")
+    ap.add_argument("--judge", action="store_true",
+                    help="also run the LLM judge (needs GROQ_API_KEY; about 15 Groq calls per day)")
     ap.add_argument("--json", metavar="PATH", help="also write the full result as JSON")
     ap.add_argument("--data", default=DATA_DIR, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
@@ -325,7 +346,13 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("No saved days with full candidate pools were found in data/daily/.")
         return 1
     later = upvotes_from_saved(days) if args.offline else upvotes_from_hf(days, refresh=args.refresh)
-    result = run_backtest(days, later, min_age=args.min_age)
+    pickers = dict(PICKERS)
+    if args.judge:
+        if not os.environ.get("GROQ_API_KEY"):
+            print("--judge needs GROQ_API_KEY in the environment or .env.")
+            return 1
+        pickers["judge"] = pick_judge
+    result = run_backtest(days, later, pickers=pickers, min_age=args.min_age)
     if args.day_late:
         late = run_backtest(late_days(days), later, pickers={"day-late": pick_current}, min_age=args.min_age)
         result["summary"].update({k: v for k, v in late["summary"].items() if k != "_random"})

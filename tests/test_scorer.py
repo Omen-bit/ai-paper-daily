@@ -116,3 +116,10 @@ def test_select_daily_falls_back_to_runner_up_without_upvotes():
     assert [p["slot"] for p in chosen] == ["pick", "runner-up"]
     assert select_daily([]) == []
     assert [p["slot"] for p in select_daily([_p("1")])] == ["pick"]
+
+
+def test_select_daily_can_be_told_which_paper_to_pick():
+    papers = [_p("1", upvotes=90), _p("2", upvotes=10, topics=("vision",)), _p("3", upvotes=40, topics=("robotics",))]
+    chosen = select_daily(papers, prefer="2")
+    assert [(p["id"], p["slot"]) for p in chosen] == [("2", "pick"), ("1", "trending")]
+    assert select_daily([_p("1", upvotes=9)], prefer="missing")[0]["id"] == "1"
