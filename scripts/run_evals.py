@@ -10,8 +10,8 @@ after instead of judged by eye.
   python scripts/run_evals.py all --langsmith  # also log the run as a LangSmith experiment
 
 Scout, per case: is an expected paper in the top 10 (hit@10), how high is the
-first one (MRR), is it marked a strong fit, and how many of the project's needs
-came back "missing".
+first one (MRR), is it marked a strong fit, how many of the project's needs
+came back "missing", and whether Scout ran a second search round.
 
 Ask, per case: was the answer backed by a quote from the paper, and is it right.
 Correctness is graded by an LLM on Groq against the reference answer. For a
@@ -84,6 +84,8 @@ def score_scout(case: dict, reply: dict) -> dict:
         "needs": len(coverage),
         "missing": sum(1 for c in coverage if c.get("status") == "missing"),
         "mode": reply.get("mode"),
+        "engine": reply.get("engine"),
+        "searched_again": reply.get("expanded") or [],
     }
 
 
@@ -98,6 +100,8 @@ def summarize_scout(rows: list) -> dict:
         "strong_hit": round(sum(r["strong_hit"] for r in done) / n, 3),
         "missing_needs": round(sum(r["missing"] for r in done) / needs, 3),
         "ai_mode": round(sum(r["mode"] == "ai" for r in done) / n, 3),
+        "second_round": round(sum(bool(r.get("searched_again")) for r in done) / n, 3),
+        "seconds_avg": round(sum(r.get("seconds", 0) for r in done) / n, 1),
     }
 
 

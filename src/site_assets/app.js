@@ -1290,6 +1290,7 @@
           "</aside>" +
           '<section class="sx-results"><div class="sx-head"><h2>Papers to build on</h2><p data-sx-count></p></div>' +
           (data.mode === "basic" && hasPlan ? '<p class="sx-note">Relevance scoring was unavailable, so these are the closest papers by search and haven’t been checked for fit.</p>' : "") +
+          ((data.expanded || []).length ? '<p class="sx-again">Searched again for: ' + data.expanded.map(function (q) { return "“" + esc(q) + "”"; }).join(", ") + ".</p>" : "") +
           '<div data-sx-list></div>' +
           '<div class="feedback" data-feedback="scout"><span data-feedback-q>Were these papers relevant?</span>' +
           '<button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, relevant</button>' +

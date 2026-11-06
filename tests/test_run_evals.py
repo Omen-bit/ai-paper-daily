@@ -31,21 +31,24 @@ def test_the_case_files_are_well_formed():
 
 def test_scout_scoring():
     case = {"id": "x", "expected": ["2611.00002", "2611.00009"]}
-    reply = {"mode": "ai",
+    reply = {"mode": "ai", "engine": "langgraph", "expanded": ["zero-shot tagging"],
              "plan": [{"id": "2611.00001", "fit": "strong"}, {"id": "2611.00002", "fit": "related"}],
              "coverage": [{"status": "covered"}, {"status": "missing"}, {"status": "partial"}]}
     row = run_evals.score_scout(case, reply)
     assert row["hit"] and row["first_rank"] == 2 and row["rr"] == 0.5
     assert not row["strong_hit"] and row["missing"] == 1 and row["needs"] == 3
+    assert row["engine"] == "langgraph" and row["searched_again"] == ["zero-shot tagging"]
     assert not run_evals.score_scout(case, {"plan": []})["hit"]
 
 
 def test_scout_summary_skips_errors():
-    rows = [{"hit": True, "rr": 1.0, "strong_hit": True, "needs": 2, "missing": 0, "mode": "ai"},
+    rows = [{"hit": True, "rr": 1.0, "strong_hit": True, "needs": 2, "missing": 0, "mode": "ai",
+             "searched_again": ["x"], "seconds": 9.0},
             {"hit": False, "rr": 0.0, "strong_hit": False, "needs": 2, "missing": 1, "mode": "basic"},
             {"id": "z", "error": "500"}]
     s = run_evals.summarize_scout(rows)
     assert s["hit@10"] == 0.5 and s["mrr"] == 0.5 and s["errors"] == 1 and s["missing_needs"] == 0.25
+    assert s["second_round"] == 0.5
 
 
 def test_ask_scoring_uses_the_grader_only_when_it_should():

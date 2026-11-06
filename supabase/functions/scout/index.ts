@@ -10,14 +10,20 @@
 //   3. The lists are merged with reciprocal rank fusion into up to 40 candidates
 //   4. Groq scores each candidate's relevance (0-100) and writes why it fits
 //      (fallback: the fused order, marked as not checked)
+//   5. If a need has no strong paper, search once more with the ranker's
+//      suggested phrases and score only the new papers (round 2)
+// Steps 1-5 are an agent loop (_shared/scout_agent.ts) run as a LangGraph graph
+// (_shared/scout_graph.ts). SCOUT_ENGINE=loop runs the same steps without
+// LangGraph, and Scout falls back to that by itself if LangGraph fails to load.
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 import { db, guard, json, safely, underLimit } from "../_shared/http.ts";
 import { groq } from "../_shared/groq.ts";
 import {
-  type Candidate, cleanDescription, coverageOf, descriptionProblem, fallbackRanking, fuseLists, type Match,
-  type Library, MIN_SIMILARITY, type Need, NEEDS_PROMPT, parseNeeds, parseRanking, RANK_PROMPT, rankInput, singleNeed,
+  cleanDescription, descriptionProblem, type Match, type Library, MIN_SIMILARITY, type Need, NEEDS_PROMPT, parseNeeds,
   SOURCES, userNeeds,
 } from "../_shared/scout.ts";
+import { initialState, runScoutLoop, type ScoutDeps, type ScoutState } from "../_shared/scout_agent.ts";
+import { runScoutGraph } from "../_shared/scout_graph.ts";
 
 const model = new Supabase.ai.Session("gte-small");
 const SCOUTS_PER_HOUR = 10;
@@ -25,6 +31,30 @@ const SPLITS_PER_HOUR = 20; // the split is one small LLM call, and people may r
 const PER_QUERY = 30;
 // "Watch this project" still compares new papers by meaning against this floor
 const FLOOR = Number(Deno.env.get("SCOUT_MIN_SIMILARITY")) || MIN_SIMILARITY;
+const ENGINE = (Deno.env.get("SCOUT_ENGINE") ?? "graph").trim().toLowerCase() === "loop" ? "loop" : "graph";
+// Loaded while the worker boots, not inside a request; null when it fails or is switched off
+const langgraph = ENGINE === "graph"
+  ? import("../_shared/langgraph.ts").catch((e) => {
+    console.error("LangGraph failed to load, Scout runs the plain loop", String(e));
+    return null;
+  })
+  : Promise.resolve(null);
+
+const deps: ScoutDeps = {
+  groq: (system, user, maxTokens) => groq(system, user, maxTokens),
+  search,
+  async abstracts(ids) {
+    const { data: rows } = await db.from("papers").select("id, abstract").in("id", ids);
+    return new Map<string, string>((rows ?? []).map((r: { id: string; abstract: string }) => [r.id, r.abstract] as [string, string]));
+  },
+};
+
+/** One Scout run on LangGraph, or on the plain loop. Same steps either way. */
+async function runScout(state: ScoutState): Promise<{ result: ScoutState; engine: string }> {
+  const lg = await langgraph;
+  return lg ? { result: await runScoutGraph(lg, state, deps), engine: "langgraph" }
+    : { result: await runScoutLoop(state, deps), engine: "loop" };
+}
 
 /** Hybrid search for one query. Keywords are skipped for the long description, where they add noise. */
 async function search(text: string, withKeywords: boolean): Promise<Match[]> {
@@ -97,39 +127,13 @@ Deno.serve(safely("scout", async (req) => {
   }
 
   try {
-    // 1. Split the project into needs, unless the visitor already has
-    const planned = edited
-      ? { summary: typeof body.summary === "string" ? cleanDescription(body.summary).slice(0, 300) : "", needs: edited }
-      : parseNeeds(await groq(NEEDS_PROMPT, description, 400));
-    const needs = planned?.needs ?? singleNeed(description);
+    const started = Date.now();
+    const summary = typeof body.summary === "string" ? cleanDescription(body.summary).slice(0, 300) : "";
+    const { result: s, engine } = await runScout(initialState(description, edited ? { summary, needs: edited } : null));
+    const ranking = s.ranking!;
+    console.log(JSON.stringify({ scout: engine, ms: Date.now() - started, round: s.round, expanded: s.expanded.length }));
 
-    // 2. Search for each need, then the whole description (one at a time: the free plan limits CPU per request)
-    const lists: Match[][] = [];
-    const queryNeeds: (string | null)[] = [];
-    for (const n of needs) {
-      lists.push(await search(n.query, true));
-      queryNeeds.push(n.id);
-    }
-    if (planned) {
-      lists.push(await search(description.slice(0, 600), false));
-      queryNeeds.push(null);
-    }
-
-    // 3. Merge into one candidate list
-    const candidates: Candidate[] = fuseLists(lists, queryNeeds);
-
-    // 4. Score relevance and explain each fit
-    let ranking = null;
-    if (candidates.length) {
-      const { data: rows } = await db.from("papers").select("id, abstract").in("id", candidates.map((c) => c.id));
-      const abstracts = new Map<string, string>((rows ?? []).map((r: { id: string; abstract: string }) => [r.id, r.abstract] as [string, string]));
-      candidates.forEach((c) => { c.abstract = abstracts.get(c.id) ?? ""; });
-      ranking = parseRanking(await groq(RANK_PROMPT, rankInput(description, needs, candidates), 2400), candidates, needs);
-    }
-    const mode = ranking ? "ai" : "basic";
-    ranking = ranking ?? fallbackRanking(candidates);
-
-    const byId = new Map(candidates.map((c) => [c.id, c]));
+    const byId = new Map(s.candidates.map((c) => [c.id, c]));
     const plan = ranking.papers.map((p) => {
       const c = byId.get(p.id)!;
       return {
@@ -141,16 +145,20 @@ Deno.serve(safely("scout", async (req) => {
     const scope = await library();
     return json(req, {
       version: 3,
-      summary: planned?.summary ?? "",
-      needs: needs.map((n) => ({ id: n.id, label: n.label, query: n.query })),
-      edited: !!edited,
-      coverage: coverageOf(needs, ranking.papers, candidates),
+      summary: s.summary,
+      needs: s.needs.map((n) => ({ id: n.id, label: n.label, query: n.query })),
+      edited: s.edited,
+      coverage: s.coverage,
       plan,
       gaps: ranking.gaps,
+      // Round 2: the phrases Scout searched again for, so the page can say so
+      expanded: s.expanded.map((e) => e.query),
+      rounds: s.round,
+      engine,
       searched: scope.papers,
       library: scope,
       floor: FLOOR,
-      mode,
+      mode: s.mode,
     });
   } catch (e) {
     console.error("scout failed", String(e));

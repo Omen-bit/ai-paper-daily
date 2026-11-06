@@ -16,3 +16,5 @@ Thumbs.db
 site/
 # Backtest cache of Hugging Face upvotes
 .cache/
+# LangGraph.js, installed only to run the Scout graph tests
+node_modules/

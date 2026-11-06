@@ -22,3 +22,6 @@ verify_jwt = false
 
 [functions.breakdown]
 verify_jwt = false
+
+[functions.scout-spike]
+verify_jwt = false

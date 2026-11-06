@@ -1193,6 +1193,7 @@ body.focus .ask-fab { display: none; }
 .sx-head h2 { margin: 0; font: 400 clamp(32px, 3.6vw, 48px)/1 var(--pixel); letter-spacing: -.01em; }
 .sx-head p { margin: 0; color: var(--muted); font-size: 14px; text-align: right; }
 .sx-note { margin: 16px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--line-2); font-size: 14px; color: var(--muted); }
+.sx-again { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
 .sx-entry { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--line); }
 .sx-score b { display: block; font: 400 52px/.9 var(--pixel); color: var(--sx-strong); font-variant-numeric: tabular-nums; }
 .sx-score i { display: block; height: 4px; margin-top: 12px; color: var(--sx-strong); background: linear-gradient(90deg, currentColor var(--w), var(--line) var(--w)); }

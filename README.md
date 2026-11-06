@@ -80,7 +80,7 @@ See who is behind each paper, with the lab's own logo, and browse companies, uni
 
 <img src="docs/screenshots/scout.png" alt="Project Scout: describe a project and get the papers to build on" width="100%">
 
-Describe what you want to build in plain words. Scout splits it into the parts it needs (you can edit them), searches each one by meaning and by keywords, and returns the papers to build on, best first, with one line on why each fits. If part of your project has no good paper, it says so. Press **Watch this project** to see new papers that match it later.
+Describe what you want to build in plain words. Scout splits it into the parts it needs (you can edit them), searches each one by meaning and by keywords, and returns the papers to build on, best first, with one line on why each fits. If part of your project has no good paper, Scout searches once more with better phrases before it says so. Press **Watch this project** to see new papers that match it later.
 
 ### And more
 
@@ -129,7 +129,7 @@ The site itself is static. Its live features call **Supabase Edge Functions** st
 | :-- | :-- | :-- |
 | `search` | All papers | Finds papers by meaning with vector search |
 | `recommend` | For you | Finds papers close to the ones you have read |
-| `scout` | Project Scout | Splits the project into needs with an LLM, runs a hybrid search for each, then scores every match and says why it fits |
+| `scout` | Project Scout | A LangGraph agent: splits the project into needs, runs a hybrid search for each, scores every match and says why it fits, then searches again for any need left without a strong paper |
 | `ask` | Ask this paper | Reads the full paper from arXiv once, stores it in sections, then answers from the best-matching sections and quotes its source |
 | `breakdown` | Paper pages | Copies the contributions, results, limitations and conclusion from the paper once (no LLM), plus a short AI summary for papers without notes |
 | `track` | Most read, site numbers | Counts anonymous views, "worth it" votes, clicks on each pick, "seen it before?" answers and returning visitors |
@@ -151,6 +151,16 @@ The best-scored paper is the pick. The most upvoted of the rest becomes Trending
 Once the site has enough views, the home page shows the week's most read paper in the second slot instead.
 
 The scorer then shortlists its top 6, and an LLM judge compares them two at a time (15 comparisons), judging novelty, evidence, reproducibility and usefulness to builders. The paper that wins the most comparisons is the pick. Without a Groq key, or with `PICK_JUDGE=off`, the best score is the pick. `python scripts/backtest_picker.py --judge` compares the judge with the scorer.
+
+Project Scout runs as a LangGraph.js graph inside its edge function:
+
+```
+plan_needs -> retrieve -> fuse -> rank -> respond
+                                   |
+          a need has no strong paper (first round only): expand_search -> fuse -> rank -> respond
+```
+
+The second round searches up to three of the phrases the ranker suggested for the weak needs, scores only the papers the first round hadn't seen, and merges them in. Needs the visitor edited skip `plan_needs`. The page then says "Searched again for: …". The steps live in `_shared/scout_agent.ts` with no network calls, so they are tested with fakes, and the same steps can run without LangGraph (`SCOUT_ENGINE=loop`); Scout also falls back to that on its own if LangGraph fails to load. `scout-spike` measures what LangGraph costs inside an edge function.
 
 Each pick's reading notes come from the Curator, a small LangGraph loop: the model drafts the notes, every field is checked (word limits, required fields, no numbers the abstract lacks), the same model is asked to fix only the fields that failed (up to two rounds), and a smaller model then checks each fact against the abstract. Unsupported optional fields are dropped; an unsupported required field goes back for repair.
 
@@ -185,7 +195,7 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 - `scout_cases.json`: 26 project descriptions, each with the papers in the library that clearly serve it.
 - `ask_cases.json`: 30 questions about 6 papers with reference answers, 5 of them questions the paper can't answer.
 
-`python scripts/run_evals.py scout|ask|all` runs them against the live functions and saves the results to `evals/results/`. Scout is scored on whether an expected paper is in the top 10 (hit@10), how high it ranks (MRR), whether it is marked a strong fit, and how many of the project's needs come back missing. Ask is scored on whether the answer quotes the paper and whether it is right, graded by an LLM against the reference; for a question the paper can't answer, right means saying so. Add `--langsmith` to log the run as a LangSmith experiment and compare runs side by side. With `SYNC_SECRET` in `.env` the hourly limits are skipped; without it the script paces itself.
+`python scripts/run_evals.py scout|ask|all` runs them against the live functions and saves the results to `evals/results/`. Scout is scored on whether an expected paper is in the top 10 (hit@10), how high it ranks (MRR), whether it is marked a strong fit, how many of the project's needs come back missing, and how often Scout searched a second round. Ask is scored on whether the answer quotes the paper and whether it is right, graded by an LLM against the reference; for a question the paper can't answer, right means saying so. Add `--langsmith` to log the run as a LangSmith experiment and compare runs side by side. With `SYNC_SECRET` in `.env` the hourly limits are skipped; without it the script paces itself.
 </details>
 
 <details>
@@ -204,7 +214,7 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 | Layer | Built with |
 | :-- | :-- |
 | Pipeline | Python 3.11, [LangGraph](https://langchain-ai.github.io/langgraph/) (the daily run is a StateGraph), arXiv API, Hugging Face Daily Papers, Semantic Scholar, OpenAlex |
-| Agents and tracing | LangChain (the pairwise judge, with model fallback), LangSmith tracing (optional) |
+| Agents and tracing | LangChain (the pairwise judge, with model fallback), LangGraph.js (Project Scout), LangSmith tracing and experiments (optional) |
 | Language model | [Groq](https://groq.com) running `gpt-oss-120b`, with `gpt-oss-20b` as fallback |
 | Database and search | [Supabase](https://supabase.com) Postgres, pgvector, Edge Functions (Deno, TypeScript) |
 | Website | Static HTML, CSS and vanilla JavaScript, hand-drawn SVG charts |
@@ -247,7 +257,7 @@ ai-paper-daily/
 │   └── site_assets/            CSS, JavaScript and fonts
 ├── supabase/
 │   ├── schema.sql              Tables, vector search, rate limits
-│   ├── functions/              search, recommend, scout, ask, breakdown, track, embed
+│   ├── functions/              search, recommend, scout (LangGraph.js agent), scout-spike, ask, breakdown, track, embed
 │   └── tests/                  Edge Function tests
 ├── scripts/
 │   ├── backtest_picker.py      Replays saved days to measure the picker
