@@ -137,3 +137,107 @@ def test_reading_level_with_a_new_number_is_dropped():
     bad = dict(GOOD, tldr_expert="Frames are compressed 500 times with a new tokenizer.")
     notes = curator.parse_notes(json.dumps(bad), abstract)
     assert notes is not None and notes["tldr_expert"] is None and notes["terms"] == []
+
+
+# --- The repair loop and grounding check (Phase 5) ---
+
+ABSTRACT = "We distil a speech model to run on a phone CPU, keeping word error rate within 0.3 points."
+
+
+def _run(replies, models=("m1",), abstract=ABSTRACT):
+    """Curate one paper with the model's replies given in call order."""
+    client = MagicMock()
+    client.chat.completions.create.side_effect = [_response(r if isinstance(r, str) else json.dumps(r))
+                                                  for r in replies]
+    paper = {"id": "1", "title": "T", "abstract": abstract}
+    with patch.object(gs, "_get_api_key", return_value="key"), \
+         patch.object(gs, "_get_client", return_value=client), \
+         patch.object(gs, "_active_models", list(models)), patch.object(gs, "_auth_failed", False), \
+         patch.object(curator.time, "sleep"):
+        notes, source, log = curator.curate_with_log(paper)
+    return notes, source, log, client
+
+
+def _users(client):
+    return [c.kwargs["messages"][1]["content"] for c in client.chat.completions.create.call_args_list]
+
+
+def test_check_notes_says_which_fields_failed_and_why():
+    notes, problems = curator.check_notes(dict(GOOD, tldr=" ".join(["word"] * 40), difficulty="easy",
+                                               build_ideas=["One idea only."]))
+    assert notes is None
+    assert "tldr: 40 words, the limit is 30" in problems
+    assert any(p.startswith("difficulty: must be one of") for p in problems)
+    assert any(p.startswith("build_ideas: need 2 or 3") for p in problems)
+    assert curator.check_notes(None)[1] == ["the reply was not a JSON object"]
+
+
+def test_numbers_the_abstract_lacks_are_problems_or_dropped():
+    bad = dict(GOOD, tldr="A small model cuts errors by 45% on phones.", key_result="Errors fall 12 points.")
+    notes, problems = curator.check_notes(bad, ABSTRACT)
+    assert notes is None and problems == ["tldr: mentions 45, which the abstract doesn't"]
+    notes, problems = curator.check_notes(dict(GOOD, key_result="Errors fall 12 points."), ABSTRACT)
+    assert problems == [] and notes["key_result"] is None
+
+
+def test_a_draft_with_one_bad_field_is_repaired_not_thrown_away():
+    long_tldr = dict(GOOD, tldr=" ".join(["word"] * 40))
+    fixed = {"tldr": "A small speech model runs on a phone CPU."}
+    notes, source, log, client = _run([long_tldr, fixed, {"unsupported": []}])
+    assert notes["tldr"] == fixed["tldr"] and notes["whats_new"] == GOOD["whats_new"]
+    assert source == "groq:m1" and log == {"repairs": 1, "grounded": True, "flagged": []}
+    repair_prompt = _users(client)[1]
+    assert "tldr: 40 words, the limit is 30" in repair_prompt and "exactly these keys, fixed: tldr" in repair_prompt
+
+
+def test_after_two_failed_repairs_the_next_model_drafts():
+    bad = dict(GOOD, difficulty="easy")
+    notes, source, log, client = _run([bad, {"difficulty": "easy"}, {"difficulty": "trivial"},
+                                       GOOD, {"unsupported": []}], models=("m1", "m2"))
+    assert source == "groq:m2" and log["repairs"] == 2
+    assert client.chat.completions.create.call_count == 5
+
+
+def test_hopeless_drafts_skip_repair():
+    notes, source, log, client = _run(["{}", "{}"], models=("m1", "m2"))
+    assert notes is None and source == "none" and log["repairs"] == 0
+    assert client.chat.completions.create.call_count == 2
+
+
+def test_ground_check_drops_flagged_optional_fields():
+    good = dict(GOOD, check_question="What does the model trade for speed?",
+                check_answer="It drops the decoder cache to run on a phone.")
+    notes, _, log, client = _run([good, {"unsupported": ["key_result", "check_answer", "not_a_field"],
+                                         "why": "Not in the abstract."}])
+    assert notes["key_result"] is None and notes["check_question"] is None and notes["check_answer"] is None
+    assert notes["tldr"] == GOOD["tldr"] and log["flagged"] == ["key_result", "check_answer"]
+    assert client.chat.completions.create.call_args_list[-1].kwargs["model"] == "m1"  # the last model checks
+
+
+def test_ground_check_sends_a_flagged_required_field_back_to_repair():
+    fixed = {"whats_new": "It shrinks a speech model so it runs on a phone CPU."}
+    notes, _, log, client = _run([GOOD, {"unsupported": ["whats_new"]}, fixed, {"unsupported": []}])
+    assert notes["whats_new"] == fixed["whats_new"] and log["repairs"] == 1 and log["flagged"] == []
+    assert "whats_new: states something the abstract doesn't support" in _users(client)[2]
+
+
+def test_a_failed_ground_check_keeps_the_notes():
+    client = MagicMock()
+    client.chat.completions.create.side_effect = [_response(json.dumps(GOOD)), RuntimeError("503")]
+    paper = {"id": "1", "title": "T", "abstract": ABSTRACT}
+    with patch.object(gs, "_get_api_key", return_value="key"), \
+         patch.object(gs, "_get_client", return_value=client), \
+         patch.object(gs, "_active_models", ["m1"]), patch.object(gs, "_auth_failed", False):
+        notes, source, log = curator.curate_with_log(paper)
+    assert notes["tldr"] == GOOD["tldr"] and source == "groq:m1" and log["grounded"] is False
+
+
+def test_curate_papers_records_the_log():
+    client = MagicMock()
+    client.chat.completions.create.side_effect = [_response(json.dumps(GOOD)), _response('{"unsupported": []}')]
+    paper = {"id": "1", "title": "T", "abstract": ABSTRACT}
+    with patch.object(gs, "_get_api_key", return_value="key"), \
+         patch.object(gs, "_get_client", return_value=client), \
+         patch.object(gs, "_active_models", ["m1"]), patch.object(gs, "_auth_failed", False):
+        curator.curate_papers([paper])
+    assert paper["curator_log"] == {"repairs": 0, "grounded": True, "flagged": []}

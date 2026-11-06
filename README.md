@@ -111,7 +111,7 @@ flowchart LR
     B["Hugging Face<br/>Daily Papers"] --> C
     C --> D["Score<br/>shortlist of 6"]
     D --> J2["LLM judge<br/>pairwise, LangChain"]
-    J2 --> E["Write notes<br/>Groq"]
+    J2 --> E["Write notes<br/>draft, check, repair, ground"]
     E --> F[("data/<br/>daily JSON")]
     F --> L["Links and labs<br/>code, citations, logos"]
     F --> G["Sync + embed"]
@@ -151,6 +151,8 @@ The best-scored paper is the pick. The most upvoted of the rest becomes Trending
 Once the site has enough views, the home page shows the week's most read paper in the second slot instead.
 
 The scorer then shortlists its top 6, and an LLM judge compares them two at a time (15 comparisons), judging novelty, evidence, reproducibility and usefulness to builders. The paper that wins the most comparisons is the pick. Without a Groq key, or with `PICK_JUDGE=off`, the best score is the pick. `python scripts/backtest_picker.py --judge` compares the judge with the scorer.
+
+Each pick's reading notes come from the Curator, a small LangGraph loop: the model drafts the notes, every field is checked (word limits, required fields, no numbers the abstract lacks), the same model is asked to fix only the fields that failed (up to two rounds), and a smaller model then checks each fact against the abstract. Unsupported optional fields are dropped; an unsupported required field goes back for repair.
 
 By default the picks come from the papers fetched that morning. Set the repository variable `PICK_FROM` to `yesterday` to pick from the previous day's papers instead, once their upvotes have had a day to build up. Run `python scripts/backtest_picker.py --day-late` first to compare the two.
 
@@ -215,7 +217,7 @@ ai-paper-daily/
 │   ├── fetcher.py              arXiv and Hugging Face fetcher
 │   ├── classifier.py           Research topic classifier
 │   ├── scorer.py               Scoring: top pick and trending
-│   ├── curator.py              Notes for each pick
+│   ├── curator.py              Notes for each pick (LangGraph: draft, check, repair, ground)
 │   ├── groq_summarizer.py      Groq client with model fallback
 │   ├── paper_store.py          Daily JSON records in data/
 │   ├── pick_pool.py            Which papers the picks come from (today or yesterday)
