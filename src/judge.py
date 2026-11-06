@@ -71,8 +71,8 @@ def enabled() -> bool:
     return bool((os.environ.get("GROQ_API_KEY") or "").strip())
 
 
-def make_llm():
-    """A structured-output chat model on Groq, with the next model as a fallback."""
+def make_llm(schema=None):
+    """A structured-output chat model on Groq (Verdict unless told otherwise), with the next model as a fallback."""
     from langchain_openai import ChatOpenAI
 
     def one(model: str):
@@ -82,7 +82,7 @@ def make_llm():
             # gpt-oss models think briefly and keep the thinking out of the reply
             extra_body={"reasoning_effort": "low", "include_reasoning": False} if "gpt-oss" in model else None,
         )
-        return llm.with_structured_output(Verdict, method="json_mode")
+        return llm.with_structured_output(schema or Verdict, method="json_mode")
 
     chain, *rest = [one(m) for m in models()[:2]]
     return chain.with_fallbacks(rest) if rest else chain

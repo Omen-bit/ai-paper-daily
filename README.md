@@ -177,11 +177,23 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 </details>
 
 <details>
+<summary><strong>Are Scout and Ask getting better? Eval sets</strong></summary>
+<br>
+
+`evals/` holds fixed test sets, so a prompt or model change can be measured before and after:
+
+- `scout_cases.json`: 26 project descriptions, each with the papers in the library that clearly serve it.
+- `ask_cases.json`: 30 questions about 6 papers with reference answers, 5 of them questions the paper can't answer.
+
+`python scripts/run_evals.py scout|ask|all` runs them against the live functions and saves the results to `evals/results/`. Scout is scored on whether an expected paper is in the top 10 (hit@10), how high it ranks (MRR), whether it is marked a strong fit, and how many of the project's needs come back missing. Ask is scored on whether the answer quotes the paper and whether it is right, graded by an LLM against the reference; for a question the paper can't answer, right means saying so. Add `--langsmith` to log the run as a LangSmith experiment and compare runs side by side. With `SYNC_SECRET` in `.env` the hourly limits are skipped; without it the script paces itself.
+</details>
+
+<details>
 <summary><strong>Limits and safety</strong></summary>
 <br>
 
 - Every public function has a per-visitor hourly limit.
-- `embed` only accepts calls carrying the pipeline's `SYNC_SECRET`.
+- `embed` only accepts calls carrying the pipeline's `SYNC_SECRET`; calls with it also skip the hourly limits.
 - If the LLM is unavailable, Scout still returns its search results, marked as not checked.
 - AI summaries in `breakdown` are capped per day; past the cap the page shows the breakdown without one.
 - Stored full texts that nobody has asked about for 30 days are removed by the daily run.
@@ -238,7 +250,9 @@ ai-paper-daily/
 │   ├── functions/              search, recommend, scout, ask, breakdown, track, embed
 │   └── tests/                  Edge Function tests
 ├── scripts/
-│   └── backtest_picker.py      Replays saved days to measure the picker
+│   ├── backtest_picker.py      Replays saved days to measure the picker
+│   └── run_evals.py            Scores Scout and Ask on the eval sets
+├── evals/                      Eval sets for Scout and Ask, and saved results
 ├── tests/                      Python tests
 ├── data/                       Daily editions, links and lab logos, updated by the workflow
 └── docs/                       Logo and screenshots

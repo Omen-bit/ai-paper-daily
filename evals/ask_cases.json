@@ -1,0 +1,215 @@
+{
+ "about": "Ask this paper eval: questions with answers from the paper's abstract, plus questions the paper can't answer, where the right reply is to say so.",
+ "cases": [
+  {
+   "id": "2610.36671-0",
+   "paper": "2610.36671",
+   "question": "How much compute does LOWN save, and how much accuracy does it keep?",
+   "reference": "It keeps 99.6% of LLaDA-V's score while using 35.3% of the decoding FLOPs on average.",
+   "answerable": true
+  },
+  {
+   "id": "2610.36671-1",
+   "paper": "2610.36671",
+   "question": "Does LOWN need any training?",
+   "reference": "No. It works without training or a tuned threshold.",
+   "answerable": true
+  },
+  {
+   "id": "2610.36671-2",
+   "paper": "2610.36671",
+   "question": "How often does removing the image change the prediction?",
+   "reference": "Only at 22.8% of decoding steps on average, and as few as 7.9%.",
+   "answerable": true
+  },
+  {
+   "id": "2610.36671-3",
+   "paper": "2610.36671",
+   "question": "Can it be combined with visual token pruning?",
+   "reference": "Yes, it composes orthogonally with visual token pruning.",
+   "answerable": true
+  },
+  {
+   "id": "2610.36671-4",
+   "paper": "2610.36671",
+   "question": "What does the paper say about predicting stock prices?",
+   "reference": "",
+   "answerable": false
+  },
+  {
+   "id": "2610.40738-5",
+   "paper": "2610.40738",
+   "question": "Which model is Apriel Voice built on?",
+   "reference": "The post-trained Gemma 4 26B-A4B checkpoint.",
+   "answerable": true
+  },
+  {
+   "id": "2610.40738-6",
+   "paper": "2610.40738",
+   "question": "What is its average latency?",
+   "reference": "A mean latency of 1.91 seconds.",
+   "answerable": true
+  },
+  {
+   "id": "2610.40738-7",
+   "paper": "2610.40738",
+   "question": "What does it score on Big Bench Audio?",
+   "reference": "98.90, in thinking mode.",
+   "answerable": true
+  },
+  {
+   "id": "2610.40738-8",
+   "paper": "2610.40738",
+   "question": "How many stages does the training have?",
+   "reference": "Two stages: one sets up the speech interface, the second adapts the projector and backbone together.",
+   "answerable": true
+  },
+  {
+   "id": "2610.40738-9",
+   "paper": "2610.40738",
+   "question": "How many authors wrote this paper?",
+   "reference": "31 authors.",
+   "answerable": true
+  },
+  {
+   "id": "2610.37481-10",
+   "paper": "2610.37481",
+   "question": "What is SafeTulu?",
+   "reference": "A version of Tulu 3 with the 20% of examples most gradient-aligned with unsafe responses removed.",
+   "answerable": true
+  },
+  {
+   "id": "2610.37481-11",
+   "paper": "2610.37481",
+   "question": "How much does training on SafeTulu reduce attacks?",
+   "reference": "It reduces the GCG attack success rate by up to 22%.",
+   "answerable": true
+  },
+  {
+   "id": "2610.37481-12",
+   "paper": "2610.37481",
+   "question": "Which part of the model does SimpleLoRIF backpropagate through?",
+   "reference": "Only the final four transformer blocks.",
+   "answerable": true
+  },
+  {
+   "id": "2610.37481-13",
+   "paper": "2610.37481",
+   "question": "Which model families were tested?",
+   "reference": "Qwen, Llama and Olmo.",
+   "answerable": true
+  },
+  {
+   "id": "2611.02112-14",
+   "paper": "2611.02112",
+   "question": "What does O3PD train the student to reproduce?",
+   "reference": "The order of the teacher's top-K tokens, without fitting their probability values.",
+   "answerable": true
+  },
+  {
+   "id": "2611.02112-15",
+   "paper": "2611.02112",
+   "question": "Does O3PD need temperature tuning?",
+   "reference": "No. Its objective is invariant to the teacher temperature.",
+   "answerable": true
+  },
+  {
+   "id": "2611.02112-16",
+   "paper": "2611.02112",
+   "question": "What is the largest gain on AIME25?",
+   "reference": "Up to 5.6 points.",
+   "answerable": true
+  },
+  {
+   "id": "2611.02112-17",
+   "paper": "2611.02112",
+   "question": "How many teacher and student pairs were tested?",
+   "reference": "Six teacher-student pairs.",
+   "answerable": true
+  },
+  {
+   "id": "2611.02112-18",
+   "paper": "2611.02112",
+   "question": "What price per GPU hour did the authors pay?",
+   "reference": "",
+   "answerable": false
+  },
+  {
+   "id": "2611.03344-19",
+   "paper": "2611.03344",
+   "question": "Which number formats does FLAMIA support?",
+   "reference": "MXFP8, and a mixed NVFP4/FP8 training path.",
+   "answerable": true
+  },
+  {
+   "id": "2611.03344-20",
+   "paper": "2611.03344",
+   "question": "How much faster is it on B200?",
+   "reference": "1.10 to 1.40 times faster for the combined forward and backward attention call.",
+   "answerable": true
+  },
+  {
+   "id": "2611.03344-21",
+   "paper": "2611.03344",
+   "question": "Which GPUs is it built for?",
+   "reference": "NVIDIA Blackwell GPUs (B200 and B300).",
+   "answerable": true
+  },
+  {
+   "id": "2611.03344-22",
+   "paper": "2611.03344",
+   "question": "Which models were used to check training stability?",
+   "reference": "Llama-style models during pretraining.",
+   "answerable": true
+  },
+  {
+   "id": "2611.03344-23",
+   "paper": "2611.03344",
+   "question": "What does the paper say about training on AMD GPUs in 2019?",
+   "reference": "",
+   "answerable": false
+  },
+  {
+   "id": "2611.04814-24",
+   "paper": "2611.04814",
+   "question": "How much shorter are the answers on math?",
+   "reference": "Completion length drops by 41.7% to 45.4% on mathematics.",
+   "answerable": true
+  },
+  {
+   "id": "2611.04814-25",
+   "paper": "2611.04814",
+   "question": "Which training method is applied to the preference pairs?",
+   "reference": "DPO (direct preference optimization).",
+   "answerable": true
+  },
+  {
+   "id": "2611.04814-26",
+   "paper": "2611.04814",
+   "question": "Was LoCo trained on code?",
+   "reference": "No. It was trained only on math traces and still transfers to code generation.",
+   "answerable": true
+  },
+  {
+   "id": "2611.04814-27",
+   "paper": "2611.04814",
+   "question": "Where will the code be released?",
+   "reference": "On GitHub at github.com/MuyaoYuan/LoCo.",
+   "answerable": true
+  },
+  {
+   "id": "2611.04814-28",
+   "paper": "2611.04814",
+   "question": "What does the paper say about the weather in Paris?",
+   "reference": "",
+   "answerable": false
+  },
+  {
+   "id": "2610.40738-29",
+   "paper": "2610.40738",
+   "question": "What is the subscription price of Apriel Voice for businesses?",
+   "reference": "",
+   "answerable": false
+  }
+ ]
+}

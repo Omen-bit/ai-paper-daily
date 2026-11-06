@@ -18,8 +18,14 @@ export function guard(req: Request): Response | null {
   return null;
 }
 
-/** True while this visitor is under maxPerHour calls of this kind. */
+const SYNC_SECRET = Deno.env.get("SYNC_SECRET") ?? "";
+
+/**
+ * True while this visitor is under maxPerHour calls of this kind. Callers holding
+ * SYNC_SECRET (the daily pipeline and scripts/run_evals.py) are never limited.
+ */
 export async function underLimit(req: Request, kind: string, maxPerHour: number): Promise<boolean> {
+  if (sameSecret(req.headers.get("x-sync-secret") ?? "", SYNC_SECRET)) return true;
   const ip = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
   const { data, error } = await db.rpc("hit_rate_limit", { bucket_key: `${kind}:${ip}`, max_hits: maxPerHour });
   if (error) {

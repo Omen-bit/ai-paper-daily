@@ -1,0 +1,191 @@
+{
+ "about": "Project Scout eval: each project description has papers in the library that clearly serve it. A good Scout run lists at least one of them in its top 10, ideally as a strong match.",
+ "cases": [
+  {
+   "id": "parse-anything",
+   "description": "An app that turns scanned PDFs, photos, voice memos and screen recordings into one structured JSON format, with where and when each item appears.",
+   "expected": [
+    "2610.39301"
+   ]
+  },
+  {
+   "id": "endless-world",
+   "description": "A browser game where players explore an endless 3D world generated in real time from their moves, and places they come back to must look the same as before.",
+   "expected": [
+    "2610.40614"
+   ]
+  },
+  {
+   "id": "prompt-to-game",
+   "description": "A tool that turns a text prompt into a playable game, with an AI player that tests the game and finds bugs to fix.",
+   "expected": [
+    "2610.33106"
+   ]
+  },
+  {
+   "id": "avatar-hair",
+   "description": "An avatar creator for indie games: upload one drawing of a stylized character and get hair geometry that is ready to animate in a game engine.",
+   "expected": [
+    "2610.40599"
+   ]
+  },
+  {
+   "id": "office-tasks",
+   "description": "Generate many realistic professional work tasks, like reports and spreadsheets, with expert demonstrations to train an office automation agent.",
+   "expected": [
+    "2610.37161"
+   ]
+  },
+  {
+   "id": "fast-diffusion-vlm",
+   "description": "Speed up a diffusion-based vision-language model that answers questions about images, by skipping the image when it isn't needed at a step.",
+   "expected": [
+    "2610.36671"
+   ]
+  },
+  {
+   "id": "voice-assistant",
+   "description": "An open-weights voice assistant that understands spoken requests, reasons over the conversation and calls tools like calendar and search, all in one model.",
+   "expected": [
+    "2610.40738"
+   ]
+  },
+  {
+   "id": "code-policy-robot",
+   "description": "Train a robot arm controller that writes code as its policy, using fine-tuning and then reinforcement learning, like coding agents are trained.",
+   "expected": [
+    "2610.40799",
+    "2611.01560"
+   ]
+  },
+  {
+   "id": "safe-finetune-data",
+   "description": "Clean my instruction fine-tuning dataset by finding the examples that quietly make the model less safe, even though none of them look harmful.",
+   "expected": [
+    "2610.37481"
+   ]
+  },
+  {
+   "id": "desktop-agent",
+   "description": "An agent that controls a desktop computer with mouse and keyboard to finish long office workflows, and recovers when it clicks the wrong thing.",
+   "expected": [
+    "2611.03126",
+    "2611.02102",
+    "2610.27954",
+    "2610.22990"
+   ]
+  },
+  {
+   "id": "live-video-gen",
+   "description": "Real-time streaming video generation for a live talking avatar, with no lag and a consistent look over many minutes.",
+   "expected": [
+    "2611.00859"
+   ]
+  },
+  {
+   "id": "omni-embeddings",
+   "description": "One embedding model for search across text, images, audio and video, so a single query can find any kind of file.",
+   "expected": [
+    "2611.00172"
+   ]
+  },
+  {
+   "id": "swe-trajectories",
+   "description": "Collect high-quality training trajectories for an AI coding agent that fixes issues in real GitHub repositories.",
+   "expected": [
+    "2611.02074"
+   ]
+  },
+  {
+   "id": "cross-repo-bench",
+   "description": "Evaluate coding agents on features that need coordinated changes across several repositories at once, like a frontend and its backend.",
+   "expected": [
+    "2611.01484"
+   ]
+  },
+  {
+   "id": "smart-crop",
+   "description": "Automatically crop photos and choose the best framing from 360 degree panoramas, and explain the photography rule behind each choice.",
+   "expected": [
+    "2611.02897"
+   ]
+  },
+  {
+   "id": "small-math-student",
+   "description": "Distill a large math reasoning model into a small student model without having to tune the sampling temperature of the teacher.",
+   "expected": [
+    "2611.02112"
+   ]
+  },
+  {
+   "id": "fp8-attention",
+   "description": "Faster attention kernels for training long-context transformers in low precision (FP8 or FP4) on NVIDIA Blackwell GPUs.",
+   "expected": [
+    "2611.03344"
+   ]
+  },
+  {
+   "id": "stop-overthinking",
+   "description": "Make a reasoning model stop thinking once it has enough information, to cut tokens and cost on math and coding questions.",
+   "expected": [
+    "2611.04814"
+   ]
+  },
+  {
+   "id": "composed-search",
+   "description": "Product image search where the shopper gives a reference photo plus a text change, like the same shoe but in red.",
+   "expected": [
+    "2611.05193"
+   ]
+  },
+  {
+   "id": "llm-teleop",
+   "description": "Use a language model agent instead of a human to teleoperate a robot and collect demonstration data cheaply.",
+   "expected": [
+    "2611.05320"
+   ]
+  },
+  {
+   "id": "video-captions",
+   "description": "Generate captions for long videos that focus on the important events instead of small background details.",
+   "expected": [
+    "2611.03602"
+   ]
+  },
+  {
+   "id": "live-video-assistant",
+   "description": "A model that watches a live video stream and has to decide at each moment whether to answer the user or keep watching, trained with reinforcement learning.",
+   "expected": [
+    "2611.06728"
+   ]
+  },
+  {
+   "id": "pixels-to-actions",
+   "description": "A robot policy that goes straight from camera pixels to actions without a separate frozen vision encoder in front of the language model.",
+   "expected": [
+    "2611.06918"
+   ]
+  },
+  {
+   "id": "physics-agent",
+   "description": "An AI agent that carries out physics research from the question to the final result, and a benchmark to test whether it can.",
+   "expected": [
+    "2611.06910"
+   ]
+  },
+  {
+   "id": "emotional-video",
+   "description": "Generate videos that show a chosen emotion and fine-tune the generator with reinforcement learning using a reward model for emotion.",
+   "expected": [
+    "2611.06518"
+   ]
+  },
+  {
+   "id": "dc-network",
+   "description": "Make the network of a large AI training cluster faster by predicting traffic and reconfiguring optical switches ahead of time.",
+   "expected": [
+    "2611.04408"
+   ]
+  }
+ ]
+}
