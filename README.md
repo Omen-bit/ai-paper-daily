@@ -38,7 +38,7 @@ The best new AI paper each day, plus the one everyone is reading,<br>explained s
 
 Hundreds of AI papers land on arXiv every day, and most people never get past the titles.
 
-AI Papers Daily reads all of them every morning and publishes a small edition: **one top pick** chosen by a scoring model, and **one trending paper** the community is upvoting on Hugging Face. Each one is explained in plain words, from a ten-second summary to what you would need to build with it.
+AI Papers Daily reads all of them every morning and publishes a small edition: **one top pick**, shortlisted by a scoring model and chosen by an LLM judge, and **one trending paper** the community is upvoting on Hugging Face. Each one is explained in plain words, from a ten-second summary to what you would need to build with it.
 
 Behind the picks sits a library of about a year of AI research, **more than 8,000 papers**, that you can search by meaning, question directly and plan projects from.
 
@@ -152,18 +152,6 @@ Once the site has enough views, the home page shows the week's most read paper i
 
 The scorer then shortlists its top 6, and an LLM judge compares them two at a time (15 comparisons), judging novelty, evidence, reproducibility and usefulness to builders. The paper that wins the most comparisons is the pick. Without a Groq key, or with `PICK_JUDGE=off`, the best score is the pick. `python scripts/backtest_picker.py --judge` compares the judge with the scorer.
 
-Project Scout runs as a LangGraph.js graph inside its edge function:
-
-```
-plan_needs -> retrieve -> fuse -> rank -> respond
-                                   |
-          a need has no strong paper (first round only): expand_search -> fuse -> rank -> respond
-```
-
-The second round searches up to three of the phrases the ranker suggested for the weak needs, scores only the papers the first round hadn't seen, and merges them in. Needs the visitor edited skip `plan_needs`. The page then says "Searched again for: …". The steps live in `_shared/scout_agent.ts` with no network calls, so they are tested with fakes, and the same steps can run without LangGraph (`SCOUT_ENGINE=loop`); Scout also falls back to that on its own if LangGraph fails to load. `scout-spike` measures what LangGraph costs inside an edge function.
-
-Each pick's reading notes come from the Curator, a small LangGraph loop: the model drafts the notes, every field is checked (word limits, required fields, no numbers the abstract lacks), the same model is asked to fix only the fields that failed (up to two rounds), and a smaller model then checks each fact against the abstract. Unsupported optional fields are dropped; an unsupported required field goes back for repair.
-
 By default the picks come from the papers fetched that morning. Set the repository variable `PICK_FROM` to `yesterday` to pick from the previous day's papers instead, once their upvotes have had a day to build up. Run `python scripts/backtest_picker.py --day-late` first to compare the two.
 
 Papers featured in the last seven editions are not picked again. The pipeline reads every new paper in the tracked arXiv categories each day (often over 1,000) and keeps the best 200 in `data/`.
@@ -184,19 +172,6 @@ The site counts, as daily totals with no visitor data:
 - visits from new readers, readers back within a week, and readers back after longer.
 
 To read them, run `select * from site_report(28);` in the Supabase SQL editor.
-</details>
-
-<details>
-<summary><strong>Code review agent</strong></summary>
-<br>
-
-Every Monday a GitHub Actions workflow (`code-review-agent.yml`) runs `scripts/code_review_agent.py`, a LangGraph graph:
-
-```
-collect -> review -> verify -> dedupe -> file
-```
-
-It collects the last 7 days of commits and runs pytest, the Supabase function tests and ruff (bug rules only). The LLM then reads each changed file's diff and lists likely bugs, each naming a line and the code on it. Findings whose code isn't really on that line are dropped, and failing checks rank first. Anything the agent filed before, open or closed, is skipped. It opens at most 3 issues labelled `agent-found`, each with the evidence and a suggested fix, using the workflow's own `GITHUB_TOKEN`. Run the workflow by hand with **dry run** ticked, or `python scripts/code_review_agent.py --dry-run` locally, to see what it would file.
 </details>
 
 <details>
@@ -222,12 +197,84 @@ It collects the last 7 days of commits and runs pytest, the Supabase function te
 - Stored full texts that nobody has asked about for 30 days are removed by the daily run.
 </details>
 
+## Agents
+
+Four parts of the project are LangGraph agents: graphs of small steps that share one state, with checks and retries between the LLM calls, so a bad answer gets caught instead of published. Every LLM step can fail without stopping the step around it.
+
+### Daily pipeline
+
+`src/pipeline_graph.py` runs the whole morning edition as a `StateGraph`. Each run can be traced step by step in LangSmith.
+
+```mermaid
+flowchart LR
+    fetch --> classify --> choose_pool --> shortlist --> judge --> pick --> notes --> save
+    fetch -.->|"nothing fetched"| stop((stop))
+    pick -.->|"nothing picked"| stop
+```
+
+The **judge** (`src/judge.py`, LangChain on Groq) compares the scorer's top 6 two at a time, with the sides shuffled, on novelty, evidence, reproducibility and usefulness to builders. The paper that wins most comparisons is the pick. If more than a quarter of the comparisons fail, the best score is the pick.
+
+### Curator
+
+`src/curator.py` writes each pick's reading notes, and doesn't trust the first draft.
+
+```mermaid
+flowchart LR
+    draft --> validate
+    validate -->|"fields fail"| repair --> validate
+    validate -->|"still failing"| next_model --> draft
+    validate -->|"all good"| ground
+    ground -->|"required fact unsupported"| repair
+    ground --> finish
+```
+
+Every field is checked for word limits, required fields and numbers that aren't in the abstract. Only the failed fields go back for repair, up to two rounds. A second model then checks each fact against the abstract.
+
+### Project Scout
+
+`supabase/functions/_shared/scout_agent.ts` is a LangGraph.js graph inside a Supabase edge function.
+
+```mermaid
+flowchart LR
+    plan_needs --> retrieve --> fuse --> rank
+    rank -->|"a need has no strong paper (round 1)"| expand_search --> fuse
+    rank --> respond
+```
+
+It splits a project into needs, searches each by meaning and keywords, fuses the lists and has the LLM score every candidate. If a need is left without a strong paper, it searches once more with the ranker's suggested phrases and scores only the new papers, and the page says "Searched again for: …". Needs the visitor edited skip `plan_needs`. The steps have no network calls, so they are tested with fakes, and the same steps run without LangGraph (`SCOUT_ENGINE=loop`) as a fallback. Loading LangGraph costs about 0.1 to 0.2 s of the edge function's 2 s CPU budget.
+
+### Code review agent
+
+Every Monday, `scripts/code_review_agent.py` reviews the week's changes and opens GitHub issues for likely bugs.
+
+```mermaid
+flowchart LR
+    collect --> review --> verify --> dedupe --> file
+    collect -.->|"nothing changed, checks pass"| stop((stop))
+```
+
+It runs pytest, the function tests and ruff (bug rules only), then has the LLM read each changed file's diff and name likely bugs, each with a line and the code on it. Findings whose code isn't really on that line are dropped, failing checks rank first, and anything filed before, open or closed, is skipped. It opens at most 3 issues labelled `agent-found` using the workflow's own `GITHUB_TOKEN`. Run the workflow by hand with **dry run** ticked to see what it would file.
+
+### How they are measured
+
+- **Picker backtest.** `python scripts/backtest_picker.py` replays every saved day and compares each pick with the papers' Hugging Face upvotes a few days later. Over the first 4 days with settled upvotes:
+
+  | Picker | Pick in the day's top 10 | Share of the best paper's upvotes |
+  | :-- | :-: | :-: |
+  | Random | 9% | |
+  | Old scorer | 4 of 4 | 0.88 |
+  | New scorer | 4 of 4 | 0.85 |
+  | Picking a day late | 3 of 3 | 0.94 |
+
+  Both scorers already find a top-10 paper every day. The new one wins on evidence (no points for buzzwords or long author lists), and picking a day late, once upvotes have built up, is the clearest gain so far. With a week of data these numbers are noisy and are re-run as days are added.
+- **Eval sets.** 26 Project Scout cases and 30 Ask this paper cases in `evals/`, run with `python scripts/run_evals.py` and logged as LangSmith experiments (see *Are Scout and Ask getting better?* above).
+
 ## Tech stack
 
 | Layer | Built with |
 | :-- | :-- |
 | Pipeline | Python 3.11, [LangGraph](https://langchain-ai.github.io/langgraph/) (the daily run is a StateGraph), arXiv API, Hugging Face Daily Papers, Semantic Scholar, OpenAlex |
-| Agents and tracing | LangChain (the pairwise judge, with model fallback), LangGraph.js (Project Scout), a LangGraph code review agent, LangSmith tracing and experiments (optional) |
+| Agents and tracing | LangGraph (daily pipeline, Curator, code review agent), LangGraph.js (Project Scout), LangChain (the pairwise judge, with model fallback), LangSmith tracing and experiments (optional) |
 | Language model | [Groq](https://groq.com) running `gpt-oss-120b`, with `gpt-oss-20b` as fallback |
 | Database and search | [Supabase](https://supabase.com) Postgres, pgvector, Edge Functions (Deno, TypeScript) |
 | Website | Static HTML, CSS and vanilla JavaScript, hand-drawn SVG charts |
