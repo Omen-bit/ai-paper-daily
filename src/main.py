@@ -4,6 +4,7 @@ The daily pipeline:
   1. Fetch new papers from arXiv and Hugging Face Daily Papers
   2. Classify them into research topics
   3. Score them and pick today's paper plus the trending one
+     (from yesterday's candidates instead when PICK_FROM=yesterday, see pick_pool.py)
   4. Write the notes for the picks with Groq
   5. Save every candidate to data/daily/<date>.json, which the website is built from
 """
@@ -31,9 +32,10 @@ if SRC_DIR not in sys.path:
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from fetcher import fetch_all_papers
+from fetcher import fetch_all_papers, fetch_hf_papers_for_date
 from classifier import classify_papers
-from scorer import select_daily
+from scorer import score_paper, select_daily
+import pick_pool
 from groq_summarizer import summarize_papers
 from curator import curate_papers
 import paper_store
@@ -75,8 +77,14 @@ def run() -> None:
     all_papers = classify_papers(all_papers)
 
     # --- Step 3: Score and select top N ---
-    print(f"\n⚡ Scoring {len(all_papers)} papers: today's pick plus the trending paper...")
-    selected = select_daily(all_papers)
+    pool, pool_source = pick_pool.candidates(date_str, all_papers, recent_paper_ids,
+                                             fetch_for_date=fetch_hf_papers_for_date)
+    if pool_source != "today":
+        # Today's papers still need scores: they are saved, best first, for tomorrow's pick
+        for p in all_papers:
+            score_paper(p)
+    print(f"\n⚡ Scoring {len(pool)} papers: today's pick plus the trending paper...")
+    selected = select_daily(pool)
 
     if not selected:
         print("❌ No papers selected after scoring.")

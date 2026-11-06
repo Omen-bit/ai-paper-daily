@@ -119,3 +119,35 @@ def test_main_offline_prints_a_report(tmp_path, capsys):
     assert bt.main(["--offline", "--data", str(tmp_path), "--json", str(out_json)]) == 0
     assert "current" in capsys.readouterr().out
     assert json.loads(out_json.read_text())["upvote_source"] == "saved files"
+
+
+def test_late_days_pick_from_the_previous_day_with_newer_upvotes():
+    days = [
+        {"date": "2026-11-01", "featured": ["x"], "pool": [bt.to_paper(record("x", 50)), bt.to_paper(record("a", 2))]},
+        {"date": "2026-11-02", "featured": ["a"], "pool": [bt.to_paper(record("a", 30)), bt.to_paper(record("b", 9)),
+                                                           bt.to_paper(record("c"))]},
+        {"date": "2026-11-03", "featured": [], "pool": [bt.to_paper(record("d", 1))]},
+        {"date": "2026-11-09", "featured": [], "pool": [bt.to_paper(record("e")), bt.to_paper(record("f"))]},
+    ]
+    late = bt.late_days(days)
+    # 11-02 would pick from 11-01 (minus x, featured that day): only "a" is left, too few
+    # 11-03 picks from 11-02 minus the recent picks x and a; 11-09 is too far from 11-03
+    assert [d["date"] for d in late] == ["2026-11-03"]
+    assert [p["id"] for p in late[0]["pool"]] == ["b", "c"] and late[0]["from"] == "2026-11-02"
+
+
+def test_late_days_refresh_upvotes_from_the_next_saved_day():
+    days = [
+        {"date": "2026-11-01", "featured": [], "pool": [bt.to_paper(record("a", 2)), bt.to_paper(record("b"))]},
+        {"date": "2026-11-02", "featured": [], "pool": [bt.to_paper(record("a", 30))]},
+    ]
+    pool = bt.late_days(days)[0]["pool"]
+    assert {p["id"]: p["hf_upvotes"] for p in pool} == {"a": 30, "b": 0}
+    assert days[0]["pool"][0]["hf_upvotes"] == 2  # the saved day itself is untouched
+
+
+def test_main_day_late_adds_its_row(tmp_path, capsys):
+    write_day(tmp_path, "2026-10-01", [record("a", 30), record("b", 1), record("c", 4)], featured=["a"])
+    write_day(tmp_path, "2026-10-02", [record("b", 20), record("d", 1)])
+    assert bt.main(["--offline", "--day-late", "--data", str(tmp_path)]) == 0
+    assert "day-late" in capsys.readouterr().out

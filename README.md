@@ -138,11 +138,18 @@ The site itself is static. Its live features call **Supabase Edge Functions** st
 <summary><strong>How papers are picked</strong></summary>
 <br>
 
-- **Community momentum.** Hugging Face upvotes. The most upvoted paper of the day becomes Trending.
-- **Novelty.** Signals in the title and abstract that the paper introduces something new.
-- **Cross-over.** Papers that span several research topics.
-- **Builder value.** Released code, benchmarks, surveys and position papers.
-- **Readers.** Once the site has enough views, the week's most read paper takes the second slot.
+Every point comes from evidence about the paper, never from buzzwords in its abstract:
+
+- **Community.** Hugging Face upvotes on a log scale, 8 points for each doubling.
+- **Hand-picked.** Making Hugging Face's Daily Papers list.
+- **Code.** Released code, from Hugging Face or a link in the abstract. Worth about one doubling of upvotes.
+- **Lab.** A lab named by direct evidence (see below), with more for a well-known one.
+- **Cross-over.** A small bonus for papers that span two or more research topics.
+
+The best-scored paper is the pick. The most upvoted of the rest becomes Trending, from a different topic than the pick whenever one has enough upvotes.
+Once the site has enough views, the home page shows the week's most read paper in the second slot instead.
+
+By default the picks come from the papers fetched that morning. Set the repository variable `PICK_FROM` to `yesterday` to pick from the previous day's papers instead, once their upvotes have had a day to build up. Run `python scripts/backtest_picker.py --day-late` first to compare the two.
 
 Papers featured in the last seven editions are not picked again. The pipeline reads every new paper in the tracked arXiv categories each day (often over 1,000) and keeps the best 200 in `data/`.
 
@@ -205,6 +212,7 @@ ai-paper-daily/
 │   ├── curator.py              Notes for each pick
 │   ├── groq_summarizer.py      Groq client with model fallback
 │   ├── paper_store.py          Daily JSON records in data/
+│   ├── pick_pool.py            Which papers the picks come from (today or yesterday)
 │   ├── paper_links.py          Code, models, citations and labs for paper pages
 │   ├── labs.py                 Which lab or company wrote each paper
 │   ├── lab_logos.py            Each lab's logo, saved in data/logos/

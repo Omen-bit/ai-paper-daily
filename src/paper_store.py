@@ -10,7 +10,7 @@ Layout:
 """
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import labs
 
@@ -70,9 +70,53 @@ def to_record(paper: dict, date_str: str, featured: bool) -> dict:
         "curator": paper.get("curator"),
         "code_url": paper.get("code_url") or None,
         "org": paper.get("org") or labs.detect(paper) or None,
-        "org_avatar": labs.hf_avatar(paper.get("hf_org")) or None,
+        "org_avatar": labs.hf_avatar(paper.get("hf_org")) or paper.get("org_avatar") or None,
         "first_seen": date_str,
     }
+
+
+def to_paper(record: dict) -> dict:
+    """
+    A saved record back into a pipeline paper, so a past day's candidates can be
+    scored again. Notes, summaries and badges are left behind: a new pick gets fresh ones.
+    """
+    return {
+        "id": record["id"],
+        "title": record.get("title") or "",
+        "authors": list(record.get("authors") or []),
+        "abstract": record.get("abstract") or "",
+        "url": record.get("url") or f"https://arxiv.org/abs/{record['id']}",
+        "pdf_url": record.get("pdf_url") or f"https://arxiv.org/pdf/{record['id']}",
+        "submitted": record.get("submitted") or "",
+        "arxiv_categories": list(record.get("arxiv_categories") or []),
+        "categories": _category_slugs(record.get("categories")),
+        "source": record.get("source") or "",
+        "hf_upvotes": record.get("hf_upvotes") or 0,
+        "code_url": record.get("code_url"),
+        "org": record.get("org"),
+        "org_avatar": record.get("org_avatar"),
+    }
+
+
+def load_day(date_str: str, data_dir: str = DATA_DIR) -> dict | None:
+    """One saved day as written by save_day, or None when it is missing or damaged."""
+    path = os.path.join(data_dir, "daily", f"{date_str}.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            day = json.load(f)
+        return day if isinstance(day, dict) and isinstance(day.get("papers"), list) else None
+    except (OSError, ValueError):
+        return None
+
+
+def previous_day(before: str, data_dir: str = DATA_DIR, max_gap: int = 4) -> dict | None:
+    """The newest saved day before `before` (YYYY-MM-DD), at most max_gap days earlier."""
+    start = datetime.strptime(before, "%Y-%m-%d").date()
+    for back in range(1, max_gap + 1):
+        day = load_day((start - timedelta(days=back)).isoformat(), data_dir)
+        if day:
+            return day
+    return None
 
 
 def _write_json(path: str, data) -> None:

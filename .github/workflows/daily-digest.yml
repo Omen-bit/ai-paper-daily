@@ -64,6 +64,7 @@ jobs:
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODELS: ${{ vars.GROQ_MODELS }}
+          PICK_FROM: ${{ vars.PICK_FROM }} # "yesterday" picks from the previous day's papers; empty = today
         run: python src/main.py
 
       - if: steps.check.outputs.skip != 'true'

@@ -1,158 +1,120 @@
 """
 scorer.py
-Heuristic-based paper scoring and badge assignment.
-Scores papers and selects the top N for daily digest.
+Scores every candidate paper and picks the day's two papers.
+
+Each point comes from evidence about the paper, not from the words in its abstract:
+  community   Hugging Face upvotes, on a log scale so each doubling of upvotes adds the same points
+  listed      the paper made Hugging Face's hand-picked Daily Papers list
+  code        code is released (Hugging Face's repo field, or a code link in the abstract)
+  lab         the lab is known from direct evidence (labs.py): a known lab, or any named one
+  topics      the paper spans two or more research topics
+
+Words like "novel" or "we propose" are left out: nearly every abstract uses them,
+so they only added noise. The two picks also come from different topics when possible.
+scripts/backtest_picker.py measures the picker against later upvotes.
 """
 
+import math
 import re
-from typing import Optional
 
+import labs
 
-# Known top-tier institutions for bonus scoring
-TOP_INSTITUTIONS = [
-    "google", "deepmind", "google deepmind", "openai", "meta ai", "fair",
-    "microsoft research", "anthropic", "stanford", "mit", "cmu", "carnegie mellon",
-    "berkeley", "uc berkeley", "oxford", "cambridge", "eth zurich", "epfl",
-    "toronto", "mila", "hugging face", "nvidia", "apple", "amazon",
-    "tsinghua", "peking university", "chinese university", "ntu", "nus",
-    "kaist", "samsung", "lg ai", "sony", "adobe", "salesforce research"
-]
+# Points per signal. Released code or a known lab is worth about one doubling of upvotes.
+COMMUNITY_PER_DOUBLING = 8   # points for each doubling of upvotes (plus one)
+COMMUNITY_CAP = 64           # reached at about 255 upvotes
+LISTED_POINTS = 8
+CODE_POINTS = 8
+KNOWN_LAB_POINTS = 6
+NAMED_LAB_POINTS = 3
+MULTI_TOPIC_POINTS = 2
 
-# Keywords that signal novelty or significance
-NOVELTY_KEYWORDS = [
-    "novel", "new", "first", "state-of-the-art", "sota",
-    "outperform", "surpass", "exceed", "breakthrough", "superior",
-    "advances", "propose", "introducing", "we present", "we introduce",
-    "we propose"
-]
+# A paper needs this many Hugging Face upvotes to fill the "Trending" slot
+MIN_TRENDING_UPVOTES = 5
 
 SURVEY_TITLE_PATTERNS = [
     r"\bsurvey\b", r"\breview\b", r"\boverview\b", r"\btutorial\b",
-    r"\bposition paper\b", r"\bbenchmark\b"
+    r"\bposition paper\b",
 ]
-
 SURVEY_ABSTRACT_PATTERNS = [
     r"\bliterature review\b", r"\bsystematic review\b", r"\bsystematic survey\b",
-    r"\bcomprehensive survey\b", r"\bcomprehensive review\b", r"\bposition paper\b"
+    r"\bcomprehensive survey\b", r"\bcomprehensive review\b", r"\bposition paper\b",
 ]
 
-EFFICIENCY_KEYWORDS = [
-    "efficient", "faster", "lightweight", "compress", "distill", "prune",
-    "reduce cost", "inference speed", "fewer parameters", "low resource"
-]
+_CODE_LINK = re.compile(r"https?://(?:www\.)?(?:github\.com|gitlab\.com)/[\w.\-]+/[\w.\-]+", re.I)
 
 
-def _normalize(text: str) -> str:
-    return text.lower()
+def topics(paper: dict) -> list[str]:
+    """The paper's topic slugs. Categories arrive as classifier dicts or as bare slugs."""
+    return [c["slug"] if isinstance(c, dict) else c for c in paper.get("categories") or []]
 
 
-def _has_word(text: str, kw: str) -> bool:
-    """Check if keyword exists in text as complete word/phrase."""
-    clean_kw = kw.replace("-", " ")
-    clean_text = text.replace("-", " ")
-    return bool(re.search(rf"\b{re.escape(clean_kw)}\b", clean_text))
+def main_topic(paper: dict) -> str:
+    """The paper's first topic, or '' when it only has the catch-all "other-ml"."""
+    first = (topics(paper) or [""])[0]
+    return "" if first == "other-ml" else first
 
 
-def _detect_institutions(authors_str: str) -> list[str]:
-    """Detect known top-tier institutions from author affiliations/names string."""
-    normalized = _normalize(authors_str)
-    found = []
-    for inst in TOP_INSTITUTIONS:
-        if bool(re.search(rf"\b{re.escape(inst)}\b", normalized)):
-            found.append(inst.title())
-    return found
-
-
-def _is_survey_or_review(title_lower: str, abstract_lower: str) -> bool:
-    """Accurately identify survey/review papers without false positives on empirical papers."""
-    for pattern in SURVEY_TITLE_PATTERNS:
-        if re.search(pattern, title_lower):
+def has_code(paper: dict) -> bool:
+    """Released code, from Hugging Face's repo field, a code link already found, or the abstract."""
+    for key in ("github_repo", "code_url"):
+        if str(paper.get(key) or "").startswith("https://"):
             return True
-    for pattern in SURVEY_ABSTRACT_PATTERNS:
-        if re.search(pattern, abstract_lower):
-            return True
-    return False
+    return bool(_CODE_LINK.search(paper.get("abstract") or ""))
+
+
+def lab_of(paper: dict) -> str:
+    """The lab that wrote the paper, from direct evidence only, or ''."""
+    return paper.get("org") or labs.detect(paper) or ""
+
+
+def is_survey(paper: dict) -> bool:
+    title = (paper.get("title") or "").lower()
+    abstract = (paper.get("abstract") or "").lower()
+    return (any(re.search(p, title) for p in SURVEY_TITLE_PATTERNS)
+            or any(re.search(p, abstract) for p in SURVEY_ABSTRACT_PATTERNS))
+
+
+def community_points(upvotes) -> float:
+    """8 points per doubling of upvotes: 1 -> 8, 7 -> 24, 31 -> 40, 127 -> 56, 255+ -> 64."""
+    n = max(0, int(upvotes or 0))
+    return min(COMMUNITY_CAP, COMMUNITY_PER_DOUBLING * math.log2(1 + n))
 
 
 def score_paper(paper: dict) -> dict:
     """
-    Score a paper and assign badges.
-    Returns the paper with 'score' and 'badges' fields added.
+    Score a paper and assign badges. Adds 'score' (a whole number), 'score_parts'
+    (points per signal, for debugging and the backtest) and 'badges' to the paper.
     """
-    score = 0
+    parts = {}
     badges = []
 
-    title_lower = _normalize(paper.get("title", ""))
-    abstract_lower = _normalize(paper.get("abstract", ""))
-    full_text = f"{title_lower} {abstract_lower}"
-    authors = paper.get("authors", [])
+    parts["community"] = round(community_points(paper.get("hf_upvotes")), 1)
 
-    # --- Signal 1: HuggingFace upvotes (community signal) ---
-    hf_upvotes = paper.get("hf_upvotes", 0)
-    if hf_upvotes >= 50:
-        score += 20
-    elif hf_upvotes >= 20:
-        score += 12
-    elif hf_upvotes >= 5:
-        score += 6
-    elif hf_upvotes > 0:
-        score += 3
-
-    # If paper is from HF trending, it's community-validated
-    if "HuggingFace" in paper.get("source", ""):
-        score += 10
+    if "HuggingFace" in (paper.get("source") or ""):
+        parts["listed"] = LISTED_POINTS
         badges.append(("🔥", "Trending on HF"))
 
-    # --- Signal 2: Novelty keywords in title (word-boundary matched) ---
-    novelty_title_count = sum(1 for kw in NOVELTY_KEYWORDS if _has_word(title_lower, kw))
-    score += novelty_title_count * 4
+    if has_code(paper):
+        parts["code"] = CODE_POINTS
+        badges.append(("💻", "Code released"))
 
-    # --- Signal 3: Novelty keywords in abstract ---
-    novelty_abstract_count = sum(1 for kw in NOVELTY_KEYWORDS if _has_word(abstract_lower, kw))
-    score += min(novelty_abstract_count * 1, 8)  # cap at 8
+    lab = lab_of(paper)
+    if lab:
+        known = bool(labs.canonical(lab)) or lab in labs.BRANDS
+        parts["lab"] = KNOWN_LAB_POINTS if known else NAMED_LAB_POINTS
+        if known:
+            badges.append(("🏛️", lab))
 
-    # --- Signal 4: Author count (collaboration signal) ---
-    num_authors = len(authors)
-    if num_authors >= 8:
-        score += 5  # Large collaboration
-    elif num_authors >= 4:
-        score += 3
-
-    # --- Signal 5: Top Institutions bonus ---
-    detected_insts = _detect_institutions(" ".join(authors))
-    if detected_insts:
-        score += min(len(detected_insts) * 3, 6)
-
-    # --- Signal 6: Cross-category paper (interdisciplinary) ---
-    categories = paper.get("categories", [])
-    if len(categories) >= 3:
-        score += 4
+    if len(topics(paper)) >= 2:
+        parts["topics"] = MULTI_TOPIC_POINTS
         badges.append(("🔀", "Interdisciplinary"))
-    elif len(categories) == 2:
-        score += 2
 
-    # --- Signal 7: Survey/review detection ---
-    if _is_survey_or_review(title_lower, abstract_lower):
-        score += 6
+    # Surveys keep their badge but get no points: the picks are meant to be new work
+    if is_survey(paper):
         badges.append(("📖", "Survey / Review"))
 
-    # --- Signal 8: Efficiency / resource-saving angle ---
-    if any(_has_word(full_text, kw) for kw in EFFICIENCY_KEYWORDS):
-        score += 3
-
-    # --- Signal 9: Abstract quality (length as proxy for detail) ---
-    abstract_words = len(abstract_lower.split())
-    if abstract_words >= 150:
-        score += 3
-    elif abstract_words >= 100:
-        score += 1
-
-    # --- Assign qualitative badges ---
-    if novelty_title_count >= 1 or novelty_abstract_count >= 3:
-        badges.append(("💡", "Novel Method"))
-
-    # Assign final composite badges (only top 3 badges)
-    paper["score"] = score
+    paper["score"] = round(sum(parts.values()))
+    paper["score_parts"] = parts
     paper["badges"] = badges[:3]
     return paper
 
@@ -164,57 +126,59 @@ def score_and_rank_papers(papers: list[dict], top_n: int = 2) -> list[dict]:
     """
     if not papers:
         return []
-
-    # Score all papers
-    scored = [score_paper(p) for p in papers]
-
-    # Sort by score descending
-    scored.sort(key=lambda x: x["score"], reverse=True)
-
-    # Mark top pick
-    if scored:
-        scored[0]["badges"] = [("⭐", "Top Pick")] + scored[0]["badges"]
-        scored[0]["badges"] = scored[0]["badges"][:4]  # limit badges
-
+    scored = sorted((score_paper(p) for p in papers), key=_rank_key)
+    scored[0]["badges"] = ([("⭐", "Top Pick")] + scored[0]["badges"])[:4]
     selected = scored[:top_n]
-
     print(f"\n🏆 Top {top_n} papers selected:")
     for i, p in enumerate(selected, 1):
         badge_str = " ".join([b[0] for b in p["badges"]])
         print(f"  {i}. [{p['score']} pts] {badge_str} {p['title'][:70]}...")
-
     return selected
 
 
-# A paper needs this many Hugging Face upvotes to fill the "Trending" slot
-MIN_TRENDING_UPVOTES = 5
+def _rank_key(p: dict):
+    """Best first: score, then upvotes, then id so the order never depends on input order."""
+    return (-p["score"], -(p.get("hf_upvotes") or 0), p.get("id") or "")
+
+
+def _other_topic(paper: dict, pick: dict) -> bool:
+    """True when the two papers' main topics differ (or either has none)."""
+    a, b = main_topic(paper), main_topic(pick)
+    return not a or not b or a != b
 
 
 def select_daily(papers: list[dict]) -> list[dict]:
     """
     Pick the day's two papers, each for a different reason:
-      1. "pick": the best new paper by our score.
-      2. "trending": the most upvoted paper on Hugging Face among the rest.
-         When nothing has enough upvotes, the runner-up by score ("runner-up").
+      1. "pick": the best paper by score.
+      2. "trending": the most upvoted of the rest, from a different topic than the pick
+         when one has enough upvotes. When nothing has enough upvotes, the best-scored
+         paper from another topic ("runner-up").
     Each selected paper gets a "slot" key saying which one it is.
     """
     if not papers:
         return []
-    ranked = sorted((score_paper(p) for p in papers), key=lambda x: x["score"], reverse=True)
+    ranked = sorted((score_paper(p) for p in papers), key=_rank_key)
     top = ranked[0]
     top["badges"] = ([("⭐", "Top Pick")] + top["badges"])[:4]
     top["slot"] = "pick"
     rest = ranked[1:]
     if not rest:
         return [top]
-    hot = max(rest, key=lambda p: (p.get("hf_upvotes") or 0, p["score"]))
-    if (hot.get("hf_upvotes") or 0) >= MIN_TRENDING_UPVOTES:
+
+    def hottest(pool):
+        return max(pool, key=lambda p: (p.get("hf_upvotes") or 0, p["score"])) if pool else None
+
+    varied = [p for p in rest if _other_topic(p, top)]
+    hot = hottest([p for p in varied if (p.get("hf_upvotes") or 0) >= MIN_TRENDING_UPVOTES]) \
+        or hottest([p for p in rest if (p.get("hf_upvotes") or 0) >= MIN_TRENDING_UPVOTES])
+    if hot:
         hot["slot"] = "trending"
-        hot["badges"] = [("🔥", "Trending")] + [b for b in hot["badges"]][:3]
+        hot["badges"] = [("🔥", "Trending")] + [b for b in hot["badges"] if b[1] != "Trending on HF"][:3]
     else:
-        hot = rest[0]
+        hot = (varied or rest)[0]
         hot["slot"] = "runner-up"
-    print(f"  [pick] Today's pick: {top['title'][:60]}")
+    print(f"  [pick] Today's pick: {top['title'][:60]} ({top['score']} pts {top['score_parts']})")
     print(f"  [pick] {hot['slot'].capitalize()}: {hot['title'][:60]} ({hot.get('hf_upvotes') or 0} upvotes)")
     return [top, hot]
 

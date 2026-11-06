@@ -6,6 +6,7 @@ some days later as the measure of "best".
 
     python scripts/backtest_picker.py              # later upvotes from Hugging Face (needs internet)
     python scripts/backtest_picker.py --offline    # later upvotes from the saved files only (rough)
+    python scripts/backtest_picker.py --day-late   # also try picking from yesterday's papers
     python scripts/backtest_picker.py --json out.json
 
 For each day and each picker it records:
@@ -32,9 +33,12 @@ from typing import Callable, Optional
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC_DIR = os.path.join(ROOT_DIR, "src")
-if SRC_DIR not in sys.path:
-    sys.path.insert(0, SRC_DIR)
+SCRIPTS_DIR = os.path.join(ROOT_DIR, "scripts")
+for _path in (SRC_DIR, SCRIPTS_DIR):
+    if _path not in sys.path:
+        sys.path.insert(0, _path)
 
+import paper_store  # noqa: E402
 import scorer  # noqa: E402
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
@@ -53,19 +57,7 @@ HF_DAYS_AFTER = 1
 
 def to_paper(record: dict) -> dict:
     """A saved record back into the shape the scorer reads. Upvotes are as of that day."""
-    return {
-        "id": record["id"],
-        "title": record.get("title") or "",
-        "abstract": record.get("abstract") or "",
-        "authors": list(record.get("authors") or []),
-        "categories": list(record.get("categories") or []),
-        "arxiv_categories": list(record.get("arxiv_categories") or []),
-        "source": record.get("source") or "",
-        "hf_upvotes": record.get("hf_upvotes") or 0,
-        "code_url": record.get("code_url"),
-        "org": record.get("org"),
-        "submitted": record.get("submitted") or "",
-    }
+    return paper_store.to_paper(record)
 
 
 def load_days(data_dir: str = DATA_DIR) -> list[dict]:
@@ -93,6 +85,36 @@ def load_days(data_dir: str = DATA_DIR) -> list[dict]:
             "pool": [to_paper(r) for r in records],
         })
     return days
+
+
+def late_days(days: list[dict], max_gap: int = 4) -> list[dict]:
+    """
+    The same days as PICK_FROM=yesterday would see them: each day's pool is the
+    previous saved day's candidates minus the picks of the 7 days before. Their upvotes are the newest
+    the saved files show (a paper often appears again the next day), which is a
+    little below what a live run would see.
+    """
+    out = []
+    for prev, day in zip(days, days[1:]):
+        gap = (date.fromisoformat(day["date"]) - date.fromisoformat(prev["date"])).days
+        if gap > max_gap:
+            continue
+        seen_today = {p["id"]: p for p in day["pool"]}
+        d = date.fromisoformat(day["date"])
+        recent = {pid for x in days if 0 < (d - date.fromisoformat(x["date"])).days <= 7 for pid in x["featured"]}
+        pool = []
+        for p in prev["pool"]:
+            if p["id"] in recent:
+                continue
+            p = dict(p)
+            again = seen_today.get(p["id"])
+            if again:
+                p["hf_upvotes"] = max(p.get("hf_upvotes") or 0, again.get("hf_upvotes") or 0)
+                p["source"] = again.get("source") or p.get("source")
+            pool.append(p)
+        if len(pool) >= 2:
+            out.append({"date": day["date"], "featured": [], "pool": pool, "from": prev["date"]})
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -166,6 +188,12 @@ def pick_current(pool: list[dict]) -> list[str]:
     return [p["id"] for p in scorer.select_daily(copy.deepcopy(pool))]
 
 
+def pick_v1(pool: list[dict]) -> list[str]:
+    """The picker before the Phase 2 rewrite (scripts/scorer_v1.py), kept for comparison."""
+    import scorer_v1
+    return [p["id"] for p in scorer_v1.select_daily(copy.deepcopy(pool))]
+
+
 def pick_upvotes_now(pool: list[dict]) -> list[str]:
     """A simple reference: the most upvoted papers at pick time."""
     ranked = sorted(pool, key=lambda p: -(p.get("hf_upvotes") or 0))
@@ -175,6 +203,7 @@ def pick_upvotes_now(pool: list[dict]) -> list[str]:
 # Phase 2 and the LLM judge add their pickers here
 PICKERS: dict[str, Callable[[list[dict]], list[str]]] = {
     "current": pick_current,
+    "v1": pick_v1,
     "upvotes-now": pick_upvotes_now,
 }
 
@@ -285,6 +314,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--offline", action="store_true", help="use only upvotes in the saved files (rough)")
     ap.add_argument("--refresh", action="store_true", help="fetch every Hugging Face list again")
     ap.add_argument("--min-age", type=int, default=MIN_AGE_DAYS, help="skip days younger than this (default 3)")
+    ap.add_argument("--day-late", action="store_true",
+                    help="also run the current picker on yesterday's papers (PICK_FROM=yesterday)")
     ap.add_argument("--json", metavar="PATH", help="also write the full result as JSON")
     ap.add_argument("--data", default=DATA_DIR, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
@@ -295,6 +326,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
     later = upvotes_from_saved(days) if args.offline else upvotes_from_hf(days, refresh=args.refresh)
     result = run_backtest(days, later, min_age=args.min_age)
+    if args.day_late:
+        late = run_backtest(late_days(days), later, pickers={"day-late": pick_current}, min_age=args.min_age)
+        result["summary"].update({k: v for k, v in late["summary"].items() if k != "_random"})
+        result["rows"] += late["rows"]
     result["upvote_source"] = "saved files" if args.offline else "Hugging Face"
     print(report(result))
     if args.offline:
