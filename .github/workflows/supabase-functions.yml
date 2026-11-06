@@ -18,4 +18,4 @@ jobs:
         with:
           version: latest
       - name: Deploy every function
-        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF" --use-api
+        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF" --use-api --yes
