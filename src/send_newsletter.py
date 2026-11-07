@@ -39,6 +39,8 @@ DATA_DIR = os.path.join(ROOT_DIR, "data", "daily")
 SITE_DIR = os.path.join(ROOT_DIR, "site")
 FEED_PATH = os.path.join(SITE_DIR, "feed.xml")
 MARKER_DIR = os.path.join(ROOT_DIR, "data", "newsletter")
+CASES_PATH = os.path.join(ROOT_DIR, "data", "cases.json")
+MAX_CASES = 3  # case studies shown in the email on days new ones came in
 API_URL = "https://api.buttondown.com/v1/emails"
 SITE_NAME = "AI Papers Daily"
 SITE_URL = (os.environ.get("SITE_URL") or "https://omen-bit.github.io/ai-paper-daily/").rstrip("/") + "/"
@@ -209,6 +211,43 @@ def more_papers(rest: list[dict]) -> str:
     )
 
 
+def new_case_studies(day: str, path: str = CASES_PATH, limit: int = MAX_CASES) -> list[dict]:
+    """The case studies added on this day, newest first. Most days there are none."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            posts = json.load(f).get("posts", [])
+    except (OSError, ValueError):
+        return []
+    fresh = [p for p in posts if p.get("added") == day and str(p.get("url", "")).startswith("https://") and p.get("title")]
+    fresh.sort(key=lambda p: p.get("published") or "", reverse=True)
+    return fresh[:limit]
+
+
+def case_studies(posts: list[dict]) -> str:
+    """New write-ups from company engineering blogs: company, title and our one line about it."""
+    if not posts:
+        return ""
+    items = ""
+    for p in posts:
+        summary = (f'<p style="margin:4px 0 0 0;font-family:{FONT};font-size:14px;line-height:21px;color:{MUTED};">'
+                   f'{esc(clip(p.get("summary"), 180))}</p>') if p.get("summary") else ""
+        items += (f'<div style="padding:0 0 14px 0;">'
+                  f'<p style="margin:0 0 2px 0;font-family:{FONT};font-size:13px;font-weight:700;color:{MUTED};">{esc(p.get("company"))}</p>'
+                  f'<p style="margin:0;font-family:{FONT};font-size:16px;line-height:23px;font-weight:700;">'
+                  f'<a href="{esc(p["url"])}" style="color:{INK};text-decoration:none;">{esc(clip(p.get("title"), 140))}</a></p>'
+                  f'{summary}</div>')
+    return (
+        '<tr><td style="padding:24px 28px 0 28px;">'
+        f'<div style="padding:18px 0 0 0;border-top:1px solid {LINE};">'
+        f'<p style="margin:0 0 12px 0;font-family:{FONT};font-size:11px;font-weight:700;letter-spacing:.08em;'
+        f'text-transform:uppercase;color:{MUTED};">From company blogs</p>'
+        f'{items}'
+        f'<p style="margin:0;"><a href="{SITE_URL}case-studies/index.html?ref=email" style="font-family:{FONT};font-size:14px;'
+        f'font-weight:700;color:{ORANGE};text-decoration:none;">See all case studies →</a></p>'
+        '</div></td></tr>'
+    )
+
+
 def footer() -> str:
     return (
         '<tr><td style="padding:24px 28px 26px 28px;">'
@@ -239,14 +278,16 @@ def wrap(rows: str, preheader: str) -> str:
 # Building and sending the email
 # ---------------------------------------------------------------------------
 
-def build_email_from_edition(edition: dict, day: str) -> dict | None:
+def build_email_from_edition(edition: dict, day: str, cases: list[dict] | None = None) -> dict | None:
     picks, rest = split_edition(edition)
     if not picks:
         return None
     rows = header(day, edition.get("scanned") or 0, len(picks))
     for p in picks:
         rows += pick_card(p)
-    rows += more_papers(rest) + footer()
+    rows += more_papers(rest)
+    rows += case_studies(new_case_studies(day) if cases is None else cases)
+    rows += footer()
 
     names = [short_title(p.get("title", "")) for p in picks]
     subject = names[0] if len(names) == 1 else f"{names[0]} · plus {len(names) - 1} more pick{'s' if len(names) > 2 else ''}"

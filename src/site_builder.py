@@ -1578,7 +1578,7 @@ def build_saved_page() -> str:
   <p>Papers you save are kept in this browser, so no account is needed. They stay here until you remove them.</p>
 </section>
 <ul class="list" data-saved-list></ul>
-<div class="empty" data-saved-empty hidden><strong>Nothing saved yet.</strong>Open any paper and press Save to keep it here for later.
+<div class="empty" data-saved-empty hidden><strong>Nothing saved yet.</strong>Press Save on any paper or case study to keep it here for later.
   <p><a class="btn btn-primary" href="index.html">See today's picks</a></p></div>
 <noscript><p class="empty">Turn on JavaScript to see your reading list.</p></noscript>"""
     return page("Your reading list", body, active="saved")

@@ -4,11 +4,13 @@ Reads company engineering blogs and keeps the posts about AI running in real pro
 for the Case studies pages.
 
 For each new post, Groq decides whether it is about AI in production, which problem and
-step it explains (case_sources.PROBLEMS), and writes one line about it in our own words.
+step it explains (case_sources.PROBLEMS), picks 1-3 technique tags (case_sources.TAGS), and
+writes one line about it in our own words.
 Without Groq, a keyword fallback sorts posts and the summary is left empty: the site never
 shows the blog's own text as ours.
 
-Writes data/cases.json. Run daily before the site build:  python src/case_studies.py
+Writes data/cases.json. The daily workflow runs it before the site build; it reads the blogs on
+RUN_DAYS only (Monday and Thursday by default). To run it now:  python src/case_studies.py --now
 A feed that is down is skipped; the posts already saved stay.
 """
 import html
@@ -24,12 +26,15 @@ ROOT_DIR = os.path.dirname(SRC_DIR)
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from case_sources import SOURCES, PROBLEMS
+from case_sources import SOURCES, PROBLEMS, TAGS, TAG_NAMES
 
 CASES_FILE = os.path.join(ROOT_DIR, "data", "cases.json")
 MAX_POSTS = 800          # oldest posts drop off past this
 MAX_AGE_DAYS = 400       # posts older than this are not added
 MAX_GROQ_CALLS = int(os.environ.get("CASES_MAX_GROQ", "60"))  # per run, to stay inside the free tier
+# Company blogs post about once a week, so the blogs are read on these days only.
+# CASES_RUN_DAYS="mon" reads them weekly, "daily" every day. "--now" runs today regardless.
+RUN_DAYS = os.environ.get("CASES_RUN_DAYS", "").strip().lower() or "mon,thu"
 USER_AGENT = "AIPapersDaily/1.0 (+https://omen-bit.github.io/ai-paper-daily/)"
 
 # A post has to mention one of these to be worth asking Groq about
@@ -123,6 +128,31 @@ def fetch_feed(url: str, timeout: int = 20) -> bytes:
     return resp.content
 
 
+_PARA = re.compile(r"<p[\s>].*?</p>", re.S | re.I)
+
+
+def article_text(page_html: str, limit: int = 2500) -> str:
+    """The opening paragraphs of a blog post page, as plain text, for Groq to read. Never shown."""
+    page_html = re.sub(r"<(script|style|nav|header|footer|aside)\b.*?</\1>", " ", page_html or "", flags=re.S | re.I)
+    main = re.search(r"<article\b.*?</article>", page_html, re.S | re.I) or re.search(r"<main\b.*?</main>", page_html, re.S | re.I)
+    scope = main.group(0) if main else page_html
+    paras = [clean_text(p, 2000) for p in _PARA.findall(scope)]
+    text = " ".join(p for p in paras if len(p.split()) >= 6)
+    return text[:limit]
+
+
+def read_article(url: str) -> str:
+    """Open a post once and return its opening text, or "" when the page cannot be read."""
+    try:
+        import requests
+        resp = requests.get(url, timeout=15, headers={"User-Agent": USER_AGENT})
+        resp.raise_for_status()
+        return article_text(resp.text)
+    except Exception as exc:
+        print(f"  [cases] Could not read {url[:70]} ({str(exc)[:60]})")
+        return ""
+
+
 def looks_like_ai(post: dict) -> bool:
     return bool(_AI_WORDS.search(f"{post['title']} {post.get('text', '')}"))
 
@@ -145,19 +175,32 @@ def rule_sort(post: dict) -> tuple[str, int] | None:
     return problem, step
 
 
+MAX_TAGS = 3
+
+
+def rule_tags(post: dict) -> list[str]:
+    """Up to MAX_TAGS technique tags from keywords in the title first, then the text."""
+    title, text = post["title"].lower(), f"{post.get('text', '')[:600]} {post.get('summary', '')}".lower()
+    tags = [t for t, pattern in TAGS if re.search(pattern, title)]
+    tags += [t for t, pattern in TAGS if t not in tags and re.search(pattern, text)]
+    return tags[:MAX_TAGS]
+
+
 GROQ_PROMPT = """You sort engineering blog posts for a site about how companies use AI in real products.
 
 Problems and their steps (0-5):
 {problems}
 
 Reply with JSON only:
-{{"ai_in_production": true or false, "problem": "<key or none>", "step": <0-5>, "summary": "<one sentence>"}}
+{{"ai_in_production": true or false, "problem": "<key or none>", "step": <0-5>, "summary": "<one sentence>", "tags": ["<tag>", ...]}}
 
 ai_in_production is true only when the post explains how the company builds, trains, serves or
 evaluates a machine learning or AI system it runs. Hiring posts, events, culture, security
 incidents and general infrastructure without a model are false.
 The summary is at most 25 words, in plain words, in your own words (never copy the post's
-sentences), says what the team did and why, and does not start with the company name."""
+sentences), says what the team did and why, and does not start with the company name.
+tags are 1 to 3 techniques the post is mainly about, chosen only from this list:
+{tags}"""
 
 
 def _problems_text() -> str:
@@ -186,7 +229,14 @@ def parse_reply(raw: str) -> dict | None:
     summary = " ".join(str(data.get("summary", "")).split())
     if len(summary.split()) > 40:
         summary = ""
-    return {"keep": True, "problem": problem, "step": step, "summary": summary}
+    by_lower = {t.lower(): t for t in TAG_NAMES}
+    raw_tags = data.get("tags") if isinstance(data.get("tags"), list) else []
+    tags = []
+    for t in raw_tags:
+        name = by_lower.get(str(t).strip().lower())
+        if name and name not in tags:
+            tags.append(name)
+    return {"keep": True, "problem": problem, "step": step, "summary": summary, "tags": tags[:MAX_TAGS]}
 
 
 def groq_sort(post: dict) -> dict | None:
@@ -199,14 +249,14 @@ def groq_sort(post: dict) -> dict | None:
     except Exception as exc:
         print(f"  [cases] Groq unavailable ({str(exc)[:80]})")
         return None
-    user = f"Company: {post['company']}\nTitle: {post['title']}\nPost start: {post.get('text', '')[:1200]}"
+    user = f"Company: {post['company']}\nTitle: {post['title']}\nPost start: {post.get('text', '')[:2500]}"
     for model in models[:2]:
         try:
             response = client.chat.completions.create(
                 model=model, temperature=0.2,
-                messages=[{"role": "system", "content": GROQ_PROMPT.format(problems=_problems_text())},
+                messages=[{"role": "system", "content": GROQ_PROMPT.format(problems=_problems_text(), tags=", ".join(TAG_NAMES))},
                           {"role": "user", "content": user}],
-                **gs.call_options(model, 160))
+                **gs.call_options(model, 200))
             result = parse_reply(response.choices[0].message.content)
             if result:
                 return result
@@ -234,12 +284,13 @@ def save(posts: list[dict], path: str = CASES_FILE) -> None:
 
 
 def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool = True,
-           max_calls: int = MAX_GROQ_CALLS) -> tuple[list[dict], dict]:
-    """Add the new AI posts in fetched to existing. Returns (posts, counts)."""
+           max_calls: int = MAX_GROQ_CALLS, reader=None) -> tuple[list[dict], dict]:
+    """Add the new AI posts in fetched to existing. Returns (posts, counts).
+    reader(url) -> text opens a new post's page so Groq reads more than the feed's excerpt."""
     known = {p["url"] for p in existing} | {u for p in existing for u in p.get("aliases", [])}
     seen_skips = set()
     cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=MAX_AGE_DAYS)).strftime("%Y-%m-%d")
-    posts = list(existing)
+    posts = [p if "tags" in p else {**p, "tags": rule_tags(p)} for p in existing]  # older posts get tags too
     counts = {"new": 0, "skipped": 0, "groq": 0, "rules": 0}
     calls = 0
     for post in fetched:
@@ -253,6 +304,10 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
         result = None
         if use_groq and calls < max_calls:
             calls += 1
+            if reader:
+                page = reader(post["url"])
+                if len(page) > len(post.get("text", "")):
+                    post = {**post, "text": page}
             result = groq_sort(post)
             if result is None and calls == 1:
                 use_groq = False  # Groq is down or not set up: sort the rest by keywords
@@ -263,6 +318,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 seen_skips.add(post["url"])
                 continue
             problem, step, summary, how = result["problem"], result["step"], result["summary"], "groq"
+            tags = result.get("tags") or rule_tags(post)
         else:
             if use_groq and calls >= max_calls:
                 continue  # leave it for tomorrow's run, when Groq has room again
@@ -272,17 +328,29 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 continue
             problem, step = sorted_
             summary, how = "", "rules"
+            tags = rule_tags(post)
             counts["rules"] += 1
         posts.append({"url": post["url"], "company": post["company"], "title": post["title"],
                       "published": post["published"] or today, "added": today, "problem": problem,
-                      "step": step, "summary": summary, "sorted_by": how})
+                      "step": step, "summary": summary, "tags": tags, "sorted_by": how})
         known.add(post["url"])
         counts["new"] += 1
     return posts, counts
 
 
-def run(path: str = CASES_FILE) -> int:
-    today = datetime.now(timezone(timedelta(hours=5, minutes=30))).strftime("%Y-%m-%d")
+def is_run_day(now: datetime, days: str = RUN_DAYS) -> bool:
+    if days in ("daily", "all", "every day"):
+        return True
+    wanted = {d.strip()[:3] for d in days.split(",") if d.strip()}
+    return now.strftime("%a").lower() in wanted
+
+
+def run(path: str = CASES_FILE, force: bool = False) -> int:
+    now = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+    today = now.strftime("%Y-%m-%d")
+    if not force and not is_run_day(now):
+        print(f"  [cases] Blogs are read on {RUN_DAYS} only; nothing to do today. Use --now to run anyway.")
+        return 0
     fetched, down = [], []
     for name, feed, *_ in SOURCES:
         try:
@@ -294,7 +362,7 @@ def run(path: str = CASES_FILE) -> int:
             print(f"  [cases] {name}: feed failed ({str(exc)[:80]})")
     existing = load(path)
     use_groq = bool(os.environ.get("GROQ_API_KEY", "").strip())
-    posts, counts = update(existing, fetched, today, use_groq=use_groq)
+    posts, counts = update(existing, fetched, today, use_groq=use_groq, reader=read_article if use_groq else None)
     save(posts, path)
     print(f"  [cases] {counts['new']} new posts ({counts['groq']} sorted by Groq, {counts['rules']} by keywords), "
           f"{counts['skipped']} not about AI in production, {len(down)} feeds down. {len(posts)} saved.")
@@ -307,4 +375,4 @@ if __name__ == "__main__":
         load_dotenv()
     except ImportError:
         pass
-    run()
+    run(force="--now" in sys.argv)

@@ -102,3 +102,36 @@ def shared_with(problem: str, step: int) -> list[str]:
 def lines_at(problem: str, step: int) -> list[str]:
     """Every line a post about this stop shows on: its own, plus the lines sharing the stop."""
     return [problem] + shared_with(problem, step)
+
+# Technique tags shown on each card and used as filters: (tag, pattern over title and text).
+# Groq picks from these names; without Groq the patterns pick them.
+TAGS = [
+    ("LLMs", r"\bllms?\b|large language model|\bgpt\b|generative ai|genai"),
+    ("RAG", r"\brag\b|retrieval.augmented"),
+    ("Agents", r"\bagents?\b|agentic|tool.?(use|call)"),
+    ("Embeddings", r"embedding"),
+    ("Vector search", r"vector (search|store|database|index)|nearest neighbou?r|\bann\b|semantic search"),
+    ("Two-tower", r"two.tower"),
+    ("Transformers", r"transformer"),
+    ("Graph neural nets", r"graph neural|\bgnns?\b"),
+    ("Fine-tuning", r"fine.?tun|\blora\b|distill"),
+    ("Feature store", r"feature (store|platform|pipeline)"),
+    ("Real-time", r"real.?time|streaming|online learning"),
+    ("GPUs", r"\bgpus?\b|cuda|accelerator"),
+    ("Latency", r"latency|\bfaster\b|speed ?up"),
+    ("Cost", r"\bcost|cheaper|efficien"),
+    ("A/B testing", r"a/b test|experiment"),
+    ("Evaluation", r"\bevaluat|benchmark|offline metric"),
+    ("Guardrails", r"guardrail|safety|hallucinat|moderation"),
+    ("Personalisation", r"personali[sz]"),
+    ("Multimodal", r"multimodal|multi-modal|vision.language"),
+    ("Computer vision", r"computer vision|image|object detection|\bocr\b"),
+    ("Video", r"\bvideo"),
+    ("Speech", r"speech|voice|audio|asr\b"),
+    ("Forecasting", r"forecast|time series|demand"),
+    ("Fraud", r"fraud|abuse|spam|risk"),
+    ("Pricing", r"pricing|price"),
+    ("Search ranking", r"search ranking|learning.to.rank|relevance"),
+    ("Code", r"\bcode\b|coding|developer|code review"),
+]
+TAG_NAMES = [t for t, _ in TAGS]

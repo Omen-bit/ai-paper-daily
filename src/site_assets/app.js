@@ -1094,8 +1094,10 @@
   // ---- Lists built from this browser's history or saved papers ----
   function storedRow(item, verb, removable) {
     return '<li class="row" data-id="' + esc(item.id) + '">' +
-      '<span class="row-title"><a href="paper/' + esc(item.id) + '.html">' + esc(item.t || item.id) + "</a></span>" +
-      '<span class="row-authors">' + verb + " " + ago(item.at) + "</span>" +
+      (item.u ? '<span class="row-title"><a href="' + esc(item.u) + '" rel="noopener" target="_blank">' + esc(item.t || item.u) + "</a></span>" +
+                '<span class="row-authors">Case study from ' + esc(item.c || "a company blog") + ", " + verb.toLowerCase() + " " + ago(item.at) + "</span>"
+              : '<span class="row-title"><a href="paper/' + esc(item.id) + '.html">' + esc(item.t || item.id) + "</a></span>" +
+                '<span class="row-authors">' + verb + " " + ago(item.at) + "</span>") +
       (removable ? '<div class="badges"><button class="btn btn-outline btn-sm" type="button" data-remove="' + esc(item.id) + '">Remove</button></div>' : "") +
       "</li>";
   }
@@ -1625,6 +1627,88 @@
     }
   }
 
+  // ---- Case studies: search, topic, company and tag filters, showing more, and Save ----
+  (function () {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-cs-save]"), function (btn) {
+      var id = btn.getAttribute("data-cs-save");
+      var paint = function () {
+        var on = saved.some(function (s) { return s.id === id; });
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+        btn.querySelector("span").textContent = on ? "Saved" : "Save";
+      };
+      btn.addEventListener("click", function () {
+        var on = saved.some(function (s) { return s.id === id; });
+        saved = on ? saved.filter(function (s) { return s.id !== id; })
+                   : [{ id: id, t: btn.getAttribute("data-title"), u: btn.getAttribute("data-url"),
+                        c: btn.getAttribute("data-co"), at: Date.now() }].concat(saved);
+        store("apd.saved", saved);
+        paint();
+        showSavedCount();
+      });
+      paint();
+    });
+
+    var list = document.querySelector("[data-cs-list]");
+    var q = document.querySelector("[data-cs-q]");
+    if (!list || !q) return;
+    var company = document.querySelector("[data-cs-company]");
+    var chips = Array.prototype.slice.call(document.querySelectorAll("[data-cs-topic]"));
+    var none = document.querySelector("[data-cs-none]");
+    var count = document.querySelector("[data-cs-count]");
+    var more = document.querySelector("[data-cs-more]");
+    var active = document.querySelector("[data-cs-active]");
+    var items = Array.prototype.slice.call(list.querySelectorAll("[data-cs-item]"));
+    var page = parseInt(list.getAttribute("data-cs-paged") || "24", 10);
+    var shown = page, topic = "", tag = "";
+
+    function apply() {
+      var words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      var co = company ? company.value : "";
+      var matches = 0;
+      items.forEach(function (el) {
+        var ok = (!topic || el.getAttribute("data-p") === topic) &&
+          (!co || el.getAttribute("data-co") === co) &&
+          (!tag || el.getAttribute("data-tags").indexOf("|" + tag + "|") >= 0) &&
+          words.every(function (w) { return el.getAttribute("data-t").indexOf(w) >= 0; });
+        if (ok) matches++;
+        el.hidden = !ok || matches > shown;
+      });
+      chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-cs-topic") === topic ? "true" : "false"); });
+      list.querySelectorAll("[data-cs-tag]").forEach(function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-cs-tag") === tag ? "true" : "false");
+      });
+      if (active) {
+        active.hidden = !tag;
+        active.querySelector("[data-cs-active-name]").textContent = tag;
+      }
+      if (none) none.hidden = matches > 0;
+      if (count) count.textContent = matches + (matches === 1 ? " write-up" : " write-ups");
+      if (more) more.hidden = matches <= shown;
+    }
+    function reset() { shown = page; apply(); }
+
+    q.addEventListener("input", reset);
+    if (company) company.addEventListener("change", reset);
+    chips.forEach(function (c) { c.addEventListener("click", function () { topic = c.getAttribute("data-cs-topic"); reset(); }); });
+    list.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-cs-tag]");
+      if (!b) return;
+      var t = b.getAttribute("data-cs-tag");
+      tag = tag === t ? "" : t;
+      reset();
+      if (tag) list.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    var clearTag = document.querySelector("[data-cs-clear-tag]");
+    if (clearTag) clearTag.addEventListener("click", function () { tag = ""; reset(); });
+    var resetAll = document.querySelector("[data-cs-reset]");
+    if (resetAll) resetAll.addEventListener("click", function () {
+      q.value = ""; topic = ""; tag = "";
+      if (company) company.value = "";
+      reset();
+    });
+    if (more) more.addEventListener("click", function () { shown += page; apply(); });
+  })();
+
   // ---- All papers: cards, quick views and search over data/papers.json ----
   // Short keys are documented in compact() in site_builder.py.
   var results = document.getElementById("results");
@@ -1994,45 +2078,5 @@
       count.textContent = "We could not load the paper list. Reload the page to try again.";
     });
 
-
-  // ---- Case studies: problem filter, search, and showing more cards ----
-  (function () {
-    var list = document.querySelector("[data-cs-list]") || document.querySelector(".cs-grid");
-    var q = document.querySelector("[data-cs-q]");
-    var filter = document.querySelector("[data-cs-filter]");
-    var none = document.querySelector("[data-cs-none]");
-    var count = document.querySelector("[data-cs-count]");
-    var more = document.querySelector("[data-cs-more]");
-    document.querySelectorAll("[data-cs-showall]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var section = btn.closest("section");
-        section.querySelectorAll("[data-cs-item][hidden]").forEach(function (el) { el.hidden = false; });
-        btn.remove();
-      });
-    });
-    if (!list || !q) return;
-    var items = Array.prototype.slice.call(list.querySelectorAll("[data-cs-item]"));
-    var page = parseInt(list.getAttribute("data-cs-paged") || "0", 10);
-    var shown = page;
-    var noun = count ? count.textContent.replace(/^[\d,]+\s*/, "") : "";
-    function apply() {
-      var words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-      var p = filter ? filter.value : "";
-      var narrowed = words.length || p;
-      var matches = 0;
-      items.forEach(function (el) {
-        var ok = (!p || (" " + el.getAttribute("data-p") + " ").indexOf(" " + p + " ") >= 0) &&
-          words.every(function (w) { return el.getAttribute("data-t").indexOf(w) >= 0; });
-        if (ok) matches++;
-        el.hidden = !ok || (!narrowed && page > 0 && matches > shown);
-      });
-      if (none) none.hidden = matches > 0;
-      if (count) count.textContent = matches + " " + (matches === 1 ? noun.replace(/s$/, "").replace(/ie$/, "y") : noun);
-      if (more) more.hidden = !!narrowed || matches <= shown;
-    }
-    q.addEventListener("input", apply);
-    if (filter) filter.addEventListener("change", apply);
-    if (more) more.addEventListener("click", function () { shown += page; apply(); });
-  })();
 
 })();
