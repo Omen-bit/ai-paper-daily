@@ -81,6 +81,14 @@ jobs:
         run: python src/paper_links.py
 
       - if: steps.check.outputs.skip != 'true'
+        name: Find new case studies on company engineering blogs
+        continue-on-error: true # the pages keep the posts already saved if a feed or Groq is down
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODELS: ${{ vars.GROQ_MODELS }}
+        run: python src/case_studies.py
+
+      - if: steps.check.outputs.skip != 'true'
         name: Sync to Supabase
         continue-on-error: true # the site still builds if Supabase is down
         env:

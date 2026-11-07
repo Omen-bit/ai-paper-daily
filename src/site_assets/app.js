@@ -74,7 +74,7 @@
     var tag = (document.activeElement && document.activeElement.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
     e.preventDefault();
-    var box = document.getElementById("q");
+    var box = document.getElementById("q") || document.getElementById("cs-q");
     if (box) { box.focus(); return; }
     var trigger = document.querySelector("[data-search-trigger]");
     if (trigger) location.href = trigger.getAttribute("href");
@@ -1993,5 +1993,46 @@
       results.innerHTML = "";
       count.textContent = "We could not load the paper list. Reload the page to try again.";
     });
+
+
+  // ---- Case studies: problem filter, search, and showing more cards ----
+  (function () {
+    var list = document.querySelector("[data-cs-list]") || document.querySelector(".cs-grid");
+    var q = document.querySelector("[data-cs-q]");
+    var filter = document.querySelector("[data-cs-filter]");
+    var none = document.querySelector("[data-cs-none]");
+    var count = document.querySelector("[data-cs-count]");
+    var more = document.querySelector("[data-cs-more]");
+    document.querySelectorAll("[data-cs-showall]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var section = btn.closest("section");
+        section.querySelectorAll("[data-cs-item][hidden]").forEach(function (el) { el.hidden = false; });
+        btn.remove();
+      });
+    });
+    if (!list || !q) return;
+    var items = Array.prototype.slice.call(list.querySelectorAll("[data-cs-item]"));
+    var page = parseInt(list.getAttribute("data-cs-paged") || "0", 10);
+    var shown = page;
+    var noun = count ? count.textContent.replace(/^[\d,]+\s*/, "") : "";
+    function apply() {
+      var words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      var p = filter ? filter.value : "";
+      var narrowed = words.length || p;
+      var matches = 0;
+      items.forEach(function (el) {
+        var ok = (!p || (" " + el.getAttribute("data-p") + " ").indexOf(" " + p + " ") >= 0) &&
+          words.every(function (w) { return el.getAttribute("data-t").indexOf(w) >= 0; });
+        if (ok) matches++;
+        el.hidden = !ok || (!narrowed && page > 0 && matches > shown);
+      });
+      if (none) none.hidden = matches > 0;
+      if (count) count.textContent = matches + " " + (matches === 1 ? noun.replace(/s$/, "").replace(/ie$/, "y") : noun);
+      if (more) more.hidden = !!narrowed || matches <= shown;
+    }
+    q.addEventListener("input", apply);
+    if (filter) filter.addEventListener("change", apply);
+    if (more) more.addEventListener("click", function () { shown += page; apply(); });
+  })();
 
 })();

@@ -32,6 +32,8 @@ import labs
 import lab_logos
 import tech_trends
 import trends
+import case_pages
+import case_studies
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SITE_DIR = os.path.join(ROOT_DIR, "site")
@@ -293,6 +295,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
       {nav("index.html", "Today", "today")}
       {nav("papers.html", '<span class="nav-long">All papers</span><span class="nav-short">Papers</span>', "papers")}
       {nav("scout.html", "Scout", "scout")}
+      {nav("case-studies/index.html", '<span class="nav-long">Case studies</span><span class="nav-short">Cases</span>', "cases")}
       {nav("trends.html", "Trends", "trends") if SHOW_TRENDS or active == "trends" else ""}
       {nav("saved.html", "Saved", "saved", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
@@ -1752,6 +1755,12 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
 
     related = related_papers(papers)
     _write(os.path.join(site_dir, "labs.html"), build_labs_page(papers, links))
+    case_paths: list[str] = []
+    try:  # engineering write-ups from company blogs; the rest of the site never waits on them
+        case_paths = case_pages.build_all(case_studies.load(os.path.join(data_dir, "cases.json")), papers,
+                                          page, _write, site_dir)
+    except Exception as exc:
+        print(f"  [site] WARNING: case study pages failed: {exc}")
     failed = 0
     for rec in papers.values():
         prev_id, next_id = neighbours.get(rec["id"], (None, None))
@@ -1776,6 +1785,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     pages = [("", newest), ("papers.html", newest), ("scout.html", ""), ("archive.html", newest), ("labs.html", newest)]
     if SHOW_TRENDS:
         pages.append(("trends.html", newest))
+    pages += [(p, newest) for p in case_paths]
     pages += [(f"day/{d['date']}.html", d["date"]) for d in days]
     pages += [(f"paper/{r['id']}.html", r.get("featured_on") or r.get("first_seen") or "")
               for r in sorted(papers.values(), key=lambda r: r.get("first_seen") or "", reverse=True)]
