@@ -204,6 +204,8 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
 EDITION = ""
 # Lab name -> its official logo file in assets/logos/ (lab_logos.py); set by build_site
 LOGOS: dict[str, str] = {}
+# Another name of a lab -> the name the site shows, for names that share a Wikidata id; set by build_site
+SAME_LAB: dict[str, str] = {}
 # True when any saved logo came from Logo.dev, whose free plan asks for a visible credit
 LOGO_DEV_CREDIT = False
 
@@ -1289,7 +1291,24 @@ def lab_of(rec: dict, links: dict | None = None) -> str:
     """The lab or company behind a paper: saved with the record, found later by paper_links, or the code's owner."""
     lab = (rec.get("org") or (links or {}).get("org")
            or labs.from_code_url(rec.get("code_url") or code_link(rec) or "") or "")
-    return labs.canonical(lab) or lab  # names saved before an alias was added still get their logo
+    lab = labs.canonical(lab) or lab  # names saved before an alias was added still get their logo
+    return SAME_LAB.get(lab, lab)
+
+
+def same_lab_names(groups: dict[str, list[str]], counts: dict[str, int]) -> dict[str, str]:
+    """
+    {other name: shown name} for names that are one organization. The shown name is the one the site
+    already knows (labs.LABS), else a written-out name over a handle ("ucas"), else the one with the
+    most papers, else the shortest.
+    """
+    out = {}
+    for names in groups.values():
+        names = [n for n in names if counts.get(n)]
+        if len(names) < 2:
+            continue
+        shown = max(names, key=lambda n: (n in labs.LABS, " " in n and n != n.lower(), counts[n], -len(n), n))
+        out.update({n: shown for n in names if n != shown})
+    return out
 
 
 def lab_mark(lab: str, root: str = "../") -> str:
@@ -1660,7 +1679,7 @@ def _write(path: str, content: str) -> None:
 
 def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: str = EXPORT_DIR) -> int:
     """Rebuild site_dir from scratch. Returns the number of paper pages written."""
-    global EDITION, LOGOS, LOGO_DEV_CREDIT
+    global EDITION, LOGOS, LOGO_DEV_CREDIT, SAME_LAB
     days = load_days(data_dir)
     papers = merge_papers(days)
     EDITION = ticker(days)
@@ -1670,6 +1689,19 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     shutil.copytree(ASSETS_DIR, os.path.join(site_dir, "assets"))
     logo_index = os.path.join(data_dir, "logos", "index.json")
     LOGOS = lab_logos.index(logo_index)
+    SAME_LAB = {}
+    links = load_links(data_dir)
+    counts: dict[str, int] = {}
+    for rec in papers.values():
+        name = lab_of(rec, links.get(rec["id"]))
+        if name:
+            counts[name] = counts.get(name, 0) + 1
+    SAME_LAB = same_lab_names(lab_logos.same_org(logo_index), counts)
+    for other, shown in SAME_LAB.items():
+        if other in LOGOS and shown not in LOGOS:
+            LOGOS[shown] = LOGOS[other]  # the shown name borrows the other name's logo
+    if SAME_LAB:
+        print(f"  [site] One lab, two names: {', '.join(f'{o} -> {s}' for o, s in sorted(SAME_LAB.items()))}")
     LOGO_DEV_CREDIT = any((e or {}).get("source") == "Logo.dev" and lab in LOGOS
                           for lab, e in lab_logos.load_index(logo_index).items())
     if LOGOS:
@@ -1719,7 +1751,6 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
         with_image = set()
 
     related = related_papers(papers)
-    links = load_links(data_dir)
     _write(os.path.join(site_dir, "labs.html"), build_labs_page(papers, links))
     failed = 0
     for rec in papers.values():

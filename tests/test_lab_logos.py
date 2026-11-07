@@ -11,6 +11,13 @@ from PIL import Image
 
 import lab_logos
 import site_builder
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _no_id_lookups(monkeypatch):
+    """Tests never reach ROR or Wikidata for ids unless they ask to."""
+    monkeypatch.setattr(lab_logos, "identify", lambda names: "")
 
 
 def _png(w, h, colour=(118, 185, 0, 255)):
@@ -129,7 +136,7 @@ def test_find_logo_falls_through_sources(monkeypatch):
 
 def test_refresh_accepts_github_hints(tmp_path, monkeypatch):
     seen = []
-    monkeypatch.setattr(lab_logos, "find_logo", lambda lab, aliases, avatar="", owners=(): seen.append(owners) or (b"", ""))
+    monkeypatch.setattr(lab_logos, "find_logo", lambda lab, aliases, avatar="", owners=(), ids=None: seen.append(owners) or (b"", ""))
     lab_logos.refresh({"Lab": {"avatar": "", "github": ["lab-org"]}}, today=date(2026, 1, 2), logo_dir=str(tmp_path))
     assert seen == [["lab-org"]]
 
@@ -157,7 +164,7 @@ def test_labs_with_a_lobe_icon_or_a_site_icon_are_looked_at_again():
     hf = {"file": "meta.png", "source": "Hugging Face", "v": 4, "checked": "2026-11-05"}
     assert lab_logos.due(hf, today, "Meta")
     assert not lab_logos.due(hf, today, "Some University")
-    assert not lab_logos.due(dict(hf, v=5), today, "Meta")  # once is enough
+    assert not lab_logos.due(dict(hf, v=6), today, "Meta")  # once is enough
     site = {"file": "x.png", "source": "website https://x.edu", "v": 4, "checked": "2026-11-05"}
     assert lab_logos.due(site, today, "X University")
     assert not lab_logos.due(dict(site, v=5), today, "X University")
@@ -216,3 +223,55 @@ def test_every_lobe_name_is_a_known_lab_or_alias():
     import labs
     assert set(lab_logos.LOBE) - set(labs.LABS) <= {"Sakana AI", "Perplexity", "Upstage", "Baichuan", "01.AI",
                                                     "Nous Research", "Yandex"}
+
+
+def test_companies_match_lobe_icons_by_brand_name():
+    assert lab_logos.lobe_file("Sakana AI") == "sakana-color"
+    assert lab_logos.lobe_file("sakana-ai") == "sakana-color"
+    assert lab_logos.lobe_file("Black Forest Labs") == "bfl"
+    assert lab_logos.lobe_file("Google DeepMind") == "deepmind-color"  # named in LOBE
+    assert lab_logos.lobe_file("Tencent") == ""  # its own avatar reads better
+    assert lab_logos.lobe_file("Magic") == ""  # a common word, too likely to be someone else
+    assert lab_logos.lobe_file("Meta University") == ""  # universities are never matched by name
+    assert lab_logos.lobe_file("Some New Lab") == ""
+
+
+def test_lab_ids_are_saved_and_backfilled(tmp_path, monkeypatch):
+    (tmp_path / "old.png").write_bytes(_png(10, 10))
+    (tmp_path / "index.json").write_text(json.dumps({
+        "Old Lab": {"file": "old.png", "source": "Hugging Face", "v": 4, "checked": "2026-11-01"}}))
+    monkeypatch.setattr(lab_logos, "identify", lambda names: {"Old Lab": "Q1", "New Lab": "Q2"}.get(names[0], ""))
+    monkeypatch.setattr(lab_logos, "find_logo", lambda *a, **k: (b"PNG", "Hugging Face"))
+    lab_logos.refresh({"New Lab": "", "Old Lab": ""}, today=date(2026, 11, 7), logo_dir=str(tmp_path))
+    idx = lab_logos.load_index(str(tmp_path / "index.json"))
+    assert idx["New Lab"]["qid"] == "Q2" and idx["Old Lab"]["qid"] == "Q1"
+    assert idx["Old Lab"]["file"] == "old.png"  # only the id was looked up
+
+
+def test_find_logo_reports_the_id_it_found(monkeypatch):
+    monkeypatch.setattr(lab_logos, "ror_lookup", lambda names: ("Q30", ""))
+    monkeypatch.setattr(lab_logos, "wikidata_images", lambda qid: [])
+    monkeypatch.setattr(lab_logos, "wikidata_website", lambda qid: "")
+    ids = {}
+    assert lab_logos.find_logo("KAIST", [], ids=ids) == (b"", "")
+    assert ids == {"qid": "Q30"}
+
+
+def test_same_org_groups_names_sharing_an_id(tmp_path):
+    (tmp_path / "index.json").write_text(json.dumps({
+        "ucas": {"qid": "Q9"}, "University of Chinese Academy of Sciences": {"qid": "Q9"},
+        "Chinese Academy of Sciences": {"qid": "Q8"}, "MMLab@NTU": {"qid": ""}}))
+    assert lab_logos.same_org(str(tmp_path / "index.json")) == {
+        "Q9": ["University of Chinese Academy of Sciences", "ucas"]}
+
+
+def test_one_lab_under_two_names_is_shown_once(monkeypatch):
+    groups = {"Q9": ["University of Chinese Academy of Sciences", "ucas"], "Q1": ["MIT", "mit-han-lab"],
+              "Q5": ["Only Here", "No Papers"]}
+    counts = {"University of Chinese Academy of Sciences": 2, "ucas": 5, "MIT": 1, "mit-han-lab": 9, "Only Here": 1}
+    same = site_builder.same_lab_names(groups, counts)
+    assert same == {"ucas": "University of Chinese Academy of Sciences",  # written out, though fewer papers
+                    "mit-han-lab": "MIT"}  # a name the site already knows wins
+    monkeypatch.setattr(site_builder, "SAME_LAB", same)
+    assert site_builder.lab_of({"org": "mit-han-lab"}) == "MIT"
+    assert site_builder.lab_of({"org": "Only Here"}) == "Only Here"

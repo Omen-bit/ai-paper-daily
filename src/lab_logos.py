@@ -3,7 +3,8 @@ lab_logos.py
 Each lab's own logo, in its own colours, saved once as a small square PNG in data/logos/.
 
 Where a logo comes from, best first:
-  0. Lobe Icons (MIT), a set of clean logos drawn for AI companies, for the labs listed in LOBE
+  0. Lobe Icons (MIT), a set of clean logos drawn for AI companies: the labs listed in LOBE, and any
+     other company whose name is exactly one of its brands (src/lobe_icons.json)
   1. the avatar the lab uploaded to its Hugging Face organization page
   2. Wikidata: its icon (P2910), logo (P154) or, for universities, seal (P158), whichever is closest
      to square, as a 120 px rendering from Wikimedia Commons. The Wikidata entry is found through
@@ -20,6 +21,9 @@ A lab with none keeps the mark the site draws itself (Simple Icons outline or in
 Every source is free to use without a key except Logo.dev; ROR and Wikidata are CC0.
 Brandfetch and similar CDNs are not used: their terms forbid saving the files.
 Logos are trademarks of their owners and are shown only to say who wrote a paper.
+
+Each lab's Wikidata id is saved too (found through ROR when it can be), so the site can show one lab
+when two names mean the same organization ("ucas" and "University of Chinese Academy of Sciences").
 
 paper_links.py calls refresh() once a day; the site builder reads index() and copies the files.
 To fetch logos on their own:  python src/lab_logos.py
@@ -46,7 +50,8 @@ MAX_LOOKUPS = int(os.environ.get("LOGO_MAX_LOOKUPS", "60"))
 # Wikidata properties, in order of preference when two images are equally square
 PROPS = ("P2910", "P154", "P158")  # icon, logo image, seal image
 # Bump to look every lab up again after a change in how logos are chosen
-VERSION = 5  # 5: Lobe Icons first; Commons thumbnails at a standard width; website icons looked at again
+VERSION = 6  # 6: Lobe Icons matched by brand name. 5: Lobe Icons first; Commons at a standard width
+MAX_ID_LOOKUPS = int(os.environ.get("LOGO_MAX_ID_LOOKUPS", "80"))  # labs saved before ids were kept
 
 # Lobe Icons: logos drawn for AI companies and models (github.com/lobehub/lobe-icons, MIT).
 # Pinned, so a logo only changes when this version does. "-color" files are the brand's colours;
@@ -69,6 +74,56 @@ LOBE = {
     "Baichuan": "baichuan-color", "01.AI": "zeroone-color", "Nous Research": "nousresearch",
     "Yandex": "yandex",
 }
+# Never matched by name: their own Hugging Face avatar reads better
+LOBE_SKIP = {"Tencent", "Yandex Research"}
+# Lobe brands named with a common word, which a lab of the same name is unlikely to be
+LOBE_AMBIGUOUS = {"ace", "amp", "automatic", "aya", "brave", "dolphin", "flora", "flux", "goose", "inference",
+                  "lambda", "liquid", "magic", "make", "morph", "muse", "nova", "pi", "spark", "sync", "wafer",
+                  "ling", "notion", "monica", "railway", "cursor", "obsidian", "figma"}
+LOBE_NAMES_FILE = os.path.join(SRC_DIR, "lobe_icons.json")  # {brand name: file}, from the pinned package
+# Words a lab's name may carry or leave out and still be the same brand
+_FILLER = {"ai", "inc", "research", "labs", "lab", "team", "technologies", "technology", "corp", "corporation",
+           "co", "ltd", "company", "the", "group", "platforms"}
+_LOBE_KEYS: dict[str, str] | None = None
+
+
+def brand_key(name: str) -> str:
+    """'Stability AI', 'stability-ai' and 'Stability' all give 'stability'."""
+    words = re.findall(r"[a-z0-9]+", (name or "").lower())
+    kept = [w for w in words if w not in _FILLER]
+    return "".join(kept or words)
+
+
+def lobe_keys() -> dict[str, str]:
+    """{brand key: Lobe file} for every brand whose key no other brand shares."""
+    global _LOBE_KEYS
+    if _LOBE_KEYS is None:
+        try:
+            with open(LOBE_NAMES_FILE, encoding="utf-8") as f:
+                names = json.load(f)
+        except (OSError, ValueError):
+            names = {}
+        keys: dict[str, str] = {}
+        clash = set()
+        for title, file in names.items():
+            k = brand_key(title)
+            if k in keys and keys[k] != file:
+                clash.add(k)
+            keys[k] = file
+        _LOBE_KEYS = {k: v for k, v in keys.items() if k not in clash and k not in LOBE_AMBIGUOUS and len(k) >= 3}
+    return _LOBE_KEYS
+
+
+def lobe_file(lab: str) -> str:
+    """The Lobe Icons file for a lab, or '' when it has none. Universities are never matched by name."""
+    if not lab or lab in LOBE_SKIP:
+        return ""
+    if lab in LOBE:
+        return LOBE[lab]
+    import labs
+    if labs.kind(lab) == "university":
+        return ""
+    return lobe_keys().get(brand_key(lab), "")
 # Commons serves thumbnails to scripts only at standard widths (w.wiki/GHai); 120 is one of them
 COMMONS_WIDTH = 120
 
@@ -235,8 +290,8 @@ def due(entry: dict | None, today: date, lab: str = "") -> bool:
     if not entry:
         return True
     source = entry.get("source") or ""
-    if lab in LOBE and entry.get("file") and source != "Lobe Icons" and entry.get("v", 0) < 5:
-        return True  # a cleaner logo exists now (bump VERSION after adding labs to LOBE)
+    if entry.get("file") and source != "Lobe Icons" and entry.get("v", 0) < 6 and lobe_file(lab):
+        return True  # a cleaner logo exists now (bump VERSION after updating LOBE or the Lobe package)
     if entry.get("file") and source.startswith("website") and entry.get("v", 0) < 5:
         return True  # Wikidata failed for these before, so a small site icon won; look again
     if entry.get("file") and entry.get("v", 0) >= 3:  # chosen by the current rules
@@ -352,9 +407,15 @@ def website_icon(site: str) -> bytes:
 
 
 def lobe_icon(lab: str) -> bytes:
-    """The lab's Lobe Icons logo, when LOBE lists it."""
-    name = LOBE.get(lab)
+    """The lab's Lobe Icons logo, when it has one."""
+    name = lobe_file(lab)
     return to_square_png(_download(LOBE_URL.format(name))) if name else b""
+
+
+def identify(names: list[str]) -> str:
+    """The organization's Wikidata id: through ROR first (exact for universities), else Wikidata itself."""
+    qid, _ = ror_lookup(names)
+    return qid or wikidata_entity(names)
 
 
 def logo_dev(site: str) -> bytes:
@@ -376,8 +437,13 @@ def logo_dev(site: str) -> bytes:
     return to_square_png(_download(url)) if url else b""
 
 
-def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] = ()) -> tuple[bytes, str]:
-    """(PNG bytes, where it came from) for a lab, or (b'', '') when no official logo was found."""
+def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] = (),
+              ids: dict | None = None) -> tuple[bytes, str]:
+    """
+    (PNG bytes, where it came from) for a lab, or (b'', '') when no official logo was found.
+    When ids is given and the lab's Wikidata id was looked up on the way, it is saved there as ids["qid"].
+    """
+    ids = {} if ids is None else ids
     names = [lab] + aliases
     errors = []
 
@@ -390,7 +456,7 @@ def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] 
             print(f"  [logos] {label} failed for {lab}: {type(exc).__name__}: {str(exc)[:100]}")
             return None
 
-    if lab in LOBE:
+    if lobe_file(lab):
         png = attempt("Lobe Icons", lambda: lobe_icon(lab))
         if png:
             return png, "Lobe Icons"
@@ -400,6 +466,8 @@ def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] 
             return png, "Hugging Face"
     qid, site = attempt("ROR", lambda: ror_lookup(names)) or ("", "")
     qid = qid or attempt("Wikidata search", lambda: wikidata_entity(names)) or ""
+    if "ROR" not in errors and "Wikidata search" not in errors:
+        ids["qid"] = qid
     if qid:
         url, prop = attempt("Wikidata images", lambda: pick_wikidata(wikidata_images(qid))) or ("", "")
         if url:
@@ -446,8 +514,9 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
             continue
         aliases = [a for a in lab_names.LABS.get(lab, []) if len(a) >= 4 and not re.fullmatch(r"[a-z0-9\-]+", a)]
         entry = {"checked": today.isoformat(), "v": VERSION}
+        ids = {}
         try:
-            png, source = find_logo(lab, aliases, avatar, owners)
+            png, source = find_logo(lab, aliases, avatar, owners, ids=ids)
             if png:
                 file = slug(lab) + ".png"
                 os.makedirs(logo_dir, exist_ok=True)
@@ -455,20 +524,49 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
                     f.write(png)
                 entry.update(file=file, source=source)
             elif (idx.get(lab) or {}).get("file") and os.path.exists(os.path.join(logo_dir, idx[lab]["file"])) \
-                    and (lab in LOBE or (idx[lab].get("source") or "").startswith("website")):
+                    and (lobe_file(lab) or (idx[lab].get("source") or "").startswith("website")):
                 entry = dict(idx[lab], checked=today.isoformat(), v=VERSION)  # looked again, nothing better: keep it
             else:
                 old = os.path.join(logo_dir, slug(lab) + ".png")
                 if os.path.exists(old):
                     os.remove(old)  # a logo chosen by an older rule that no longer qualifies
                 print(f"  [logos] No official logo found for {lab}")
+            if "qid" not in ids:  # found early (Lobe Icons, Hugging Face): look the id up on its own
+                try:
+                    ids["qid"] = identify([lab] + aliases)
+                except Exception as exc:
+                    print(f"  [logos] Id lookup failed for {lab}: {str(exc)[:100]}")
+            if "qid" in ids:
+                entry["qid"] = ids["qid"]
         except Exception as exc:
             print(f"  [logos] Lookup failed for {lab}: {str(exc)[:100]}")
             entry = dict(idx.get(lab) or {})  # try again next run
         idx[lab] = entry
         done += 1
+    # Labs saved before ids were kept: look their ids up, a few each day
+    id_done = 0
+    for lab in labs_seen:
+        entry = idx.get(lab)
+        if id_done >= MAX_ID_LOOKUPS or not entry or "qid" in entry or "checked" not in entry:
+            continue
+        aliases = [a for a in lab_names.LABS.get(lab, []) if len(a) >= 4 and not re.fullmatch(r"[a-z0-9\-]+", a)]
+        try:
+            entry["qid"] = identify([lab] + aliases)
+        except Exception as exc:
+            print(f"  [logos] Id lookup failed for {lab}: {str(exc)[:100]}")
+        id_done += 1
     save_index(idx, path)
     return done
+
+
+def same_org(path: str = INDEX_FILE) -> dict[str, list[str]]:
+    """{Wikidata id: the lab names that share it}, for ids that more than one name has."""
+    groups: dict[str, list[str]] = {}
+    for name, entry in load_index(path).items():
+        qid = (entry or {}).get("qid")
+        if qid:
+            groups.setdefault(qid, []).append(name)
+    return {q: sorted(names) for q, names in groups.items() if len(names) > 1}
 
 
 if __name__ == "__main__":
