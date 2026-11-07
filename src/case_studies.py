@@ -348,7 +348,8 @@ def is_run_day(now: datetime, days: str = RUN_DAYS) -> bool:
 def run(path: str = CASES_FILE, force: bool = False) -> int:
     now = datetime.now(timezone(timedelta(hours=5, minutes=30)))
     today = now.strftime("%Y-%m-%d")
-    if not force and not is_run_day(now):
+    existing = load(path)
+    if existing and not force and not is_run_day(now):  # the very first run always reads the blogs
         print(f"  [cases] Blogs are read on {RUN_DAYS} only; nothing to do today. Use --now to run anyway.")
         return 0
     fetched, down = [], []
@@ -360,7 +361,6 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
         except Exception as exc:
             down.append(name)
             print(f"  [cases] {name}: feed failed ({str(exc)[:80]})")
-    existing = load(path)
     use_groq = bool(os.environ.get("GROQ_API_KEY", "").strip())
     posts, counts = update(existing, fetched, today, use_groq=use_groq, reader=read_article if use_groq else None)
     save(posts, path)
