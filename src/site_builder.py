@@ -204,6 +204,8 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
 EDITION = ""
 # Lab name -> its official logo file in assets/logos/ (lab_logos.py); set by build_site
 LOGOS: dict[str, str] = {}
+# True when any saved logo came from Logo.dev, whose free plan asks for a visible credit
+LOGO_DEV_CREDIT = False
 
 # Runs before first paint so a saved dark theme never flashes white
 def _asset_version() -> str:
@@ -304,7 +306,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 </main>
 <footer class="site-footer">
   <div class="wrap foot-in">
-    <span>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.</span>
+    <span>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.{' Some lab logos by <a href="https://logo.dev" rel="noopener">Logo.dev</a>.' if LOGO_DEV_CREDIT else ""}</span>
     <span>Summaries are written by AI. Check the paper before you rely on them.</span>
     <span><a href="{root}feed.xml" data-subscribe="rss">RSS feed</a>{f' · <a href="https://buttondown.com/{BUTTONDOWN_USER}" rel="noopener">Daily email</a>' if BUTTONDOWN_USER else ""}</span>
   </div>
@@ -1658,7 +1660,7 @@ def _write(path: str, content: str) -> None:
 
 def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: str = EXPORT_DIR) -> int:
     """Rebuild site_dir from scratch. Returns the number of paper pages written."""
-    global EDITION, LOGOS
+    global EDITION, LOGOS, LOGO_DEV_CREDIT
     days = load_days(data_dir)
     papers = merge_papers(days)
     EDITION = ticker(days)
@@ -1668,6 +1670,8 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     shutil.copytree(ASSETS_DIR, os.path.join(site_dir, "assets"))
     logo_index = os.path.join(data_dir, "logos", "index.json")
     LOGOS = lab_logos.index(logo_index)
+    LOGO_DEV_CREDIT = any((e or {}).get("source") == "Logo.dev" and lab in LOGOS
+                          for lab, e in lab_logos.load_index(logo_index).items())
     if LOGOS:
         os.makedirs(os.path.join(site_dir, "assets", "logos"), exist_ok=True)
         for file in set(LOGOS.values()):

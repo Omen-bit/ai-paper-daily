@@ -141,3 +141,78 @@ def test_network_failure_is_retried_next_run(tmp_path, monkeypatch):
         monkeypatch.setattr(lab_logos, name, down)
     lab_logos.refresh({"Lab": ""}, today=date(2026, 1, 2), logo_dir=str(tmp_path))
     assert lab_logos.due(lab_logos.load_index(str(tmp_path / "index.json")).get("Lab"), date(2026, 1, 3))
+
+
+def test_lobe_icons_come_first_for_listed_labs(monkeypatch):
+    urls = []
+    monkeypatch.setattr(lab_logos, "_download", lambda url: urls.append(url) or _png(40, 40))
+    monkeypatch.setattr(lab_logos, "ror_lookup", lambda names: (_ for _ in ()).throw(AssertionError("not needed")))
+    png, source = lab_logos.find_logo("OpenAI", [], "https://cdn-avatars.huggingface.co/v1/openai.png")
+    assert source == "Lobe Icons" and png
+    assert urls == [f"https://cdn.jsdelivr.net/npm/@lobehub/icons-static-png@{lab_logos.LOBE_VERSION}/light/openai.png"]
+
+
+def test_labs_with_a_lobe_icon_or_a_site_icon_are_looked_at_again():
+    today = date(2026, 11, 7)
+    hf = {"file": "meta.png", "source": "Hugging Face", "v": 4, "checked": "2026-11-05"}
+    assert lab_logos.due(hf, today, "Meta")
+    assert not lab_logos.due(hf, today, "Some University")
+    assert not lab_logos.due(dict(hf, v=5), today, "Meta")  # once is enough
+    site = {"file": "x.png", "source": "website https://x.edu", "v": 4, "checked": "2026-11-05"}
+    assert lab_logos.due(site, today, "X University")
+    assert not lab_logos.due(dict(site, v=5), today, "X University")
+
+
+def test_a_second_look_that_finds_nothing_keeps_the_old_logo(tmp_path, monkeypatch):
+    (tmp_path / "x-university.png").write_bytes(_png(10, 10))
+    old = {"file": "x-university.png", "source": "website https://x.edu", "v": 4, "checked": "2026-11-01"}
+    (tmp_path / "index.json").write_text(json.dumps({"X University": old}))
+    monkeypatch.setattr(lab_logos, "find_logo", lambda *a, **k: (b"", ""))
+    lab_logos.refresh({"X University": ""}, today=date(2026, 11, 7), logo_dir=str(tmp_path))
+    entry = lab_logos.load_index(str(tmp_path / "index.json"))["X University"]
+    assert (tmp_path / "x-university.png").exists() and entry["file"] == "x-university.png"
+    assert entry["v"] == lab_logos.VERSION and not lab_logos.due(entry, date(2026, 11, 8), "X University")
+
+
+def test_ror_skips_an_acronym_when_a_full_name_is_known(monkeypatch):
+    asked = []
+    monkeypatch.setattr(lab_logos, "_get_json", lambda url, params=None: asked.append(params["query"]) or {})
+    lab_logos.ror_lookup(["NUS", "national university of singapore"])
+    assert asked == ["national university of singapore"]
+    asked.clear()
+    lab_logos.ror_lookup(["KAIST"])  # nothing longer to go by
+    assert asked == ["KAIST"]
+
+
+def test_commons_thumbnails_use_a_standard_width(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(lab_logos, "_get_json", lambda url, params=None: seen.update(params) or {})
+    lab_logos.commons_thumb("Logo.svg")
+    assert seen["iiurlwidth"] in (20, 40, 60, 120, 250, 330, 500, 960)
+
+
+def test_logo_dev_uses_the_download_api_not_the_cdn(monkeypatch):
+    calls = []
+
+    class R:
+        def __init__(self, code, data=None): self.status_code, self._d = code, data
+        def json(self): return self._d
+    monkeypatch.setenv("LOGO_DEV_SECRET_KEY", "sk_test")
+    monkeypatch.setattr(lab_logos.requests, "get",
+                        lambda url, **kw: calls.append((url, kw)) or R(200, {"data": {"url": "https://dl.example/x.png"}}))
+    monkeypatch.setattr(lab_logos, "_download", lambda url: calls.append((url, {})) or _png(40, 40))
+    assert lab_logos.logo_dev("https://www.lab.example/")
+    assert calls[0][0] == "https://api.logo.dev/v2/brands/logo"
+    assert calls[0][1]["params"] == {"domain": "lab.example"}
+    assert calls[0][1]["headers"]["Authorization"] == "Bearer sk_test"
+    assert calls[1][0] == "https://dl.example/x.png" and not any("img.logo.dev" in u for u, _ in calls)
+    monkeypatch.setattr(lab_logos.requests, "get", lambda url, **kw: R(202))
+    assert lab_logos.logo_dev("https://lab.example") == b""
+    monkeypatch.delenv("LOGO_DEV_SECRET_KEY")
+    assert lab_logos.logo_dev("https://lab.example") == b""
+
+
+def test_every_lobe_name_is_a_known_lab_or_alias():
+    import labs
+    assert set(lab_logos.LOBE) - set(labs.LABS) <= {"Sakana AI", "Perplexity", "Upstage", "Baichuan", "01.AI",
+                                                    "Nous Research", "Yandex"}

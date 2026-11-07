@@ -3,18 +3,22 @@ lab_logos.py
 Each lab's own logo, in its own colours, saved once as a small square PNG in data/logos/.
 
 Where a logo comes from, best first:
+  0. Lobe Icons (MIT), a set of clean logos drawn for AI companies, for the labs listed in LOBE
   1. the avatar the lab uploaded to its Hugging Face organization page
   2. Wikidata: its icon (P2910), logo (P154) or, for universities, seal (P158), whichever is closest
-     to square, as a 128 px rendering from Wikimedia Commons. The Wikidata entry is found through
+     to square, as a 120 px rendering from Wikimedia Commons. The Wikidata entry is found through
      ROR, the open registry of research organizations (exact for universities and institutes),
      else by an exact name or alias match on an organization
   3. the avatar of the lab's GitHub organization, when the paper's code lives there and the
      organization's name is the lab's name
   4. the app icon on the lab's official website (apple-touch-icon or a large icon), the site
      coming from ROR or Wikidata
-  5. optional: Logo.dev, when LOGO_DEV_TOKEN is set (its free plan asks for a credit link)
+  5. optional: Logo.dev, when LOGO_DEV_SECRET_KEY is set. Its download API lets us keep the file
+     (its image CDN does not, so it is never fetched from here). The site credits Logo.dev when
+     any logo came from it, as its free plan asks
 A lab with none keeps the mark the site draws itself (Simple Icons outline or initials).
 Every source is free to use without a key except Logo.dev; ROR and Wikidata are CC0.
+Brandfetch and similar CDNs are not used: their terms forbid saving the files.
 Logos are trademarks of their owners and are shown only to say who wrote a paper.
 
 paper_links.py calls refresh() once a day; the site builder reads index() and copies the files.
@@ -42,7 +46,31 @@ MAX_LOOKUPS = int(os.environ.get("LOGO_MAX_LOOKUPS", "60"))
 # Wikidata properties, in order of preference when two images are equally square
 PROPS = ("P2910", "P154", "P158")  # icon, logo image, seal image
 # Bump to look every lab up again after a change in how logos are chosen
-VERSION = 4  # 4: labs missed because the network failed are tried again
+VERSION = 5  # 5: Lobe Icons first; Commons thumbnails at a standard width; website icons looked at again
+
+# Lobe Icons: logos drawn for AI companies and models (github.com/lobehub/lobe-icons, MIT).
+# Pinned, so a logo only changes when this version does. "-color" files are the brand's colours;
+# the others are the single-colour mark, dark on our white tile. Labs whose own Hugging Face avatar
+# reads better are left out on purpose (Tencent's wordmark, Yandex Research's "YR").
+LOBE_VERSION = "2.6.0"
+LOBE_URL = "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-png@" + LOBE_VERSION + "/light/{}.png"
+LOBE = {
+    "Google DeepMind": "deepmind-color", "Google": "google-color", "OpenAI": "openai",
+    "Anthropic": "anthropic", "Meta": "meta-color", "Microsoft": "microsoft-color",
+    "NVIDIA": "nvidia-color", "Apple": "apple", "Hugging Face": "huggingface-color",
+    "Ai2": "ai2-color", "Mistral AI": "mistral-color", "Alibaba Qwen": "qwen-color",
+    "Alibaba": "alibaba-color", "DeepSeek": "deepseek-color", "ByteDance": "bytedance-color",
+    "Baidu": "baidu-color", "Huawei": "huawei-color",
+    "Moonshot AI": "moonshot", "Zhipu AI": "zhipu-color", "MiniMax": "minimax-color",
+    "Ant Group": "antgroup-color", "LG AI Research": "lg-color", "Cohere": "cohere-color",
+    "Stability AI": "stability-color", "xAI": "xai", "Snowflake": "snowflake-color",
+    "IBM": "ibm", "Adobe": "adobe-color", "StepFun": "stepfun-color", "Together AI": "together-color",
+    "Sakana AI": "sakana-color", "Perplexity": "perplexity-color", "Upstage": "upstage-color",
+    "Baichuan": "baichuan-color", "01.AI": "zeroone-color", "Nous Research": "nousresearch",
+    "Yandex": "yandex",
+}
+# Commons serves thumbnails to scripts only at standard widths (w.wiki/GHai); 120 is one of them
+COMMONS_WIDTH = 120
 
 
 def slug(name: str) -> str:
@@ -172,7 +200,7 @@ def wikidata_images(qid: str) -> list[tuple[str, str]]:
     return out
 
 
-def commons_thumb(file_name: str, width: int = 128) -> tuple[str, float]:
+def commons_thumb(file_name: str, width: int = COMMONS_WIDTH) -> tuple[str, float]:
     """A PNG rendering of a Commons file and its width/height ratio."""
     data = _get_json(COMMONS_API, {"action": "query", "titles": "File:" + file_name, "prop": "imageinfo",
                                    "iiprop": "size|mime", "iiurlwidth": width, "format": "json"}) or {}
@@ -199,9 +227,18 @@ def pick_wikidata(images: list[tuple[str, str]]) -> tuple[str, str]:
 
 # --- Refresh --------------------------------------------------------------
 
-def due(entry: dict | None, today: date) -> bool:
+def _acronym(name: str) -> bool:
+    return bool(re.fullmatch(r"[A-Z0-9.&-]{2,6}", (name or "").strip()))
+
+
+def due(entry: dict | None, today: date, lab: str = "") -> bool:
     if not entry:
         return True
+    source = entry.get("source") or ""
+    if lab in LOBE and entry.get("file") and source != "Lobe Icons" and entry.get("v", 0) < 5:
+        return True  # a cleaner logo exists now (bump VERSION after adding labs to LOBE)
+    if entry.get("file") and source.startswith("website") and entry.get("v", 0) < 5:
+        return True  # Wikidata failed for these before, so a small site icon won; look again
     if entry.get("file") and entry.get("v", 0) >= 3:  # chosen by the current rules
         return False
     if entry.get("v") != VERSION:
@@ -218,6 +255,10 @@ def due(entry: dict | None, today: date) -> bool:
 
 def ror_lookup(names: list[str]) -> tuple[str, str]:
     """(Wikidata id, website) of the ROR organization whose name, alias or acronym is exactly one of the names."""
+    # An acronym alone matches the wrong place too often ("NUS" is also a university in Ukraine),
+    # so it is used only when the lab has no longer name to go by
+    full = [n for n in names if n and len(n.strip()) >= 3 and not _acronym(n)]
+    names = full or names
     wanted = {n.strip().lower() for n in names if n and len(n.strip()) >= 3}
     for name in names:
         if not name or len(name.strip()) < 3:
@@ -310,14 +351,29 @@ def website_icon(site: str) -> bytes:
     return b""
 
 
+def lobe_icon(lab: str) -> bytes:
+    """The lab's Lobe Icons logo, when LOBE lists it."""
+    name = LOBE.get(lab)
+    return to_square_png(_download(LOBE_URL.format(name))) if name else b""
+
+
 def logo_dev(site: str) -> bytes:
-    """Logo.dev, only when LOGO_DEV_TOKEN is set."""
-    token = os.environ.get("LOGO_DEV_TOKEN")
-    if not token or not site:
+    """
+    Logo.dev's download API, only when LOGO_DEV_SECRET_KEY (an sk_ key) is set. Logo.dev lets us keep
+    files from this API; its img.logo.dev CDN is only for browsers, so it is never fetched here.
+    Each download costs $0.02 of the free plan's $5 a month, and a logo is fetched once.
+    """
+    key = os.environ.get("LOGO_DEV_SECRET_KEY")
+    if not key or not site:
         return b""
     from urllib.parse import urlparse
-    domain = urlparse(site).netloc.removeprefix("www.")
-    return to_square_png(_download(f"https://img.logo.dev/{domain}?token={token}&size=128&format=png"))
+    domain = urlparse(site if "//" in site else "https://" + site).netloc.removeprefix("www.")
+    r = requests.get("https://api.logo.dev/v2/brands/logo", params={"domain": domain}, timeout=TIMEOUT,
+                     headers={"User-Agent": USER_AGENT, "Authorization": f"Bearer {key}"})
+    if r.status_code != 200:  # 202: still being indexed, 404: no logo; either way none today
+        return b""
+    url = ((r.json() or {}).get("data") or {}).get("url")
+    return to_square_png(_download(url)) if url else b""
 
 
 def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] = ()) -> tuple[bytes, str]:
@@ -334,6 +390,10 @@ def find_logo(lab: str, aliases: list[str], avatar: str = "", owners: list[str] 
             print(f"  [logos] {label} failed for {lab}: {type(exc).__name__}: {str(exc)[:100]}")
             return None
 
+    if lab in LOBE:
+        png = attempt("Lobe Icons", lambda: lobe_icon(lab))
+        if png:
+            return png, "Lobe Icons"
     if avatar and is_uploaded_avatar(avatar):
         png = attempt("Hugging Face", lambda: to_square_png(_download(hf_avatar_url(avatar))))
         if png:
@@ -382,7 +442,7 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
         avatar, owners = (hint.get("avatar") or "", hint.get("github") or []) if isinstance(hint, dict) else (hint or "", [])
         if done >= max_lookups:
             break
-        if not due(idx.get(lab), today):
+        if not due(idx.get(lab), today, lab):
             continue
         aliases = [a for a in lab_names.LABS.get(lab, []) if len(a) >= 4 and not re.fullmatch(r"[a-z0-9\-]+", a)]
         entry = {"checked": today.isoformat(), "v": VERSION}
@@ -394,6 +454,9 @@ def refresh(labs_seen: dict[str, str], today: date | None = None, max_lookups: i
                 with open(os.path.join(logo_dir, file), "wb") as f:
                     f.write(png)
                 entry.update(file=file, source=source)
+            elif (idx.get(lab) or {}).get("file") and os.path.exists(os.path.join(logo_dir, idx[lab]["file"])) \
+                    and (lab in LOBE or (idx[lab].get("source") or "").startswith("website")):
+                entry = dict(idx[lab], checked=today.isoformat(), v=VERSION)  # looked again, nothing better: keep it
             else:
                 old = os.path.join(logo_dir, slug(lab) + ".png")
                 if os.path.exists(old):

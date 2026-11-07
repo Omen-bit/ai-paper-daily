@@ -24,10 +24,10 @@
   "v": 4
  },
  "Adobe": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "adobe.png",
-  "source": "Hugging Face",
-  "v": 3
+  "source": "Lobe Icons",
+  "v": 5
  },
  "African Institute for Mathematical Sciences": {
   "checked": "2026-11-05",
@@ -54,16 +54,16 @@
   "v": 3
  },
  "Alibaba": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "alibaba.png",
-  "source": "Hugging Face",
-  "v": 3
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Alibaba Qwen": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "alibaba-qwen.png",
-  "source": "Hugging Face",
-  "v": 3
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Amazon": {
   "checked": "2026-11-05",
@@ -72,16 +72,16 @@
   "v": 4
  },
  "Ant Group": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "ant-group.png",
-  "source": "Hugging Face",
-  "v": 3
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Apple": {
-  "checked": "2026-11-06",
+  "checked": "2026-11-07",
   "file": "apple.png",
-  "source": "Hugging Face",
-  "v": 4
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Arm": {
   "checked": "2026-11-05",
@@ -116,10 +116,10 @@
   "v": 3
  },
  "ByteDance": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "bytedance.png",
-  "source": "Hugging Face",
-  "v": 3
+  "source": "Lobe Icons",
+  "v": 5
  },
  "CUHK": {
   "checked": "2026-11-05",
@@ -334,10 +334,10 @@
   "v": 3
  },
  "Google": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "google.png",
-  "source": "GitHub",
-  "v": 4
+  "source": "Lobe Icons",
+  "v": 5
  },
  "HKU": {
   "checked": "2026-11-05",
@@ -370,20 +370,20 @@
   "v": 4
  },
  "Huawei": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "huawei.png",
-  "source": "website https://www.huawei.com/",
-  "v": 4
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Huazhong University of Science and Technology": {
   "checked": "2026-11-06",
   "v": 4
  },
  "Hugging Face": {
-  "checked": "2026-11-06",
+  "checked": "2026-11-07",
   "file": "hugging-face.png",
-  "source": "website https://huggingface.co",
-  "v": 4
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Hunan University": {
   "checked": "2026-11-05",
@@ -507,16 +507,16 @@
   "v": 4
  },
  "Meta": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "meta.png",
-  "source": "Hugging Face",
-  "v": 4
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Microsoft": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "microsoft.png",
-  "source": "Hugging Face",
-  "v": 3
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Multimedia and Human Understanding Group": {
   "checked": "2026-11-05",
@@ -541,10 +541,10 @@
   "v": 4
  },
  "NVIDIA": {
-  "checked": "2026-11-05",
+  "checked": "2026-11-07",
   "file": "nvidia.png",
-  "source": "Hugging Face",
-  "v": 3
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Nanjing University": {
   "checked": "2026-11-06",
@@ -680,10 +680,10 @@
   "v": 4
  },
  "Snowflake": {
-  "checked": "2026-11-06",
+  "checked": "2026-11-07",
   "file": "snowflake.png",
-  "source": "Hugging Face",
-  "v": 4
+  "source": "Lobe Icons",
+  "v": 5
  },
  "Sookmyung Women's University": {
   "checked": "2026-11-05",
@@ -1043,4 +1043,4 @@
   "source": "Hugging Face",
   "v": 3
  }
-}
+}
