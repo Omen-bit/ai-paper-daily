@@ -1,14 +1,14 @@
 {
  "schema_version": 1,
  "total_days": 19,
- "total_papers": 1029,
+ "total_papers": 1042,
  "days": [
   {
    "date": "2026-11-07",
    "paper_count": 200,
    "featured": [
-    "2611.06425",
-    "2611.04408"
+    "2610.41432",
+    "2611.06741"
    ]
   },
   {
