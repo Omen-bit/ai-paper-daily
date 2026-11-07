@@ -1,0 +1,602 @@
+{
+ "posts": [
+  {
+   "url": "https://engineering.fb.com/2026/11/03/ml-applications/f3-lightning-how-meta-accelerates-ads-ml-features-to-production",
+   "company": "Meta",
+   "title": "F3 Lightning: How Meta Accelerates Ads ML Features to Production at Scale",
+   "published": "2026-11-03",
+   "added": "2026-11-07",
+   "problem": "ads",
+   "step": 1,
+   "summary": "Engineers built a DAG-based feature compiler that merges shared feature computations to serve thousands of ad features efficiently.",
+   "tags": [
+    "Feature store",
+    "Real-time",
+    "Cost"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.fb.com/2026/10/29/security/catching-bugs-before-they-land-jittestings-human-on-the-loop-approach-at-full-scale",
+   "company": "Meta",
+   "title": "Catching Bugs Before They Land: JiTTesting’s Human-on-the-Loop Approach at Full Scale",
+   "published": "2026-10-29",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 3,
+   "summary": "Used LLMs to auto‑generate and judge tests that catch bugs before code lands, improving reliability while maintaining engineer velocity.",
+   "tags": [
+    "LLMs",
+    "Guardrails",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design",
+   "company": "Meta",
+   "title": "Meta Andromeda: Powering the Next Generation of Ads Retrieval Through Model-System Co-Design",
+   "published": "2026-10-28",
+   "added": "2026-11-07",
+   "problem": "ads",
+   "step": 2,
+   "summary": "Engineers co‑designed model, system, and hardware to run a GPU‑optimized deep network that retrieves billions of personalized ads per second while keeping compute costs low.",
+   "tags": [
+    "GPUs",
+    "Real-time",
+    "Cost"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/the-sleep-framework-a-new-way-for-llms-to-retain-knowledge-in-continual-learning",
+   "company": "Google",
+   "title": "The sleep framework: A new way for LLMs to retain knowledge in continual learning",
+   "published": "2026-10-27",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 0,
+   "summary": "Introduced a sleep phase that lets deployed LLMs periodically update themselves with new facts, preventing forgetting and improving reasoning.",
+   "tags": [
+    "LLMs",
+    "Fine-tuning",
+    "Guardrails"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://netflixtechblog.com/making-failure-diagnosis-reliable-with-pensive-ai-6b0811a1c015",
+   "company": "Netflix",
+   "title": "Making Failure Diagnosis Reliable with Pensive AI",
+   "published": "2026-10-26",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 4,
+   "summary": "Implemented an AI layer to automatically extract and classify failure logs, improving coverage and reducing manual debugging effort.",
+   "tags": [
+    "LLMs",
+    "Guardrails",
+    "Real-time"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/bringing-foundational-models-to-the-front-lines-of-tb-screening",
+   "company": "Google",
+   "title": "Bringing foundational models to the front lines of TB screening",
+   "published": "2026-10-23",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 4,
+   "summary": "Developed and fine‑tuned foundation vision models to interpret chest X‑rays for TB screening, enabling point‑of‑care diagnosis in low‑resource settings.",
+   "tags": [
+    "Computer vision",
+    "Fine-tuning",
+    "Multimodal"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/empowering-frontline-maternal-care-with-ai-assisted-ultrasound",
+   "company": "Google",
+   "title": "Empowering frontline maternal care with AI-assisted ultrasound",
+   "published": "2026-10-21",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 4,
+   "summary": "Developed a mobile AI model that interprets blind‑sweep ultrasounds to give expert‑level gestational age estimates, enabling low‑resource frontline care.",
+   "tags": [
+    "Computer vision",
+    "Real-time",
+    "Cost"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.fb.com/2026/10/19/ml-applications/thin-orchestrator-ai-agent-architecture",
+   "company": "Meta",
+   "title": "The Thin Orchestrator: How We Made Our AI Agents More Reliable by Giving the Router Less to Do",
+   "published": "2026-10-19",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 2,
+   "summary": "Implemented a thin orchestrator that routes tasks to specialized AI agents, improving reliability by reducing each agent's domain scope.",
+   "tags": [
+    "Agents",
+    "Guardrails",
+    "Real-time"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.fb.com/2026/10/19/ml-applications/genrecs-tokenization-transforming-ads-recommendation-at-meta-with-stable-model-vocabulary",
+   "company": "Meta",
+   "title": "GenRecs Tokenization: Transforming Ads Recommendation at Meta with Stable Model Vocabulary",
+   "published": "2026-10-19",
+   "added": "2026-11-07",
+   "problem": "ads",
+   "step": 2,
+   "summary": "Implemented a semantic tokenization pipeline that encodes ads into embeddings, enabling LLM-based retrieval and ranking of new items without prior engagement data.",
+   "tags": [
+    "LLMs",
+    "Embeddings",
+    "Personalisation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.fb.com/2026/10/19/data-center-engineering/inside-prometheus-meta-gigawatt-scale-supercluster",
+   "company": "Meta",
+   "title": "Inside Prometheus: Meta’s Journey to a Gigawatt-Scale Supercluster",
+   "published": "2026-10-19",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 2,
+   "summary": "",
+   "tags": [],
+   "sorted_by": "rules"
+  },
+  {
+   "url": "https://research.google/blog/grounding-ai-agents-in-biological-reality-building-blocks-for-autonomous-wet-labs",
+   "company": "Google",
+   "title": "Grounding AI agents in biological reality: Building blocks for autonomous wet labs",
+   "published": "2026-10-16",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 2,
+   "summary": "Developed AI agents that control lab robots, generate and execute experiments, and learn from results to accelerate protein binder discovery.",
+   "tags": [
+    "Agents",
+    "LLMs",
+    "Guardrails"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/putting-earth-ai-to-work-geospatial-agents-for-our-planets-biggest-challenges",
+   "company": "Google",
+   "title": "Putting Earth AI to work: Geospatial agents for our planet's biggest challenges",
+   "published": "2026-10-14",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 2,
+   "summary": "Developed a geospatial reasoning agent that orchestrates foundation models and data sources to perform multi-step spatial analysis and predictions.",
+   "tags": [
+    "LLMs",
+    "Agents",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://netflixtechblog.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb",
+   "company": "Netflix",
+   "title": "Integrating Netflix’s Foundation Model into Personalization applications",
+   "published": "2026-10-14",
+   "added": "2026-11-07",
+   "problem": "recs",
+   "step": 1,
+   "summary": "Integrated a large transformer foundation model into Netflix personalization by generating daily user and item embeddings and fine‑tuning for low‑latency recommendations.",
+   "tags": [
+    "Transformers",
+    "Embeddings",
+    "Fine-tuning"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/earth-ais-planetary-geospatial-foundation-models-for-global-public-health",
+   "company": "Google",
+   "title": "Unlocking Earth AI’s planetary geospatial foundation models for global public health",
+   "published": "2026-10-06",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 2,
+   "summary": "Created location embeddings from satellite and mobility data to improve epidemiological models for disease monitoring and resource allocation.",
+   "tags": [
+    "Embeddings",
+    "Forecasting",
+    "Multimodal"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/how-diffusion-controller-unifies-and-simplifies-ai-image-generation",
+   "company": "Google",
+   "title": "How Diffusion Controller unifies and simplifies AI image generation",
+   "published": "2026-09-29",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 4,
+   "summary": "Engineers added a lightweight control network to diffusion models to better align generated images with prompts while preserving quality.",
+   "tags": [
+    "Multimodal",
+    "Computer vision",
+    "Fine-tuning"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/bypassing-inference-bottlenecks-accelerating-complex-ai-search-with-retrieve-for-train",
+   "company": "Google",
+   "title": "Bypassing inference bottlenecks: Accelerating complex AI search with Retrieve-for-Train",
+   "published": "2026-09-15",
+   "added": "2026-11-07",
+   "problem": "search",
+   "step": 2,
+   "summary": "Trained a lightweight diffusion retriever via offline RL to generate diverse, coherent result sets in a single pass, avoiding heavy inference.",
+   "tags": [
+    "Search ranking",
+    "Transformers",
+    "Real-time"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/transfer-learning-for-genomic-prediction-in-underrepresented-populations",
+   "company": "Google",
+   "title": "Transfer learning for genomic prediction in underrepresented populations",
+   "published": "2026-09-03",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 5,
+   "summary": "Evaluated transfer learning for polygenic risk scores, showing how model training and dataset size affect prediction accuracy in underrepresented populations.",
+   "tags": [
+    "Forecasting",
+    "Fine-tuning",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/mapping-global-methane-emissions-from-space-with-deep-learning",
+   "company": "Google",
+   "title": "Mapping global methane emissions from space with deep learning",
+   "published": "2026-09-01",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 1,
+   "summary": "Developed a deep‑learning pipeline that labels satellite hyperspectral images, detects methane plumes, and estimates their sources to enable global monitoring.",
+   "tags": [
+    "Computer vision",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting",
+   "company": "Google",
+   "title": "TimesFM-3: A zero-shot foundation model for multivariate forecasting",
+   "published": "2026-08-31",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 2,
+   "summary": "Developed a 330M-parameter decoder-only transformer that zero-shot forecasts multivariate time series by jointly modeling multiple related signals.",
+   "tags": [
+    "Forecasting",
+    "Transformers",
+    "Multimodal"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/planetary-prediction-engine-automating-global-models-via-earth-ai",
+   "company": "Google",
+   "title": "Planetary prediction engine: Automating global models via Earth AI",
+   "published": "2026-08-27",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 2,
+   "summary": "Automated system discovers geospatial data, engineers features, trains and evaluates models to predict health, food security, and environmental risks.",
+   "tags": [
+    "Forecasting",
+    "Feature store",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/glucofm-foundation-model-for-continuous-glucose-monitoring",
+   "company": "Google",
+   "title": "GlucoFM: Foundation model for continuous glucose monitoring",
+   "published": "2026-08-26",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 5,
+   "summary": "Developed a dual‑stream self‑supervised foundation model for glucose data, improving prediction of diabetes risk and related health outcomes.",
+   "tags": [
+    "Transformers",
+    "Fine-tuning",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/how-mobility-gives-language-models-a-deeper-understanding-of-place",
+   "company": "Google",
+   "title": "How mobility gives language models a deeper understanding of place",
+   "published": "2026-08-21",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 1,
+   "summary": "Created mobility‑enhanced place embeddings by blending text with aggregated movement data, improving predictions of opening hours, price levels, and busyness.",
+   "tags": [
+    "Embeddings",
+    "Multimodal",
+    "LLMs"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/an-ai-tool-for-prioritizing-candidate-biomarkers-from-wearable-sensor-data",
+   "company": "Google",
+   "title": "An AI tool for prioritizing candidate biomarkers from wearable sensor data",
+   "published": "2026-08-21",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 2,
+   "summary": "Built a multi‑agent system that generates hypotheses, runs statistical analyses, and validates wearable sensor biomarkers to improve predictive health models.",
+   "tags": [
+    "LLMs",
+    "Agents",
+    "Guardrails"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data",
+   "company": "Google",
+   "title": "Introducing TabFM: A zero-shot foundation model for tabular data",
+   "published": "2026-06-30",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 4,
+   "summary": "The team built TabFM, a zero-shot foundation model that predicts tabular classification and regression tasks without training per dataset, and deployed it via BigQuery.",
+   "tags": [
+    "Transformers",
+    "LLMs"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/accelerating-gemini-nano-models-on-pixel-with-frozen-multi-token-prediction",
+   "company": "Google",
+   "title": "Accelerating Gemini Nano models on Pixel with frozen Multi-Token Prediction",
+   "published": "2026-06-26",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 4,
+   "summary": "Implemented Multi-Token Prediction on frozen Gemini Nano models to speed up on-device text generation while reducing energy use.",
+   "tags": [
+    "LLMs",
+    "Real-time",
+    "Latency"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/from-pixels-to-planning-earth-ai-for-nature-restoration",
+   "company": "Google",
+   "title": "From pixels to planning: Earth AI for nature restoration",
+   "published": "2026-06-16",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 1,
+   "summary": "Developed a high‑resolution deep learning model to detect fine‑scale ecological features from satellite imagery and output actionable vector maps for restoration planning.",
+   "tags": [
+    "Computer vision"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag",
+   "company": "Google",
+   "title": "Unlocking dependable responses with Gemini Enterprise Agent Platform’s Agentic RAG",
+   "published": "2026-06-05",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 2,
+   "summary": "Built a multi‑agent RAG system that iteratively searches and reasons across data sources to provide more accurate enterprise answers.",
+   "tags": [
+    "Agents",
+    "RAG",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/its-all-about-the-angle-your-photos-re-composed",
+   "company": "Google",
+   "title": "It's all about the angle: Your photos, re-composed",
+   "published": "2026-04-22",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 1,
+   "summary": "Implemented a ML pipeline that infers 3D scene geometry from a photo and uses generative inpainting to create new viewpoints, now live in Google Photos.",
+   "tags": [
+    "Computer vision",
+    "Multimodal"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/reasoningbank-enabling-agents-to-learn-from-experience",
+   "company": "Google",
+   "title": "ReasoningBank: Enabling agents to learn from experience",
+   "published": "2026-04-21",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 2,
+   "summary": "Developed a memory framework that lets agents retrieve and distill past successes and failures to improve reasoning and task efficiency.",
+   "tags": [
+    "Agents",
+    "LLMs",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/ai-generated-synthetic-neurons-speed-up-brain-mapping",
+   "company": "Google",
+   "title": "AI-generated synthetic neurons speed up brain mapping",
+   "published": "2026-04-16",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 0,
+   "summary": "Created synthetic neuron shapes to augment training data, reducing reconstruction errors and speeding up brain mapping.",
+   "tags": [
+    "Computer vision",
+    "Fine-tuning",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/towards-developing-future-ready-skills-with-generative-ai",
+   "company": "Google",
+   "title": "Towards developing future-ready skills with generative AI",
+   "published": "2026-04-13",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 4,
+   "summary": "Created a generative AI sandbox that simulates conversations to assess future-ready skills for students, enabling scalable, automated evaluation.",
+   "tags": [
+    "LLMs",
+    "Evaluation",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/improving-the-academic-workflow-introducing-two-ai-agents-for-better-figures-and-peer-review",
+   "company": "Google",
+   "title": "Improving the academic workflow: Introducing two AI agents for better figures and peer review",
+   "published": "2026-04-08",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 2,
+   "summary": "Built two AI agents that generate academic figures and automatically review papers, reducing manual effort and improving review consistency.",
+   "tags": [
+    "Agents",
+    "LLMs",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/evaluating-alignment-of-behavioral-dispositions-in-llms",
+   "company": "Google",
+   "title": "Evaluating alignment of behavioral dispositions in LLMs",
+   "published": "2026-04-03",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 5,
+   "summary": "Created a framework to assess how closely LLMs' behavioral tendencies match human social norms using situational judgment tests.",
+   "tags": [
+    "LLMs",
+    "Evaluation",
+    "Guardrails"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/vibe-coding-xr-accelerating-ai-xr-prototyping-with-xr-blocks-and-gemini",
+   "company": "Google",
+   "title": "Vibe Coding XR: Accelerating AI + XR prototyping with XR Blocks and Gemini",
+   "published": "2026-03-25",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 0,
+   "summary": "The team built a workflow where Gemini LLM interprets natural language prompts to generate physics‑aware WebXR code, enabling rapid XR prototyping.",
+   "tags": [
+    "LLMs",
+    "Agents",
+    "Multimodal"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression",
+   "company": "Google",
+   "title": "TurboQuant: Redefining AI efficiency with extreme compression",
+   "published": "2026-03-24",
+   "added": "2026-11-07",
+   "problem": "search",
+   "step": 2,
+   "summary": "Developed quantization algorithms to compress high‑dimensional vectors, reducing memory use and speeding up similarity lookups in vector search systems.",
+   "tags": [
+    "Embeddings",
+    "Vector search",
+    "Cost"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/improving-breast-cancer-screening-workflows-with-machine-learning",
+   "company": "Google",
+   "title": "Improving breast cancer screening workflows with machine learning",
+   "published": "2026-03-17",
+   "added": "2026-11-07",
+   "problem": "vision",
+   "step": 5,
+   "summary": "Developed and evaluated an AI mammography system to improve cancer detection accuracy and reduce radiologist workload in NHS screening.",
+   "tags": [
+    "Computer vision",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting",
+   "company": "Google",
+   "title": "Protecting cities with AI-driven flash flood forecasting",
+   "published": "2026-03-12",
+   "added": "2026-11-07",
+   "problem": "predict",
+   "step": 2,
+   "summary": "Developed and deployed AI models that forecast urban flash floods up to 24 hours ahead to improve early warning systems.",
+   "tags": [
+    "Forecasting",
+    "Real-time",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://research.google/blog/exploring-the-feasibility-of-conversational-diagnostic-ai-in-a-real-world-clinical-study",
+   "company": "Google",
+   "title": "Exploring the feasibility of conversational diagnostic AI in a real-world clinical study",
+   "published": "2026-03-11",
+   "added": "2026-11-07",
+   "problem": "llm",
+   "step": 5,
+   "summary": "Deployed a conversational medical AI to collect patient histories in clinics and evaluated its safety and feasibility.",
+   "tags": [
+    "LLMs",
+    "Guardrails",
+    "Evaluation"
+   ],
+   "sorted_by": "groq"
+  }
+ ]
+}

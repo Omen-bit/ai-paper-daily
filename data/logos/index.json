@@ -579,7 +579,11 @@
   "source": "website https://www.harvard.edu",
   "v": 6
  },
- "Hebrew University of Jerusalem": {},
+ "Hebrew University of Jerusalem": {
+  "checked": "2026-11-07",
+  "qid": "Q174158",
+  "v": 6
+ },
  "Hefei University of Technology": {
   "checked": "2026-11-07",
   "file": "hefei-university-of-technology.png",
