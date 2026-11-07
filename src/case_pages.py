@@ -1,8 +1,11 @@
 """
 case_pages.py
-The Case studies page (case-studies/index.html): engineering write-ups from company blogs,
-newest first, with search and filters for topic, company and technique tag. Every card links
-out to the company's own blog.
+The Case studies pages: engineering write-ups from company blogs. Every card links out to the
+company's own blog.
+
+  case-studies/index.html     the newest write-ups, then a section per topic; search, company
+                              or a tag switches to one list of every match
+  case-studies/<topic>.html   every write-up on one topic, with the same search and filters
 
 site_builder.build_site calls build_all with the posts from data/cases.json.
 """
@@ -11,14 +14,13 @@ import json
 import math
 import os
 
-from case_sources import BY_NAME, PROBLEMS
+from case_sources import BY_NAME, TOPICS as TOPIC_INFO, topic_of
 
 DIR = "case-studies"
 ROOT = "../"
-# Topic order on the filter chips, and the short names they use
-TOPICS = ["recs", "search", "ads", "llm", "vision", "predict"]
-SHORT = {"recs": "Recommendations", "search": "Search", "ads": "Ads", "llm": "LLM apps", "vision": "Vision",
-         "predict": "Forecasting"}
+# Topic order on the filter chips: the LLM topics first, then the rest
+TOPICS = list(TOPIC_INFO)
+SHORT = {k: name for k, (name, _) in TOPIC_INFO.items()}
 PAGE_SIZE = 24
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
@@ -30,6 +32,11 @@ EXT = ('<svg class="cs-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor
        '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>')
 BOOKMARK = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
             'stroke-linejoin="round" aria-hidden="true"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>')
+EXT_ARROW = ('<svg class="cs-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+             'stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>')
+PAPER_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+              'stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'
+              '<path d="M14 3v5h5M9 13h6M9 17h4"/></svg>')
 SEARCH = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
           'aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/></svg>')
 GOOGLE_G = ('<path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 '
@@ -45,7 +52,7 @@ def esc(text) -> str:
 
 
 def problem_name(key: str) -> str:
-    return PROBLEMS[key][0]
+    return TOPIC_INFO[key][0]
 
 
 def host(url: str) -> str:
@@ -127,8 +134,8 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
     tag_html = ("<ul class=\"cs-tags\" aria-label=\"Techniques\">" +
                 "".join(f'<li><button type="button" data-cs-tag="{esc(t)}">{esc(t)}</button></li>' for t in tags) +
                 "</ul>") if tags else ""
-    rel = (f'<p class="cs-rel">Related paper: <a href="../paper/{esc(paper[0])}.html">{esc(paper[1])}</a></p>'
-           if paper else "")
+    rel = (f'<a class="cs-rel" href="../paper/{esc(paper[0])}.html">{PAPER_ICON}<div><span>Related paper on AI Papers Daily</span>'
+           f'<b>{esc(paper[1])}</b></div></a>' if paper else "")
     date = nice_date(post.get("published", ""))
     when = f'<time datetime="{esc(post.get("published", ""))}">{date}</time>' if date else ""
     return f"""<li class="cs-card" style="--c:var(--l-{problem});--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''))}">
@@ -178,59 +185,115 @@ def _clean(posts: list[dict]) -> list[dict]:
     good = []
     for p in posts:
         try:
-            if p["problem"] in PROBLEMS and p.get("url", "").startswith("https://") and p.get("title") and p.get("company"):
-                good.append(p)
-        except (KeyError, TypeError):
+            topic = topic_of(p)  # posts saved under the old problems move onto today's topics
+            if topic and p.get("url", "").startswith("https://") and p.get("title") and p.get("company"):
+                good.append({**p, "problem": topic})
+        except (KeyError, TypeError, AttributeError):
             continue
     return sorted(good, key=lambda p: (p.get("published") or "", p["url"]), reverse=True)
 
 
-def filters(posts: list[dict]) -> str:
-    """Topic chips and the company menu, showing only what has write-ups."""
-    per_topic = {k: sum(1 for p in posts if p["problem"] == k) for k in TOPICS}
-    chips = [f'<button type="button" data-cs-topic="" aria-pressed="true">All <span>{len(posts)}</span></button>']
-    chips += [f'<button type="button" data-cs-topic="{k}" aria-pressed="false" style="--c:var(--l-{k})">'
-              f'<i aria-hidden="true"></i>{esc(SHORT[k])} <span>{n}</span></button>'
+SLUGS = {"rag": "rag", "agents": "agents", "evals": "evaluation", "cost": "cost-and-speed", "tuning": "fine-tuning",
+         "safety": "guardrails", "llm": "llm-products", "recs": "recommendations", "ads": "ads",
+         "predict": "forecasting", "vision": "vision"}
+PER_SECTION = 3  # cards per topic on the main page
+
+
+def filters(all_posts: list[dict], posts: list[dict], current: str = "") -> str:
+    """Topic links (every topic with write-ups), search and the company menu for these posts."""
+    per_topic = {k: sum(1 for p in all_posts if p["problem"] == k) for k in TOPICS}
+    here = ' aria-current="page"'
+    chips = [f'<a href="index.html"{here if not current else ""}>All <span>{len(all_posts)}</span></a>']
+    chips += [f'<a href="{SLUGS[k]}.html" style="--c:var(--l-{k})"{here if k == current else ""}>'
+              f'<i aria-hidden="true"></i>{esc(SHORT[k])} <span>{n}</span></a>'
               for k, n in per_topic.items() if n]
     per_co: dict[str, int] = {}
     for p in posts:
         per_co[p["company"]] = per_co.get(p["company"], 0) + 1
     options = "".join(f'<option value="{esc(c)}">{esc(c)} ({n})</option>' for c, n in sorted(per_co.items(), key=lambda kv: kv[0].lower()))
-    return f"""<div class="cs-tools">
-<div class="cs-find"><label for="cs-q">Search write-ups</label><div class="cs-search">{SEARCH}<input id="cs-q" type="search" placeholder="RAG, feature store, Netflix" autocomplete="off" data-cs-q></div></div>
+    label = "Search write-ups" if not current else f"Search {SHORT[current]}"
+    return f"""<nav class="cs-chips" aria-label="Topics">{"".join(chips)}</nav>
+<div class="cs-tools">
+<div class="cs-find"><label for="cs-q">{esc(label)}</label><div class="cs-search">{SEARCH}<input id="cs-q" type="search" placeholder="RAG, caching, Netflix" autocomplete="off" data-cs-q></div></div>
 <label class="cs-sel" for="cs-co"><span>Company</span><select id="cs-co" data-cs-company><option value="">All companies</option>{options}</select></label>
-</div>
-<div class="cs-chips" role="group" aria-label="Topic">{"".join(chips)}</div>
-<div class="cs-status"><p data-cs-count aria-live="polite">{len(posts)} write-up{"" if len(posts) == 1 else "s"}</p>
-<p class="cs-active" data-cs-active hidden>Tag: <b data-cs-active-name></b> <button type="button" data-cs-clear-tag>Clear tag</button></p></div>"""
+</div>"""
+
+
+def status(n: int, hidden: bool = False) -> str:
+    return (f'<div class="cs-status" data-cs-status{" hidden" if hidden else ""}><p data-cs-count aria-live="polite">{n} write-up{"" if n == 1 else "s"}</p>'
+            '<p class="cs-active" data-cs-active hidden>Tag: <b data-cs-active-name></b> <button type="button" data-cs-clear-tag>Clear tag</button></p></div>')
+
+
+NONE = ('<div class="cs-none" data-cs-none hidden><p>No write-ups match these filters.</p>'
+        '<button class="cs-more" type="button" data-cs-reset>Clear all filters</button></div>')
 
 
 def build_all(posts: list[dict], papers: dict, page, write, site_dir: str) -> list[str]:
-    """Write the Case studies page. page is site_builder.page; returns its path for the sitemap."""
+    """Write the Case studies pages: the main page with a section per topic, and one page per topic.
+    page is site_builder.page; returns the paths for the sitemap."""
     posts = _clean(posts)
     companies = {p["company"] for p in posts}
     related = related_papers(posts, papers, k=1) if papers else {}
     desc = "How companies like Netflix, Meta and Spotify build AI into their products, from their own engineering blogs."
-    if posts:
-        lead = (f"Write-ups from {len(companies)} company engineering blogs about AI running in real products. "
-                "Each card opens the original post on the company’s own blog.")
-        cards = []
-        for i, p in enumerate(posts):
-            pid = (related.get(p["url"]) or [None])[0]
-            card = post_card(p, (pid, papers[pid]["title"]) if pid else None)
-            cards.append(card.replace("<li ", "<li hidden ", 1) if i >= PAGE_SIZE else card)
+    sprite_all = sprite(companies)
+
+    def card(p: dict, hidden: bool = False) -> str:
+        pid = (related.get(p["url"]) or [None])[0]
+        html_ = post_card(p, (pid, papers[pid]["title"]) if pid else None)
+        return html_.replace("<li ", "<li hidden ", 1) if hidden else html_
+
+    def feed(these: list[dict], cls: str = "") -> str:
+        """Every post in a filterable list: the first PAGE_SIZE shown, the rest behind Show more."""
         more = (f'<button class="cs-more" type="button" data-cs-more="{PAGE_SIZE}">Show more write-ups</button>'
-                if len(posts) > PAGE_SIZE else "")
-        inner = f"""{filters(posts)}
-<ul class="cs-grid" data-cs-list data-cs-paged="{PAGE_SIZE}">{"".join(cards)}</ul>
-<div class="cs-none" data-cs-none hidden><p>No write-ups match these filters.</p><button class="cs-more" type="button" data-cs-reset>Clear all filters</button></div>{more}"""
+                if len(these) > PAGE_SIZE else "")
+        items = "".join(card(p, i >= PAGE_SIZE) for i, p in enumerate(these))
+        return f'<ul class="cs-grid{cls}" data-cs-list data-cs-paged="{PAGE_SIZE}">{items}</ul>{NONE}{more}'
+
+    def wrap(inner: str, style: str = "") -> str:
+        return f'{sprite_all}<div class="cs-wrap"{style}>{inner}</div>'
+
+    # The main page: the newest write-ups, then a section for each topic
+    if posts:
+        lead = (f"Write-ups from {len(companies)} company engineering blogs about AI running in real products, "
+                "grouped by topic. Each card opens the original post on the company’s own blog.")
+        sections = [f'<section class="cs-sec"><div class="cs-sec-head"><h2>Newest</h2></div>'
+                    f'<ul class="cs-grid">{"".join(card(p) for p in posts[:2])}</ul></section>']
+        for k in TOPICS:
+            these = [p for p in posts if p["problem"] == k]
+            if not these:
+                continue
+            see = (f'<a class="cs-see" href="{SLUGS[k]}.html">See all {len(these)}{EXT_ARROW}</a>'
+                   if len(these) > PER_SECTION else f'<a class="cs-see" href="{SLUGS[k]}.html">Open topic{EXT_ARROW}</a>')
+            sections.append(
+                f'<section class="cs-sec" id="{SLUGS[k]}" style="--c:var(--l-{k})"><div class="cs-sec-head">'
+                f'<div><h2><i aria-hidden="true"></i><a href="{SLUGS[k]}.html">{esc(SHORT[k])}</a></h2>'
+                f'<p>{esc(TOPIC_INFO[k][1])}</p></div>{see}</div>'
+                f'<ul class="cs-grid cs-plain">{"".join(card(p) for p in these[:PER_SECTION])}</ul></section>')
+        inner = f"""{filters(posts, posts)}
+<div data-cs-sections>{"".join(sections)}</div>
+<div data-cs-results hidden>{status(len(posts))}{feed(posts, " cs-plain")}</div>"""
     else:
-        lead = ("Write-ups from company engineering blogs about AI running in real products. "
+        lead = ("Write-ups from company engineering blogs about AI running in real products, grouped by topic. "
                 "Each card will open the original post on the company’s own blog.")
         inner = ('<div class="cs-empty"><p><b>No write-ups yet.</b> The first ones arrive with the next blog check, '
                  'on Monday or Thursday morning.</p></div>')
-    body = f"""{sprite(companies)}<div class="cs-wrap"><section class="cs-top"><h1>How companies build AI</h1><p>{lead}</p></section>
-{inner}</div>"""
+    body = f'<section class="cs-top"><h1>How companies build AI</h1><p>{lead}</p></section>{inner}'
     write(os.path.join(site_dir, DIR, "index.html"),
-          page("Case studies", body, root=ROOT, active="cases", path=f"{DIR}/index.html", description=desc))
-    return [f"{DIR}/index.html"]
+          page("Case studies", wrap(body), root=ROOT, active="cases", path=f"{DIR}/index.html", description=desc))
+    paths = [f"{DIR}/index.html"]
+
+    # One page per topic with write-ups
+    for k in TOPICS:
+        these = [p for p in posts if p["problem"] == k]
+        if not these:
+            continue
+        name, about = TOPIC_INFO[k]
+        body = (f'<p class="cs-crumb"><a href="index.html">Case studies</a> / {esc(name)}</p>'
+                f'<section class="cs-top cs-topic-top"><h1>{esc(name)}</h1><p>{esc(about)}</p></section>'
+                f'{filters(posts, these, k)}{status(len(these))}{feed(these)}')
+        write(os.path.join(site_dir, DIR, f"{SLUGS[k]}.html"),
+              page(f"{name}: case studies", wrap(body, f' style="--c:var(--l-{k})"'), root=ROOT, active="cases",
+                   path=f"{DIR}/{SLUGS[k]}.html",
+                   description=f"How companies handle {name.lower()} in production, from their own engineering blogs."))
+        paths.append(f"{DIR}/{SLUGS[k]}.html")
+    return paths

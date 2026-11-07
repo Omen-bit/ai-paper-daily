@@ -1627,54 +1627,59 @@
     }
   }
 
-  // ---- Case studies: search, topic, company and tag filters, showing more, and Save ----
+  // ---- Case studies: search, company and tag filters, showing more, and Save ----
   (function () {
-    Array.prototype.forEach.call(document.querySelectorAll("[data-cs-save]"), function (btn) {
-      var id = btn.getAttribute("data-cs-save");
-      var paint = function () {
-        var on = saved.some(function (s) { return s.id === id; });
-        btn.setAttribute("aria-pressed", on ? "true" : "false");
-        btn.querySelector("span").textContent = on ? "Saved" : "Save";
-      };
+    var saveBtns = Array.prototype.slice.call(document.querySelectorAll("[data-cs-save]"));
+    function paintSaves() {
+      saveBtns.forEach(function (b) {
+        var on = saved.some(function (s) { return s.id === b.getAttribute("data-cs-save"); });
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+        b.querySelector("span").textContent = on ? "Saved" : "Save";
+      });
+    }
+    saveBtns.forEach(function (btn) {
       btn.addEventListener("click", function () {
+        var id = btn.getAttribute("data-cs-save");
         var on = saved.some(function (s) { return s.id === id; });
         saved = on ? saved.filter(function (s) { return s.id !== id; })
                    : [{ id: id, t: btn.getAttribute("data-title"), u: btn.getAttribute("data-url"),
                         c: btn.getAttribute("data-co"), at: Date.now() }].concat(saved);
         store("apd.saved", saved);
-        paint();
+        paintSaves();
         showSavedCount();
       });
-      paint();
     });
+    paintSaves();
 
     var list = document.querySelector("[data-cs-list]");
     var q = document.querySelector("[data-cs-q]");
     if (!list || !q) return;
     var company = document.querySelector("[data-cs-company]");
-    var chips = Array.prototype.slice.call(document.querySelectorAll("[data-cs-topic]"));
+    var sections = document.querySelector("[data-cs-sections]");
+    var results = document.querySelector("[data-cs-results]");
     var none = document.querySelector("[data-cs-none]");
     var count = document.querySelector("[data-cs-count]");
     var more = document.querySelector("[data-cs-more]");
     var active = document.querySelector("[data-cs-active]");
     var items = Array.prototype.slice.call(list.querySelectorAll("[data-cs-item]"));
     var page = parseInt(list.getAttribute("data-cs-paged") || "24", 10);
-    var shown = page, topic = "", tag = "";
+    var shown = page, tag = "";
 
     function apply() {
       var words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
       var co = company ? company.value : "";
+      var filtering = words.length > 0 || !!co || !!tag;
+      // On the main page the topic sections show until someone searches or filters
+      if (sections) { sections.hidden = filtering; results.hidden = !filtering; }
       var matches = 0;
       items.forEach(function (el) {
-        var ok = (!topic || el.getAttribute("data-p") === topic) &&
-          (!co || el.getAttribute("data-co") === co) &&
+        var ok = (!co || el.getAttribute("data-co") === co) &&
           (!tag || el.getAttribute("data-tags").indexOf("|" + tag + "|") >= 0) &&
           words.every(function (w) { return el.getAttribute("data-t").indexOf(w) >= 0; });
         if (ok) matches++;
         el.hidden = !ok || matches > shown;
       });
-      chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-cs-topic") === topic ? "true" : "false"); });
-      list.querySelectorAll("[data-cs-tag]").forEach(function (b) {
+      document.querySelectorAll("[data-cs-tag]").forEach(function (b) {
         b.setAttribute("aria-pressed", b.getAttribute("data-cs-tag") === tag ? "true" : "false");
       });
       if (active) {
@@ -1689,20 +1694,19 @@
 
     q.addEventListener("input", reset);
     if (company) company.addEventListener("change", reset);
-    chips.forEach(function (c) { c.addEventListener("click", function () { topic = c.getAttribute("data-cs-topic"); reset(); }); });
-    list.addEventListener("click", function (e) {
+    document.addEventListener("click", function (e) {
       var b = e.target.closest && e.target.closest("[data-cs-tag]");
       if (!b) return;
       var t = b.getAttribute("data-cs-tag");
       tag = tag === t ? "" : t;
       reset();
-      if (tag) list.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (tag) (results || list).scrollIntoView({ behavior: "smooth", block: "start" });
     });
     var clearTag = document.querySelector("[data-cs-clear-tag]");
     if (clearTag) clearTag.addEventListener("click", function () { tag = ""; reset(); });
     var resetAll = document.querySelector("[data-cs-reset]");
     if (resetAll) resetAll.addEventListener("click", function () {
-      q.value = ""; topic = ""; tag = "";
+      q.value = ""; tag = "";
       if (company) company.value = "";
       reset();
     });

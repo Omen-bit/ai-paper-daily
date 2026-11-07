@@ -4,13 +4,14 @@ Reads company engineering blogs and keeps the posts about AI running in real pro
 for the Case studies pages.
 
 For each new post, Groq decides whether it is about AI in production, which problem and
-step it explains (case_sources.PROBLEMS), picks 1-3 technique tags (case_sources.TAGS), and
-writes one line about it in our own words.
+topic it is about (case_sources.TOPICS), picks 1-3 technique tags (case_sources.TAGS), and
+writes one line about it in our own words. Posts that look LLM-related are asked about first.
 Without Groq, a keyword fallback sorts posts and the summary is left empty: the site never
 shows the blog's own text as ours.
 
 Writes data/cases.json. The daily workflow runs it before the site build; it reads the blogs on
-RUN_DAYS only (Monday and Thursday by default). To run it now:  python src/case_studies.py --now
+RUN_DAYS only (Monday and Thursday by default), and on any day while posts are still waiting
+for Groq from a run that ran out of calls. To run it now:  python src/case_studies.py --now
 A feed that is down is skipped; the posts already saved stay.
 """
 import html
@@ -26,12 +27,15 @@ ROOT_DIR = os.path.dirname(SRC_DIR)
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from case_sources import SOURCES, PROBLEMS, TAGS, TAG_NAMES
+from case_sources import FOCUS_WORDS, SOURCES, TAG_NAMES, TAGS, TOPIC_RULES, TOPICS, topic_of
 
 CASES_FILE = os.path.join(ROOT_DIR, "data", "cases.json")
 MAX_POSTS = 800          # oldest posts drop off past this
 MAX_AGE_DAYS = 400       # posts older than this are not added
 MAX_GROQ_CALLS = int(os.environ.get("CASES_MAX_GROQ", "60"))  # per run, to stay inside the free tier
+GROQ_PAUSE = 8           # seconds to wait after a failed call, so a rate limit can clear
+MAX_PER_BLOG = 6         # Groq calls per blog per run, so every blog gets a turn
+MAX_REJECTED = 4000      # posts Groq said are not about AI in production, remembered so they are not asked again
 # Company blogs post about once a week, so the blogs are read on these days only.
 # CASES_RUN_DAYS="mon" reads them weekly, "daily" every day. "--now" runs today regardless.
 RUN_DAYS = os.environ.get("CASES_RUN_DAYS", "").strip().lower() or "mon,thu"
@@ -43,36 +47,6 @@ _AI_WORDS = re.compile(
     r"models?|embeddings?|transformers?|recommend\w*|ranking|personali[sz]\w*|retrieval|rag|"
     r"agents?|agentic|inference|training|fine-?tun\w*|classif\w*|predict\w*|forecast\w*|"
     r"computer vision|vision|ocr|search relevance|semantic search|vector|gpu)\b", re.I)
-
-# Fallback sorting when Groq is not available: (problem, step, pattern), first match wins
-_RULES = [
-    ("llm", 3, r"guardrail|safety|hallucinat|jailbreak|red.?team"),
-    ("llm", 2, r"\bagents?\b|agentic|tool.?(use|call)|copilot|assistant"),
-    ("llm", 1, r"\brag\b|retrieval.augmented|knowledge base|grounding"),
-    ("llm", 0, r"prompt|context window|\bllms?\b|large language|genai|generative ai|chatbot|gpt"),
-    ("ads", 3, r"\bbid(ding)?\b|auction"),
-    ("ads", 2, r"\bads?\b.{0,20}retrieval|ad candidates"),
-    ("ads", 0, r"\bads?\b|advertis|targeting|lookalike"),
-    ("search", 0, r"query understanding|query rewriting|spell|autocomplete|typeahead"),
-    ("search", 1, r"\bindex(ing)?\b|vector (store|database)"),
-    ("search", 3, r"re-?rank"),
-    ("search", 2, r"\bsearch\b|semantic retrieval|relevance"),
-    ("vision", 3, r"video (editing|resiz|crop|enhanc)|reframe|upscal"),
-    ("vision", 2, r"tracking|tracker"),
-    ("vision", 1, r"detection|detector|\bocr\b|segmentation"),
-    ("vision", 0, r"label(l)?ing|annotat"),
-    ("vision", 1, r"computer vision|image|video|visual"),
-    ("predict", 3, r"fraud|risk|pricing|dispatch"),
-    ("predict", 2, r"forecast|demand|eta\b|arrival time|time series|churn"),
-    ("recs", 0, r"user (intent|interest|journey)|personali[sz]"),
-    ("recs", 2, r"candidate|two.tower|retrieval"),
-    ("recs", 3, r"recommend|ranking|feed\b|home ?feed"),
-]
-_SHARED_RULES = [
-    (1, r"feature (store|platform|pipeline)|features? (to|in) production"),
-    (5, r"\bevaluat|a/b test|experiment|offline metric|benchmark"),
-    (4, r"\bserving\b|inference|latency|\bgpus?\b|throughput|kernel|quantiz"),
-]
 
 _TAG = re.compile(r"<[^>]+>")
 
@@ -157,22 +131,17 @@ def looks_like_ai(post: dict) -> bool:
     return bool(_AI_WORDS.search(f"{post['title']} {post.get('text', '')}"))
 
 
-def rule_sort(post: dict) -> tuple[str, int] | None:
-    """(problem, step) from keywords, or None when nothing matches."""
-    text = f"{post['title']} {post.get('text', '')[:400]}".lower()
-    problem = step = None
-    for p, s, pattern in _RULES:
-        if re.search(pattern, text):
-            problem, step = p, s
-            break
-    if problem is None:
-        return None
-    for s, pattern in _SHARED_RULES:  # a post about serving or evaluation sits on that shared stop
-        if re.search(pattern, post["title"].lower()):
-            if s != 1 or problem in ("recs", "ads", "predict"):
-                step = s
-                break
-    return problem, step
+def rule_sort(post: dict) -> str | None:
+    """A topic from keywords, title first then the opening text, or None when nothing matches."""
+    for text in (post["title"].lower(), post.get("text", "")[:400].lower()):
+        for topic, pattern in TOPIC_RULES:
+            if re.search(pattern, text):
+                return topic
+    return None
+
+
+def is_focus(post: dict) -> bool:
+    return bool(re.search(FOCUS_WORDS, f"{post['title']} {post.get('text', '')[:600]}", re.I))
 
 
 MAX_TAGS = 3
@@ -188,24 +157,26 @@ def rule_tags(post: dict) -> list[str]:
 
 GROQ_PROMPT = """You sort engineering blog posts for a site about how companies use AI in real products.
 
-Problems and their steps (0-5):
-{problems}
+Topics:
+{topics}
 
 Reply with JSON only:
-{{"ai_in_production": true or false, "problem": "<key or none>", "step": <0-5>, "summary": "<one sentence>", "tags": ["<tag>", ...]}}
+{{"ai_in_production": true or false, "topic": "<key>", "summary": "<one sentence>", "tags": ["<tag>", ...]}}
 
 ai_in_production is true only when the post explains how the company builds, trains, serves or
 evaluates a machine learning or AI system it runs. Hiring posts, events, culture, security
 incidents and general infrastructure without a model are false.
+topic is the one key the post is mainly about. Prefer the specific LLM topics (rag, agents,
+evals, cost, tuning, safety) over llm when one fits: a post about making an LLM cheaper or
+faster is cost, a post about testing answer quality is evals.
 The summary is at most 25 words, in plain words, in your own words (never copy the post's
 sentences), says what the team did and why, and does not start with the company name.
 tags are 1 to 3 techniques the post is mainly about, chosen only from this list:
 {tags}"""
 
 
-def _problems_text() -> str:
-    return "\n".join(f'- {k}: {name}. Steps: ' + "; ".join(f"{i} {s}" for i, s in enumerate(steps))
-                     for k, (name, _, steps) in PROBLEMS.items())
+def _topics_text() -> str:
+    return "\n".join(f"- {k}: {name}. {about}" for k, (name, about) in TOPICS.items())
 
 
 def parse_reply(raw: str) -> dict | None:
@@ -219,12 +190,8 @@ def parse_reply(raw: str) -> dict | None:
         return None
     if not data.get("ai_in_production"):
         return {"keep": False}
-    problem = str(data.get("problem", "")).strip()
-    try:
-        step = int(data.get("step"))
-    except (TypeError, ValueError):
-        return None
-    if problem not in PROBLEMS or not 0 <= step <= 5:
+    topic = str(data.get("topic", "")).strip().lower()
+    if topic not in TOPICS:
         return None
     summary = " ".join(str(data.get("summary", "")).split())
     if len(summary.split()) > 40:
@@ -236,7 +203,7 @@ def parse_reply(raw: str) -> dict | None:
         name = by_lower.get(str(t).strip().lower())
         if name and name not in tags:
             tags.append(name)
-    return {"keep": True, "problem": problem, "step": step, "summary": summary, "tags": tags[:MAX_TAGS]}
+    return {"keep": True, "topic": topic, "summary": summary, "tags": tags[:MAX_TAGS]}
 
 
 def groq_sort(post: dict) -> dict | None:
@@ -254,7 +221,7 @@ def groq_sort(post: dict) -> dict | None:
         try:
             response = client.chat.completions.create(
                 model=model, temperature=0.2,
-                messages=[{"role": "system", "content": GROQ_PROMPT.format(problems=_problems_text(), tags=", ".join(TAG_NAMES))},
+                messages=[{"role": "system", "content": GROQ_PROMPT.format(topics=_topics_text(), tags=", ".join(TAG_NAMES))},
                           {"role": "user", "content": user}],
                 **gs.call_options(model, 200))
             result = parse_reply(response.choices[0].message.content)
@@ -267,33 +234,94 @@ def groq_sort(post: dict) -> dict | None:
     return None
 
 
-def load(path: str = CASES_FILE) -> list[dict]:
+def load_all(path: str = CASES_FILE) -> dict:
+    """The whole file: posts, the urls already rejected, and how many posts are waiting for Groq."""
     try:
         with open(path, encoding="utf-8") as f:
-            return json.load(f).get("posts", [])
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
     except (OSError, ValueError):
-        return []
+        return {}
 
 
-def save(posts: list[dict], path: str = CASES_FILE) -> None:
+def load(path: str = CASES_FILE) -> list[dict]:
+    return load_all(path).get("posts", [])
+
+
+def save(posts: list[dict], path: str = CASES_FILE, rejected=(), waiting: int = 0) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     posts = sorted(posts, key=lambda p: (p.get("published") or "", p["url"]), reverse=True)[:MAX_POSTS]
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({"posts": posts}, f, ensure_ascii=False, indent=1)
+        json.dump({"posts": posts, "waiting": waiting, "rejected": sorted(rejected)[-MAX_REJECTED:]},
+                  f, ensure_ascii=False, indent=1)
         f.write("\n")
 
 
-def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool = True,
-           max_calls: int = MAX_GROQ_CALLS, reader=None) -> tuple[list[dict], dict]:
-    """Add the new AI posts in fetched to existing. Returns (posts, counts).
-    reader(url) -> text opens a new post's page so Groq reads more than the feed's excerpt."""
-    known = {p["url"] for p in existing} | {u for p in existing for u in p.get("aliases", [])}
-    seen_skips = set()
-    cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=MAX_AGE_DAYS)).strftime("%Y-%m-%d")
-    posts = [p if "tags" in p else {**p, "tags": rule_tags(p)} for p in existing]  # older posts get tags too
-    counts = {"new": 0, "skipped": 0, "groq": 0, "rules": 0}
-    calls = 0
+def interleave(fetched: list[dict]) -> list[dict]:
+    """Newest post of every blog first, then the second newest of each, and so on,
+    so a busy blog cannot use up the run's Groq calls before the others get a turn.
+    LLM-looking posts go before the rest, since those are the site's focus."""
+    by_blog: dict[str, list[dict]] = {}
     for post in fetched:
+        by_blog.setdefault(post["company"], []).append(post)
+    queues = [sorted(v, key=lambda p: p.get("published") or "", reverse=True) for v in by_blog.values()]
+    out = []
+    for i in range(max((len(q) for q in queues), default=0)):
+        out += [q[i] for q in queues if i < len(q)]
+    return [p for p in out if is_focus(p)] + [p for p in out if not is_focus(p)]  # LLM posts first
+
+
+def migrate(post: dict) -> dict:
+    """A saved post in today's shape: today's topics, no step, and tags."""
+    post = dict(post)
+    topic = topic_of(post)
+    if topic:
+        post["problem"] = topic
+    if post.pop("step", None) is not None:
+        post["resort"] = True  # sorted under the old problems: Groq sorts it again when it has room
+    tags = [t for t in post.get("tags") or [] if t in TAG_NAMES]  # tags from older lists are redone
+    post["tags"] = tags or rule_tags(post)
+    return post
+
+
+def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool = True,
+           max_calls: int = MAX_GROQ_CALLS, reader=None, rejected: set | None = None,
+           per_blog: int = MAX_PER_BLOG) -> tuple[list[dict], dict]:
+    """Add the new AI posts in fetched to existing. Returns (posts, counts); counts["waiting"] is
+    how many posts were left for the next run because the Groq calls ran out.
+    reader(url) -> text opens a new post's page so Groq reads more than the feed's excerpt.
+    rejected is the set of urls Groq already turned down; new rejections are added to it."""
+    known = {p["url"] for p in existing} | {u for p in existing for u in p.get("aliases", [])}
+    seen_skips = rejected if rejected is not None else set()
+    blog_calls: dict[str, int] = {}
+    cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=MAX_AGE_DAYS)).strftime("%Y-%m-%d")
+    posts = [migrate(p) for p in existing]
+    counts = {"new": 0, "skipped": 0, "groq": 0, "rules": 0, "waiting": 0, "resorted": 0}
+    calls = 0
+
+    # Posts saved under the old problems are sorted again, with up to half of this run's calls
+    for i, old in sorted(enumerate(posts), key=lambda ip: ip[1].get("published") or "", reverse=True):
+        if not old.get("resort"):
+            continue
+        if not use_groq or calls >= max_calls // 2:
+            counts["waiting"] += 1 if use_groq else 0
+            continue
+        calls += 1
+        text = (reader(old["url"]) if reader else "") or old.get("summary", "")
+        result = groq_sort({**old, "text": text})
+        if result is None:
+            counts["waiting"] += 1
+            continue
+        if not result["keep"]:
+            posts[i] = None
+            seen_skips.add(old["url"])
+        else:
+            posts[i] = {**old, "problem": result["topic"], "summary": result["summary"] or old.get("summary", ""),
+                        "tags": result.get("tags") or old.get("tags", []), "sorted_by": "groq"}
+            posts[i].pop("resort", None)
+        counts["resorted"] += 1
+    posts = [p for p in posts if p]
+    for post in interleave(fetched):
         if post["url"] in known or post["url"] in seen_skips:
             continue
         if post["published"] and post["published"] < cutoff:
@@ -302,8 +330,12 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
             seen_skips.add(post["url"])
             continue
         result = None
-        if use_groq and calls < max_calls:
+        if use_groq and (calls >= max_calls or blog_calls.get(post["company"], 0) >= per_blog):
+            counts["waiting"] += 1
+            continue  # leave it for the next run, when Groq has room again
+        if use_groq:
             calls += 1
+            blog_calls[post["company"]] = blog_calls.get(post["company"], 0) + 1
             if reader:
                 page = reader(post["url"])
                 if len(page) > len(post.get("text", "")):
@@ -311,28 +343,29 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
             result = groq_sort(post)
             if result is None and calls == 1:
                 use_groq = False  # Groq is down or not set up: sort the rest by keywords
+            elif result is None:
+                counts["waiting"] += 1  # a passing failure such as a rate limit: try it on the next run
+                time.sleep(GROQ_PAUSE)
+                continue
         if result is not None:
             counts["groq"] += 1
             if not result["keep"]:
                 counts["skipped"] += 1
                 seen_skips.add(post["url"])
                 continue
-            problem, step, summary, how = result["problem"], result["step"], result["summary"], "groq"
+            problem, summary, how = result["topic"], result["summary"], "groq"
             tags = result.get("tags") or rule_tags(post)
         else:
-            if use_groq and calls >= max_calls:
-                continue  # leave it for tomorrow's run, when Groq has room again
-            sorted_ = rule_sort(post)
-            if not sorted_:
+            problem = rule_sort(post)
+            if not problem:
                 counts["skipped"] += 1
                 continue
-            problem, step = sorted_
             summary, how = "", "rules"
             tags = rule_tags(post)
             counts["rules"] += 1
         posts.append({"url": post["url"], "company": post["company"], "title": post["title"],
                       "published": post["published"] or today, "added": today, "problem": problem,
-                      "step": step, "summary": summary, "tags": tags, "sorted_by": how})
+                      "summary": summary, "tags": tags, "sorted_by": how})
         known.add(post["url"])
         counts["new"] += 1
     return posts, counts
@@ -348,8 +381,10 @@ def is_run_day(now: datetime, days: str = RUN_DAYS) -> bool:
 def run(path: str = CASES_FILE, force: bool = False) -> int:
     now = datetime.now(timezone(timedelta(hours=5, minutes=30)))
     today = now.strftime("%Y-%m-%d")
-    existing = load(path)
-    if existing and not force and not is_run_day(now):  # the very first run always reads the blogs
+    saved = load_all(path)
+    existing = saved.get("posts", [])
+    behind = saved.get("waiting", 1) > 0  # the last run ran out of Groq calls (or is from before this was counted)
+    if existing and not behind and not force and not is_run_day(now):
         print(f"  [cases] Blogs are read on {RUN_DAYS} only; nothing to do today. Use --now to run anyway.")
         return 0
     fetched, down = [], []
@@ -362,10 +397,13 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
             down.append(name)
             print(f"  [cases] {name}: feed failed ({str(exc)[:80]})")
     use_groq = bool(os.environ.get("GROQ_API_KEY", "").strip())
-    posts, counts = update(existing, fetched, today, use_groq=use_groq, reader=read_article if use_groq else None)
-    save(posts, path)
+    rejected = set(saved.get("rejected", []))
+    posts, counts = update(existing, fetched, today, use_groq=use_groq,
+                           reader=read_article if use_groq else None, rejected=rejected)
+    save(posts, path, rejected, counts["waiting"])
     print(f"  [cases] {counts['new']} new posts ({counts['groq']} sorted by Groq, {counts['rules']} by keywords), "
-          f"{counts['skipped']} not about AI in production, {len(down)} feeds down. {len(posts)} saved.")
+          f"{counts['resorted']} older posts sorted again, {counts['skipped']} not about AI in production, {counts['waiting']} waiting for the next run, "
+          f"{len(down)} feeds down. {len(posts)} saved.")
     return counts["new"]
 
 

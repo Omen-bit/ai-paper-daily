@@ -1,10 +1,10 @@
 """
 case_sources.py
-The company engineering blogs behind the Case studies pages, and the map they are sorted onto.
+The company engineering blogs behind the Case studies page, the topics posts are sorted into,
+and the technique tags shown on each card.
 
-Each problem is a line on the map and each step is a stop. Serving and Evaluation are shared
-by every line, and Feature pipelines by the lines that rank things, so a post about one of
-those steps shows on every line that shares it.
+The site's focus is LLMs in production (RAG, agents, evaluation, cost), so those topics come
+first; recommendations, ads, forecasting and vision keep their own topics.
 """
 
 # (name, RSS or Atom feed, blog home, Simple Icons slug or "", brand colour without #)
@@ -41,97 +41,136 @@ SOURCES = [
     ("Expedia", "https://medium.com/feed/expedia-group-tech", "https://medium.com/expedia-group-tech", "expedia", "191E3B"),
     ("PayPal", "https://medium.com/feed/paypal-tech", "https://medium.com/paypal-tech", "paypal", "003087"),
     ("Booking.com", "https://booking.ai/feed", "https://booking.ai/", "", "003580"),
+    # Banking and payments
+    ("Capital One", "https://medium.com/feed/capital-one-tech", "https://medium.com/capital-one-tech", "", "004879"),
+    ("Intuit", "https://medium.com/feed/intuit-engineering", "https://medium.com/intuit-engineering", "intuit", "236CFF"),
+    ("Wise", "https://medium.com/feed/wise-engineering", "https://medium.com/wise-engineering", "wise", "9FE870"),
+    ("Nubank", "https://building.nubank.com.br/feed/", "https://building.nubank.com.br/", "nubank", "820AD1"),
+    ("Klarna", "https://engineering.klarna.com/feed", "https://engineering.klarna.com/", "klarna", "FFB3C7"),
+    ("Razorpay", "https://engineering.razorpay.com/feed", "https://engineering.razorpay.com/", "razorpay", "0C2451"),
+    ("PhonePe", "https://tech.phonepe.com/feed/", "https://tech.phonepe.com/", "phonepe", "5F259F"),
+    # Shopping
+    ("Flipkart", "https://blog.flipkart.tech/feed", "https://blog.flipkart.tech/", "flipkart", "2874F0"),
+    ("Myntra", "https://medium.com/feed/myntra-engineering", "https://medium.com/myntra-engineering", "", "FF3F6C"),
+    ("Meesho", "https://medium.com/feed/meesho-tech", "https://medium.com/meesho-tech", "", "F43397"),
+    ("Mercado Libre", "https://medium.com/feed/mercadolibre-tech", "https://medium.com/mercadolibre-tech", "", "2D3277"),
+    ("Coupang", "https://medium.com/feed/coupang-engineering", "https://medium.com/coupang-engineering", "", "D52A1D"),
+    ("Faire", "https://craft.faire.com/feed", "https://craft.faire.com/", "", "333333"),
+    ("OLX", "https://tech.olx.com/feed", "https://tech.olx.com/", "", "002F34"),
+    # Food delivery
+    ("Swiggy", "https://bytes.swiggy.com/feed", "https://bytes.swiggy.com/", "swiggy", "FC8019"),
+    ("Glovo", "https://medium.com/feed/glovo-engineering", "https://medium.com/glovo-engineering", "glovo", "F2CC38"),
+    ("Delivery Hero", "https://tech.deliveryhero.com/feed/", "https://tech.deliveryhero.com/", "", "D61F26"),
+    # Travel
+    ("Tripadvisor", "https://medium.com/feed/tripadvisor", "https://medium.com/tripadvisor", "tripadvisor", "34E0A1"),
+    ("Agoda", "https://medium.com/feed/agoda-engineering", "https://medium.com/agoda-engineering", "", "2067DA"),
+    # Media, fitness and dating
+    ("The New York Times", "https://open.nytimes.com/feed", "https://open.nytimes.com/", "newyorktimes", "000000"),
+    ("JioHotstar", "https://blog.hotstar.com/feed", "https://blog.hotstar.com/", "", "1F80E0"),
+    ("Strava", "https://medium.com/feed/strava-engineering", "https://medium.com/strava-engineering", "strava", "FC4C02"),
+    ("Tinder", "https://medium.com/feed/tinder", "https://medium.com/tinder", "tinder", "FF6B6B"),
+    # Software
+    ("Microsoft", "https://www.microsoft.com/en-us/research/feed/", "https://www.microsoft.com/en-us/research/blog/", "", "0078D4"),
+    ("Databricks", "https://www.databricks.com/feed", "https://www.databricks.com/blog", "databricks", "FF3621"),
+    ("Adobe", "https://medium.com/feed/adobetech", "https://medium.com/adobetech", "adobe", "FF0000"),
+    # Teams that write mostly about LLMs in production
+    ("Hugging Face", "https://huggingface.co/blog/feed.xml", "https://huggingface.co/blog", "huggingface", "FFD21E"),
+    ("LangChain", "https://blog.langchain.dev/rss/", "https://blog.langchain.dev/", "langchain", "1C3C3C"),
+    ("Intercom", "https://www.intercom.com/blog/feed/", "https://www.intercom.com/blog/", "intercom", "1F8DED"),
+    ("Replit", "https://blog.replit.com/feed.xml", "https://blog.replit.com/", "replit", "F26207"),
+    ("Vercel", "https://vercel.com/atom", "https://vercel.com/blog", "vercel", "000000"),
+    ("Weaviate", "https://weaviate.io/blog/rss.xml", "https://weaviate.io/blog", "", "00B061"),
+    ("Honeycomb", "https://www.honeycomb.io/feed", "https://www.honeycomb.io/blog", "", "F5A623"),
 ]
 
 BY_NAME = {s[0]: s for s in SOURCES}
 
-# key -> (name, short description, its six steps). Steps 4 and 5 are shared by every line.
-PROBLEMS = {
-    "recs": ("Recommendations", "Pick what each person sees next: feeds, home screens, playlists.",
-             ["Understanding the user", "Feature pipelines", "Candidate retrieval", "Ranking", "Serving", "Evaluation"]),
-    "search": ("Search", "Turn what someone types into the right results.",
-               ["Query understanding", "Indexing", "Retrieval", "Re-ranking", "Serving", "Evaluation"]),
-    "ads": ("Ads and ranking", "Choose which ads to show, and what to bid.",
-            ["Targeting", "Feature pipelines", "Ad retrieval", "Bidding and ranking", "Serving", "Evaluation"]),
-    "llm": ("LLM apps and agents", "Products built on LLMs, from chat to agents that act.",
-            ["Prompts and context", "Retrieval for LLMs", "Agents and tools", "Guardrails", "Serving", "Evaluation"]),
-    "vision": ("Vision and video", "Understand and edit images and video.",
-               ["Labelling data", "Detection", "Tracking", "Video editing", "Serving", "Evaluation"]),
-    "predict": ("Forecasting and risk", "Predict demand, prices, arrival times and fraud.",
-                ["Defining the target", "Feature pipelines", "Model training", "Decisions", "Serving", "Evaluation"]),
+# key -> (name, what it covers). The order is the order of the topic chips.
+TOPICS = {
+    "rag": ("RAG and search", "Retrieval, vector search, chunking and re-ranking, for search boxes and for LLM answers."),
+    "agents": ("Agents", "LLMs that use tools and work through multi-step tasks."),
+    "evals": ("Evaluation", "Offline evals, LLM judges, A/B tests: knowing a change is better before it ships."),
+    "cost": ("Cost and speed", "Caching, smaller or distilled models, batching and GPU serving to cut cost and latency."),
+    "tuning": ("Fine-tuning", "LoRA, distillation and training models on a company's own data."),
+    "safety": ("Guardrails", "Stopping hallucinations, unsafe answers and prompt injection; moderation."),
+    "llm": ("LLM products", "Prompting, assistants and copilots: shipping a product built on an LLM."),
+    "recs": ("Recommendations", "Feeds, home screens and playlists: picking what each person sees next."),
+    "ads": ("Ads", "Targeting, bidding and ranking ads."),
+    "predict": ("Forecasting", "Predicting demand, prices, arrival times and fraud."),
+    "vision": ("Vision", "Understanding and editing images and video."),
 }
+FOCUS = ["rag", "agents", "evals", "cost", "tuning", "safety", "llm"]
 
-# What each step is about, in one line, for the step sections on a problem page
-STEP_QUESTIONS = {
-    "Understanding the user": "What does this person want right now?",
-    "Feature pipelines": "Getting signals to the models, and shipping new ones quickly.",
-    "Candidate retrieval": "From millions of items, find the few hundred worth scoring.",
-    "Ranking": "Put the candidates in the best order for this person.",
-    "Serving": "Run the models fast and cheaply for every request.",
-    "Evaluation": "Know a new model is better before it launches.",
-    "Query understanding": "Work out what someone means from a few typed words.",
-    "Indexing": "Store items so the right ones can be found fast.",
-    "Retrieval": "Find the items that match the query.",
-    "Re-ranking": "Order the matches by what is most useful.",
-    "Targeting": "Decide who an ad is for.",
-    "Ad retrieval": "Find the ads worth considering for this moment.",
-    "Bidding and ranking": "Decide what to bid and which ad wins.",
-    "Prompts and context": "Give the model the right instructions and facts.",
-    "Retrieval for LLMs": "Fetch the documents an answer should be based on.",
-    "Agents and tools": "Let the model take steps and call other systems.",
-    "Guardrails": "Keep answers safe, correct and on topic.",
-    "Labelling data": "Get images and video labelled well enough to train on.",
-    "Detection": "Find the objects, faces or text in a frame.",
-    "Tracking": "Follow things from one frame to the next.",
-    "Video editing": "Change footage automatically: crop, cut or enhance.",
-    "Defining the target": "Decide exactly what to predict, and from what.",
-    "Model training": "Train models that hold up when the world changes.",
-    "Decisions": "Turn a prediction into an action: a price, an alert, a block.",
-}
+# Topic from keywords when Groq is not available: (topic, pattern), first match wins.
+# Titles are checked first, then the opening text.
+TOPIC_RULES = [
+    ("safety", r"guardrail|hallucinat|jailbreak|prompt injection|red.?team|moderation|\bsafety\b"),
+    ("evals", r"\bevals?\b|evaluat|llm.as.a.judge|\bjudges?\b|benchmark|a/b test|offline metric"),
+    ("cost", r"\bcosts?\b|cheaper|latency|\bcach(e|ing)\b|distill|quantiz|quantis|small(er)? models?|batching|inference|\bserving\b|\bgpus?\b|throughput"),
+    ("tuning", r"fine.?tun|\blora\b|rlhf|post.?training|synthetic data"),
+    ("agents", r"\bagents?\b|agentic|tool.?(use|call)|multi.?step"),
+    ("rag", r"\brag\b|retrieval|vector|embedding|semantic search|\bsearch\b|re-?rank|chunk|\bindex"),
+    ("llm", r"\bllms?\b|large language|genai|generative ai|\bgpt|chatbot|assistant|copilot|prompt"),
+    ("ads", r"\bads?\b|advertis|bidding|auction"),
+    ("predict", r"forecast|demand|\beta\b|arrival time|fraud|risk|pricing|time series|churn"),
+    ("vision", r"computer vision|image|video|visual|\bocr\b|detection"),
+    ("recs", r"recommend|ranking|personali[sz]|feed\b|two.tower|candidate"),
+]
 
-# Steps several lines share: step index -> the lines that share it
-SHARED_STEPS = {1: ["recs", "ads", "predict"], 4: list(PROBLEMS), 5: list(PROBLEMS)}
-
-
-def shared_with(problem: str, step: int) -> list[str]:
-    """The other lines that share this stop, or [] when the stop is the line's own."""
-    lines = SHARED_STEPS.get(step, [])
-    return [p for p in lines if p != problem] if problem in lines else []
-
-
-def lines_at(problem: str, step: int) -> list[str]:
-    """Every line a post about this stop shows on: its own, plus the lines sharing the stop."""
-    return [problem] + shared_with(problem, step)
+# Posts that look like these are sent to Groq first each run, so its daily calls go on the focus topics
+FOCUS_WORDS = r"\bllms?\b|large language|genai|generative|\bgpt|\brag\b|retrieval|agent|\bevals?\b|evaluat|prompt|fine.?tun|\blora\b|distill|inference|embedding|vector|copilot|assistant|chatbot|hallucinat|guardrail"
 
 # Technique tags shown on each card and used as filters: (tag, pattern over title and text).
-# Groq picks from these names; without Groq the patterns pick them.
+# Groq picks from these names; without Groq the patterns pick them. More specific tags come first.
 TAGS = [
-    ("LLMs", r"\bllms?\b|large language model|\bgpt\b|generative ai|genai"),
+    ("Semantic caching", r"semantic cach"),
+    ("Prompt caching", r"prompt cach|kv.?cache|context cach"),
+    ("Distillation", r"distill"),
+    ("Small models", r"small(er)? (language )?models?|\bslms?\b"),
+    ("Quantisation", r"quantiz|quantis|\bint[48]\b|\bfp8\b"),
+    ("LLM-as-judge", r"llm.as.a.judge|\bjudge (model|llm)|\bllm judges?"),
+    ("Hybrid search", r"hybrid search|bm25"),
+    ("Reranking", r"re-?rank"),
+    ("Chunking", r"chunk"),
+    ("Tool calling", r"tool.?(use|call)|function call"),
+    ("Multi-agent", r"multi.?agent"),
     ("RAG", r"\brag\b|retrieval.augmented"),
-    ("Agents", r"\bagents?\b|agentic|tool.?(use|call)"),
+    ("Agents", r"\bagents?\b|agentic"),
+    ("Evals", r"\bevals?\b|evaluat|benchmark|offline metric"),
+    ("A/B testing", r"a/b test|experiment"),
+    ("Fine-tuning", r"fine.?tun|\blora\b"),
+    ("Guardrails", r"guardrail|hallucinat|moderation|prompt injection"),
     ("Embeddings", r"embedding"),
     ("Vector search", r"vector (search|store|database|index)|nearest neighbou?r|\bann\b|semantic search"),
+    ("Prompting", r"prompt"),
+    ("Latency", r"latency|\bfaster\b|speed ?up"),
+    ("Cost", r"\bcosts?\b|cheaper|cost.efficien"),
+    ("GPUs", r"\bgpus?\b|cuda|accelerator"),
+    ("LLMs", r"\bllms?\b|large language model|\bgpt|generative ai|genai"),
     ("Two-tower", r"two.tower"),
     ("Transformers", r"transformer"),
     ("Graph neural nets", r"graph neural|\bgnns?\b"),
-    ("Fine-tuning", r"fine.?tun|\blora\b|distill"),
     ("Feature store", r"feature (store|platform|pipeline)"),
     ("Real-time", r"real.?time|streaming|online learning"),
-    ("GPUs", r"\bgpus?\b|cuda|accelerator"),
-    ("Latency", r"latency|\bfaster\b|speed ?up"),
-    ("Cost", r"\bcost|cheaper|efficien"),
-    ("A/B testing", r"a/b test|experiment"),
-    ("Evaluation", r"\bevaluat|benchmark|offline metric"),
-    ("Guardrails", r"guardrail|safety|hallucinat|moderation"),
     ("Personalisation", r"personali[sz]"),
     ("Multimodal", r"multimodal|multi-modal|vision.language"),
-    ("Computer vision", r"computer vision|image|object detection|\bocr\b"),
-    ("Video", r"\bvideo"),
-    ("Speech", r"speech|voice|audio|asr\b"),
-    ("Forecasting", r"forecast|time series|demand"),
-    ("Fraud", r"fraud|abuse|spam|risk"),
-    ("Pricing", r"pricing|price"),
-    ("Search ranking", r"search ranking|learning.to.rank|relevance"),
-    ("Code", r"\bcode\b|coding|developer|code review"),
+    ("Speech", r"speech|voice|audio|\basr\b"),
+    ("Code", r"\bcode\b|coding|code review"),
 ]
 TAG_NAMES = [t for t, _ in TAGS]
+
+# Posts saved before the topics changed (problem + step) -> today's topic
+_OLD_LLM_STEPS = {0: "llm", 1: "rag", 2: "agents", 3: "safety", 4: "cost", 5: "evals"}
+
+
+def topic_of(post: dict) -> str | None:
+    """A saved post's topic, moving posts saved under the old problems onto today's topics."""
+    key = post.get("problem")
+    if key == "llm" and "step" in post:
+        try:
+            return _OLD_LLM_STEPS.get(int(post["step"]), "llm")
+        except (TypeError, ValueError):
+            return "llm"
+    if key == "search":
+        return "rag"
+    return key if key in TOPICS else None

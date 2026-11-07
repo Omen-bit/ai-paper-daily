@@ -78,6 +78,10 @@ ICONS = {
     "share": '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>',
     "quote": '<path d="M17 6H3"/><path d="M21 12H8"/><path d="M21 18H8"/><path d="M3 12v6"/>',
     "next": '<path d="m9 18 6-6-6-6"/>',
+    "calendar": '<path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+    "compass": '<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"/>',
+    "briefcase": '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>',
+    "trend": '<path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/>',
 }
 
 # The logo: four pixels, two orange and two ink, like a cursor blinking on a page.
@@ -263,15 +267,15 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
         seo += (f'\n<script id="umami-script" defer src="https://cloud.umami.is/script.js"'
                 f' data-website-id="{UMAMI_WEBSITE_ID}" data-auto-track="false"></script>')
 
-    def nav(href, label, key, extra=""):
+    def nav(href, label, key, ic, extra=""):
         current = ' aria-current="page"' if key == active else ""
-        return f'<a href="{root}{href}"{current}>{label}{extra}</a>'
+        return f'<a href="{root}{href}"{current}>{icon(ic, 18, "nav-ic")}<span class="nav-label">{label}</span>{extra}</a>'
 
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
 <meta name="apd-track" content="{TRACK_URL}">
@@ -292,12 +296,12 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
   <div class="wrap bar-in">
     <a class="brand" href="{root}index.html" aria-label="{SITE_NAME}, home"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">AI PAPERS<em>/DAILY</em></span></a>
     <nav class="nav" aria-label="Main">
-      {nav("index.html", "Today", "today")}
-      {nav("papers.html", '<span class="nav-long">All papers</span><span class="nav-short">Papers</span>', "papers")}
-      {nav("scout.html", "Scout", "scout")}
-      {nav("case-studies/index.html", '<span class="nav-long">Case studies</span><span class="nav-short">Cases</span>', "cases")}
-      {nav("trends.html", "Trends", "trends") if SHOW_TRENDS or active == "trends" else ""}
-      {nav("saved.html", "Saved", "saved", '<span class="nav-count" data-saved-count hidden></span>')}
+      {nav("index.html", "Today", "today", "calendar")}
+      {nav("papers.html", '<span class="nav-long">All papers</span><span class="nav-short">Papers</span>', "papers", "file")}
+      {nav("scout.html", "Scout", "scout", "compass")}
+      {nav("case-studies/index.html", '<span class="nav-long">Case studies</span><span class="nav-short">Cases</span>', "cases", "briefcase")}
+      {nav("trends.html", "Trends", "trends", "trend") if SHOW_TRENDS or active == "trends" else ""}
+      {nav("saved.html", "Saved", "saved", "bookmark", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
     <div class="header-actions">
       {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump><span class="nav-long">Get it by email</span><span class="nav-short">Subscribe</span></a>' if BUTTONDOWN_USER else ""}
