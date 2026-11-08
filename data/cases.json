@@ -1,34 +1,22 @@
 {
  "posts": [
   {
-   "url": "https://vercel.com/changelog/deepseek-v4-1-flash-1017-ultrafast-now-available-on-ai-gateway",
-   "company": "Vercel",
-   "title": "DeepSeek V4.1 Flash 1017 Ultrafast now available on AI Gateway",
-   "published": "2026-11-07",
-   "added": "2026-11-07",
-   "problem": "cost",
-   "summary": "Provided an ultrafast DeepSeek model via AI Gateway to reduce latency and inference cost for interactive coding and agent workflows.",
-   "tags": [
-    "Latency",
-    "Cost",
-    "GPUs"
-   ],
-   "sorted_by": "groq"
-  },
-  {
    "url": "https://vercel.com/changelog/json-render-and-chat-sdk-agents",
    "company": "Vercel",
    "title": "Chat SDK agents can now stream generative UI with json-render",
    "published": "2026-11-06",
    "added": "2026-11-08",
    "problem": "agents",
-   "summary": "Implemented a Chat SDK agent that streams JSON‑defined UI components as cards, enabling dynamic, multi‑step UI generation within chat platforms.",
+   "summary": "Created a JSON‑based UI spec that agents output, which json‑render turns into native cards for Slack, Teams, etc., streaming updates as the spec builds.",
    "tags": [
-    "Tool calling",
     "Agents",
+    "Tool calling",
     "Prompting"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers had to create separate UI code for each chat platform, slowing down agent responses.",
+   "v": 3
   },
   {
    "url": "https://vercel.com/changelog/ai-gateway-adds-deepseek-search-and-fetch-tools",
@@ -37,12 +25,16 @@
    "published": "2026-11-06",
    "added": "2026-11-08",
    "problem": "agents",
-   "summary": "Added DeepSeek Search and Fetch tools to AI Gateway, enabling LLMs to retrieve relevant pages and content via tool calling.",
+   "summary": "Added DeepSeek Search and Fetch tools to AI Gateway, letting any model that supports tool calling retrieve page titles, URLs, summaries, and markdown content via a single API key.",
    "tags": [
     "Tool calling",
+    "Routing",
     "Agents"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers needed a simple way to let LLMs fetch web pages and search results during tool‑calling tasks.",
+   "v": 3
   },
   {
    "url": "https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83",
@@ -50,14 +42,16 @@
    "title": "Safe and Efficient Multi-Epoch Embedding Training",
    "published": "2026-11-06",
    "added": "2026-11-07",
-   "problem": "recs",
-   "summary": "Implemented multi-epoch fine-tuning of large ID embedding tables for homefeed ranking, improving representation quality and model performance on fresh data.",
+   "problem": "tuning",
+   "summary": "Created a multi‑epoch training pipeline that pre‑trains ID embeddings with a contrastive objective and then fine‑tunes them safely, avoiding memorization.",
    "tags": [
-    "Embeddings",
     "Fine-tuning",
-    "Personalisation"
+    "Embeddings"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Fine‑tuning embeddings for only one epoch limited model quality on fresh data.",
+   "v": 3
   },
   {
    "url": "https://developer.nvidia.com/blog/speed-up-image-generation-with-flux-3-image-klein-on-nvidia-blackwell-gpus",
@@ -66,13 +60,16 @@
    "published": "2026-11-06",
    "added": "2026-11-07",
    "problem": "cost",
-   "summary": "Optimized FLUX 3 Image Klein inference on Blackwell GPUs using FP8/NVFP4 quantization, caching and attention tricks to cut latency by up to 4.5×.",
+   "summary": "They optimized the FLUX 3 Image Klein model with TensorRT, fused kernels, multi‑GPU parallelism, FP8/NVFP4 quantisation and caching, cutting latency dramatically.",
    "tags": [
     "Quantisation",
     "Latency",
     "GPUs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "Up to 4.45× faster generation",
+   "issue": "Image generation was too slow for design tools and workflows.",
+   "v": 3
   },
   {
    "url": "https://developer.nvidia.com/blog/accelerating-reinforcement-learning-weight-refit-with-the-reshard-collective",
@@ -81,13 +78,15 @@
    "published": "2026-11-06",
    "added": "2026-11-07",
    "problem": "cost",
-   "summary": "Implemented a Reshard collective to reduce communication overhead when synchronizing large RL model weights between training and inference GPUs, improving latency and cost.",
+   "summary": "They created a new Reshard collective that moves only needed weight shards directly between training and inference GPUs, cutting redundant data transfer.",
    "tags": [
-    "GPUs",
     "Latency",
-    "Cost"
+    "GPUs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Updating model weights on inference GPUs was slow and used too much network bandwidth.",
+   "v": 3
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/formally-verifying-agent-written-full-stack-web-apps-with-pdd-kit",
@@ -96,12 +95,15 @@
    "published": "2026-11-05",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Implemented a toolkit that lets coding agents generate formal proofs from specs, ensuring generated code matches intended behavior.",
+   "summary": "Created PDD Kit, a toolkit that lets agents generate formal proofs from natural‑language specs, ensuring the code matches the contract for all inputs.",
    "tags": [
     "Agents",
-    "Tool calling"
+    "Guardrails"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Agent‑written code often drifts from the original specification, and tests miss many bugs.",
+   "v": 3
   },
   {
    "url": "https://stripe.com/blog/analyze-your-stripe-data-directly-with-your-agent",
@@ -110,12 +112,16 @@
    "published": "2026-11-05",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Enabled LLM agents like Claude to query Stripe's data via APIs, letting users generate analytics and reports through natural language prompts.",
+   "summary": "Stripe added APIs that let agents like Claude retrieve and query over 300 structured tables, generate SQL, and return results for natural‑language prompts.",
    "tags": [
+    "Agents",
     "Tool calling",
-    "Agents"
+    "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Customers wanted to ask AI agents to analyze their Stripe data without writing code.",
+   "v": 3
   },
   {
    "url": "https://shopify.engineering/reflex",
@@ -124,13 +130,14 @@
    "published": "2026-11-05",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Implemented Reflex, an MVVM architecture letting AI agents write and test mobile screens headlessly, speeding feedback and syncing iOS/Android implementations.",
+   "summary": "Created Reflex, an MVVM architecture that runs app logic headlessly and exposes state via a CLI, letting agents test iOS and Android with a single test suite.",
    "tags": [
-    "Agents",
-    "Tool calling",
-    "Multi-agent"
+    "Agents"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Testing mobile screens required slow emulator builds, delaying agent-written code verification.",
+   "v": 3
   },
   {
    "url": "https://machinelearning.apple.com/research/faster-retrieval",
@@ -139,13 +146,16 @@
    "published": "2026-11-05",
    "added": "2026-11-07",
    "problem": "rag",
-   "summary": "Apple trains small neural networks offline to route queries more efficiently, speeding up vector search for retrieval‑augmented generation.",
+   "summary": "Apple trained tiny neural networks offline to learn how typical queries map to the best document vectors, routing queries quickly to the right cluster for faster retrieval.",
    "tags": [
-    "Hybrid search",
+    "Routing",
     "RAG",
-    "Embeddings"
+    "Hybrid search"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Searching millions of document vectors was slow and costly, hurting response time for user questions.",
+   "v": 3
   },
   {
    "url": "https://dropbox.tech/machine-learning/how-two-engineer-side-projects-became-the-agent-taking-action-inside-dropbox",
@@ -154,28 +164,16 @@
    "published": "2026-11-05",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Engineers built an internal agent that accesses Dropbox files, applies changes in a sandbox with permission checks, and logs edits for user review.",
+   "summary": "Created a sandboxed agent that connects to Dropbox via rclone, uses permission checks and version history to safely modify files and allow rollbacks.",
    "tags": [
     "Agents",
     "Tool calling",
     "Guardrails"
    ],
-   "sorted_by": "groq"
-  },
-  {
-   "url": "https://www.honeycomb.io/blog/good-agents-need-good-managers-innovation-week",
-   "company": "Honeycomb",
-   "title": "Good Agents Need Good Managers: What We Heard at Innovation Week",
-   "published": "2026-11-04",
-   "added": "2026-11-07",
-   "problem": "agents",
-   "summary": "Describes how to manage and align AI agents in production by defining outcomes, testing inputs/outputs, and scaling verification across fleets.",
-   "tags": [
-    "Agents",
-    "Tool calling",
-    "Multi-agent"
-   ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users wanted AI to edit their Dropbox files but needed safety and control over changes.",
+   "v": 3
   },
   {
    "url": "https://medium.com/pinterest-engineering/scaling-model-evaluation-at-pinterest-with-ray-part-4-4a96cd12cc11",
@@ -184,12 +182,32 @@
    "published": "2026-11-04",
    "added": "2026-11-07",
    "problem": "evals",
-   "summary": "Implemented a fused Ray‑Spark evaluation pipeline that computes metrics during inference, cutting evaluation time by up to 32% while scaling linearly.",
+   "summary": "They combined Ray with Spark to compute metrics during inference, using accumulators to aggregate results on the fly, cutting evaluation time by up to 32%.",
    "tags": [
-    "Evals",
-    "Latency"
+    "Evals"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "Evaluation time reduced up to 32%",
+   "issue": "Running many model experiments caused slow, costly evaluation pipelines.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/use-nvidia-nemo-to-turn-agent-failures-into-tests-and-harness-fixes",
+   "company": "NVIDIA",
+   "title": "Use NVIDIA NeMo to Turn Agent Failures into Tests and Harness Fixes",
+   "published": "2026-11-04",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "They built a loop using NeMo Compass to turn trace logs into prioritized test cases, wrote evaluations with NeMo Eval Author, and refined prompts, routing and memory to fix the agent.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Evals"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Agents sometimes pick the wrong tool or miss context, causing task failures.",
+   "v": 3
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-uses-ai-agents-to-streamline-ai-factory-operations",
@@ -198,13 +216,34 @@
    "published": "2026-11-04",
    "added": "2026-11-08",
    "problem": "agents",
-   "summary": "Built AI agents that monitor GPU clusters, diagnose failures, and suggest fixes via chat, improving SRE efficiency and uptime.",
+   "summary": "NVIDIA built an AI Factory Operations Agent that uses multiple specialized agents, connected via a protocol, to diagnose issues and suggest fixes through a chat interface.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Routing"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "SREs had to check many dashboards manually to find why training performance dropped.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/how-nvidia-factory-operations-blueprint-coordinates-ai-agents-to-investigate-production-issues",
+   "company": "NVIDIA",
+   "title": "How NVIDIA Factory Operations Blueprint Coordinates AI Agents to Investigate Production Issues",
+   "published": "2026-11-04",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created a factory manager AI agent that connects to existing data and tools, monitors operations, finds root causes, and directs robots to fix problems.",
    "tags": [
     "Agents",
     "Tool calling",
-    "Multi-agent"
+    "Planning"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "Cost savings up to 20%",
+   "issue": "Unplanned factory downtime costs millions and investigating issues takes too much time.",
+   "v": 3
   },
   {
    "url": "https://www.honeycomb.io/blog/honeycomb-team-agents-ai-sre-done-right",
@@ -213,13 +252,16 @@
    "published": "2026-11-03",
    "added": "2026-11-08",
    "problem": "agents",
-   "summary": "Built AI SRE agents that proactively monitor releases, metrics, and runbooks, automatically filing tickets and suggesting fixes to reduce alerts.",
+   "summary": "Created AI agents that read code, logs, runbooks and tickets, set goals, run continuously, and proactively suggest fixes or actions.",
    "tags": [
     "Agents",
-    "Tool calling",
-    "RAG"
+    "Agent memory",
+    "Planning"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "SRE teams spend too much time reacting to alerts instead of preventing problems.",
+   "v": 3
   },
   {
    "url": "https://engineering.fb.com/2026/11/03/ml-applications/f3-lightning-how-meta-accelerates-ads-ml-features-to-production",
@@ -228,13 +270,15 @@
    "published": "2026-11-03",
    "added": "2026-11-07",
    "problem": "ads",
-   "summary": "Implemented a DAG-based feature extraction system that merges shared computations, reducing latency and cost for serving millions of ad model features.",
+   "summary": "Created a DAG compiler that merges feature graphs, sharing common operations so each computation runs only once per request.",
    "tags": [
-    "Latency",
-    "Cost",
-    "Real-time"
+    "Graph RAG",
+    "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Feature extraction duplicated work, causing slow and costly ad model predictions.",
+   "v": 3
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/from-synthetic-enterprise-data-evaluations-to-real-microsoft-copilot-ai-confidence",
@@ -243,26 +287,16 @@
    "published": "2026-10-30",
    "added": "2026-11-08",
    "problem": "evals",
-   "summary": "The team built a synthetic data generation platform to create realistic enterprise test tenants and automated evaluation pipelines, proving Copilot’s accuracy without using real user data.",
+   "summary": "Created a synthetic data platform that generates realistic enterprise workspaces and runs automated evaluation pipelines to measure AI performance.",
    "tags": [
     "Evals",
-    "LLM-as-judge"
+    "Synthetic data",
+    "Human review"
    ],
-   "sorted_by": "groq"
-  },
-  {
-   "url": "https://weaviate.io/blog/weaviate-1-40-release",
-   "company": "Weaviate",
-   "title": "Weaviate 1.40 Release",
-   "published": "2026-10-30",
-   "added": "2026-11-07",
-   "problem": "cost",
-   "summary": "Implemented 4-bit rotational quantization and vector dropping to reduce memory usage and improve import speed in Weaviate.",
-   "tags": [
-    "Quantisation",
-    "Cost"
-   ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Need to test Copilot accuracy without exposing sensitive enterprise data.",
+   "v": 3
   },
   {
    "url": "https://engineering.fb.com/2026/10/29/security/catching-bugs-before-they-land-jittestings-human-on-the-loop-approach-at-full-scale",
@@ -271,13 +305,15 @@
    "published": "2026-10-29",
    "added": "2026-11-07",
    "problem": "evals",
-   "summary": "They generate Just-in-Time tests with LLMs and use an LLM-as-judge ensemble to filter false positives, improving bug detection before code lands.",
+   "summary": "They built a system that uses LLMs to automatically write tests for each code change and an LLM‑as‑judge ensemble to filter out false positives.",
    "tags": [
     "LLM-as-judge",
-    "Evals",
-    "Guardrails"
+    "Evals"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Code changes introduced bugs faster than traditional tests could catch, risking production issues.",
+   "v": 3
   },
   {
    "url": "https://replit.com/blog/architecture-behind-secure-agent-work",
@@ -286,13 +322,16 @@
    "published": "2026-10-28",
    "added": "2026-11-07",
    "problem": "safety",
-   "summary": "Replit built isolation and policy controls for AI agents, enabling secure deployment, automated response, and bounded access to company systems.",
+   "summary": "Replit added isolation, firewall rules, and policy‑driven controls in its Agent Habitat platform to limit what agents can read or write and to automatically enforce security rules.",
    "tags": [
     "Guardrails",
-    "Agents",
-    "Tool calling"
+    "Sandboxing",
+    "Agents"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Agents could be exploited to cause damage, so companies need secure guardrails and monitoring.",
+   "v": 3
   },
   {
    "url": "https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design",
@@ -301,28 +340,16 @@
    "published": "2026-10-28",
    "added": "2026-11-07",
    "problem": "ads",
-   "summary": "Co-designed model, system, and hardware to boost ads retrieval accuracy while handling billions of candidates per second with GPU‑optimized deep nets.",
+   "summary": "Meta co‑designed a new model, system architecture, and custom GPU hardware to run a much larger neural network with hierarchical indexing and GPU‑native operators, achieving near‑ranking quality at retrieval speed.",
    "tags": [
     "GPUs",
-    "Latency",
-    "Cost"
+    "Cost",
+    "Latency"
    ],
-   "sorted_by": "groq"
-  },
-  {
-   "url": "https://research.google/blog/the-sleep-framework-a-new-way-for-llms-to-retain-knowledge-in-continual-learning",
-   "company": "Google",
-   "title": "The sleep framework: A new way for LLMs to retain knowledge in continual learning",
-   "published": "2026-10-27",
-   "added": "2026-11-07",
-   "problem": "tuning",
-   "summary": "Introduced a sleep phase that periodically updates deployed LLMs with self‑generated data, enabling continual knowledge acquisition and reducing forgetting.",
-   "tags": [
-    "Fine-tuning",
-    "LLMs",
-    "Transformers"
-   ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "tens of millions ads/second per GPU",
+   "issue": "Retrieving relevant ads from billions of candidates was too slow and expensive for high‑quality models.",
+   "v": 3
   },
   {
    "url": "https://replit.com/blog/anyone-can-bring-ideas-to-company-codebase",
@@ -331,13 +358,16 @@
    "published": "2026-10-27",
    "added": "2026-11-08",
    "problem": "agents",
-   "summary": "Replit Cloud Agents let non‑engineers describe code changes in plain language, automatically locate, modify, test, and submit updates to the codebase.",
+   "summary": "Replit built Cloud Agents that turn plain‑language requests into safe code changes, test them, and handle pull‑request reviews automatically.",
    "tags": [
-    "Tool calling",
     "Agents",
-    "RAG"
+    "Tool calling",
+    "Planning"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Non‑technical team members can't directly modify core code, causing slow review bottlenecks.",
+   "v": 3
   },
   {
    "url": "https://medium.com/expedia-group-tech/beyond-the-prompt-engineering-the-loop-for-software-change-at-scale-9ac26e3b2706",
@@ -346,13 +376,16 @@
    "published": "2026-10-27",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Built an autonomous loop that orchestrates coding agents, skills, and sub‑agents to modularize and ship iOS component changes at scale.",
+   "summary": "Created a Loop system that combines prompts, reusable skills, and sub‑agents to automate iOS component migration, handling failures and decisions autonomously.",
    "tags": [
     "Agents",
     "Tool calling",
-    "Multi-agent"
+    "Planning"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "Two‑year effort finished in three months",
+   "issue": "Large code changes were slow because hidden dependencies and build failures required constant human intervention.",
+   "v": 3
   },
   {
    "url": "https://medium.com/agoda-engineering/key-takeaways-from-tech-at-agoda-from-assistants-to-ai-agents-b0e9187730bb",
@@ -361,13 +394,16 @@
    "published": "2026-10-27",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Agoda integrated AI agents to automate planning, review, testing, and deployment tasks, improving the software development lifecycle while keeping human oversight.",
+   "summary": "Agoda created AI agents that take on planning, code review, support triage and testing, using clear goals and human approval steps to keep work safe.",
    "tags": [
     "Agents",
-    "Tool calling",
-    "Multi-agent"
+    "Planning",
+    "Tool calling"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Engineers wrote code faster, but planning, testing and release became bottlenecks.",
+   "v": 3
   },
   {
    "url": "https://netflixtechblog.com/making-failure-diagnosis-reliable-with-pensive-ai-6b0811a1c015",
@@ -376,13 +412,16 @@
    "published": "2026-10-26",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Integrated an AI layer into Netflix's failure diagnosis system to automatically extract error details from logs and suggest remediation, improving coverage and speed.",
+   "summary": "They added an LLM layer to read logs, extract error details, and suggest fixes, while keeping existing rule‑based logic for known cases.",
    "tags": [
-    "LLMs",
     "Tool calling",
-    "Agents"
+    "Prompting",
+    "LLMs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "AI extraction covers 100% of failures",
+   "issue": "Half of failed jobs were unclassified, wasting engineer time.",
+   "v": 3
   },
   {
    "url": "https://research.google/blog/bringing-foundational-models-to-the-front-lines-of-tb-screening",
@@ -391,13 +430,34 @@
    "published": "2026-10-23",
    "added": "2026-11-07",
    "problem": "vision",
-   "summary": "Developed and deployed a foundation model that reads chest X‑rays to detect TB with radiologist‑level accuracy, enabling point‑of‑care screening in low‑resource settings.",
+   "summary": "Created and fine‑tuned a foundation model that reads chest X‑rays, runs on low‑resource devices, and flags TB like an expert radiologist.",
    "tags": [
     "Multimodal",
-    "Transformers",
-    "Real-time"
+    "Fine-tuning",
+    "Transformers"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Remote clinics lack radiologists, causing many TB cases to be missed.",
+   "v": 3
+  },
+  {
+   "url": "https://www.microsoft.com/en-us/research/blog/flint-interactive-a-language-for-creating-interactive-data-visualizations",
+   "company": "Microsoft",
+   "title": "Flint-interactive: A language for creating interactive data visualizations",
+   "published": "2026-10-22",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "They created Flint‑interactive, a high‑level language that turns user or agent commands into semantic events, letting a compiler generate and update interactive visualizations automatically.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Context engineering"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users wanted charts they could explore, not just static images.",
+   "v": 3
   },
   {
    "url": "https://www.amazon.science/blog/the-science-behind-torchneuron-amazons-new-pytorch-backend-for-aws-trainium-chips",
@@ -406,12 +466,15 @@
    "published": "2026-10-22",
    "added": "2026-11-08",
    "problem": "cost",
-   "summary": "Implemented TorchNeuron to translate PyTorch models to Trainium, adding multi-level caching and adaptive eager compilation to boost speed and reduce compute cost.",
+   "summary": "Created TorchNeuron, a backend that translates PyTorch ops to Trainium, adds multi‑level caching and adaptive eager grouping to boost performance.",
    "tags": [
     "Latency",
     "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers needed to run PyTorch models on Trainium without rewriting code, while keeping speed and cost low.",
+   "v": 3
   },
   {
    "url": "https://shopify.engineering/remote-dev",
@@ -420,13 +483,34 @@
    "published": "2026-10-22",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Built a remote development platform so AI agents can compile, test, and debug mobile apps independently, freeing developers from local resource limits.",
+   "summary": "Created Remote Dev, a cloud‑based Mac environment that gives each AI agent its own sandbox to compile, run simulators, and create PRs, all triggered from Slack.",
    "tags": [
-    "Tool calling",
     "Agents",
-    "Multi-agent"
+    "Tool calling",
+    "Planning"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "AI agents were overloading developers' laptops when building and testing mobile apps.",
+   "v": 3
+  },
+  {
+   "url": "https://replit.com/blog/replit-monitoring-agent",
+   "company": "Replit",
+   "title": "Replit Monitoring Agent: Your very own software engineering team",
+   "published": "2026-10-22",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created an autonomous monitoring agent that watches app health, diagnoses problems from logs, writes and validates a fix, and can deploy it automatically.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Small teams must manually find and fix app outages, which wastes time and frustrates users.",
+   "v": 3
   },
   {
    "url": "https://research.google/blog/empowering-frontline-maternal-care-with-ai-assisted-ultrasound",
@@ -435,13 +519,16 @@
    "published": "2026-10-21",
    "added": "2026-11-07",
    "problem": "vision",
-   "summary": "Developed a mobile AI model that interprets blind‑sweep ultrasounds to estimate gestational age, enabling low‑skill workers to provide expert‑level prenatal care.",
+   "summary": "They built an AI model that reads blind‑sweep ultrasound scans from cheap portable probes and runs on mobile devices, letting frontline workers assess gestational age.",
    "tags": [
     "Multimodal",
     "Real-time",
-    "Transformers"
+    "Embeddings"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Many regions lack trained sonographers, leaving pregnant people without ultrasound access.",
+   "v": 3
   },
   {
    "url": "https://www.amazon.science/blog/strengthening-ai-safety-evaluation-through-independent-third-party-review",
@@ -455,7 +542,8 @@
     "Guardrails",
     "Evals"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://medium.com/expedia-group-tech/the-quiet-tax-on-machine-learning-teams-43d71bd539c7",
@@ -470,7 +558,8 @@
     "Latency",
     "GPUs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/thin-orchestrator-ai-agent-architecture",
@@ -485,7 +574,8 @@
     "Agents",
     "Tool calling"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/genrecs-tokenization-transforming-ads-recommendation-at-meta-with-stable-model-vocabulary",
@@ -500,7 +590,8 @@
     "Vector search",
     "Multimodal"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/data-center-engineering/inside-prometheus-meta-gigawatt-scale-supercluster",
@@ -515,7 +606,8 @@
     "Cost",
     "Latency"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://booking.ai/from-static-help-content-to-a-rag-based-onboarding-agent-for-partners-f7d5a789c4f7",
@@ -530,7 +622,8 @@
     "Hybrid search",
     "Reranking"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://www.honeycomb.io/blog/everything-we-talked-about-o11yday-london-2026",
@@ -545,7 +638,8 @@
     "Tool calling",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.atspotify.com/2026/10/advancing-generative-recommendation-inference-our-collaboration-with-nvidia-on-tensorrt-llm",
@@ -560,7 +654,8 @@
     "GPUs",
     "LLMs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://weaviate.io/blog/weaviate-security-release-nearobject-2026",
@@ -574,7 +669,8 @@
     "Guardrails",
     "Vector search"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://machinelearning.apple.com/research/selection-structured-reasoning",
@@ -589,7 +685,8 @@
     "Latency",
     "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://machinelearning.apple.com/research/plan-retrieve-tool-discovery",
@@ -604,7 +701,8 @@
     "Agents",
     "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://machinelearning.apple.com/research/mlx-distributed-inference",
@@ -619,7 +717,26 @@
     "GPUs",
     "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://weaviate.io/blog/pathseer-filtered-vector-search",
+   "company": "Weaviate",
+   "title": "PathSeer: Adaptive Filtered Vector Search",
+   "published": "2026-10-14",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "We added the PathSeer algorithm to the HNSW index, letting the system choose the best order for distance and filter checks, which speeds up filtered searches.",
+   "tags": [
+    "Hybrid search",
+    "Reranking",
+    "Vector search"
+   ],
+   "sorted_by": "groq",
+   "result": "Significant query‑time reductions",
+   "issue": "Filtered vector searches were slow and unreliable when filters changed frequently.",
+   "v": 3
   },
   {
    "url": "https://research.google/blog/putting-earth-ai-to-work-geospatial-agents-for-our-planets-biggest-challenges",
@@ -634,7 +751,8 @@
     "Agents",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://netflixtechblog.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb",
@@ -649,7 +767,8 @@
     "Fine-tuning",
     "Real-time"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.razorpay.com/inside-razorpays-rto-model-the-engineering-behind-its-ml-lifecycle-999fe75e66ec",
@@ -662,7 +781,8 @@
    "tags": [
     "Evals"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/10/structure-automating-data-ingestion-with-a-rag-flywheel.html",
@@ -677,7 +797,8 @@
     "Hybrid search",
     "Embeddings"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626",
@@ -692,7 +813,8 @@
     "Distillation",
     "LLMs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://www.intercom.com/blog/fin-4-customer-agent-operator-and-major-upgrades-to-the-intercom-helpdesk",
@@ -707,7 +829,8 @@
     "Tool calling",
     "Prompting"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/earth-ais-planetary-geospatial-foundation-models-for-global-public-health",
@@ -721,7 +844,8 @@
     "Embeddings",
     "Two-tower"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://medium.com/pinterest-engineering/metrics-board-building-an-agent-ready-metrics-layer-2c8fefe68756",
@@ -736,7 +860,8 @@
     "Tool calling",
     "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development",
@@ -751,7 +876,8 @@
     "Agents",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.salesforce.com/ai-agents-need-memory-building-persistent-memory-for-agentforce",
@@ -765,7 +891,8 @@
     "Agents",
     "Tool calling"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://booking.ai/introducing-agenthub-booking-com-platform-for-modular-travel-ai-agents-68bc521a0f50",
@@ -780,7 +907,44 @@
     "Multi-agent",
     "Agents"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://www.amazon.science/blog/graph-centric-agentic-intelligence",
+   "company": "Amazon",
+   "title": "Graph-centric agentic intelligence",
+   "published": "2026-10-01",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created an agent that walks real‑time dependency graphs, runs cascaded analytics, and uses causal inference to locate root causes automatically.",
+   "tags": [
+    "Graph RAG",
+    "Agents",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "95% fault localization accuracy in under 30 seconds",
+   "issue": "Ops teams needed AI agents that could understand complex network graphs to pinpoint failures fast.",
+   "v": 3
+  },
+  {
+   "url": "https://shopify.engineering/shopgym",
+   "company": "Shopify",
+   "title": "ShopGym: Realistic, reproducible sandboxes for shopping agents",
+   "published": "2026-10-01",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "They built ShopGym, a sandbox that copies live stores into resettable simulations and creates realistic shopping tasks, letting agents be evaluated consistently.",
+   "tags": [
+    "Agents",
+    "Graph RAG",
+    "RAG"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers struggled to train and test shopping agents because real stores constantly change and bots get blocked.",
+   "v": 3
   },
   {
    "url": "https://engineering.salesforce.com/how-deterministic-controls-turn-ai-output-into-reliable-prompt-templates",
@@ -795,7 +959,8 @@
     "Prompting",
     "LLMs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/how-diffusion-controller-unifies-and-simplifies-ai-image-generation",
@@ -810,7 +975,8 @@
     "Transformers",
     "Multimodal"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/09/the-making-of-the-yelp-assistant-ui.html",
@@ -824,7 +990,8 @@
     "Prompting",
     "Latency"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://dropbox.tech/machine-learning/evolving-calendar-assistant-reclaim-to-be-ai-native",
@@ -839,7 +1006,8 @@
     "Agents",
     "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.salesforce.com/engineering-multi-agent-ai-teams-that-build-and-test-themselves",
@@ -854,7 +1022,8 @@
     "Agents",
     "Tool calling"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://blog.hotstar.com/what-we-learned-from-benchmarking-knowledge-bases-for-coding-agents-6bbdd9e53727",
@@ -869,7 +1038,8 @@
     "Reranking",
     "Chunking"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/09/agentic-platform-open-sourcing-agentic-identity-broker.html",
@@ -884,7 +1054,8 @@
     "Tool calling",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://medium.com/expedia-group-tech/building-the-operating-model-for-agentic-ai-at-expedia-group-f7555fcce506",
@@ -899,7 +1070,8 @@
     "Multi-agent",
     "Agents"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://medium.com/agoda-engineering/how-agoda-is-evolving-engineering-support-with-ai-agents-c907a54e236e",
@@ -914,7 +1086,42 @@
     "Agents",
     "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://engineering.salesforce.com/ai-agent-observability-making-silent-production-failures-visible-and-actionable",
+   "company": "Salesforce",
+   "title": "AI Agent Observability: Making Silent Production Failures Visible and Actionable",
+   "published": "2026-09-22",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "The team created Agentforce Health Monitoring, which tracks agent uptime, logs metrics, and alerts ops teams to investigate issues quickly.",
+   "tags": [
+    "Agents"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Silent failures of AI agents in production went unnoticed, hurting reliability.",
+   "v": 3
+  },
+  {
+   "url": "https://shopify.engineering/helix",
+   "company": "Shopify",
+   "title": "Helix: The internal tool powering our Shopify app's native migration",
+   "published": "2026-09-21",
+   "added": "2026-11-08",
+   "problem": "llm",
+   "summary": "Created Helix, a tool that splits migration into tiny checkpoints with strict review gates, letting LLMs generate code step‑by‑step while engineers guide it.",
+   "tags": [
+    "Guardrails",
+    "Prompting",
+    "Tool calling"
+   ],
+   "sorted_by": "groq",
+   "result": "App rebuilt and published in 12 weeks",
+   "issue": "Migrating a large React Native app to native Swift/Kotlin was slow and error‑prone.",
+   "v": 3
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/09/ml-ranking-with-nrtsearch.html",
@@ -929,7 +1136,26 @@
     "Reranking",
     "Two-tower"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://engineering.salesforce.com/how-data-360-builds-trusted-context-the-enduring-layer-for-enterprise-ai",
+   "company": "Salesforce",
+   "title": "How Data 360 Builds Trusted Context: The Enduring Layer for Enterprise AI",
+   "published": "2026-09-16",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "Created Data 360 Trusted Context, a layer that selects the smallest needed data slice, checks permissions, and retrieves it on‑demand for LLM calls.",
+   "tags": [
+    "RAG",
+    "Query rewriting",
+    "Hybrid search"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Need relevant, authorized enterprise data for each AI request without sending all data in the prompt.",
+   "v": 3
   },
   {
    "url": "https://research.google/blog/bypassing-inference-bottlenecks-accelerating-complex-ai-search-with-retrieve-for-train",
@@ -944,7 +1170,8 @@
     "RAG",
     "Hybrid search"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://medium.com/airbnb-engineering/beyond-the-model-engineering-ai-infra-with-scientific-judgement-371316d43261",
@@ -959,7 +1186,26 @@
     "Vector search",
     "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://medium.com/pinterest-engineering/evolving-pinterests-embedding-retrieval-platform-aede4e831e01",
+   "company": "Pinterest",
+   "title": "Evolving Pinterest’s Embedding Retrieval Platform",
+   "published": "2026-09-11",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "They upgraded their internal search platform to use quantized integer vectors, hybrid queries and more flexible indexing, cutting memory use while keeping latency low.",
+   "tags": [
+    "Quantisation",
+    "Vector search",
+    "Hybrid search"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Embedding search was becoming too expensive and slow as the number of items grew into tens of billions.",
+   "v": 3
   },
   {
    "url": "https://tech.instacart.com/agentic-machine-learning-modeling-at-instacart-fb3ecd295ee7",
@@ -974,7 +1220,8 @@
     "Agents",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.atspotify.com/2026/9/portal-by-spotify-cut-my-claude-code-token-usage-by-90",
@@ -989,7 +1236,8 @@
     "Agents",
     "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/mapping-global-methane-emissions-from-space-with-deep-learning",
@@ -1003,7 +1251,8 @@
     "Multimodal",
     "Transformers"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting",
@@ -1016,7 +1265,8 @@
    "tags": [
     "Transformers"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/planetary-prediction-engine-automating-global-models-via-earth-ai",
@@ -1031,7 +1281,8 @@
     "Tool calling",
     "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/glucofm-foundation-model-for-continuous-glucose-monitoring",
@@ -1046,7 +1297,8 @@
     "Transformers",
     "Embeddings"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://medium.com/expedia-group-tech/the-context-tax-of-agentic-development-0bb9de03237c",
@@ -1061,7 +1313,8 @@
     "Tool calling",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://tech.olx.com/does-it-matter-how-you-feed-an-agent-its-context-ee1519586520",
@@ -1076,7 +1329,8 @@
     "Tool calling",
     "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/how-mobility-gives-language-models-a-deeper-understanding-of-place",
@@ -1091,7 +1345,8 @@
     "Vector search",
     "Fine-tuning"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/an-ai-tool-for-prioritizing-candidate-biomarkers-from-wearable-sensor-data",
@@ -1106,7 +1361,26 @@
     "Multi-agent",
     "Tool calling"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://engineering.grab.com/jarvis-pro-route-firsr-answer-later",
+   "company": "Grab",
+   "title": "Building Jarvis Pro: Route first, answer later",
+   "published": "2026-08-21",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created Jarvis Pro that first classifies each user request, then loads only the needed data and generates an answer, using a routing guide to enforce safe paths.",
+   "tags": [
+    "Routing",
+    "Guardrails",
+    "Agents"
+   ],
+   "sorted_by": "groq",
+   "result": "Safe routing 99.4% accuracy, quality score rose to 91.0",
+   "issue": "Account managers needed reliable AI advice for merchant meetings without giving wrong recommendations.",
+   "v": 3
   },
   {
    "url": "https://craft.faire.com/faires-agentic-development-culture-7aeb03f04bcb",
@@ -1121,7 +1395,26 @@
     "Agents",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://engineering.zalando.com/posts/2026/08/agentic-engineering-at-zalando-a-snapshot.html",
+   "company": "Zalando",
+   "title": "Agentic Engineering at Zalando: a snapshot",
+   "published": "2026-08-13",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created a LiteLLM API proxy with pre/post hooks for cost tracking, model retirement, and prompt‑caching injection, plus a chat UI and CLI, running on tiny pods.",
+   "tags": [
+    "Prompt caching",
+    "Cost",
+    "Agents"
+   ],
+   "sorted_by": "groq",
+   "result": "Supports 2k MAU with six small pods",
+   "issue": "Engineers struggled to experiment with LLMs across providers and track usage costs.",
+   "v": 3
   },
   {
    "url": "https://medium.com/expedia-group-tech/how-keras-3-helped-modernise-expedia-groups-lodging-ranking-stack-7fec96f052fd",
@@ -1136,7 +1429,8 @@
     "GPUs",
     "Transformers"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://booking.ai/how-we-selected-the-next-vector-database-at-booking-com-1e738a5e3bb0",
@@ -1151,7 +1445,8 @@
     "RAG",
     "Vector search"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://blog.flipkart.tech/llms-for-relevance-automating-high-quality-product-relevance-labeling-in-flipkart-search-ddd5ca50b584",
@@ -1166,7 +1461,8 @@
     "RAG",
     "Evals"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://www.etsy.com/codeascraft/kafka-app-thereas-a-skill-for-that",
@@ -1181,7 +1477,62 @@
     "Real-time",
     "Personalisation"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://medium.com/expedia-group-tech/focus-on-the-feature-not-the-fixture-genai-powered-graphql-mocks-ea069670af02",
+   "company": "Expedia",
+   "title": "Focus on the Feature, Not the Fixture: GenAI powered GraphQL mocks",
+   "published": "2026-07-31",
+   "added": "2026-11-08",
+   "problem": "llm",
+   "summary": "They created mockql‑rs, a CLI that reads a GraphQL query with @mock tags, checks the schema, and asks an LLM to fill in only the annotated fields, producing schema‑valid mock responses on the fly.",
+   "tags": [
+    "Prompting",
+    "Graph RAG",
+    "Tool calling"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers spent hours creating and updating hand‑written GraphQL mock data that quickly became outdated.",
+   "v": 3
+  },
+  {
+   "url": "https://craft.faire.com/autoscience-how-we-built-agent-driven-ml-exploration-at-faire-f3183e7deb29",
+   "company": "Faire",
+   "title": "Autoscience: How we built agent-driven ML exploration at Faire",
+   "published": "2026-07-22",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Built Autoscience, an agent system that proposes, runs, and evaluates model experiments with persistent memory and steering hooks, enabling many more iterations.",
+   "tags": [
+    "Agents",
+    "Agent memory",
+    "Tool calling"
+   ],
+   "sorted_by": "groq",
+   "result": "Production model accuracy improved double‑digit percentages",
+   "issue": "ML teams could only try a tiny fraction of possible model changes, limiting performance.",
+   "v": 3
+  },
+  {
+   "url": "https://booking.ai/from-traditional-ml-to-ai-agents-how-booking-com-scales-ai-observability-with-arize-ai-625ac3996c7e",
+   "company": "Booking.com",
+   "title": "From Traditional ML to AI Agents: How Booking.com Scales AI Observability With Arize AI",
+   "published": "2026-07-10",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "They integrated Arize AI to collect telemetry and trace every prompt, model call, retrieval and tool use, giving end‑to‑end visibility for all AI systems.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Routing"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Complex AI workflows were hard to debug because many steps happen behind the scenes.",
+   "v": 3
   },
   {
    "url": "https://blog.hotstar.com/getting-past-the-first-frame-building-video-models-that-remember-31f03d0710e1",
@@ -1196,7 +1547,8 @@
     "Distillation",
     "Small models"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data",
@@ -1211,7 +1563,8 @@
     "Transformers",
     "LLMs"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/accelerating-gemini-nano-models-on-pixel-with-frozen-multi-token-prediction",
@@ -1226,7 +1579,8 @@
     "Cost",
     "Small models"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/from-pixels-to-planning-earth-ai-for-nature-restoration",
@@ -1241,7 +1595,8 @@
     "Transformers",
     "Vector search"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://slack.engineering/agentic-testing-where-agents-fit-in-the-e2e-testing-stack",
@@ -1256,7 +1611,8 @@
     "Tool calling",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag",
@@ -1271,7 +1627,8 @@
     "RAG",
     "Multi-agent"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://tech.instacart.com/from-scoring-to-spelling-rebuilding-ads-retrieval-at-instacart-cf36b4e8d1bb",
@@ -1286,7 +1643,8 @@
     "RAG",
     "Personalisation"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://slack.engineering/slack-ai-the-path-to-multi-cloud",
@@ -1301,7 +1659,44 @@
     "Latency",
     "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://engineeringblog.yelp.com/2026/05/beyond-menu-tree.html",
+   "company": "Yelp",
+   "title": "Beyond the Menu Tree: How Yelp Built a Smarter Customer Success Chatbot with AI",
+   "published": "2026-05-27",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "They connected their knowledge base to an LLM with a Retrieval‑Augmented Generation pipeline, using whole support articles stored in a vector store and routing queries to specialized workflows.",
+   "tags": [
+    "RAG",
+    "Vector search",
+    "Reranking"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "The old chatbot could only answer fixed menu options or exact phrase matches, leaving many user questions unanswered.",
+   "v": 3
+  },
+  {
+   "url": "https://blog.hotstar.com/beyond-imitation-teaching-ai-to-speak-like-a-character-in-hindi-476bd33f049a",
+   "company": "JioHotstar",
+   "title": "Beyond Imitation: Teaching AI to Speak Like a Character in Hindi",
+   "published": "2026-05-08",
+   "added": "2026-11-08",
+   "problem": "llm",
+   "summary": "Created a modular LLM‑based TTS system with Hindi data curation, language‑aware preprocessing, and production‑focused evaluation to generate expressive, stable speech.",
+   "tags": [
+    "LLMs",
+    "Fine-tuning",
+    "Prompting"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Hindi speech synthesis lacked emotion and consistency at production scale.",
+   "v": 3
   },
   {
    "url": "https://research.google/blog/its-all-about-the-angle-your-photos-re-composed",
@@ -1315,7 +1710,8 @@
     "Multimodal",
     "Transformers"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/reasoningbank-enabling-agents-to-learn-from-experience",
@@ -1330,7 +1726,8 @@
     "LLM-as-judge",
     "RAG"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/ai-generated-synthetic-neurons-speed-up-brain-mapping",
@@ -1343,7 +1740,8 @@
    "tags": [
     "Fine-tuning"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://slack.engineering/managing-context-in-long-run-agentic-applications",
@@ -1358,7 +1756,8 @@
     "Multi-agent",
     "Agents"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/towards-developing-future-ready-skills-with-generative-ai",
@@ -1373,7 +1772,8 @@
     "Evals",
     "Prompting"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/improving-the-academic-workflow-introducing-two-ai-agents-for-better-figures-and-peer-review",
@@ -1388,7 +1788,8 @@
     "Agents",
     "Tool calling"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/evaluating-alignment-of-behavioral-dispositions-in-llms",
@@ -1402,7 +1803,8 @@
     "LLM-as-judge",
     "Evals"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://engineering.klarna.com/beyond-prompting-how-algorithmic-evolution-doubled-our-training-speed-8f874af3080d",
@@ -1417,7 +1819,26 @@
     "Latency",
     "Cost"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://blog.hotstar.com/ai-video-generation-at-scale-prompts-dont-scale-640c93778df9",
+   "company": "JioHotstar",
+   "title": "AI Video Generation at Scale — Prompts Don’t Scale",
+   "published": "2026-03-28",
+   "added": "2026-11-08",
+   "problem": "vision",
+   "summary": "They created a production pipeline that replaces free‑form prompts with structured contracts, adds objective quality checks, and optimizes GPU use for consistent, scalable AI video output.",
+   "tags": [
+    "Multimodal",
+    "Cost",
+    "GPUs"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Prompt‑based video creation drifts and becomes inconsistent when producing large volumes.",
+   "v": 3
   },
   {
    "url": "https://research.google/blog/vibe-coding-xr-accelerating-ai-xr-prototyping-with-xr-blocks-and-gemini",
@@ -1432,7 +1853,8 @@
     "Agents",
     "Prompting"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression",
@@ -1447,7 +1869,8 @@
     "Cost",
     "Vector search"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/improving-breast-cancer-screening-workflows-with-machine-learning",
@@ -1461,7 +1884,8 @@
     "Evals",
     "Multimodal"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting",
@@ -1475,7 +1899,8 @@
     "Real-time",
     "Transformers"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://research.google/blog/exploring-the-feasibility-of-conversational-diagnostic-ai-in-a-real-world-clinical-study",
@@ -1490,7 +1915,8 @@
     "Guardrails",
     "A/B testing"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
   },
   {
    "url": "https://blog.flipkart.tech/from-noise-to-insight-how-llms-are-transforming-threat-intelligence-analysis-17dae388808e",
@@ -1505,10 +1931,47 @@
     "LLMs",
     "Prompting"
    ],
-   "sorted_by": "groq"
+   "sorted_by": "groq",
+   "resort": true
+  },
+  {
+   "url": "https://www.etsy.com/codeascraft/how-etsy-uses-llms-to-improve-search-relevance",
+   "company": "Etsy",
+   "title": "How Etsy Uses LLMs to Improve Search Relevance",
+   "published": "2026-01-16",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "They added a semantic relevance layer that uses text embeddings to match queries with listings, complementing click‑based signals for better ranking.",
+   "tags": [
+    "Embeddings",
+    "Vector search",
+    "Reranking"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Buyers saw search results that were close but not exactly what they wanted, hurting satisfaction.",
+   "v": 3
+  },
+  {
+   "url": "https://slack.engineering/streamlining-security-investigations-with-agents",
+   "company": "Slack",
+   "title": "Streamlining Security Investigations with Agents",
+   "published": "2025-12-01",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "They built AI agents that automatically pull data, run queries, and suggest actions to investigate alerts, using tool‑calling and multi‑step reasoning.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Security engineers were overwhelmed reviewing billions of alerts each day.",
+   "v": 3
   }
  ],
- "waiting": 1145,
+ "waiting": 997,
  "rejected": [
   "https://blog.cloudflare.com/ddos-threat-report-2026-q3",
   "https://blog.cloudflare.com/dns-targeted-zone-builds",
@@ -1552,6 +2015,7 @@
   "https://blog.hotstar.com/journey-of-an-ad-request-the-hidden-engineering-e7b7f9921e46",
   "https://blog.hotstar.com/orchestrating-jiohotstar-traffic-the-difference-between-a-loading-spinner-and-a-winning-six-8a385b01380e",
   "https://blog.hotstar.com/the-kafka-optimization-that-saved-us-350k-a-year-48a0e05c3c08",
+  "https://booking.ai/a-recap-of-the-2026-experimentation-conference-at-booking-com-f43d48698fcd",
   "https://booking.ai/outlier-handling-at-scale-in-experimentation-a8bb140e1ab8",
   "https://booking.ai/scaling-experimentation-quality-at-booking-com-726152ee4ef0",
   "https://building.nu.com/beyond-a-b-testing-designing-experiments-when-the-space-is-too-large-to-explore",
@@ -1768,12 +2232,15 @@
   "https://huggingface.co/blog/torch-mlp-fusion",
   "https://huggingface.co/blog/torch-profiler",
   "https://huggingface.co/blog/transformers-to-mlx",
+  "https://huggingface.co/blog/transformersjs-v4",
   "https://huggingface.co/blog/vllm-jobs",
   "https://huggingface.co/blog/voice-consent-gate",
   "https://huggingface.co/blog/waypoint-1",
   "https://huggingface.co/blog/waypoint-1-5",
   "https://huggingface.co/blog/zai-org/glm-52-blog",
+  "https://machinelearning.apple.com/research/tri-modal-masked-diffusion",
   "https://medium.com/agoda-engineering/agoda-launches-bug-bounty-program-on-hackerone-to-connect-with-global-research-community-8e67530f0934",
+  "https://medium.com/agoda-engineering/from-assistant-to-autonomous-ai-the-next-chapter-of-ai-in-software-engineering-20b912b9a849",
   "https://medium.com/agoda-engineering/how-agoda-powers-multiple-travel-brands-with-one-design-system-a48de5f906af",
   "https://medium.com/agoda-engineering/how-agoda-scaled-its-price-cache-with-dragonflydb-0828e478e84f",
   "https://medium.com/agoda-engineering/how-agoda-simulates-booking-flows-to-test-flight-integrations-204ec4f2e128",
@@ -1784,6 +2251,7 @@
   "https://medium.com/airbnb-engineering/flexible-authentication-reimagining-authentication-for-millions-of-users-at-airbnb-3a8a4c917137",
   "https://medium.com/airbnb-engineering/project-lighthouse-part-3-introducing-project-lighthouse-anonymize-74f8b26653fb",
   "https://medium.com/capital-one-tech/advancing-safe-agentic-ai-asks-symposium-highlights-bbba40b19784",
+  "https://medium.com/capital-one-tech/beyond-the-hallucination-why-ai-needs-deterministic-math-aa9c448479ab",
   "https://medium.com/capital-one-tech/capital-one-at-emnlp-2026-in-budapest-4f5b6a450ebc",
   "https://medium.com/capital-one-tech/operational-excellence-in-serverless-5es-framework-f3bf3dcd2cda",
   "https://medium.com/capital-one-tech/strengthening-open-source-security-with-socket-7ee8fe88bfec",
@@ -1796,6 +2264,7 @@
   "https://medium.com/myntra-engineering/revamping-myntra-app-analytics-persistence-with-kmp-and-sqlite-516751e24d63",
   "https://medium.com/paypal-tech/we-have-moved-to-https-developer-paypal-com-community-blog-2acf7cb138a6",
   "https://medium.com/pinterest-engineering/introducing-modulelens-zooming-into-pytorch-modules-for-human-and-agentic-engineering-b7e9be9d29f8",
+  "https://medium.com/pinterest-engineering/partition-finalization-in-pinterests-next-generation-db-ingestion-framework-4c7da6e4cc8f",
   "https://medium.com/strava-engineering/my-summer-at-strava-375656e322b6",
   "https://medium.com/strava-engineering/summer-at-my-dream-company-a7c46aac76fe",
   "https://medium.com/tripadvisor/how-weekly-operations-reviews-strengthen-engineering-teams-90222a5100b1",
@@ -1823,11 +2292,14 @@
   "https://open.nytimes.com/designing-the-front-door-to-our-subscriptions-6bb2ed3f5338",
   "https://open.nytimes.com/implementing-dark-mode-in-the-games-app-be7241ddb7ba",
   "https://open.nytimes.com/the-right-team-for-the-job-from-engineering-to-product-a-superpower-for-developer-platform-a290e65970ea",
+  "https://replit.com/blog/bookmark-manager-browser-extension",
   "https://replit.com/blog/bring-your-own-cloud",
   "https://replit.com/blog/critical-security-vulnerability-in-react-server-components",
+  "https://replit.com/blog/databricks2026",
   "https://replit.com/blog/databricksjune2026",
   "https://replit.com/blog/enterprise-self-serve",
   "https://replit.com/blog/introducing-replit-design",
+  "https://replit.com/blog/introducing-replit-solutions-partners",
   "https://replit.com/blog/mobile-apps",
   "https://replit.com/blog/mothers-who-build",
   "https://replit.com/blog/package-firewall",
@@ -1835,6 +2307,7 @@
   "https://replit.com/blog/replit-acquires-atta",
   "https://replit.com/blog/replit-and-databricks",
   "https://replit.com/blog/replit-and-snowflake-webinar",
+  "https://replit.com/blog/replit-and-snowflake-webinar-pt2",
   "https://replit.com/blog/replit-claude",
   "https://replit.com/blog/rise-of-self-driving-company",
   "https://replit.com/blog/security-center",
@@ -1873,6 +2346,7 @@
   "https://research.google/blog/spotlight-on-innovation-google-sponsored-data-science-for-health-ideathon-across-africa",
   "https://research.google/blog/the-next-chapter-in-flood-resilience-open-sourcing-googles-hydrology-framework",
   "https://research.google/blog/the-power-of-collaboration-how-we-can-reduce-traffic-congestion",
+  "https://research.google/blog/the-sleep-framework-a-new-way-for-llms-to-retain-knowledge-in-continual-learning",
   "https://research.google/blog/toolgrad-efficient-tool-use-dataset-generation-with-textual-gradients",
   "https://research.google/blog/toward-provably-private-learning-from-federated-data",
   "https://research.google/blog/towards-a-quantum-computer-that-learns-from-its-errors",
@@ -1906,6 +2380,8 @@
   "https://tech.olx.com/correlation-lied-to-us-rethinking-product-impact-with-causal-inference-5ba47181f7c5",
   "https://tech.olx.com/empowering-innovation-through-structure-93c15614f6d3",
   "https://tech.olx.com/handling-concurrency-on-the-web-with-web-locks-api-163b7e07eddd",
+  "https://tech.olx.com/importance-of-offline-evaluation-to-guide-model-choice-1c2be1c4599a",
+  "https://vercel.com/blog/2026-vercel-ai-accelerator-recap",
   "https://vercel.com/blog/aws-databases-are-now-live-on-the-vercel-marketplace-and-v0",
   "https://vercel.com/blog/backends-on-vercel-python-containers-and-daemons",
   "https://vercel.com/blog/bfcm-2025",
@@ -1932,10 +2408,12 @@
   "https://vercel.com/blog/just-another-black-friday",
   "https://vercel.com/blog/optimizing-vercel-sandbox-snapshots",
   "https://vercel.com/blog/our-million-dollar-hacker-challenge-for-react2shell",
+  "https://vercel.com/blog/python-on-vercel-is-now-generally-available",
   "https://vercel.com/blog/reproducing-disclosing-and-fixing-the-libheif-vulnerability-with-hacktron-and-the-maintainers",
   "https://vercel.com/blog/resources-for-protecting-against-react2shell",
   "https://vercel.com/blog/scaling-redirects-to-infinity-on-vercel",
   "https://vercel.com/blog/security-through-design-creating-the-improved-firewall-experience",
+  "https://vercel.com/blog/ship-ai-2025-recap",
   "https://vercel.com/blog/simplifying-runtime-caching-on-vercel",
   "https://vercel.com/blog/the-best-workflow-engine-is-a-programming-language",
   "https://vercel.com/blog/the-vercel-oss-bug-bounty-program-is-now-available",
@@ -1944,7 +2422,9 @@
   "https://vercel.com/blog/vercel-and-shopify-are-rebuilding-hydrogen",
   "https://vercel.com/blog/vercel-launches-partner-certification",
   "https://vercel.com/blog/vercel-open-source-program-spring-2026-cohort",
+  "https://vercel.com/blog/vercel-sandbox-is-now-generally-available",
   "https://vercel.com/blog/vercel-services-run-full-stack-on-vercel",
+  "https://vercel.com/blog/vercel-ship-2026-recap",
   "https://vercel.com/blog/vercel-supports-next-js-16-3",
   "https://vercel.com/blog/vercel-the-anti-vendor-lock-in-cloud",
   "https://vercel.com/changelog/access-billing-usage-cost-data-api",
@@ -1952,9 +2432,20 @@
   "https://vercel.com/changelog/activity-log-now-tracks-100-of-team-and-project-changes",
   "https://vercel.com/changelog/add-cache-tags-from-function-responses-regardless-of-framework",
   "https://vercel.com/changelog/add-liveness-checks-to-your-daemons",
+  "https://vercel.com/changelog/agent-runs-vercel-mcp-cli",
+  "https://vercel.com/changelog/ai-chat-now-available-on-vercel-docs",
+  "https://vercel.com/changelog/ai-domain-search-now-available-via-vercel-domains",
+  "https://vercel.com/changelog/ai-elements-1-9",
+  "https://vercel.com/changelog/ai-gateway-and-one-click-deploys-now-available-on-trae",
+  "https://vercel.com/changelog/ai-gateway-is-now-available-on-aws-marketplace",
+  "https://vercel.com/changelog/ai-gateway-routing-rules",
+  "https://vercel.com/changelog/ai-sdk-7",
+  "https://vercel.com/changelog/ai-traffic-insights-now-available-in-vercel-observability",
   "https://vercel.com/changelog/always-on-tracing-for-production-and-preview-traffic",
+  "https://vercel.com/changelog/amazon-opensearch-serverless-is-now-available-in-the-vercel-marketplace",
   "https://vercel.com/changelog/amazon-s3-joins-the-vercel-marketplace",
   "https://vercel.com/changelog/anomaly-alert-configuration-now-available",
+  "https://vercel.com/changelog/anomaly-alerts-ga",
   "https://vercel.com/changelog/anomaly-alerts-now-available-via-email",
   "https://vercel.com/changelog/anomaly-alerts-now-in-public-beta",
   "https://vercel.com/changelog/app-and-dev-domains-included-with-free-domain-for-pro",
@@ -1963,9 +2454,12 @@
   "https://vercel.com/changelog/authenticate-vercel-flags-with-openid-connect-by-default",
   "https://vercel.com/changelog/auto-add-git-committers-now-available-for-enterprise-teams",
   "https://vercel.com/changelog/auto-add-git-committers-to-your-team",
+  "https://vercel.com/changelog/automated-react2shell-vulnerability-patching-is-now-available",
   "https://vercel.com/changelog/automated-security-audits-now-available-for-skills-sh",
   "https://vercel.com/changelog/aws-databases-now-available-on-the-vercel-marketplace",
   "https://vercel.com/changelog/aws-privatelink-is-now-available-on-pro-and-enterprise",
+  "https://vercel.com/changelog/basetens-mammoth-1-and-elephant-1-now-available-on-ai-gateway-for-free",
+  "https://vercel.com/changelog/basic-build-machines",
   "https://vercel.com/changelog/block-vercel-deployment-promotions-with-github-actions",
   "https://vercel.com/changelog/blocking-malicious-npm-packages-before-and-during-installation",
   "https://vercel.com/changelog/bookmark-domains-on-vercel-domains",
@@ -1984,6 +2478,7 @@
   "https://vercel.com/changelog/bun-runtime-now-supports-large-functions-and-extended-max-duration",
   "https://vercel.com/changelog/bun-serve-entrypoint-for-vercel-functions",
   "https://vercel.com/changelog/caching-details-now-available-in-runtime-logs",
+  "https://vercel.com/changelog/cat-jam-is-now-available-in-stealth-for-free-on-ai-gateway",
   "https://vercel.com/changelog/chat-sdk-adds-agentphone-support",
   "https://vercel.com/changelog/chat-sdk-adds-dial-support",
   "https://vercel.com/changelog/chat-sdk-adds-discord-components-v2-support",
@@ -2015,14 +2510,26 @@
   "https://vercel.com/changelog/chat-sdk-slack-enterprise-grid",
   "https://vercel.com/changelog/chat-sdk-vercel-connect",
   "https://vercel.com/changelog/claude-design-and-vercel",
+  "https://vercel.com/changelog/claude-fable-5-1-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/claude-fable-5-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/claude-haiku-4-5-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/claude-haiku-5-5-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/claude-opus-4-5-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/claude-opus-5-5-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/claude-opus-5-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/claude-sonnet-5-5-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/claude-sonnet-5-ai-gateway",
+  "https://vercel.com/changelog/cline-harness-adapter",
   "https://vercel.com/changelog/compliance-documents-are-now-available-in-team-settings",
   "https://vercel.com/changelog/configure-build-machine-settings-across-all-projects",
   "https://vercel.com/changelog/configure-weighted-traffic-splits-for-vercel-flags-from-the-vercel-cli",
   "https://vercel.com/changelog/configure-which-sources-can-create-deployments-with-deployment-policies",
   "https://vercel.com/changelog/connect-to-and-manage-sandboxes-from-the-dashboard",
   "https://vercel.com/changelog/consolidated-commit-status-now-available-for-github",
+  "https://vercel.com/changelog/copy-to-prompt-instructions-now-available-for-flags",
   "https://vercel.com/changelog/cron-jobs-now-support-100-per-project-on-every-plan",
   "https://vercel.com/changelog/cron-jobs-now-visible-in-deployment-summary",
+  "https://vercel.com/changelog/cursor-ai-sdk-harness-adapter",
   "https://vercel.com/changelog/custom-environments-support-for-marketplace-integrations",
   "https://vercel.com/changelog/custom-metrics-are-now-supported-in-vercel-observability",
   "https://vercel.com/changelog/custom-oidc-token-audiences",
@@ -2031,6 +2538,14 @@
   "https://vercel.com/changelog/dashboard-navigation-redesign-rollout",
   "https://vercel.com/changelog/data-cache-is-moving-to-runtime-cache",
   "https://vercel.com/changelog/data-downloaded-by-vercel-sandbox-is-now-free",
+  "https://vercel.com/changelog/deepagents-and-opencode-harness-adapters",
+  "https://vercel.com/changelog/deepseek-models-now-available-via-azure-on-ai-gateway",
+  "https://vercel.com/changelog/deepseek-v3-2-now-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/deepseek-v4-1-flash-1017-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/deepseek-v4-1-flash-1017-ultrafast-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/deepseek-v4-1-flash-is-now-available-in-token-pass",
+  "https://vercel.com/changelog/deepseek-v4-1-flash-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/deepseek-v4-flash-with-vision-now-available-on-ai-gateway",
   "https://vercel.com/changelog/deleted-deployments-are-permanently-removed-sooner",
   "https://vercel.com/changelog/deploy-a-container-from-a-plain-dockerfile",
   "https://vercel.com/changelog/deploy-cursor-origin-repositories-with-vercel-in-public-beta",
@@ -2052,6 +2567,7 @@
   "https://vercel.com/changelog/developer-role-now-available-for-pro-teams",
   "https://vercel.com/changelog/domain-search-is-now-available-through-the-vercel-cli",
   "https://vercel.com/changelog/domains-must-now-be-managed-at-the-team-level",
+  "https://vercel.com/changelog/drama-3-now-available-on-ai-gateway",
   "https://vercel.com/changelog/edge-config-is-now-global-config",
   "https://vercel.com/changelog/edge-requests-are-now-called-cdn-requests",
   "https://vercel.com/changelog/edit-git-settings-for-all-projects-in-a-repo",
@@ -2060,6 +2576,8 @@
   "https://vercel.com/changelog/elastic-build-machines-is-now-ga",
   "https://vercel.com/changelog/elastic-build-machines-now-protect-against-out-of-memory-builds",
   "https://vercel.com/changelog/elastic-build-machines-now-use-turborepo-cache-hits-to-prevent-downgrades",
+  "https://vercel.com/changelog/elorian-ai-glimpse-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/ember-1-from-fireworks-now-available-on-ai-gateway",
   "https://vercel.com/changelog/encrypted-client-hello-now-supported-on-vercel-cdn",
   "https://vercel.com/changelog/endform-joins-the-vercel-marketplace",
   "https://vercel.com/changelog/enterprise-managed-users",
@@ -2080,19 +2598,67 @@
   "https://vercel.com/changelog/faster-pnpm-installs",
   "https://vercel.com/changelog/filesystem-snapshots-supported-on-vercel-sandboxes",
   "https://vercel.com/changelog/find-deployments-faster-with-redesigned-filters",
+  "https://vercel.com/changelog/fish-audio-models-now-available-on-ai-gateway-for-free",
   "https://vercel.com/changelog/flags-sdk-now-evaluates-flags-10x-faster",
   "https://vercel.com/changelog/flat-rate-cdn-is-now-ga-for-pro-teams",
+  "https://vercel.com/changelog/flux-2-pro-image-model-is-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/flux-3-image-now-available-on-ai-gateway",
   "https://vercel.com/changelog/free-domain-for-one-year-now-for-all-pro-teams",
   "https://vercel.com/changelog/free-domain-now-included-with-new-pro-subscriptions",
+  "https://vercel.com/changelog/full-sandbox-egress-firewall-now-available-on-hobby-plan",
   "https://vercel.com/changelog/function-invocations-now-billed-per-unit",
   "https://vercel.com/changelog/function-start-type-now-available-in-runtime-logs",
+  "https://vercel.com/changelog/fx-ai-sdk-harness-adapter",
+  "https://vercel.com/changelog/fx-is-now-available-in-t3-code",
+  "https://vercel.com/changelog/gemini-3-5-transcribe-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gemini-3-6-flash-3-5-flash-lite-on-ai-gateway",
+  "https://vercel.com/changelog/gemini-3-7-flash-now-available-on-ai-gateway-for-50-off",
+  "https://vercel.com/changelog/gemini-3-8-flash-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gemini-3-8-live-models-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gemini-3-8-text-to-speech-models-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gemini-3-flash-is-now-available-on-the-vercel-ai-gateway",
+  "https://vercel.com/changelog/gemini-3-pro-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/gemini-4-argon-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gemini-omni-1-2-flash-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/github-copilot-ai-sdk-harness-adapter",
+  "https://vercel.com/changelog/glm-5-2-fast-via-wafer-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/glm-5-2-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/glm-5-3-flash-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/glm-5-3-flashx-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/glm-5-3-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/glyph-cluster-is-now-available-in-stealth-for-free-on-ai-gateway",
+  "https://vercel.com/changelog/gpt-5-1-codex-max-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/gpt-5-1-codex-models-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/gpt-5-1-models-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/gpt-5-2-codex-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/gpt-5-2-models-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/gpt-5-6-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gpt-6-1-sol-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gpt-6-1-terra-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gpt-6-astra-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/gpt-6-sol-and-luna-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gpt-image-2-5-flare-and-sunburst-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/gpt-live-1-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/grok-4-1-fast-models-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/grok-4-5-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/grok-4-6-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/grok-4-7-now-available-and-40-off-on-ai-gateway-fx-eve",
+  "https://vercel.com/changelog/grok-build-0-1-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/grok-build-harness-adapter",
+  "https://vercel.com/changelog/grok-imagine-image-2-0-preview-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/grok-voice-think-fast-2-0-now-available-on-ai-gateway",
   "https://vercel.com/changelog/hobby-projects-now-default-to-30-day-deployment-retention",
   "https://vercel.com/changelog/hobby-projects-now-retain-fewer-deployments-to-free-up-storage",
+  "https://vercel.com/changelog/humans-and-ampersand-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/hy4-preview-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/improved-analytics-experience-now-available-on-the-vercel-firewall",
   "https://vercel.com/changelog/improved-environment-variables-ui",
   "https://vercel.com/changelog/improved-ip-geolocation-data",
   "https://vercel.com/changelog/improved-streaming-runtime-logs-exports",
   "https://vercel.com/changelog/increased-blob-store-limit-for-hobby-users",
   "https://vercel.com/changelog/increased-limit-for-projects-per-git-repo",
+  "https://vercel.com/changelog/inkling-from-thinking-machines-is-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/inkling-small-now-available-on-ai-gateway",
   "https://vercel.com/changelog/inspect-feature-flag-history-with-vercel-cli",
   "https://vercel.com/changelog/introducing-enterprise-flexible-commitment-for-vercel-marketplace",
   "https://vercel.com/changelog/introducing-platform-elements",
@@ -2100,18 +2666,56 @@
   "https://vercel.com/changelog/introducing-trace-drains-on-the-vercel-marketplace",
   "https://vercel.com/changelog/introducing-vcr-vercel-container-registry",
   "https://vercel.com/changelog/invalidate-the-cdn-cache-by-tag",
+  "https://vercel.com/changelog/kimi-k2-7-code-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/kimi-k3-is-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/laguna-s-2-1-is-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/launchdarkly-is-now-available-on-the-vercel-marketplace",
+  "https://vercel.com/changelog/laya-decision-model-now-available-on-ai-gateway-free-through-october-31",
   "https://vercel.com/changelog/limit-on-demand-concurrent-builds-to-one-build-per-branch",
+  "https://vercel.com/changelog/ling-3-0-flash-fin-now-available-on-ai-gateway-for-free",
+  "https://vercel.com/changelog/ling-3-0-flash-is-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/ling-3-0-flash-sante-is-now-available-on-ai-gateway-for-free",
+  "https://vercel.com/changelog/ling-3-0-tiny-is-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/ling-3-1-flash-1019-now-available-on-ai-gateway-for-free",
+  "https://vercel.com/changelog/ling-3-1-flash-is-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/liquid-ais-d1-ultra-now-available-on-ai-gateway",
   "https://vercel.com/changelog/logs-filtering-for-vercel-workflows-now-available",
+  "https://vercel.com/changelog/longcat-2-5-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/mai-image-2-6-and-mai-image-2-6-flash-now-available-on-ai-gateway",
   "https://vercel.com/changelog/manage-next-js-server-actions-in-the-vercel-firewall",
   "https://vercel.com/changelog/manage-vercel-container-registry-with-vercel-cli",
   "https://vercel.com/changelog/measure-time-between-steps-in-vercel-workflows",
+  "https://vercel.com/changelog/mercury-3-now-available-on-ai-gateway",
   "https://vercel.com/changelog/microfrontends-now-generally-available",
   "https://vercel.com/changelog/microfrontends-previews-now-link-across-repositories",
   "https://vercel.com/changelog/microfrontends-routing-is-now-free-for-firewall-mitigated-traffic",
   "https://vercel.com/changelog/microfrontends-routing-now-applies-to-vc-alias-and-branch-domains",
+  "https://vercel.com/changelog/microsoft-ai-models-are-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/microsoft-decision-1-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/mimo-v2-6-models-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/minimax-h3-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/minimax-m2-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/minimax-m3-1-flash-now-available-on-ai-gateway-for-free",
+  "https://vercel.com/changelog/mistral-large-3-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/mistral-large-4-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/model-fallbacks-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/moonshot-ai-kimi-k2-thinking-and-kimi-k2-thinking-turbo-are-now-available",
+  "https://vercel.com/changelog/muse-image-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/muse-spark-1-1-is-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/muse-spark-1-2-is-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/muse-spark-1-3-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/muse-spark-open-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/muse-wonder-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/nano-banana-2-1-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/nano-banana-pro-gemini-3-pro-image-now-available-in-the-ai-gateway",
+  "https://vercel.com/changelog/native-deployment-checks",
+  "https://vercel.com/changelog/nemotron-3-5-lightning-now-available-on-ai-gateway-for-free",
+  "https://vercel.com/changelog/nemotron-3-ultra-now-available-on-ai-gateway",
   "https://vercel.com/changelog/new-dashboard-navigation-available",
   "https://vercel.com/changelog/new-domains-registrar-api-for-domain-search-pricing-purchase-and-management",
   "https://vercel.com/changelog/new-setup-page-after-domain-checkout",
+  "https://vercel.com/changelog/next-forge-6",
+  "https://vercel.com/changelog/next-js-may-2026-security-release",
   "https://vercel.com/changelog/nextjs-august-2026-security-release",
   "https://vercel.com/changelog/no-base-fee-for-observability-plus",
   "https://vercel.com/changelog/node-js-20-is-being-deprecated",
@@ -2120,17 +2724,25 @@
   "https://vercel.com/changelog/node-js-26-lts-is-now-generally-available-on-vercel",
   "https://vercel.com/changelog/node-js-26-x-now-available-on-vercel-sandboxes",
   "https://vercel.com/changelog/node-js-runtime-now-defaults-to-version-24-for-vercel-sandbox",
+  "https://vercel.com/changelog/nova-2-lite-now-available-on-vercel-ai-gateway",
   "https://vercel.com/changelog/nuxt-july-2026-security-advisory",
   "https://vercel.com/changelog/one-click-upgrade-for-deprecated-node-js-versions",
   "https://vercel.com/changelog/open-your-vercel-dashboard-from-the-vercel-cli",
+  "https://vercel.com/changelog/openai-decisions-api-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/openai-gpt-oss-safeguard-20b-now-available-in-vercel-ai-gateway",
+  "https://vercel.com/changelog/openai-ultrafast-mode-now-available-on-ai-gateway",
   "https://vercel.com/changelog/optimized-cdn-caching-and-deploying-of-immutable-static-assets",
+  "https://vercel.com/changelog/particle-1-is-now-available-on-ai-gateway",
   "https://vercel.com/changelog/password-protection-now-costs-20-per-project-per-month-on-pro",
+  "https://vercel.com/changelog/perplexity-decider-v1-2-models-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/pixel-canary-is-now-available-in-stealth-for-free-on-ai-gateway",
   "https://vercel.com/changelog/port-8080-is-now-available-in-vercel-sandboxes",
   "https://vercel.com/changelog/post-quantum-crypto",
   "https://vercel.com/changelog/posthog-joins-the-vercel-marketplace",
   "https://vercel.com/changelog/preserve-local-environment-variables-when-linking-with-the-vercel-cli",
   "https://vercel.com/changelog/preview-links-between-microfrontends-projects-now-serve-all-paths",
   "https://vercel.com/changelog/preview-urls-optimized-for-multi-tenant-platforms",
+  "https://vercel.com/changelog/private-storage-for-vercel-blob-now-available-in-public-beta",
   "https://vercel.com/changelog/pro-edge-config-pricing",
   "https://vercel.com/changelog/pro-teams-can-now-run-up-to-500-concurrent-builds",
   "https://vercel.com/changelog/progressive-rollouts-in-vercel-flags",
@@ -2145,12 +2757,19 @@
   "https://vercel.com/changelog/push-notifications-support-on-desktop-and-mobile",
   "https://vercel.com/changelog/python-3-13-and-3-14-are-now-available",
   "https://vercel.com/changelog/python-function-bundles-now-include-precompiled-bytecode",
+  "https://vercel.com/changelog/python-on-vercel-is-now-generally-available",
   "https://vercel.com/changelog/python-package-manager-uv-is-now-available-for-builds-with-zero",
   "https://vercel.com/changelog/python-projects-now-support-routing-rules",
   "https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb",
   "https://vercel.com/changelog/query-and-manage-marketplace-databases-from-the-dashboard",
   "https://vercel.com/changelog/query-and-visualize-workflow-data-in-vercel-observability",
   "https://vercel.com/changelog/queues-now-supports-7-day-ttl",
+  "https://vercel.com/changelog/qwen-3-7-max-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/qwen-3-7-plus-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/qwen-3-8-flash-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/qwen-3-8-max-0902-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/qwen-3-8-max-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/qwen-3-max-thinking-now-available-on-ai-gateway",
   "https://vercel.com/changelog/react-server-components-security-update-dos-and-source-code-exposure",
   "https://vercel.com/changelog/redesigned-deployments-list",
   "https://vercel.com/changelog/redesigned-search-and-filtering-for-runtime-logs",
@@ -2159,6 +2778,8 @@
   "https://vercel.com/changelog/reduced-build-times-for-large-projects",
   "https://vercel.com/changelog/reduced-prices-for-tlds-site-space-website-fun-online-store-tech",
   "https://vercel.com/changelog/referer-now-available-in-runtime-logs",
+  "https://vercel.com/changelog/reflection-ai-beam-now-available-on-ai-gateway-for-free",
+  "https://vercel.com/changelog/regional-inference-now-available-on-ai-gateway",
   "https://vercel.com/changelog/repository-checkout-and-git-lfs-downloads-are-now-faster",
   "https://vercel.com/changelog/rewrites-and-redirects-now-available-in-runtime-logs",
   "https://vercel.com/changelog/rollbar-joins-the-vercel-marketplace",
@@ -2170,6 +2791,7 @@
   "https://vercel.com/changelog/runtime-logs-now-appear-in-the-dashboard-6x-faster",
   "https://vercel.com/changelog/runtime-logs-now-show-cache-reasons",
   "https://vercel.com/changelog/rust-runtime-now-in-public-beta-for-vercel-functions",
+  "https://vercel.com/changelog/sakana-fugu-ultra-now-available-on-ai-gateway",
   "https://vercel.com/changelog/sandbox-create-waits-until-ready",
   "https://vercel.com/changelog/sandbox-persistence-is-now-ga",
   "https://vercel.com/changelog/sandbox-sdk-file-permissions",
@@ -2180,7 +2802,10 @@
   "https://vercel.com/changelog/secure-compute-and-static-ip-builds-start-64-faster",
   "https://vercel.com/changelog/secure-compute-is-now-self-serve",
   "https://vercel.com/changelog/secure-internal-communication-between-services",
+  "https://vercel.com/changelog/seedance-2-5-now-available-on-vercel-ai-gateway",
+  "https://vercel.com/changelog/seedream-5-0-pro-is-now-available-on-ai-gateway",
   "https://vercel.com/changelog/server-timing-header",
+  "https://vercel.com/changelog/service-tiers-now-available-on-ai-gateway",
   "https://vercel.com/changelog/set-team-wide-defaults-for-deployment-protection",
   "https://vercel.com/changelog/shai-hulud-2-0-supply-chain-compromise",
   "https://vercel.com/changelog/share-vercel-container-registry-repositories-across-teams",
@@ -2191,6 +2816,7 @@
   "https://vercel.com/changelog/signed-urls-are-now-available-for-vercel-blob",
   "https://vercel.com/changelog/skew-protection-max-age-now-supports-the-full-deployment-lifetime",
   "https://vercel.com/changelog/skew-protection-now-supports-prebuilt-deployments",
+  "https://vercel.com/changelog/skill-packs-are-now-available",
   "https://vercel.com/changelog/skip-sending-request-bodies-to-routing-middleware",
   "https://vercel.com/changelog/skip-unaffected-builds-for-projects-in-bun-monorepos",
   "https://vercel.com/changelog/skipped-monorepo-deployments-no-longer-count-against-limits",
@@ -2199,9 +2825,11 @@
   "https://vercel.com/changelog/split-web-analytics-data-by-any-dimension",
   "https://vercel.com/changelog/ssh-into-running-sandboxes-with-the-sandbox-cli",
   "https://vercel.com/changelog/stale-if-error-cache-control-header-is-now-supported",
+  "https://vercel.com/changelog/step-5-preview-now-available-on-ai-gateway",
   "https://vercel.com/changelog/streamdown-1-6-is-now-available-to-run-faster-and-ship-less-code",
   "https://vercel.com/changelog/streamdown-2-3",
   "https://vercel.com/changelog/streamdown-2-4",
+  "https://vercel.com/changelog/streamdown-2-5",
   "https://vercel.com/changelog/stripe-is-now-generally-available-on-the-marketplace-and-v0",
   "https://vercel.com/changelog/subscribe-to-webhook-events-for-vercel-flags",
   "https://vercel.com/changelog/summaries-of-cve-2025-59471-and-cve-2025-59472",
@@ -2210,15 +2838,20 @@
   "https://vercel.com/changelog/support-for-elysia",
   "https://vercel.com/changelog/support-for-now-json-will-be-removed-on-march-31-2026",
   "https://vercel.com/changelog/support-for-tanstack-start",
+  "https://vercel.com/changelog/tag-based-cache-invalidation-now-available-for-all-responses",
+  "https://vercel.com/changelog/tencent-hy4-now-available-on-ai-gateway",
   "https://vercel.com/changelog/the-skills-sh-api-is-now-available",
   "https://vercel.com/changelog/threshold-billing-is-now-enabled-for-pro-teams",
   "https://vercel.com/changelog/timestamp-attributes-are-now-supported-in-vercel-flags",
   "https://vercel.com/changelog/trace-any-vercel-request-from-the-cli",
   "https://vercel.com/changelog/traces-now-support-tree-and-waterfall-views",
   "https://vercel.com/changelog/transfer-marketplace-resources-between-teams",
+  "https://vercel.com/changelog/trinity-mini-model-now-available-in-vercel-ai-gateway",
   "https://vercel.com/changelog/turbo-build-machines",
   "https://vercel.com/changelog/turbo-build-machines-by-default-for-new-pro-projects",
   "https://vercel.com/changelog/turbo-build-machines-can-now-be-enabled-per-deployment",
+  "https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/typesafe-ais-jev-1-14-is-now-available-on-ai-gateway",
   "https://vercel.com/changelog/unified-security-actions-dashboard",
   "https://vercel.com/changelog/unlimited-vercel-blob-stores-on-every-plan",
   "https://vercel.com/changelog/updates-to-hobby-and-pro-terms-of-service",
@@ -2228,6 +2861,9 @@
   "https://vercel.com/changelog/v0-now-includes-diff-view-to-review-code-changes",
   "https://vercel.com/changelog/vcr-login-github-action",
   "https://vercel.com/changelog/vercel-achieves-tisax-al2",
+  "https://vercel.com/changelog/vercel-agent-investigations-now-available-in-slack",
+  "https://vercel.com/changelog/vercel-agent-is-now-available-in-slack-code-channels",
+  "https://vercel.com/changelog/vercel-ai-gateway-and-vercel-sandbox-now-available-on-hermes-agent",
   "https://vercel.com/changelog/vercel-ci-no-longer-requires-a-linked-vercel-project",
   "https://vercel.com/changelog/vercel-cli-100-services",
   "https://vercel.com/changelog/vercel-cli-can-now-set-new-projects-to-expire",
@@ -2244,10 +2880,12 @@
   "https://vercel.com/changelog/vercel-daemons-can-now-call-services-with-bindings",
   "https://vercel.com/changelog/vercel-daemons-is-now-in-public-beta",
   "https://vercel.com/changelog/vercel-domains-now-supports-price-sorting-and-availability-filtering",
+  "https://vercel.com/changelog/vercel-drives-is-now-generally-available",
   "https://vercel.com/changelog/vercel-drop",
   "https://vercel.com/changelog/vercel-flags-ga",
   "https://vercel.com/changelog/vercel-flags-is-now-in-public-beta",
   "https://vercel.com/changelog/vercel-flags-starts-7x-faster-and-no-longer-extends-function-duration",
+  "https://vercel.com/changelog/vercel-is-now-available-in-stripe-projects",
   "https://vercel.com/changelog/vercel-marketplace-database-browser-now-supports-redis",
   "https://vercel.com/changelog/vercel-microfrontends-checks-for-missing-configuration",
   "https://vercel.com/changelog/vercel-now-supports-build-commands-for-fastapi-and-flask",
@@ -2255,9 +2893,16 @@
   "https://vercel.com/changelog/vercel-now-supports-domain-connect-as-a-dns-provider",
   "https://vercel.com/changelog/vercel-passport-generally-available",
   "https://vercel.com/changelog/vercel-passport-is-now-in-public-beta",
+  "https://vercel.com/changelog/vercel-plugin-is-now-available-in-antigravity",
+  "https://vercel.com/changelog/vercel-plugin-is-now-available-in-grok-build",
+  "https://vercel.com/changelog/vercel-plugin-now-available-in-kimi-code-cli",
+  "https://vercel.com/changelog/vercel-plugin-now-available-in-opencode",
+  "https://vercel.com/changelog/vercel-plugin-now-available-in-vs-code-and-github-copilot-cli",
+  "https://vercel.com/changelog/vercel-private-blob-is-now-generally-available",
   "https://vercel.com/changelog/vercel-python-queues-sdk-is-now-available-in-beta",
   "https://vercel.com/changelog/vercel-python-sdk-in-beta",
   "https://vercel.com/changelog/vercel-queues-now-in-public-beta",
+  "https://vercel.com/changelog/vercel-sandbox-cli-is-now-available",
   "https://vercel.com/changelog/vercel-sandbox-firewall-now-supports-postgres-connections",
   "https://vercel.com/changelog/vercel-sandbox-firewall-now-supports-request-proxying-and-filtering",
   "https://vercel.com/changelog/vercel-sandbox-is-now-available-in-all-regions",
@@ -2275,10 +2920,13 @@
   "https://vercel.com/changelog/vercel-sandbox-routing-is-now-18x-faster-globally",
   "https://vercel.com/changelog/vercel-sandbox-snapshots-now-allow-custom-retention-periods",
   "https://vercel.com/changelog/vercel-sandbox-with-drives-now-starts-up-to-2-4x-faster",
+  "https://vercel.com/changelog/vercel-sandboxes-ga",
   "https://vercel.com/changelog/vercel-sandboxes-now-allow-unique-customizable-names",
   "https://vercel.com/changelog/vercel-schedules-is-now-in-public-beta",
+  "https://vercel.com/changelog/vercel-security-dashboard-is-now-generally-available",
   "https://vercel.com/changelog/vercel-tracing-is-now-generally-available",
   "https://vercel.com/changelog/vercel-ts",
+  "https://vercel.com/changelog/vercel-waf-for-blob-is-now-generally-available",
   "https://vercel.com/changelog/vercel-waf-for-blob-is-now-in-beta",
   "https://vercel.com/changelog/vercel-workflow-is-now-twice-as-fast",
   "https://vercel.com/changelog/vercel-workflows-trace-viewer-now-has-a-minimap",
@@ -2286,8 +2934,16 @@
   "https://vercel.com/changelog/vercels-cdn-now-respects-cache-control-headers-from-external-origins-by-default",
   "https://vercel.com/changelog/vercels-cdn-now-supports-updating-routing-rules-without-a-new-deployment",
   "https://vercel.com/changelog/view-specific-error-codes-in-runtime-logs",
+  "https://vercel.com/changelog/virtual-models-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/voyage-rerank-3-and-rerank-3-lite-are-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/wan-3-0-now-available-on-ai-gateway",
   "https://vercel.com/changelog/web-analytics-and-speed-insights-are-now-more-cost-efficient",
+  "https://vercel.com/changelog/web-analytics-api",
   "https://vercel.com/changelog/web-application-firewall-mitigated-traffic-is-free-on-vercel",
+  "https://vercel.com/changelog/web-interface-guidelines-now-available-as-an-agent-command",
+  "https://vercel.com/changelog/webmcp-mcp-handler",
+  "https://vercel.com/changelog/websocket-support-is-now-available-for-python-functions",
+  "https://vercel.com/changelog/websocket-support-is-now-generally-available",
   "https://vercel.com/changelog/workflow-custom-class-serialization",
   "https://vercel.com/changelog/workflow-encryption",
   "https://vercel.com/changelog/workflow-event-sourcing",
@@ -2295,6 +2951,8 @@
   "https://vercel.com/changelog/workflow-sdk-now-supports-inflight-cancellation",
   "https://vercel.com/changelog/workflow-sdk-now-supports-tanstack-start",
   "https://vercel.com/changelog/workflow-steps-now-support-extended-function-durations",
+  "https://vercel.com/changelog/write-utilization-now-available-in-isr-observability",
+  "https://vercel.com/changelog/xai-grok-audio-models-now-available-on-vercel-ai-gateway",
   "https://vercel.com/changelog/you-can-now-configure-advanced-sampling-rules-for-vercel-drains",
   "https://vercel.com/changelog/you-can-now-deploy-lovable-apps-to-vercel",
   "https://vercel.com/changelog/you-can-now-view-the-activity-log-at-a-project-level",
@@ -2310,7 +2968,9 @@
   "https://weaviate.io/blog/engram-for-claude-code",
   "https://weaviate.io/blog/graphql-api-deprecation",
   "https://weaviate.io/blog/query-profiling",
+  "https://weaviate.io/blog/weaviate-1-38-release",
   "https://weaviate.io/blog/weaviate-1-39-release",
+  "https://weaviate.io/blog/weaviate-1-40-release",
   "https://weaviate.io/blog/weaviate-emudhra-response",
   "https://weaviate.io/blog/weaviate-free-tier",
   "https://weaviate.io/blog/weaviate-security-release-googlemodules-2026",
@@ -2332,8 +2992,11 @@
   "https://www.databricks.com/blog/which-data-collaboration-tool-opensharing-clean-rooms-marketplace",
   "https://www.etsy.com/codeascraft/unlocking-faster-insights-with-experimenter-defined-segmentations",
   "https://www.honeycomb.io/blog/30-70-prs-day-how-we-managed-not-wreck-systems",
+  "https://www.honeycomb.io/blog/agent-timeline-generally-available",
+  "https://www.honeycomb.io/blog/ama-recap-observability-engineering-authors-more-answers",
   "https://www.honeycomb.io/blog/bringing-most-advanced-sampling-opentelemetry-collector",
   "https://www.honeycomb.io/blog/could-should-first-year-managing-sre-team",
+  "https://www.honeycomb.io/blog/good-agents-need-good-managers-innovation-week",
   "https://www.honeycomb.io/blog/graviton5-honeycomb-per-service-results-m8g-m9g-migration",
   "https://www.honeycomb.io/blog/honeycomb-aws-resilience-technology-competency",
   "https://www.honeycomb.io/blog/honeycomb-hiring-vp-engineering",
@@ -2342,6 +3005,7 @@
   "https://www.honeycomb.io/blog/how-our-support-team-uses-honeycomb-debug-honeycomb",
   "https://www.honeycomb.io/blog/it-can-only-goodhart-happen",
   "https://www.honeycomb.io/blog/lattice-watch-smarter-guardrails-design-system-observability",
+  "https://www.honeycomb.io/blog/otel-collector-llm-observability",
   "https://www.honeycomb.io/blog/our-limits-are-not-our-imagination",
   "https://www.honeycomb.io/blog/prototype-production-aws-agentcore",
   "https://www.honeycomb.io/blog/relational-query-superpowers",
@@ -2352,6 +3016,8 @@
   "https://www.intercom.com/blog/announcing-evals-and-releases",
   "https://www.intercom.com/blog/doing-the-right-thing-when-things-go-wrong",
   "https://www.intercom.com/blog/early-stage-startup-tech-stack",
+  "https://www.intercom.com/blog/how-to-measure-customer-experience-as-ai-scales",
+  "https://www.intercom.com/blog/npi-how-to-ensure-your-agent-is-ready-every-time-you-ship",
   "https://www.intercom.com/blog/playing-a-different-game",
   "https://www.intercom.com/blog/ready-for-your-busiest-day-how-we-scale",
   "https://www.intercom.com/blog/salesforce-signs-definitive-agreement-to-acquire-fin",
