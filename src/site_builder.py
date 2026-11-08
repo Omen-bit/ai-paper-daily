@@ -1762,7 +1762,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     case_paths: list[str] = []
     try:  # engineering write-ups from company blogs; the rest of the site never waits on them
         case_paths = case_pages.build_all(case_studies.load(os.path.join(data_dir, "cases.json")), papers,
-                                          page, _write, site_dir)
+                                          page, _write, site_dir, os.path.join(data_dir, "case_logos"))
     except Exception as exc:
         print(f"  [site] WARNING: case study pages failed: {exc}")
     failed = 0

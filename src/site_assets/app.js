@@ -1704,6 +1704,11 @@
     });
     var clearTag = document.querySelector("[data-cs-clear-tag]");
     if (clearTag) clearTag.addEventListener("click", function () { tag = ""; reset(); });
+    var apMore = document.querySelector("[data-cs-ap-more]");
+    if (apMore) apMore.addEventListener("click", function () {
+      document.querySelectorAll(".cs-ap [data-cs-ap-extra]").forEach(function (b) { b.hidden = false; });
+      apMore.hidden = true;
+    });
     var resetAll = document.querySelector("[data-cs-reset]");
     if (resetAll) resetAll.addEventListener("click", function () {
       q.value = ""; tag = "";

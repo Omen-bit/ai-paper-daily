@@ -13,7 +13,9 @@ import html
 import json
 import math
 import os
+import shutil
 
+import case_logos
 from case_sources import BY_NAME, TOPICS as TOPIC_INFO, topic_of
 
 DIR = "case-studies"
@@ -37,6 +39,8 @@ EXT_ARROW = ('<svg class="cs-ext" viewBox="0 0 24 24" fill="none" stroke="curren
 PAPER_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
               'stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'
               '<path d="M14 3v5h5M9 13h6M9 17h4"/></svg>')
+TREND = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+         'stroke-linejoin="round" aria-hidden="true"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg>')
 SEARCH = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
           'aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/></svg>')
 GOOGLE_G = ('<path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 '
@@ -93,6 +97,8 @@ def sprite(companies) -> str:
         elif slug == "spotify":
             out.append(f'<symbol id="b-spotify" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.6" fill="#121212"/>'
                        f'<path fill="#1ED760" d="{BRAND_ICONS["spotify"]["path"]}"/></symbol>')
+        elif BRAND_ICONS[slug].get("svg"):  # a full-colour logo
+            out.append(f'<symbol id="b-{slug}" viewBox="{BRAND_ICONS[slug]["vb"]}">{BRAND_ICONS[slug]["svg"]}</symbol>')
         else:
             fill = "currentColor" if _dark_brand(company) else brand_hex(company)
             out.append(f'<symbol id="b-{slug}" viewBox="0 0 24 24"><path fill="{fill}" d="{BRAND_ICONS[slug]["path"]}"/></symbol>')
@@ -101,12 +107,17 @@ def sprite(companies) -> str:
     return f'<svg class="cs-sprite" aria-hidden="true" focusable="false"><defs>{"".join(out)}</defs></svg>'
 
 
+LOGO_FILES: dict[str, str] = {}  # company -> saved icon file, filled in by build_all
+
+
 def logo(company: str, cls: str = "") -> str:
     """The company's real logo from the sprite, or its initials on its brand colour when there is none."""
     slug = _slug(company)
     dark = " cs-ink" if _dark_brand(company) else ""
     if slug:
         return f'<svg class="{cls}{dark}" aria-hidden="true"><use href="#b-{slug}"/></svg>'
+    if company in LOGO_FILES:  # the icon from the company's own website, saved by case_logos.py
+        return f'<img class="{cls} cs-img" src="logos/{esc(LOGO_FILES[company])}" alt="" loading="lazy" decoding="async">'
     letters = (company[:1] or "?").upper()
     return f'<span class="{cls} cs-mono" style="--b:{brand_hex(company)}" aria-hidden="true">{esc(letters)}</span>'
 
@@ -131,6 +142,11 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
     problem, company = post["problem"], post["company"]
     tags = [t for t in post.get("tags") or [] if isinstance(t, str)][:3]
     summary = f'<p>{esc(post["summary"])}</p>' if post.get("summary") else ""
+    if post.get("issue"):  # the problem in plain words, then how they solved it
+        summary = (f'<p class="cs-issue"><b>Problem</b> {esc(post["issue"])}</p>'
+                   + (f'<p class="cs-fix"><b>Solution</b> {esc(post["summary"])}</p>' if post.get("summary") else ""))
+    if post.get("result"):
+        summary += f'<p class="cs-result">{TREND}<span>{esc(post["result"])}</span></p>'
     tag_html = ("<ul class=\"cs-tags\" aria-label=\"Techniques\">" +
                 "".join(f'<li><button type="button" data-cs-tag="{esc(t)}">{esc(t)}</button></li>' for t in tags) +
                 "</ul>") if tags else ""
@@ -138,7 +154,7 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
            f'<b>{esc(paper[1])}</b></div></a>' if paper else "")
     date = nice_date(post.get("published", ""))
     when = f'<time datetime="{esc(post.get("published", ""))}">{date}</time>' if date else ""
-    return f"""<li class="cs-card" style="--c:var(--l-{problem});--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''))}">
+    return f"""<li class="cs-card" style="--c:var(--l-{problem});--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
 <div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-topic">{esc(problem_name(problem))}</span></div>
 <div class="cs-body"><h3><a class="cs-link" href="{esc(post['url'])}" rel="noopener" target="_blank">{esc(post['title'])}</a></h3>{summary}{tag_html}{rel}
 <div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span><button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
@@ -211,12 +227,37 @@ def filters(all_posts: list[dict], posts: list[dict], current: str = "") -> str:
     for p in posts:
         per_co[p["company"]] = per_co.get(p["company"], 0) + 1
     options = "".join(f'<option value="{esc(c)}">{esc(c)} ({n})</option>' for c, n in sorted(per_co.items(), key=lambda kv: kv[0].lower()))
-    label = "Search write-ups" if not current else f"Search {SHORT[current]}"
+    label = "Search write-ups" if not current else f"Search {SHORT[current]} write-ups"
     return f"""<nav class="cs-chips" aria-label="Topics">{"".join(chips)}</nav>
 <div class="cs-tools">
-<div class="cs-find"><label for="cs-q">{esc(label)}</label><div class="cs-search">{SEARCH}<input id="cs-q" type="search" placeholder="RAG, caching, Netflix" autocomplete="off" data-cs-q></div></div>
-<label class="cs-sel" for="cs-co"><span>Company</span><select id="cs-co" data-cs-company><option value="">All companies</option>{options}</select></label>
+<div class="cs-find"><label class="sr-only" for="cs-q">{esc(label)}</label><div class="cs-search">{SEARCH}<input id="cs-q" type="search" placeholder="{esc(label)}" autocomplete="off" data-cs-q></div></div>
+<label class="cs-sel" for="cs-co"><span class="sr-only">Company</span><select id="cs-co" data-cs-company><option value="">All companies</option>{options}</select></label>
 </div>"""
+
+
+# Tags that only repeat the topic's own name, left out of that topic's "How they built it" row
+SAME_AS_TOPIC = {"rag": {"RAG"}, "agents": {"Agents"}, "evals": {"Evals"}, "cost": {"Cost"},
+                 "tuning": {"Fine-tuning"}, "safety": {"Guardrails"}, "llm": {"LLMs"}, "recs": {"Personalisation"}}
+MAX_APPROACHES = 12
+SHOWN_APPROACHES = 6  # the rest sit behind "More"
+
+
+def approaches(posts: list[dict], topic: str) -> str:
+    """The techniques used across these write-ups, most used first, as tag filters."""
+    count: dict[str, int] = {}
+    for p in posts:
+        for t in (p.get("tags") or [])[:3]:
+            if isinstance(t, str) and t not in SAME_AS_TOPIC.get(topic, set()):
+                count[t] = count.get(t, 0) + 1
+    top = sorted(count.items(), key=lambda kv: (-kv[1], kv[0]))[:MAX_APPROACHES]
+    if len(top) < 2:
+        return ""
+    buttons = "".join(f'<button type="button" data-cs-tag="{esc(t)}" aria-pressed="false"'
+                      f'{" data-cs-ap-extra hidden" if i >= SHOWN_APPROACHES else ""}>{esc(t)} <span>{n}</span></button>'
+                      for i, (t, n) in enumerate(top))
+    more = (f'<button class="cs-ap-more" type="button" data-cs-ap-more>{len(top) - SHOWN_APPROACHES} more</button>'
+            if len(top) > SHOWN_APPROACHES else "")
+    return f'<div class="cs-ap" role="group" aria-label="Filter by how they built it"><p>Approach</p><div>{buttons}{more}</div></div>'
 
 
 def status(n: int, hidden: bool = False) -> str:
@@ -228,11 +269,18 @@ NONE = ('<div class="cs-none" data-cs-none hidden><p>No write-ups match these fi
         '<button class="cs-more" type="button" data-cs-reset>Clear all filters</button></div>')
 
 
-def build_all(posts: list[dict], papers: dict, page, write, site_dir: str) -> list[str]:
+def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_dir: str = "") -> list[str]:
     """Write the Case studies pages: the main page with a section per topic, and one page per topic.
-    page is site_builder.page; returns the paths for the sitemap."""
+    page is site_builder.page; logo_dir holds the icons case_logos.py saved. Returns the paths for the sitemap."""
     posts = _clean(posts)
     companies = {p["company"] for p in posts}
+    LOGO_FILES.clear()
+    for company in companies:
+        name = case_logos.saved_file(company, logo_dir) if logo_dir and not _slug(company) else ""
+        if name:
+            os.makedirs(os.path.join(site_dir, DIR, "logos"), exist_ok=True)
+            shutil.copyfile(os.path.join(logo_dir, name), os.path.join(site_dir, DIR, "logos", name))
+            LOGO_FILES[company] = name
     related = related_papers(posts, papers, k=1) if papers else {}
     desc = "How companies like Netflix, Meta and Spotify build AI into their products, from their own engineering blogs."
     sprite_all = sprite(companies)
@@ -290,7 +338,7 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str) -> li
         name, about = TOPIC_INFO[k]
         body = (f'<p class="cs-crumb"><a href="index.html">Case studies</a> / {esc(name)}</p>'
                 f'<section class="cs-top cs-topic-top"><h1>{esc(name)}</h1><p>{esc(about)}</p></section>'
-                f'{filters(posts, these, k)}{status(len(these))}{feed(these)}')
+                f'{filters(posts, these, k)}{approaches(these, k)}{status(len(these))}{feed(these)}')
         write(os.path.join(site_dir, DIR, f"{SLUGS[k]}.html"),
               page(f"{name}: case studies", wrap(body, f' style="--c:var(--l-{k})"'), root=ROOT, active="cases",
                    path=f"{DIR}/{SLUGS[k]}.html",

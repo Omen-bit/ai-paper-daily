@@ -60,10 +60,12 @@ def test_keyword_rules_prefer_the_specific_llm_topics():
 
 
 def test_groq_reply_parsing():
-    ok = cs.parse_reply('Sure: {"ai_in_production": true, "topic": "RAG", "summary": "Built a retriever."}')
-    assert ok == {"keep": True, "topic": "rag", "summary": "Built a retriever.", "tags": []}
-    assert cs.parse_reply('{"ai_in_production": false}') == {"keep": False}
-    assert cs.parse_reply('{"ai_in_production": true, "topic": "music"}') is None
+    ok = cs.parse_reply('Sure: {"kind": "build", "topic": "RAG", "summary": "Built a retriever.", "result": "Answers 20% better."}')
+    assert ok == {"keep": True, "topic": "rag", "issue": "", "summary": "Built a retriever.", "result": "Answers 20% better", "tags": []}
+    assert cs.parse_reply('{"kind": "launch", "topic": "rag"}') == {"keep": False}
+    assert cs.parse_reply('{"kind": "research", "topic": "rag"}') == {"keep": False}
+    assert cs.parse_reply('{"kind": "build", "topic": "music"}') is None
+    assert cs.parse_reply('{"kind": "build", "topic": "rag", "summary": "x", "result": "none"}')["result"] == ""
     assert cs.parse_reply("no json here") is None
 
 
@@ -108,7 +110,7 @@ def test_sources_and_tags_are_well_formed():
 def test_tags_come_from_the_list_and_keywords():
     assert cs.rule_tags({"title": "RAG for support agents", "text": "We use embeddings and GPUs."}) == ["RAG", "Agents", "Embeddings"]
     assert cs.rule_tags({"title": "Semantic caching cut our LLM bill", "text": ""})[:2] == ["Semantic caching", "LLMs"]
-    ok = cs.parse_reply('{"ai_in_production": true, "topic": "rag", "summary": "x", "tags": ["rag", "Made up", "LLMs"]}')
+    ok = cs.parse_reply('{"kind": "build", "topic": "rag", "summary": "x", "tags": ["rag", "Made up", "LLMs"]}')
     assert ok["tags"] == ["RAG", "LLMs"]
 
 
@@ -158,7 +160,7 @@ def test_case_studies_are_split_by_topic(tmp_path):
     assert 'id="recommendations"' in page and 'href="guardrails.html"' in page and 'id="vision"' not in page
     results = page.split("data-cs-results", 1)[1]
     assert results.count("data-cs-item") == 3  # the search list holds every write-up once
-    assert 'id="b-netflix"' in page and "cs-mono" in page  # real logo, initial for Booking.com
+    assert 'id="b-netflix"' in page and 'id="b-bookingdotcom"' in page  # real logos for both
     assert 'data-cs-tag="Two-tower"' in page and 'data-cs-save="cs:https://netflixtechblog.com/a"' in page
     assert '<option value="Meta">Meta (1)</option>' in page
     assert "../paper/2611.1.html" in page  # a related paper from our library
@@ -232,3 +234,76 @@ def test_old_posts_are_sorted_again_with_half_the_calls(monkeypatch):
     assert counts["resorted"] == 3 and counts["waiting"] == 2
     assert {p["problem"] for p in redone} == {"evals"} and redone[0]["summary"] == "New line."
     assert all(p["problem"] == "cost" for p in posts if p.get("resort"))  # moved by the old step until then
+
+
+def test_launches_and_event_recaps_are_turned_down_without_groq(monkeypatch):
+    calls = []
+    monkeypatch.setattr(cs, "groq_sort", lambda post: calls.append(post) or {"keep": True, "topic": "agents", "summary": "x", "result": "", "tags": []})
+    fetched = [dict(url="https://a.example/1", company="Vercel", title="DeepSeek model now available on AI Gateway", published="2026-11-01", text="LLM"),
+               dict(url="https://a.example/2", company="Honeycomb", title="Everything we talked about at O11yDay", published="2026-11-01", text="agents"),
+               dict(url="https://a.example/3", company="Uber", title="How we built an LLM agent for redlining", published="2026-11-01", text="")]
+    posts, _ = cs.update([], fetched, "2026-11-07")
+    assert [p["url"] for p in posts] == ["https://a.example/3"] and len(calls) == 1
+    assert posts[0]["v"] == cs.VERSION and posts[0]["result"] == ""
+
+
+def test_posts_from_the_older_prompt_are_sorted_again(monkeypatch):
+    monkeypatch.setattr(cs, "groq_sort", lambda post: {"keep": True, "topic": "rag", "summary": "New.", "result": "2x faster", "tags": ["RAG"]})
+    old = _post("https://x/1")
+    old.pop("v", None)
+    posts, counts = cs.update([old], [], "2026-11-07")
+    assert counts["resorted"] == 1 and posts[0]["result"] == "2x faster" and posts[0]["v"] == cs.VERSION
+    assert "resort" not in posts[0]
+
+
+def test_topic_pages_list_the_approaches_used():
+    import case_pages as cp
+    posts = [{"tags": ["RAG", "Reranking", "Hybrid search"]}, {"tags": ["Reranking", "Chunking"]}]
+    row = cp.approaches(posts, "rag")
+    assert 'data-cs-tag="Reranking"' in row and "Reranking <span>2</span>" in row
+    assert 'data-cs-tag="RAG"' not in row  # the topic's own name is left out
+    assert cp.approaches([{"tags": ["RAG"]}], "rag") == ""
+
+
+def test_result_line_shows_on_the_card():
+    import case_pages as cp
+    card = cp.post_card({**_post("https://x/1"), "problem": "rag", "summary": "Built it.", "result": "Tickets 30% faster"})
+    assert 'class="cs-result"' in card and "Tickets 30% faster" in card
+
+
+def test_logos_are_fetched_from_the_company_site(tmp_path):
+    import io
+    from datetime import date
+    from PIL import Image
+    import case_logos
+
+    def png(size):
+        out = io.BytesIO()
+        Image.new("RGBA", (size, size), (255, 0, 0, 255)).save(out, "PNG")
+        return out.getvalue()
+
+    class R:
+        def __init__(self, status, content=b"", text=""):
+            self.status_code, self.content, self.text = status, content, text
+
+    pages = {"https://www.agoda.com/": R(200, text='<link rel="icon" href="/fav.png" sizes="16x16"><link rel="apple-touch-icon" href="/touch.png" sizes="180x180">'),
+             "https://www.agoda.com/touch.png": R(200, png(180)),
+             "https://www.agoda.com/fav.png": R(200, png(16))}
+    get = lambda url: pages.get(url, R(404))
+    assert case_logos.icon_links(pages["https://www.agoda.com/"].text, "https://www.agoda.com/")[0] == "https://www.agoda.com/touch.png"
+    saved = case_logos.fetch_missing(["Agoda", "Myntra", "Netflix"], str(tmp_path), date(2026, 11, 8), get)
+    assert saved == 1 and case_logos.saved_file("Agoda", str(tmp_path)) == "agoda.png"
+    assert Image.open(tmp_path / "agoda.png").size == (case_logos.SAVE_SIZE, case_logos.SAVE_SIZE)
+    assert case_logos.saved_file("Myntra", str(tmp_path)) == ""  # nothing usable: keeps its initial, tried again later
+    assert case_logos.fetch_missing(["Myntra"], str(tmp_path), date(2026, 11, 9), get) == 0
+    assert case_logos.to_png(png(16)) is None  # too small to look sharp
+
+
+def test_cards_explain_the_problem_in_plain_words():
+    import case_pages as cp
+    ok = cs.parse_reply('{"kind": "build", "topic": "rag", "issue": "Partners kept asking support the same questions.", "summary": "A help chatbot."}')
+    assert ok["issue"] == "Partners kept asking support the same questions."
+    card = cp.post_card({**_post("https://x/1"), "problem": "rag", "summary": "A help chatbot.", "issue": ok["issue"]})
+    assert "<b>Problem</b> Partners kept" in card and "<b>Solution</b> A help chatbot." in card
+    row = cp.approaches([{"tags": [f"T{i}"]} for i in range(8)] * 2, "rag")
+    assert row.count("data-cs-ap-extra hidden") == 2 and "2 more" in row

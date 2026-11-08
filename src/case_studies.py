@@ -3,9 +3,9 @@ case_studies.py
 Reads company engineering blogs and keeps the posts about AI running in real products,
 for the Case studies pages.
 
-For each new post, Groq decides whether it is about AI in production, which problem and
+For each new post, Groq decides whether it explains how the company built an AI system (not a launch, research or event post), which problem and
 topic it is about (case_sources.TOPICS), picks 1-3 technique tags (case_sources.TAGS), and
-writes one line about it in our own words. Posts that look LLM-related are asked about first.
+writes a sentence or two in our own words on what was built and how, plus the result the post reports. Posts that look LLM-related are asked about first.
 Without Groq, a keyword fallback sorts posts and the summary is left empty: the site never
 shows the blog's own text as ours.
 
@@ -155,24 +155,45 @@ def rule_tags(post: dict) -> list[str]:
     return tags[:MAX_TAGS]
 
 
-GROQ_PROMPT = """You sort engineering blog posts for a site about how companies use AI in real products.
+GROQ_PROMPT = """You pick engineering blog posts for a site that shows how companies build AI into their
+products: how they built a RAG system, an agent, a recommender, an evaluation setup, and so on.
 
 Topics:
 {topics}
 
 Reply with JSON only:
-{{"ai_in_production": true or false, "topic": "<key>", "summary": "<one sentence>", "tags": ["<tag>", ...]}}
+{{"kind": "<kind>", "topic": "<key>", "issue": "<one sentence>", "summary": "<one or two sentences>", "result": "<short phrase or empty>", "tags": ["<tag>", ...]}}
 
-ai_in_production is true only when the post explains how the company builds, trains, serves or
-evaluates a machine learning or AI system it runs. Hiring posts, events, culture, security
-incidents and general infrastructure without a model are false.
+kind is one of:
+- build: the company explains how it built, trained, served, tested or improved an AI or machine
+  learning system that it runs in its own product or its own work, with some detail of how it works.
+- launch: a product or feature announcement, release notes, a new version or "now available".
+- research: a research result, paper or model that the post does not say is running in a product.
+- event: a talk, conference, meetup or webinar recap.
+- other: culture, hiring, opinion, advice, an operating model or a security notice, with no concrete system.
+Only build posts are kept, so when unsure between build and another kind, pick the other kind.
 topic is the one key the post is mainly about. Prefer the specific LLM topics (rag, agents,
 evals, cost, tuning, safety) over llm when one fits: a post about making an LLM cheaper or
 faster is cost, a post about testing answer quality is evals.
-The summary is at most 25 words, in plain words, in your own words (never copy the post's
-sentences), says what the team did and why, and does not start with the company name.
-tags are 1 to 3 techniques the post is mainly about, chosen only from this list:
+Write issue and summary for someone new to AI: simple everyday words, short sentences, no
+jargon (or explain it in a few words), in your own words (never copy the post's sentences),
+and never start with the company name.
+issue is the problem the company was trying to solve, in at most 20 words, as its users or
+team felt it (for example "Hotel partners kept asking support the same setup questions,
+which slowed down their sign-up").
+summary is how they solved it, in at most 30 words: what they built and how it works.
+result is the outcome the post reports, in at most 10 words, with its number when the post gives
+one (for example "Support tickets resolved 30% faster"). Leave it empty when the post reports none;
+never guess one.
+tags are 1 to 3 techniques the system uses, the most specific first, chosen only from this list:
 {tags}"""
+
+# Titles that are never a write-up about how something was built, turned down without asking Groq
+NOT_A_BUILD = re.compile(
+    r"now (generally )?available|\brelease notes?\b|\brelease\s*$|security release|what we heard|"
+    r"everything we talked|key takeaways|\brecap\b|\bwebinar\b|join us|we.re hiring|meet the team|"
+    r"\bchangelog\b|\bnewsletter\b", re.I)
+VERSION = 3  # posts sorted under an older prompt are sorted again, so they get a result and a kind
 
 
 def _topics_text() -> str:
@@ -188,13 +209,13 @@ def parse_reply(raw: str) -> dict | None:
         data = json.loads(match.group(0))
     except json.JSONDecodeError:
         return None
-    if not data.get("ai_in_production"):
+    if str(data.get("kind", "")).strip().lower() != "build":
         return {"keep": False}
     topic = str(data.get("topic", "")).strip().lower()
     if topic not in TOPICS:
         return None
     summary = " ".join(str(data.get("summary", "")).split())
-    if len(summary.split()) > 40:
+    if len(summary.split()) > 45:
         summary = ""
     by_lower = {t.lower(): t for t in TAG_NAMES}
     raw_tags = data.get("tags") if isinstance(data.get("tags"), list) else []
@@ -203,7 +224,13 @@ def parse_reply(raw: str) -> dict | None:
         name = by_lower.get(str(t).strip().lower())
         if name and name not in tags:
             tags.append(name)
-    return {"keep": True, "topic": topic, "summary": summary, "tags": tags[:MAX_TAGS]}
+    result = " ".join(str(data.get("result") or "").split()).rstrip(".")
+    if len(result.split()) > 14 or result.lower() in ("none", "n/a", "not stated", "unknown"):
+        result = ""
+    issue = " ".join(str(data.get("issue") or "").split())
+    if len(issue.split()) > 30:
+        issue = ""
+    return {"keep": True, "topic": topic, "issue": issue, "summary": summary, "result": result, "tags": tags[:MAX_TAGS]}
 
 
 def groq_sort(post: dict) -> dict | None:
@@ -223,7 +250,7 @@ def groq_sort(post: dict) -> dict | None:
                 model=model, temperature=0.2,
                 messages=[{"role": "system", "content": GROQ_PROMPT.format(topics=_topics_text(), tags=", ".join(TAG_NAMES))},
                           {"role": "user", "content": user}],
-                **gs.call_options(model, 200))
+                **gs.call_options(model, 400))
             result = parse_reply(response.choices[0].message.content)
             if result:
                 return result
@@ -277,8 +304,9 @@ def migrate(post: dict) -> dict:
     topic = topic_of(post)
     if topic:
         post["problem"] = topic
-    if post.pop("step", None) is not None:
-        post["resort"] = True  # sorted under the old problems: Groq sorts it again when it has room
+    post.pop("step", None)
+    if post.get("v") != VERSION:
+        post["resort"] = True  # sorted under an older prompt: Groq sorts it again when it has room
     tags = [t for t in post.get("tags") or [] if t in TAG_NAMES]  # tags from older lists are redone
     post["tags"] = tags or rule_tags(post)
     return post
@@ -317,7 +345,8 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
             seen_skips.add(old["url"])
         else:
             posts[i] = {**old, "problem": result["topic"], "summary": result["summary"] or old.get("summary", ""),
-                        "tags": result.get("tags") or old.get("tags", []), "sorted_by": "groq"}
+                        "result": result.get("result", ""), "issue": result.get("issue", ""), "tags": result.get("tags") or old.get("tags", []),
+                        "sorted_by": "groq", "v": VERSION}
             posts[i].pop("resort", None)
         counts["resorted"] += 1
     posts = [p for p in posts if p]
@@ -326,7 +355,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
             continue
         if post["published"] and post["published"] < cutoff:
             continue
-        if not looks_like_ai(post):
+        if not looks_like_ai(post) or NOT_A_BUILD.search(post["title"]):
             seen_skips.add(post["url"])
             continue
         result = None
@@ -355,6 +384,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 continue
             problem, summary, how = result["topic"], result["summary"], "groq"
             tags = result.get("tags") or rule_tags(post)
+            extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION}
         else:
             problem = rule_sort(post)
             if not problem:
@@ -362,10 +392,11 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 continue
             summary, how = "", "rules"
             tags = rule_tags(post)
+            extra = {}
             counts["rules"] += 1
         posts.append({"url": post["url"], "company": post["company"], "title": post["title"],
                       "published": post["published"] or today, "added": today, "problem": problem,
-                      "summary": summary, "tags": tags, "sorted_by": how})
+                      "summary": summary, "tags": tags, "sorted_by": how, **extra})
         known.add(post["url"])
         counts["new"] += 1
     return posts, counts
@@ -401,6 +432,13 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
     posts, counts = update(existing, fetched, today, use_groq=use_groq,
                            reader=read_article if use_groq else None, rejected=rejected)
     save(posts, path, rejected, counts["waiting"])
+    try:  # icons for the companies with no drawn logo, from their own websites
+        import case_logos
+        with open(os.path.join(SRC_DIR, "case_brands.json"), encoding="utf-8") as f:
+            drawn = set(json.load(f))
+        case_logos.fetch_missing([name for name, _, _, slug, _ in SOURCES if slug not in drawn])
+    except Exception as exc:
+        print(f"  [cases] Logos skipped ({str(exc)[:80]})")
     print(f"  [cases] {counts['new']} new posts ({counts['groq']} sorted by Groq, {counts['rules']} by keywords), "
           f"{counts['resorted']} older posts sorted again, {counts['skipped']} not about AI in production, {counts['waiting']} waiting for the next run, "
           f"{len(down)} feeds down. {len(posts)} saved.")
