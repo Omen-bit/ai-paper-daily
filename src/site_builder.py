@@ -1684,6 +1684,14 @@ def _write(path: str, content: str) -> None:
         f.write(content)
 
 
+def _making_of_head() -> str:
+    """The favicon and visit counting for "How I built AI Papers Daily", which has its own page layout."""
+    head = f'\n<link rel="icon" href="{FAVICON}">'
+    if UMAMI_WEBSITE_ID:  # this page has no app.js, so Umami counts the visit itself
+        head += (f'\n<script defer src="https://cloud.umami.is/script.js" data-website-id="{UMAMI_WEBSITE_ID}"></script>')
+    return head
+
+
 def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: str = EXPORT_DIR) -> int:
     """Rebuild site_dir from scratch. Returns the number of paper pages written."""
     global EDITION, LOGOS, LOGO_DEV_CREDIT, SAME_LAB
@@ -1762,7 +1770,8 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     case_paths: list[str] = []
     try:  # engineering write-ups from company blogs; the rest of the site never waits on them
         case_paths = case_pages.build_all(case_studies.load(os.path.join(data_dir, "cases.json")), papers,
-                                          page, _write, site_dir, os.path.join(data_dir, "case_logos"))
+                                          page, _write, site_dir, os.path.join(data_dir, "case_logos"),
+                                          SITE_URL, THEME_SCRIPT, _making_of_head())
     except Exception as exc:
         print(f"  [site] WARNING: case study pages failed: {exc}")
     failed = 0

@@ -16,6 +16,7 @@ import os
 import shutil
 
 import case_logos
+import making_of
 from case_sources import BY_NAME, TOPICS as TOPIC_INFO, topic_of
 
 DIR = "case-studies"
@@ -269,9 +270,11 @@ NONE = ('<div class="cs-none" data-cs-none hidden><p>No write-ups match these fi
         '<button class="cs-more" type="button" data-cs-reset>Clear all filters</button></div>')
 
 
-def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_dir: str = "") -> list[str]:
+def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_dir: str = "",
+              site_url: str = "", theme_script: str = "", head_extra: str = "") -> list[str]:
     """Write the Case studies pages: the main page with a section per topic, and one page per topic.
-    page is site_builder.page; logo_dir holds the icons case_logos.py saved. Returns the paths for the sitemap."""
+    page is site_builder.page; logo_dir holds the icons case_logos.py saved. It also writes "How I built
+    AI Papers Daily" (making_of.py), whose card leads the main page. Returns the paths for the sitemap."""
     posts = _clean(posts)
     companies = {p["company"] for p in posts}
     LOGO_FILES.clear()
@@ -304,8 +307,9 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
     if posts:
         lead = (f"Write-ups from {len(companies)} company engineering blogs about AI running in real products, "
                 "grouped by topic. Each card opens the original post on the company’s own blog.")
+        # Our own write-up about building this site leads, beside the newest company post
         sections = [f'<section class="cs-sec"><div class="cs-sec-head"><h2>Newest</h2></div>'
-                    f'<ul class="cs-grid">{"".join(card(p) for p in posts[:2])}</ul></section>']
+                    f'<ul class="cs-grid">{making_of.card()}{"".join(card(p) for p in posts[:1])}</ul></section>']
         for k in TOPICS:
             these = [p for p in posts if p["problem"] == k]
             if not these:
@@ -329,6 +333,7 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
     write(os.path.join(site_dir, DIR, "index.html"),
           page("Case studies", wrap(body), root=ROOT, active="cases", path=f"{DIR}/index.html", description=desc))
     paths = [f"{DIR}/index.html"]
+    paths += making_of.build(write, site_dir, site_url, posts, theme_script, head_extra)
 
     # One page per topic with write-ups
     for k in TOPICS:
