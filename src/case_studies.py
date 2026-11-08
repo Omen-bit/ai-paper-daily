@@ -228,8 +228,8 @@ def parse_reply(raw: str) -> dict | None:
     if len(result.split()) > 14 or result.lower() in ("none", "n/a", "not stated", "unknown"):
         result = ""
     issue = " ".join(str(data.get("issue") or "").split())
-    if len(issue.split()) > 30:
-        issue = ""
+    if not issue or len(issue.split()) > 30:
+        return None  # every card shows the problem, so a reply without one is asked again on the next run
     return {"keep": True, "topic": topic, "issue": issue, "summary": summary, "result": result, "tags": tags[:MAX_TAGS]}
 
 
@@ -305,8 +305,8 @@ def migrate(post: dict) -> dict:
     if topic:
         post["problem"] = topic
     post.pop("step", None)
-    if post.get("v") != VERSION:
-        post["resort"] = True  # sorted under an older prompt: Groq sorts it again when it has room
+    if post.get("v") != VERSION or not post.get("issue"):
+        post["resort"] = True  # sorted under an older prompt, or no problem yet: Groq sorts it again when it has room
     tags = [t for t in post.get("tags") or [] if t in TAG_NAMES]  # tags from older lists are redone
     post["tags"] = tags or rule_tags(post)
     return post
@@ -327,8 +327,11 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
     counts = {"new": 0, "skipped": 0, "groq": 0, "rules": 0, "waiting": 0, "resorted": 0}
     calls = 0
 
-    # Posts saved under the old problems are sorted again, with up to half of this run's calls
-    for i, old in sorted(enumerate(posts), key=lambda ip: ip[1].get("published") or "", reverse=True):
+    # Posts saved under the old problems, or with no problem line, are sorted again, with up to half of this run's calls
+    # Posts with no problem line come first, newest first, since their cards look unfinished
+    order = sorted(enumerate(posts), key=lambda ip: ip[1].get("published") or "", reverse=True)
+    order.sort(key=lambda ip: bool(ip[1].get("issue")))
+    for i, old in order:
         if not old.get("resort"):
             continue
         if not use_groq or calls >= max_calls // 2:

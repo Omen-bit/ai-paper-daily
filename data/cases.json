@@ -543,7 +543,8 @@
     "Evals"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI safety tests built in-house could miss gaps, so the team needed an outside check that they were thorough."
   },
   {
    "url": "https://medium.com/expedia-group-tech/the-quiet-tax-on-machine-learning-teams-43d71bd539c7",
@@ -559,7 +560,8 @@
     "GPUs"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Every ML team rebuilt the same deployment steps by hand, wasting engineering time and money."
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/thin-orchestrator-ai-agent-architecture",
@@ -575,7 +577,8 @@
     "Tool calling"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "One central AI agent doing too much made the whole agent system slow and prone to mistakes."
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/genrecs-tokenization-transforming-ads-recommendation-at-meta-with-stable-model-vocabulary",
@@ -591,7 +594,8 @@
     "Multimodal"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Ads change constantly, so ranking models struggled to understand new ads with no history yet."
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/data-center-engineering/inside-prometheus-meta-gigawatt-scale-supercluster",
@@ -607,7 +611,8 @@
     "Latency"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Training the biggest AI models needs huge, reliable compute that existing clusters could not provide."
   },
   {
    "url": "https://booking.ai/from-static-help-content-to-a-rag-based-onboarding-agent-for-partners-f7d5a789c4f7",
@@ -623,7 +628,8 @@
     "Reranking"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "New hotel partners got stuck signing up and kept asking support the same setup questions."
   },
   {
    "url": "https://www.honeycomb.io/blog/everything-we-talked-about-o11yday-london-2026",
@@ -639,7 +645,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Code reviews and debugging took engineers a lot of slow, repetitive effort."
   },
   {
    "url": "https://engineering.atspotify.com/2026/10/advancing-generative-recommendation-inference-our-collaboration-with-nvidia-on-tensorrt-llm",
@@ -655,7 +662,8 @@
     "LLMs"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Generating podcast recommendations with a large model was too slow for real-time use at Spotify's scale."
   },
   {
    "url": "https://weaviate.io/blog/weaviate-security-release-nearobject-2026",
@@ -670,7 +678,8 @@
     "Vector search"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "A search feature let some users read vectors from collections they were not allowed to see."
   },
   {
    "url": "https://machinelearning.apple.com/research/selection-structured-reasoning",
@@ -686,7 +695,8 @@
     "Cost"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Search agents that reason step by step over images and text were slow and costly to run."
   },
   {
    "url": "https://machinelearning.apple.com/research/plan-retrieve-tool-discovery",
@@ -702,7 +712,8 @@
     "RAG"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Agents with many tools did not know whether to plan first or look up the right tools first."
   },
   {
    "url": "https://machinelearning.apple.com/research/mlx-distributed-inference",
@@ -718,7 +729,8 @@
     "Cost"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Very large language models are too big to run on a single machine at a usable speed."
   },
   {
    "url": "https://weaviate.io/blog/pathseer-filtered-vector-search",
@@ -752,7 +764,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Answering big questions about the planet needs many models and datasets that are hard to combine by hand."
   },
   {
    "url": "https://netflixtechblog.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb",
@@ -768,7 +781,8 @@
     "Real-time"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Netflix's big new recommendation model was too heavy to plug directly into every personalization system."
   },
   {
    "url": "https://engineering.razorpay.com/inside-razorpays-rto-model-the-engineering-behind-its-ml-lifecycle-999fe75e66ec",
@@ -782,7 +796,8 @@
     "Evals"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Cash-on-delivery orders that get returned cost merchants money, so risky orders needed spotting before checkout."
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/10/structure-automating-data-ingestion-with-a-rag-flywheel.html",
@@ -798,7 +813,8 @@
     "Embeddings"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Every supplier sends product data in its own format, and mapping it by hand was slow."
   },
   {
    "url": "https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626",
@@ -814,7 +830,8 @@
     "LLMs"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Raw activity logs did not show what people were actually trying to do on Pinterest."
   },
   {
    "url": "https://www.intercom.com/blog/fin-4-customer-agent-operator-and-major-upgrades-to-the-intercom-helpdesk",
@@ -830,7 +847,8 @@
     "Prompting"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Support teams spent too long answering customer questions and actions by hand."
   },
   {
    "url": "https://research.google/blog/earth-ais-planetary-geospatial-foundation-models-for-global-public-health",
@@ -845,7 +863,8 @@
     "Two-tower"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Disease forecasts needed location data that was slow and hard to collect for every place."
   },
   {
    "url": "https://medium.com/pinterest-engineering/metrics-board-building-an-agent-ready-metrics-layer-2c8fefe68756",
@@ -861,7 +880,8 @@
     "RAG"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Defining metrics by hand did not scale, and AI agents could not reliably look up the right numbers."
   },
   {
    "url": "https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development",
@@ -877,7 +897,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI coding agents create far more Git activity than GitHub's systems were built to handle."
   },
   {
    "url": "https://engineering.salesforce.com/ai-agents-need-memory-building-persistent-memory-for-agentforce",
@@ -892,7 +913,8 @@
     "Tool calling"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI agents forgot everything between conversations, so users had to repeat themselves."
   },
   {
    "url": "https://booking.ai/introducing-agenthub-booking-com-platform-for-modular-travel-ai-agents-68bc521a0f50",
@@ -908,7 +930,8 @@
     "Agents"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Each team building travel AI agents was reinventing the same plumbing on its own."
   },
   {
    "url": "https://www.amazon.science/blog/graph-centric-agentic-intelligence",
@@ -960,7 +983,8 @@
     "LLMs"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Free-form AI instructions gave unpredictable answers that businesses could not rely on."
   },
   {
    "url": "https://research.google/blog/how-diffusion-controller-unifies-and-simplifies-ai-image-generation",
@@ -976,7 +1000,8 @@
     "Multimodal"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI image generators often ignored parts of the prompt, and add-on controls made results unstable."
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/09/the-making-of-the-yelp-assistant-ui.html",
@@ -991,7 +1016,8 @@
     "Latency"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "People struggled to describe their problem and find the right local business in a normal search box."
   },
   {
    "url": "https://dropbox.tech/machine-learning/evolving-calendar-assistant-reclaim-to-be-ai-native",
@@ -1007,7 +1033,8 @@
     "RAG"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Scheduling meetings meant many manual calendar tweaks that the old assistant could not understand from plain language."
   },
   {
    "url": "https://engineering.salesforce.com/engineering-multi-agent-ai-teams-that-build-and-test-themselves",
@@ -1023,7 +1050,8 @@
     "Tool calling"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Building and testing each new AI agent by hand was slow and did not scale."
   },
   {
    "url": "https://blog.hotstar.com/what-we-learned-from-benchmarking-knowledge-bases-for-coding-agents-6bbdd9e53727",
@@ -1039,7 +1067,8 @@
     "Chunking"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Coding agents gave weak answers because they could not find the right code and docs quickly."
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/09/agentic-platform-open-sourcing-agentic-identity-broker.html",
@@ -1055,7 +1084,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI agents needed to act for users on other services without the risk of storing their passwords or tokens."
   },
   {
    "url": "https://medium.com/expedia-group-tech/building-the-operating-model-for-agentic-ai-at-expedia-group-f7555fcce506",
@@ -1071,7 +1101,8 @@
     "Agents"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Teams wanted to build AI agents for travel tasks, but there were no shared safety rules or tools."
   },
   {
    "url": "https://medium.com/agoda-engineering/how-agoda-is-evolving-engineering-support-with-ai-agents-c907a54e236e",
@@ -1087,7 +1118,8 @@
     "RAG"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Engineers' support requests were vague and landed with the wrong team, slowing down fixes."
   },
   {
    "url": "https://engineering.salesforce.com/ai-agent-observability-making-silent-production-failures-visible-and-actionable",
@@ -1137,7 +1169,8 @@
     "Two-tower"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Ranking search results outside the search engine added delay and made results less relevant."
   },
   {
    "url": "https://engineering.salesforce.com/how-data-360-builds-trusted-context-the-enduring-layer-for-enterprise-ai",
@@ -1171,7 +1204,8 @@
     "Hybrid search"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Breaking complex search questions into many sub-queries made AI search slow and expensive."
   },
   {
    "url": "https://medium.com/airbnb-engineering/beyond-the-model-engineering-ai-infra-with-scientific-judgement-371316d43261",
@@ -1187,7 +1221,8 @@
     "RAG"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI agents analysing customer service data gave results that were hard to check or repeat."
   },
   {
    "url": "https://medium.com/pinterest-engineering/evolving-pinterests-embedding-retrieval-platform-aede4e831e01",
@@ -1221,7 +1256,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Building and testing new ML models took data scientists many slow, manual steps."
   },
   {
    "url": "https://engineering.atspotify.com/2026/9/portal-by-spotify-cut-my-claude-code-token-usage-by-90",
@@ -1237,7 +1273,8 @@
     "Cost"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI coding assistants burned through expensive tokens on simple file reading and searching."
   },
   {
    "url": "https://research.google/blog/mapping-global-methane-emissions-from-space-with-deep-learning",
@@ -1252,7 +1289,8 @@
     "Transformers"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Methane leaks are hard to find and measure across the whole planet."
   },
   {
    "url": "https://research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting",
@@ -1266,7 +1304,8 @@
     "Transformers"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Forecasting time series usually means training a new model for every dataset, which is slow."
   },
   {
    "url": "https://research.google/blog/planetary-prediction-engine-automating-global-models-via-earth-ai",
@@ -1282,7 +1321,8 @@
     "RAG"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Building a geospatial prediction model took experts weeks of finding, cleaning and training on data."
   },
   {
    "url": "https://research.google/blog/glucofm-foundation-model-for-continuous-glucose-monitoring",
@@ -1298,7 +1338,8 @@
     "Embeddings"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Glucose monitors produce huge amounts of data, but there are few labelled examples for medical predictions."
   },
   {
    "url": "https://medium.com/expedia-group-tech/the-context-tax-of-agentic-development-0bb9de03237c",
@@ -1314,7 +1355,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI agents and new teammates made mistakes because important project context lived only in people's heads."
   },
   {
    "url": "https://tech.olx.com/does-it-matter-how-you-feed-an-agent-its-context-ee1519586520",
@@ -1330,7 +1372,8 @@
     "Cost"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "It was unclear how the way you give a coding agent its context changes cost and quality."
   },
   {
    "url": "https://research.google/blog/how-mobility-gives-language-models-a-deeper-understanding-of-place",
@@ -1346,7 +1389,8 @@
     "Fine-tuning"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Language models knew little about how real places are used, such as when they are busy."
   },
   {
    "url": "https://research.google/blog/an-ai-tool-for-prioritizing-candidate-biomarkers-from-wearable-sensor-data",
@@ -1362,7 +1406,8 @@
     "Tool calling"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Finding useful health signals in wearable data took researchers a long time by hand."
   },
   {
    "url": "https://engineering.grab.com/jarvis-pro-route-firsr-answer-later",
@@ -1396,7 +1441,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Engineers wanted AI agents to help ship code, but each tool needed its own custom setup."
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/08/agentic-engineering-at-zalando-a-snapshot.html",
@@ -1430,7 +1476,8 @@
     "Transformers"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Expedia's old ranking code was slow to train and too slow to answer in production."
   },
   {
    "url": "https://booking.ai/how-we-selected-the-next-vector-database-at-booking-com-1e738a5e3bb0",
@@ -1446,7 +1493,8 @@
     "Vector search"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "The old vector database could not keep up with fast, large-scale similarity search for new AI features."
   },
   {
    "url": "https://blog.flipkart.tech/llms-for-relevance-automating-high-quality-product-relevance-labeling-in-flipkart-search-ddd5ca50b584",
@@ -1462,7 +1510,8 @@
     "Evals"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Human labels for whether a product matches a search were slow, costly and often inconsistent."
   },
   {
    "url": "https://www.etsy.com/codeascraft/kafka-app-thereas-a-skill-for-that",
@@ -1478,7 +1527,8 @@
     "Personalisation"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Recommendations used stale data because features and embeddings updated too slowly."
   },
   {
    "url": "https://medium.com/expedia-group-tech/focus-on-the-feature-not-the-fixture-genai-powered-graphql-mocks-ea069670af02",
@@ -1548,7 +1598,8 @@
     "Small models"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "AI-generated videos could not keep the same character looking consistent from shot to shot."
   },
   {
    "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data",
@@ -1564,7 +1615,8 @@
     "LLMs"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Getting predictions from tables of data usually needs training and tuning a new model each time."
   },
   {
    "url": "https://research.google/blog/accelerating-gemini-nano-models-on-pixel-with-frozen-multi-token-prediction",
@@ -1580,7 +1632,8 @@
     "Small models"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "On-phone AI models answered too slowly and used too much battery."
   },
   {
    "url": "https://research.google/blog/from-pixels-to-planning-earth-ai-for-nature-restoration",
@@ -1596,7 +1649,8 @@
     "Vector search"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Planning nature restoration needs detailed maps of small woods and hedges that did not exist."
   },
   {
    "url": "https://slack.engineering/agentic-testing-where-agents-fit-in-the-e2e-testing-stack",
@@ -1612,7 +1666,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Fixed end-to-end tests miss unexpected bugs, and writing more by hand takes a lot of time."
   },
   {
    "url": "https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag",
@@ -1628,7 +1683,8 @@
     "Multi-agent"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Enterprise questions spread across many data sources got incomplete or wrong answers from simple search."
   },
   {
    "url": "https://tech.instacart.com/from-scoring-to-spelling-rebuilding-ads-retrieval-at-instacart-cf36b4e8d1bb",
@@ -1644,7 +1700,8 @@
     "Personalisation"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "The old ad search model missed many relevant products in Instacart's huge catalog."
   },
   {
    "url": "https://slack.engineering/slack-ai-the-path-to-multi-cloud",
@@ -1660,7 +1717,8 @@
     "Cost"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Relying on a single cloud for AI models risked outages and slow answers for customers."
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/05/beyond-menu-tree.html",
@@ -1711,7 +1769,8 @@
     "Transformers"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "A photo taken from a bad angle usually cannot be fixed after the fact."
   },
   {
    "url": "https://research.google/blog/reasoningbank-enabling-agents-to-learn-from-experience",
@@ -1727,7 +1786,8 @@
     "RAG"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Deployed AI agents kept repeating the same mistakes because they could not learn from past tasks."
   },
   {
    "url": "https://research.google/blog/ai-generated-synthetic-neurons-speed-up-brain-mapping",
@@ -1741,7 +1801,8 @@
     "Fine-tuning"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Mapping brain cells needed lots of training data and slow manual checking of errors."
   },
   {
    "url": "https://slack.engineering/managing-context-in-long-run-agentic-applications",
@@ -1757,7 +1818,8 @@
     "Agents"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Long-running AI agents lost track of their goals and of each other over time."
   },
   {
    "url": "https://research.google/blog/towards-developing-future-ready-skills-with-generative-ai",
@@ -1773,7 +1835,8 @@
     "Prompting"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Skills like teamwork and creativity are hard to measure at scale with normal tests."
   },
   {
    "url": "https://research.google/blog/improving-the-academic-workflow-introducing-two-ai-agents-for-better-figures-and-peer-review",
@@ -1789,7 +1852,8 @@
     "Tool calling"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Scientists spend a lot of time drawing figures and doing careful peer review by hand."
   },
   {
    "url": "https://research.google/blog/evaluating-alignment-of-behavioral-dispositions-in-llms",
@@ -1804,7 +1868,8 @@
     "Evals"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "It was hard to measure whether AI models behave the way people do in social situations."
   },
   {
    "url": "https://engineering.klarna.com/beyond-prompting-how-algorithmic-evolution-doubled-our-training-speed-8f874af3080d",
@@ -1820,7 +1885,8 @@
     "Cost"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Model training at Klarna was slow and costly, and hand-tuning the code had stopped helping."
   },
   {
    "url": "https://blog.hotstar.com/ai-video-generation-at-scale-prompts-dont-scale-640c93778df9",
@@ -1854,7 +1920,8 @@
     "Prompting"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Building prototypes for mixed-reality headsets took a lot of specialist coding."
   },
   {
    "url": "https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression",
@@ -1870,7 +1937,8 @@
     "Vector search"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Large AI models and search indexes need lots of memory, which makes them slow and costly."
   },
   {
    "url": "https://research.google/blog/improving-breast-cancer-screening-workflows-with-machine-learning",
@@ -1885,7 +1953,8 @@
     "Multimodal"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Radiologists face heavy workloads, and some breast cancers are missed in screening."
   },
   {
    "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting",
@@ -1900,7 +1969,8 @@
     "Transformers"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Cities lacked warnings for sudden flash floods because there was little local flood data to learn from."
   },
   {
    "url": "https://research.google/blog/exploring-the-feasibility-of-conversational-diagnostic-ai-in-a-real-world-clinical-study",
@@ -1916,7 +1986,8 @@
     "A/B testing"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Doctors have little time to take full patient histories, and it was unclear if AI could help safely."
   },
   {
    "url": "https://blog.flipkart.tech/from-noise-to-insight-how-llms-are-transforming-threat-intelligence-analysis-17dae388808e",
@@ -1932,7 +2003,8 @@
     "Prompting"
    ],
    "sorted_by": "groq",
-   "resort": true
+   "resort": true,
+   "issue": "Security teams were flooded with noisy threat alerts that took a long time to review by hand."
   },
   {
    "url": "https://www.etsy.com/codeascraft/how-etsy-uses-llms-to-improve-search-relevance",

@@ -437,6 +437,98 @@
       if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { confirmLabel(copyBtn, "Copied"); });
     });
 
+    // "Copy for LLM" and "View as Markdown": the same notes as a plain .md file
+    var mdCopy = document.querySelector("[data-md-copy]");
+    if (mdCopy) {
+      var mdUrl = mdCopy.getAttribute("data-md"), mdText = null;
+      var getMd = function () {
+        if (mdText !== null) return Promise.resolve(mdText);
+        return fetch(mdUrl).then(function (r) {
+          if (!r.ok) throw new Error("No Markdown");
+          return r.text();
+        }).then(function (t) { mdText = t; return t; });
+      };
+      mdCopy.addEventListener("click", function () {
+        getMd().then(function (t) { return navigator.clipboard.writeText(t); }).then(function () {
+          mdCopy.classList.add("is-done");
+          confirmLabel(mdCopy, "Copied for your LLM");
+          setTimeout(function () { mdCopy.classList.remove("is-done"); }, 1800);
+        }).catch(function () { confirmLabel(mdCopy, "Couldn't copy, try View as Markdown"); });
+      });
+      var mdView = document.querySelector("[data-md-view]");
+      if (mdView && window.HTMLDialogElement) {
+        mdView.addEventListener("click", function (e) {
+          e.preventDefault();
+          getMd().then(function (t) {
+            var d = document.querySelector(".np-md");
+            if (!d) {
+              d = document.createElement("dialog");
+              d.className = "np-md";
+              d.setAttribute("aria-label", "This page as Markdown");
+              d.innerHTML = '<div class="np-md-head"><b>' + esc(mdUrl) + '</b><small>Notes, numbers and links as plain text</small>' +
+                '<div class="np-md-btns"><button class="btn btn-outline btn-sm" type="button" data-md-dcopy><span>Copy</span></button>' +
+                '<button class="btn btn-outline btn-sm" type="button" data-md-close>Close</button></div></div><pre></pre>';
+              d.querySelector("pre").textContent = t;
+              d.querySelector("[data-md-close]").addEventListener("click", function () { d.close(); });
+              d.querySelector("[data-md-dcopy]").addEventListener("click", function () {
+                var b = this;
+                navigator.clipboard.writeText(t).then(function () { confirmLabel(b, "Copied"); });
+              });
+              d.addEventListener("click", function (ev) { if (ev.target === d) d.close(); });
+              d.addEventListener("close", function () { mdView.focus(); });
+              document.body.appendChild(d);
+            }
+            d.showModal();
+          }).catch(function () { location.href = mdUrl; });
+        });
+      }
+    }
+
+    // "On this page": highlights the section you are reading, and the thin line fills as you read
+    var otp = document.querySelector("[data-otp]");
+    if (otp) {
+      var otpLinks = Array.prototype.slice.call(otp.querySelectorAll("a[href^='#']"));
+      var otpBar = otp.querySelector("[data-otp-bar]");
+      var visible = function (el) { return el && el.offsetParent !== null; };
+      var otpSecs = function () {
+        return otpLinks.map(function (a) {
+          var sec = document.getElementById(a.getAttribute("href").slice(1));
+          a.hidden = !visible(sec);
+          return a.hidden ? null : sec;
+        });
+      };
+      // A # link on each heading, so any section can be shared
+      Array.prototype.forEach.call(document.querySelectorAll(".np-sec[id] > h2"), function (h) {
+        var a = document.createElement("a");
+        a.className = "np-hash";
+        a.href = "#" + h.parentNode.id;
+        a.textContent = "#";
+        a.setAttribute("aria-label", "Link to this section");
+        h.insertBefore(a, h.querySelector("small"));
+      });
+      var otpTick = false;
+      var paintOtp = function () {
+        otpTick = false;
+        var max = root.scrollHeight - root.clientHeight;
+        otpBar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, root.scrollTop / max) : 0) + ")";
+        var line = otp.getBoundingClientRect().bottom + 24, cur = -1;
+        otpSecs().forEach(function (sec, i) { if (sec && sec.getBoundingClientRect().top <= line) cur = i; });
+        otpLinks.forEach(function (a, i) {
+          if (i === cur) {
+            if (!a.hasAttribute("aria-current")) {
+              a.setAttribute("aria-current", "true");
+              var box = a.parentNode;
+              if (box.scrollWidth > box.clientWidth) box.scrollTo({ left: a.offsetLeft - 16, behavior: "smooth" });
+            }
+          } else a.removeAttribute("aria-current");
+        });
+      };
+      var askOtp = function () { if (!otpTick) { otpTick = true; requestAnimationFrame(paintOtp); } };
+      window.addEventListener("scroll", askOtp, { passive: true });
+      window.addEventListener("resize", askOtp);
+      paintOtp();
+    }
+
     // Text size, remembered across papers
     var SIZES = [0.9, 1, 1.1, 1.2, 1.32];
     var size = load("apd.textsize", 1);

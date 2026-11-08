@@ -15,7 +15,8 @@ from urllib.parse import quote, urljoin
 SLUG = "how-i-built-ai-papers-daily"
 TITLE = "How I built AI Papers Daily"
 PUBLISHED = "2026-11-08"
-AUTHOR = "Prathamesh Salokhe"
+AUTHOR = "Darshan Chougule"
+AUTHOR_GITHUB = "https://github.com/Omen-bit"
 READ_MIN = 25
 REPO_URL = "https://github.com/Omen-bit/ai-paper-daily"
 # After cross-posting the Markdown copy to dev.to, paste the post's link here; the "Read on dev.to" links
@@ -205,7 +206,7 @@ def _article(actions: str) -> str:
   <dl class="meta">
     <p class="lbl">/Metadata</p>
     <div><dt>Date</dt><dd><time datetime="{PUBLISHED}">{PUBLISHED.replace("-", ".")}</time></dd></div>
-    <div><dt>Author</dt><dd><a href="#author">Prathamesh Salokhe</a></dd></div>
+    <div><dt>Author</dt><dd><a href="#author">{AUTHOR}</a></dd></div>
     <div><dt>Reading time</dt><dd>25 min read</dd></div>
     <div><dt>Built with</dt><dd>Python · GitHub · Supabase · Groq</dd></div>
   </dl>
@@ -448,15 +449,21 @@ def _related(posts: list[dict]) -> str:
             f'<p class="rel-all"><a href="index.html">All case studies {ARROW}</a></p></section>')
 
 
+def _initials(name: str) -> str:
+    return "".join(w[0] for w in name.split()[:2]).upper()
+
+
 def _tail() -> str:
+    gh = (f'<li><a href="{_esc(AUTHOR_GITHUB)}" rel="noopener">{AUTHOR} on GitHub {ARROW}</a></li>'
+          if AUTHOR_GITHUB else "")
     devto = f'<li><a href="{_esc(DEVTO_URL)}" rel="noopener">This post on dev.to {ARROW}</a></li>' if DEVTO_URL else ""
     return f"""
 <div class="cta"><div><b>Get the pick every morning</b><span>One paper, explained, at 07:00 IST.</span></div><a class="btn" href="../index.html#subscribe">Subscribe {ARROW}</a></div>
 
 <section id="author" class="author"><p class="lbl">/About the author</p>
-<div class="who"><span class="av">PS</span><div><h3>{AUTHOR}</h3><p>Builds AI Papers Daily.</p></div></div></section>
+<div class="who"><span class="av">{_initials(AUTHOR)}</span><div><h3>{AUTHOR}</h3><p>Builds AI Papers Daily.</p></div></div></section>
 <section class="res"><p class="lbl">/Additional resources</p><ul><li><a href="{REPO_URL}" rel="noopener">Source code on GitHub {ARROW}</a></li>{devto}
-<li><a href="../papers.html">Search 8,000+ papers {ARROW}</a></li><li><a href="../scout.html">Try Project Scout {ARROW}</a></li></ul></section>"""
+<li><a href="../papers.html">Search 8,000+ papers {ARROW}</a></li><li><a href="../scout.html">Try Project Scout {ARROW}</a></li>{gh}</ul></section>"""
 
 
 SCRIPT = """<script>
@@ -506,8 +513,6 @@ def page_html(posts: list[dict], site_url: str, theme_script: str = "", head_ext
 <div class="prog" aria-hidden="true"></div>
 <header class="top"><div class="in">
   <a class="home" href="../index.html"><span class="mk"></span>AI Papers Daily<span class="sl">/</span><span class="mut">Case studies</span></a>
-  <nav aria-label="Main"><a href="../index.html"><kbd>T</kbd>Today</a><a href="../papers.html"><kbd>P</kbd>Papers</a><a href="../scout.html"><kbd>S</kbd>Scout</a><a href="index.html" aria-current="page"><kbd>C</kbd>Case studies</a></nav>
-  <a class="btn" href="../index.html#subscribe">Get the daily email</a>
 </div></header>
 <main>{body}
 </article>

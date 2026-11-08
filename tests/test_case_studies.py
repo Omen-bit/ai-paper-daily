@@ -60,12 +60,12 @@ def test_keyword_rules_prefer_the_specific_llm_topics():
 
 
 def test_groq_reply_parsing():
-    ok = cs.parse_reply('Sure: {"kind": "build", "topic": "RAG", "summary": "Built a retriever.", "result": "Answers 20% better."}')
-    assert ok == {"keep": True, "topic": "rag", "issue": "", "summary": "Built a retriever.", "result": "Answers 20% better", "tags": []}
+    ok = cs.parse_reply('Sure: {"kind": "build", "topic": "RAG", "issue": "Search was slow.", "summary": "Built a retriever.", "result": "Answers 20% better."}')
+    assert ok == {"keep": True, "topic": "rag", "issue": "Search was slow.", "summary": "Built a retriever.", "result": "Answers 20% better", "tags": []}
     assert cs.parse_reply('{"kind": "launch", "topic": "rag"}') == {"keep": False}
     assert cs.parse_reply('{"kind": "research", "topic": "rag"}') == {"keep": False}
     assert cs.parse_reply('{"kind": "build", "topic": "music"}') is None
-    assert cs.parse_reply('{"kind": "build", "topic": "rag", "summary": "x", "result": "none"}')["result"] == ""
+    assert cs.parse_reply('{"kind": "build", "topic": "rag", "issue": "y", "summary": "x", "result": "none"}')["result"] == ""
     assert cs.parse_reply("no json here") is None
 
 
@@ -110,7 +110,7 @@ def test_sources_and_tags_are_well_formed():
 def test_tags_come_from_the_list_and_keywords():
     assert cs.rule_tags({"title": "RAG for support agents", "text": "We use embeddings and GPUs."}) == ["RAG", "Agents", "Embeddings"]
     assert cs.rule_tags({"title": "Semantic caching cut our LLM bill", "text": ""})[:2] == ["Semantic caching", "LLMs"]
-    ok = cs.parse_reply('{"kind": "build", "topic": "rag", "summary": "x", "tags": ["rag", "Made up", "LLMs"]}')
+    ok = cs.parse_reply('{"kind": "build", "topic": "rag", "issue": "y", "summary": "x", "tags": ["rag", "Made up", "LLMs"]}')
     assert ok["tags"] == ["RAG", "LLMs"]
 
 
@@ -308,3 +308,27 @@ def test_cards_explain_the_problem_in_plain_words():
     assert "<b>Problem</b> Partners kept" in card and "<b>Solution</b> A help chatbot." in card
     row = cp.approaches([{"tags": [f"T{i}"]} for i in range(8)] * 2, "rag")
     assert row.count("data-cs-ap-extra hidden") == 2 and "2 more" in row
+
+
+def test_every_kept_post_has_a_problem_line():
+    # A build reply with no problem (or a rambling one) is unusable, so Groq is asked again next run
+    assert cs.parse_reply('{"kind": "build", "topic": "rag", "summary": "x"}') is None
+    assert cs.parse_reply('{"kind": "build", "topic": "rag", "issue": "' + "word " * 31 + '", "summary": "x"}') is None
+    # A saved post with no problem line is queued to be sorted again, ahead of the others
+    post = cs.migrate({**_post("https://x/9"), "problem": "rag", "v": cs.VERSION, "summary": "x"})
+    assert post["resort"] is True
+    done = cs.migrate({**_post("https://x/8"), "problem": "rag", "v": cs.VERSION, "summary": "x", "issue": "y"})
+    assert "resort" not in done
+
+
+def test_posts_missing_a_problem_are_filled_first(monkeypatch):
+    asked = []
+    def fake(post):
+        asked.append(post["url"])
+        return {"keep": True, "topic": "rag", "issue": "Now it has one.", "summary": "x", "result": "", "tags": []}
+    monkeypatch.setattr(cs, "groq_sort", fake)
+    old = [{**_post("https://x/new"), "problem": "rag", "summary": "x", "issue": "Old prompt.", "published": "2026-11-01"},
+           {**_post("https://x/missing"), "problem": "rag", "summary": "x", "issue": "", "v": cs.VERSION, "published": "2026-10-01"}]
+    posts, _ = cs.update(old, [], "2026-11-08", max_calls=2)
+    assert asked[0] == "https://x/missing"
+    assert all(p.get("issue") for p in posts)

@@ -1374,6 +1374,39 @@ body.focus .ask-fab { display: none; }
 .np-tools { position: relative; }
 .np-tools > summary { width: auto; }
 .np-tools:not([open]) .tools-menu { display: none; }
+
+/* Paper page: "Copy for LLM" and "View as Markdown" */
+.np-ai { display: inline-flex; align-items: center; margin-left: auto; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); overflow: hidden; }
+.np-ai button, .np-ai a { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border: 0; background: none; color: var(--ink); font: 500 14px var(--sans); cursor: pointer; text-decoration: none; }
+.np-ai > * + * { border-left: 1px solid var(--line); }
+.np-ai button:hover, .np-ai a:hover { background: var(--line-2); }
+.np-ai .is-done { color: var(--good, #1a7f37); }
+.np-md { width: min(760px, calc(100vw - 32px)); max-height: 82vh; padding: 0; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: 0 30px 60px -20px rgb(0 0 0 / .4); }
+.np-md[open] { display: flex; flex-direction: column; }
+.np-md::backdrop { background: rgb(0 0 0 / .35); }
+.np-md-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.np-md-head b { font: 600 15px var(--sans); } .np-md-head small { font-size: 13px; color: var(--muted); }
+.np-md-head .np-md-btns { display: flex; gap: 8px; margin-left: auto; }
+.np-md pre { flex: 1; margin: 0; padding: 18px; overflow: auto; font: 13px/1.6 var(--mono); background: var(--bg); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Paper page: the sticky "On this page" bar, and its reading line */
+.np-otp { position: sticky; top: var(--header-h, 64px); z-index: 15; margin: 8px 0 0; background: var(--bg); border-bottom: 1px solid var(--line); }
+.np-otp-in { display: flex; align-items: center; gap: 4px; height: 48px; overflow-x: auto; scrollbar-width: none; }
+.np-otp-in::-webkit-scrollbar { display: none; }
+.np-otp-in b { flex: none; margin-right: 10px; font: 400 11px/1 var(--pixel); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.np-otp a { flex: none; padding: 7px 11px; border-radius: 8px; color: var(--muted); font: 500 13.5px var(--sans); text-decoration: none; white-space: nowrap; }
+.np-otp a:hover { color: var(--ink); background: var(--line-2); }
+.np-otp a[aria-current] { color: var(--accent-ink); background: var(--accent-wash); }
+.np-otp a[hidden] { display: none; }
+.np-otp-time { flex: none; margin-left: auto; padding-left: 12px; font: 400 12px var(--pixel); color: var(--muted); }
+.np-otp-bar { height: 2px; margin-bottom: -1px; background: var(--accent); transform-origin: left; transform: scaleX(0); }
+.np-sec[id] { scroll-margin-top: calc(var(--header-h, 64px) + 64px); }
+.np-hash { margin-left: 6px; color: var(--muted); text-decoration: none; font-family: var(--mono); opacity: 0; }
+.np-sec > h2:hover .np-hash, .np-hash:focus-visible { opacity: 1; }
+@media (max-width: 680px) {
+  .np-ai { margin-left: 0; }
+  .np-otp-time { display: none; }
+}
 .np-tools .tools-menu { position: absolute; z-index: 30; left: auto; right: 0; top: calc(100% + 6px); width: 260px; padding: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
 .np-tools .cite-box { left: auto; right: 0; width: min(560px, calc(100vw - 32px)); }
 .np-tools .rail-notes:has([data-notes-empty]:not([hidden])) .note-list { display: none; }
@@ -1664,7 +1697,6 @@ a.try-tile:hover { border-color: var(--ink); }
 @media (max-width: 980px) { .cs-own > a { grid-template-columns: 1fr; } .cs-own-cv { min-height: 200px; } }
 @media (max-width: 640px) { .cs-own { grid-column: auto; } }
 @media (prefers-reduced-motion: reduce) { .cs-own > a, .cs-own > a:hover, .cs-own-go .ar { transition: none; transform: none; } }
-
 /* topic sections on the main page, and the topic pages */
 .cs-chips a { text-decoration: none; }
 .cs-chips { margin-top: 36px; }
@@ -1784,6 +1816,19 @@ a.try-tile:hover { border-color: var(--ink); }
 :root[data-theme="dark"] .cs-fix b { filter: none; }
 img.cs-img { object-fit: contain; border-radius: 22%; }
 img.cs-badge.cs-img { border-radius: 6px; }
+/* Case study cards use the same type as the "How I built AI Papers Daily" card:
+   a light headline with tight spacing, mono labels and chips, an orange "Read" link */
+.cs-body h3 { font: 300 23px/1.16 var(--sans); letter-spacing: -.028em; color: var(--ink); text-wrap: balance; }
+.cs-body h3 a { color: inherit; }
+.cs-body > p, .cs-body > p:not(.cs-result) { font-size: 15px; line-height: 1.55; color: var(--muted); }
+.cs-body > p.cs-issue, .cs-issue b, .cs-fix b { font-weight: 500; }
+.cs-body > p.cs-result { font-weight: 500; }
+.cs-cover time { font: 500 12px var(--mono); }
+.cs-topic { font: 500 12px var(--mono); }
+.cs-tags button { min-height: 26px; padding: 0 8px; border-radius: 6px; font: 12px var(--mono); }
+.cs-src { font-size: 15px; font-weight: 400; color: var(--accent-ink); }
+.cs-src .cs-ext { color: var(--accent-ink); }
+.cs-save { font-family: var(--mono); font-size: 12px; }
 @media (max-width: 680px) {
   .cs-ap { align-items: flex-start; flex-direction: column; gap: 8px; }
   .cs-ap div { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; width: 100%; }

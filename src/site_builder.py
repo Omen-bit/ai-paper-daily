@@ -82,6 +82,7 @@ ICONS = {
     "compass": '<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"/>',
     "briefcase": '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>',
     "trend": '<path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/>',
+    "copy": '<rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
 }
 
 # The logo: four pixels, two orange and two ink, like a cursor blinking on a page.
@@ -1333,6 +1334,77 @@ def lab_mark(lab: str, root: str = "../") -> str:
     return f'<span class="org-mark{" has-logo" if logo else ""}"{style} aria-hidden="true">{inner}</span>'
 
 
+def on_this_page(rec: dict, notes: dict, sections: str) -> str:
+    """The sticky contents bar on a paper page, with a thin bar that fills as you read.
+    It lists only the sections this page really has."""
+    items = [("minute", "Curator's notes" if notes.get("tldr") else "In short"), ("numbers", "Key numbers"),
+             ("abstract", "Abstract"), ("full", "Full paper"), ("build", "What you could build"),
+             ("fits", "Where it fits"), ("try", "Try it"), ("ask-sec", "Ask this paper")]
+    items = [(k, v) for k, v in items if f'class="np-sec" id="{k}"' in sections]
+    links = "".join(f'<a href="#{k}">{esc(v)}</a>' for k, v in items)
+    return (f'<nav class="np-otp" aria-label="On this page" data-otp><div class="np-otp-in">'
+            f'<b>On this page</b>{links}<span class="np-otp-time">{pick_minutes(rec)} min read</span></div>'
+            f'<div class="np-otp-bar" data-otp-bar></div></nav>')
+
+
+def paper_markdown(rec: dict, links: dict | None = None) -> str:
+    """The paper page as plain Markdown, for "Copy for LLM" and "View as Markdown"."""
+    if not rec.get("code_url") and code_link(rec):
+        rec = dict(rec, code_url=code_link(rec))
+    links = links or {}
+    notes = rec.get("curator") or {}
+    abstract = tidy_tex(rec.get("abstract") or "")
+    one = lambda t: " ".join(str(t).split())
+    out = [f"# {one(rec['title'])}", ""]
+    meta = []
+    if rec.get("authors"):
+        meta.append(f"**Authors:** {', '.join(rec['authors'])}")
+    facts = []
+    lab = lab_of(rec, links)
+    if lab:
+        facts.append(f"**Lab:** {lab}")
+    if published(rec):
+        facts.append(f"**Published:** {nice_date(published(rec))}")
+    if rec.get("hf_upvotes"):
+        facts.append(f"**Upvotes:** {int(rec['hf_upvotes'])}")
+    if notes.get("difficulty") in LEVELS:
+        facts.append(f"**Level:** {notes['difficulty'].capitalize()}")
+    if facts:
+        meta.append(" · ".join(facts))
+    arxiv = rec.get("url") or "https://arxiv.org/abs/" + rec["id"]
+    refs = [f"[arXiv]({arxiv})"]
+    if rec.get("pdf_url"):
+        refs.append(f"[PDF]({rec['pdf_url']})")
+    if rec.get("code_url"):
+        refs.append(f"[Code]({rec['code_url']})")
+    refs.append(f"[This page]({SITE_URL}paper/{rec['id']}.html)")
+    meta.append("**Links:** " + " · ".join(refs))
+    out += ["  \n".join(meta), ""]
+    short = notes.get("tldr") or (rec.get("summary") or {}).get("text")
+    if short:
+        out += ["## Curator's notes" if notes.get("tldr") else "## In short", "", f"**TL;DR:** {one(short)}", ""]
+        rows = [("What's new", notes.get("whats_new")), ("Key result", notes.get("key_result")),
+                ("Why it matters", notes.get("why_it_matters"))]
+        rows = [f"- **{k}:** {one(v)}" for k, v in rows if v]
+        if rows:
+            out += rows + [""]
+    numbers = key_numbers(rec.get("abstract") or "")
+    if numbers:
+        out += ["## Key numbers", ""] + [f"- **{n['value']}**: {one(n['context'])}" for n in numbers] + [""]
+    if abstract:
+        out += ["## Abstract", "", one(abstract), ""]
+    if notes.get("build_ideas"):
+        out += ["## What you could build", ""] + [f"{i + 1}. {one(x)}" for i, x in enumerate(notes["build_ideas"])] + [""]
+    if notes.get("check_question"):
+        out += ["## Quiz yourself", "", one(notes["check_question"])]
+        if notes.get("check_answer"):
+            out += ["", f"**Answer:** {one(notes['check_answer'])}"]
+        out.append("")
+    out += ["---", "", "Notes written by AI from the paper, numbers copied from the abstract. "
+            "Check the paper before you rely on them. From AI Papers Daily.", ""]
+    return "\n".join(out)
+
+
 def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dict = None,
                 next_pick: dict = None, day_picks: list[str] = (), has_image: bool = False,
                 links: dict | None = None, papers: dict | None = None) -> str:
@@ -1405,6 +1477,10 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       <a class="btn btn-outline" href="https://huggingface.co/papers/{pid}" rel="noopener" data-out="hf">Hugging Face</a>
       <button class="btn btn-outline" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>
       {tools}
+      <div class="np-ai" role="group" aria-label="This page as text">
+        <button type="button" data-md-copy data-md="{pid}.md">{icon("copy", 15)}<span>Copy for LLM</span></button>
+        <a href="{pid}.md" data-md-view>{icon("file", 15)}<span>View as Markdown</span></a>
+      </div>
     </div>
   </div>
   <div class="np-glance">{glance_tiles(rec, notes, links)}</div>
@@ -1524,18 +1600,15 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         related_html = (f'<section class="np-sec read-next"><h2>Read next, same idea</h2>'
                         f'<div class="np-related">{"".join(related_card(r) for r in related[:3])}</div></section>')
 
+    sections = "\n    ".join(x for x in (minute, numbers_html, abstract_sec, full, ideas_html,
+                                         lineage_html((links or {}).get("s2"), papers or {}, rec),
+                                         try_it_html(rec, links), ask_html) if x)
     body = f"""<div class="np">
   <p class="np-crumbs"><a href="../papers.html">{icon("back", 14)} All papers</a><span aria-hidden="true">/</span><a href="../papers.html?cat={esc(topic)}">{esc(category_name(topic))}</a></p>
   <article class="paper np-paper" data-paper-id="{pid}" data-title="{title}" data-topics="{esc(' '.join(rec.get('categories') or ['other-ml']))}">
     {hero}
-    {minute}
-    {numbers_html}
-    {abstract_sec}
-    {full}
-    {ideas_html}
-    {lineage_html((links or {}).get("s2"), papers or {}, rec)}
-    {try_it_html(rec, links)}
-    {ask_html}
+    {on_this_page(rec, notes, sections)}
+    {sections}
     <div class="feedback" data-feedback="{pid}">
       <span data-feedback-q>Was this paper worth your time?</span>
       <button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, useful</button>
@@ -1783,6 +1856,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
                                    papers.get(next_pick.get(rec["id"])), picks_of.get(rec["id"], []),
                                    has_image=rec["id"] in with_image, links=links.get(rec["id"]) or {}, papers=papers)
             _write(os.path.join(site_dir, "paper", f"{rec['id']}.html"), html_out)
+            _write(os.path.join(site_dir, "paper", f"{rec['id']}.md"), paper_markdown(rec, links.get(rec["id"]) or {}))
         except Exception as exc:  # one bad record must not stop the other pages
             failed += 1
             print(f"  [site] WARNING: paper page {rec.get('id')} failed: {exc}")
