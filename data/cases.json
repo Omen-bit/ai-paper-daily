@@ -16,6 +16,35 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://vercel.com/changelog/json-render-and-chat-sdk-agents",
+   "company": "Vercel",
+   "title": "Chat SDK agents can now stream generative UI with json-render",
+   "published": "2026-11-06",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Implemented a Chat SDK agent that streams JSON‑defined UI components as cards, enabling dynamic, multi‑step UI generation within chat platforms.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Prompting"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://vercel.com/changelog/ai-gateway-adds-deepseek-search-and-fetch-tools",
+   "company": "Vercel",
+   "title": "AI Gateway adds DeepSeek Search and Fetch tools",
+   "published": "2026-11-06",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Added DeepSeek Search and Fetch tools to AI Gateway, enabling LLMs to retrieve relevant pages and content via tool calling.",
+   "tags": [
+    "Tool calling",
+    "Agents"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83",
    "company": "Pinterest",
    "title": "Safe and Efficient Multi-Epoch Embedding Training",
@@ -163,6 +192,36 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://developer.nvidia.com/blog/how-nvidia-uses-ai-agents-to-streamline-ai-factory-operations",
+   "company": "NVIDIA",
+   "title": "How NVIDIA Uses AI Agents to Streamline AI Factory Operations",
+   "published": "2026-11-04",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Built AI agents that monitor GPU clusters, diagnose failures, and suggest fixes via chat, improving SRE efficiency and uptime.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Multi-agent"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://www.honeycomb.io/blog/honeycomb-team-agents-ai-sre-done-right",
+   "company": "Honeycomb",
+   "title": "Honeycomb Team Agents: AI SRE Done Right",
+   "published": "2026-11-03",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Built AI SRE agents that proactively monitor releases, metrics, and runbooks, automatically filing tickets and suggesting fixes to reduce alerts.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://engineering.fb.com/2026/11/03/ml-applications/f3-lightning-how-meta-accelerates-ads-ml-features-to-production",
    "company": "Meta",
    "title": "F3 Lightning: How Meta Accelerates Ads ML Features to Production at Scale",
@@ -174,6 +233,20 @@
     "Latency",
     "Cost",
     "Real-time"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://www.microsoft.com/en-us/research/blog/from-synthetic-enterprise-data-evaluations-to-real-microsoft-copilot-ai-confidence",
+   "company": "Microsoft",
+   "title": "From synthetic enterprise data evaluations to real Microsoft Copilot AI confidence",
+   "published": "2026-10-30",
+   "added": "2026-11-08",
+   "problem": "evals",
+   "summary": "The team built a synthetic data generation platform to create realistic enterprise test tenants and automated evaluation pipelines, proving Copilot’s accuracy without using real user data.",
+   "tags": [
+    "Evals",
+    "LLM-as-judge"
    ],
    "sorted_by": "groq"
   },
@@ -252,6 +325,21 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://replit.com/blog/anyone-can-bring-ideas-to-company-codebase",
+   "company": "Replit",
+   "title": "Anyone can now bring their ideas into the company codebase",
+   "published": "2026-10-27",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Replit Cloud Agents let non‑engineers describe code changes in plain language, automatically locate, modify, test, and submit updates to the codebase.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://medium.com/expedia-group-tech/beyond-the-prompt-engineering-the-loop-for-software-change-at-scale-9ac26e3b2706",
    "company": "Expedia",
    "title": "Beyond the Prompt: Engineering the Loop for Software Change at Scale",
@@ -312,6 +400,20 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://www.amazon.science/blog/the-science-behind-torchneuron-amazons-new-pytorch-backend-for-aws-trainium-chips",
+   "company": "Amazon",
+   "title": "The science behind TorchNeuron, Amazon’s new PyTorch backend for AWS Trainium chips",
+   "published": "2026-10-22",
+   "added": "2026-11-08",
+   "problem": "cost",
+   "summary": "Implemented TorchNeuron to translate PyTorch models to Trainium, adding multi-level caching and adaptive eager compilation to boost speed and reduce compute cost.",
+   "tags": [
+    "Latency",
+    "Cost"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://shopify.engineering/remote-dev",
    "company": "Shopify",
    "title": "We gave AI agents a mobile dev environment",
@@ -338,6 +440,35 @@
     "Multimodal",
     "Real-time",
     "Transformers"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://www.amazon.science/blog/strengthening-ai-safety-evaluation-through-independent-third-party-review",
+   "company": "Amazon",
+   "title": "Strengthening AI safety evaluation through independent third-party review",
+   "published": "2026-10-20",
+   "added": "2026-11-08",
+   "problem": "safety",
+   "summary": "Amazon partnered with an independent nonprofit to audit and improve the rigor of its AI safety evaluation datasets, enhancing guardrails and evaluation quality.",
+   "tags": [
+    "Guardrails",
+    "Evals"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://medium.com/expedia-group-tech/the-quiet-tax-on-machine-learning-teams-43d71bd539c7",
+   "company": "Expedia",
+   "title": "The Quiet Tax on Machine Learning Teams",
+   "published": "2026-10-20",
+   "added": "2026-11-08",
+   "problem": "cost",
+   "summary": "Describes a CLI tool that standardizes model deployment pipelines to reduce repetitive engineering effort and lower operational costs.",
+   "tags": [
+    "Cost",
+    "Latency",
+    "GPUs"
    ],
    "sorted_by": "groq"
   },
@@ -402,6 +533,21 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://www.honeycomb.io/blog/everything-we-talked-about-o11yday-london-2026",
+   "company": "Honeycomb",
+   "title": "Everything We Talked About at O11yDay London 2026",
+   "published": "2026-10-16",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "They built an internal code‑review LLM agent that assists debugging and automates review, integrating it into their observability platform to boost productivity.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Multi-agent"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://engineering.atspotify.com/2026/10/advancing-generative-recommendation-inference-our-collaboration-with-nvidia-on-tensorrt-llm",
    "company": "Spotify",
    "title": "Advancing Generative Recommendation Inference: our collaboration with NVIDIA on TensorRT LLM",
@@ -413,6 +559,65 @@
     "Latency",
     "GPUs",
     "LLMs"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://weaviate.io/blog/weaviate-security-release-nearobject-2026",
+   "company": "Weaviate",
+   "title": "Weaviate security release - Medium severity fix for a cross-collection vector disclosure in nearObject (CVE pending assignment)",
+   "published": "2026-10-15",
+   "added": "2026-11-08",
+   "problem": "safety",
+   "summary": "Implemented authorization checks on nearObject searches to prevent unauthorized vector extraction, protecting data confidentiality.",
+   "tags": [
+    "Guardrails",
+    "Vector search"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://machinelearning.apple.com/research/selection-structured-reasoning",
+   "company": "Apple",
+   "title": "Selection-Based Structured Reasoning: Toward Efficient Multimodal Search Agents",
+   "published": "2026-10-15",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Implemented a selection-based reasoning framework that lets multimodal agents pick from predefined reasoning candidates, cutting inference latency by up to 90% while keeping performance.",
+   "tags": [
+    "Agents",
+    "Latency",
+    "Cost"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://machinelearning.apple.com/research/plan-retrieve-tool-discovery",
+   "company": "Apple",
+   "title": "Plan or Retrieve First? A Scale Study of Tool Discovery Architectures",
+   "published": "2026-10-15",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "The team compared retrieve‑then‑plan and plan‑then‑retrieve methods for tool‑augmented agents, finding each excels at different query complexities.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://machinelearning.apple.com/research/mlx-distributed-inference",
+   "company": "Apple",
+   "title": "Local and Distributed Large LLM Inference with MLX and RDMA on Mac Studio",
+   "published": "2026-10-15",
+   "added": "2026-11-08",
+   "problem": "cost",
+   "summary": "Implemented local and distributed inference of trillion‑parameter LLMs on Mac Studios using MLX and RDMA, achieving high token throughput and efficient power use.",
+   "tags": [
+    "Latency",
+    "GPUs",
+    "Cost"
    ],
    "sorted_by": "groq"
   },
@@ -447,6 +652,49 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://engineering.razorpay.com/inside-razorpays-rto-model-the-engineering-behind-its-ml-lifecycle-999fe75e66ec",
+   "company": "Razorpay",
+   "title": "Inside Razorpay’s RTO Model: The Engineering Behind its ML Lifecycle",
+   "published": "2026-10-13",
+   "added": "2026-11-08",
+   "problem": "evals",
+   "summary": "Describes building, deploying, monitoring, and iterating an RTO risk model to decide COD availability and improve decisions via outcome feedback.",
+   "tags": [
+    "Evals"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.zalando.com/posts/2026/10/structure-automating-data-ingestion-with-a-rag-flywheel.html",
+   "company": "Zalando",
+   "title": "Automating Data Ingestion with a RAG Flywheel",
+   "published": "2026-10-11",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "Implemented an LLM‑powered RAG loop that uses vector embeddings and semantic search to auto‑map diverse supplier schemas to a unified target schema, reducing manual effort.",
+   "tags": [
+    "RAG",
+    "Hybrid search",
+    "Embeddings"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626",
+   "company": "Pinterest",
+   "title": "From Activity to Intent: Generating User Journeys with LLMs",
+   "published": "2026-10-09",
+   "added": "2026-11-08",
+   "problem": "tuning",
+   "summary": "They fine‑tuned a 4B LLM to read user activity logs and generate ranked journey names, then distilled it for scalable production serving.",
+   "tags": [
+    "Fine-tuning",
+    "Distillation",
+    "LLMs"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://www.intercom.com/blog/fin-4-customer-agent-operator-and-major-upgrades-to-the-intercom-helpdesk",
    "company": "Intercom",
    "title": "Introducing Fin 4: Customer Agent, Operator, and major upgrades to the Intercom helpdesk",
@@ -472,6 +720,80 @@
    "tags": [
     "Embeddings",
     "Two-tower"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://medium.com/pinterest-engineering/metrics-board-building-an-agent-ready-metrics-layer-2c8fefe68756",
+   "company": "Pinterest",
+   "title": "Metrics Board: Building an Agent-ready Metrics Layer",
+   "published": "2026-10-06",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created a platform that automates metric creation and lets LLM agents query metrics in natural language, improving scalability and reliability of analytics.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development",
+   "company": "GitHub",
+   "title": "Building Git infrastructure for agent-scale development",
+   "published": "2026-10-06",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Redesigned GitHub's Git backend to support large-scale AI agents that automate code changes and continuous integration.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Multi-agent"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.salesforce.com/ai-agents-need-memory-building-persistent-memory-for-agentforce",
+   "company": "Salesforce",
+   "title": "AI Agents Need Memory: Building Persistent Memory for Agentforce",
+   "published": "2026-10-05",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Implemented persistent memory for AI agents, enabling them to retain context across interactions and improve enterprise task automation.",
+   "tags": [
+    "Agents",
+    "Tool calling"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://booking.ai/introducing-agenthub-booking-com-platform-for-modular-travel-ai-agents-68bc521a0f50",
+   "company": "Booking.com",
+   "title": "Introducing AgentHub: Booking.com Platform for Modular Travel AI Agents",
+   "published": "2026-10-02",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Built AgentHub to let teams configure and deploy modular LLM agents that orchestrate travel workflows via internal APIs.",
+   "tags": [
+    "Tool calling",
+    "Multi-agent",
+    "Agents"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.salesforce.com/how-deterministic-controls-turn-ai-output-into-reliable-prompt-templates",
+   "company": "Salesforce",
+   "title": "How Deterministic Controls Turn AI Output Into Reliable Prompt Templates",
+   "published": "2026-09-30",
+   "added": "2026-11-08",
+   "problem": "safety",
+   "summary": "Implemented deterministic controls to convert open-ended AI instructions into stable prompt templates, ensuring reliable and safe output for Salesforce Prompt Builder.",
+   "tags": [
+    "Guardrails",
+    "Prompting",
+    "LLMs"
    ],
    "sorted_by": "groq"
   },
@@ -505,6 +827,111 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://dropbox.tech/machine-learning/evolving-calendar-assistant-reclaim-to-be-ai-native",
+   "company": "Dropbox",
+   "title": "Evolving our calendar assistant Reclaim to be AI-native without starting over",
+   "published": "2026-09-29",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Implemented an AI agent to parse natural language scheduling requests, integrate calendar context, and automate adjustments within the existing Reclaim system.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.salesforce.com/engineering-multi-agent-ai-teams-that-build-and-test-themselves",
+   "company": "Salesforce",
+   "title": "Engineering Multi-Agent AI Teams That Build and Test Themselves",
+   "published": "2026-09-28",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "The team created self‑modifying AI agents that can design, verify, test, and repair other agents to automate their own development lifecycle.",
+   "tags": [
+    "Multi-agent",
+    "Agents",
+    "Tool calling"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://blog.hotstar.com/what-we-learned-from-benchmarking-knowledge-bases-for-coding-agents-6bbdd9e53727",
+   "company": "JioHotstar",
+   "title": "What We Learned from Benchmarking Knowledge Bases for Coding Agents",
+   "published": "2026-09-28",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "Evaluated various code retrieval methods for coding agents, measuring effectiveness and cost to improve developer assistance.",
+   "tags": [
+    "Hybrid search",
+    "Reranking",
+    "Chunking"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.zalando.com/posts/2026/09/agentic-platform-open-sourcing-agentic-identity-broker.html",
+   "company": "Zalando",
+   "title": "Agentic Platform: Open-Sourcing the Agentic Identity Broker",
+   "published": "2026-09-24",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Built an open‑source identity broker so AI agents can act for users across third‑party services without storing user tokens.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Multi-agent"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://medium.com/expedia-group-tech/building-the-operating-model-for-agentic-ai-at-expedia-group-f7555fcce506",
+   "company": "Expedia",
+   "title": "Building the Operating Model for Agentic AI at Expedia Group",
+   "published": "2026-09-22",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created a governance and platform framework so teams can safely develop multi-step, tool‑using AI agents for travel workflows.",
+   "tags": [
+    "Tool calling",
+    "Multi-agent",
+    "Agents"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://medium.com/agoda-engineering/how-agoda-is-evolving-engineering-support-with-ai-agents-c907a54e236e",
+   "company": "Agoda",
+   "title": "How Agoda is evolving engineering support with AI agents",
+   "published": "2026-09-22",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Implemented an LLM-powered Slack bot that parses engineers' free‑form issue descriptions, gathers relevant context, and routes tickets automatically.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineeringblog.yelp.com/2026/09/ml-ranking-with-nrtsearch.html",
+   "company": "Yelp",
+   "title": "ML based ranking using Nrtsearch",
+   "published": "2026-09-16",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "Integrated ML models into Nrtsearch to perform on‑engine ranking, reducing latency and improving relevance for search, ads, and feed.",
+   "tags": [
+    "Hybrid search",
+    "Reranking",
+    "Two-tower"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://research.google/blog/bypassing-inference-bottlenecks-accelerating-complex-ai-search-with-retrieve-for-train",
    "company": "Google",
    "title": "Bypassing inference bottlenecks: Accelerating complex AI search with Retrieve-for-Train",
@@ -520,6 +947,21 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://medium.com/airbnb-engineering/beyond-the-model-engineering-ai-infra-with-scientific-judgement-371316d43261",
+   "company": "Airbnb",
+   "title": "Beyond the model: Engineering AI infra with scientific judgement",
+   "published": "2026-09-15",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Built an infrastructure harness that standardizes how AI agents investigate data, enabling reproducible, auditable analyses for scaling customer‑service AI.",
+   "tags": [
+    "Embeddings",
+    "Vector search",
+    "RAG"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://tech.instacart.com/agentic-machine-learning-modeling-at-instacart-fb3ecd295ee7",
    "company": "Instacart",
    "title": "Agentic Machine Learning Modeling at Instacart",
@@ -531,6 +973,21 @@
     "Tool calling",
     "Agents",
     "Multi-agent"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://engineering.atspotify.com/2026/9/portal-by-spotify-cut-my-claude-code-token-usage-by-90",
+   "company": "Spotify",
+   "title": "Portal by Spotify cut my Claude Code token usage by 90%",
+   "published": "2026-09-03",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Created declarative agent modes that offload I/O-heavy coding tasks to a cheaper model, reducing token usage and costs.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Cost"
    ],
    "sorted_by": "groq"
   },
@@ -592,6 +1049,21 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://medium.com/expedia-group-tech/the-context-tax-of-agentic-development-0bb9de03237c",
+   "company": "Expedia",
+   "title": "The Context Tax of Agentic Development",
+   "published": "2026-08-25",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "They redesigned their development workflow to make context explicit so both humans and AI agents can act correctly, avoiding misaligned automation.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Multi-agent"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://tech.olx.com/does-it-matter-how-you-feed-an-agent-its-context-ee1519586520",
    "company": "OLX",
    "title": "Does it matter how you feed an agent its context?",
@@ -637,6 +1109,51 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://craft.faire.com/faires-agentic-development-culture-7aeb03f04bcb",
+   "company": "Faire",
+   "title": "Faire’s agentic development culture",
+   "published": "2026-08-18",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Built modular thin layers around LLMs and tools to enable internal agents for code delivery, improving output volume and shipping speed.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Multi-agent"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://medium.com/expedia-group-tech/how-keras-3-helped-modernise-expedia-groups-lodging-ranking-stack-7fec96f052fd",
+   "company": "Expedia",
+   "title": "How Keras 3 Helped Modernise Expedia Group’s Lodging Ranking Stack",
+   "published": "2026-08-11",
+   "added": "2026-11-08",
+   "problem": "cost",
+   "summary": "They upgraded to Keras 3, speeding training by 30% and cutting P99 inference latency by two‑thirds, enabling faster, GPU‑optimized ranking models.",
+   "tags": [
+    "Latency",
+    "GPUs",
+    "Transformers"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://booking.ai/how-we-selected-the-next-vector-database-at-booking-com-1e738a5e3bb0",
+   "company": "Booking.com",
+   "title": "How we selected the next vector database at Booking.com",
+   "published": "2026-08-11",
+   "added": "2026-11-08",
+   "problem": "rag",
+   "summary": "Evaluated and chose a new vector database to improve fast, scalable similarity search and hybrid capabilities for RAG and other embedding-powered features.",
+   "tags": [
+    "Hybrid search",
+    "RAG",
+    "Vector search"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://blog.flipkart.tech/llms-for-relevance-automating-high-quality-product-relevance-labeling-in-flipkart-search-ddd5ca50b584",
    "company": "Flipkart",
    "title": "LLMs for Relevance: Automating High-Quality Product Relevance Labeling in Flipkart Search",
@@ -648,6 +1165,36 @@
     "Fine-tuning",
     "RAG",
     "Evals"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://www.etsy.com/codeascraft/kafka-app-thereas-a-skill-for-that",
+   "company": "Etsy",
+   "title": "Kafka App? There’s a Skill for That",
+   "published": "2026-07-31",
+   "added": "2026-11-08",
+   "problem": "recs",
+   "summary": "Implemented Kafka streaming to deliver fresh features and embeddings, enabling near‑real‑time personalized recommendations for shoppers.",
+   "tags": [
+    "Embeddings",
+    "Real-time",
+    "Personalisation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://blog.hotstar.com/getting-past-the-first-frame-building-video-models-that-remember-31f03d0710e1",
+   "company": "JioHotstar",
+   "title": "Consistent Generative Video: Building Video Models That Remember",
+   "published": "2026-07-01",
+   "added": "2026-11-08",
+   "problem": "tuning",
+   "summary": "Implemented LoRA fine‑tuning on video diffusion models to create character‑consistent talking‑head videos, enabling scalable, low‑parameter adapters for production.",
+   "tags": [
+    "Fine-tuning",
+    "Distillation",
+    "Small models"
    ],
    "sorted_by": "groq"
   },
@@ -727,6 +1274,36 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://tech.instacart.com/from-scoring-to-spelling-rebuilding-ads-retrieval-at-instacart-cf36b4e8d1bb",
+   "company": "Instacart",
+   "title": "From Scoring to Spelling: Rebuilding Ads Retrieval at Instacart",
+   "published": "2026-06-02",
+   "added": "2026-11-08",
+   "problem": "ads",
+   "summary": "Replaced a scoring encoder with a BERT‑style generative model that predicts product IDs token‑by‑token, improving ad relevance and catalog coverage.",
+   "tags": [
+    "Transformers",
+    "RAG",
+    "Personalisation"
+   ],
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://slack.engineering/slack-ai-the-path-to-multi-cloud",
+   "company": "Slack",
+   "title": "Slack AI: The Path to Multi-Cloud",
+   "published": "2026-05-28",
+   "added": "2026-11-08",
+   "problem": "cost",
+   "summary": "Implemented a multi‑cloud architecture to reliably serve enterprise LLMs, improving latency and reducing outage risk while optimizing infrastructure expenses.",
+   "tags": [
+    "GPUs",
+    "Latency",
+    "Cost"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://research.google/blog/its-all-about-the-angle-your-photos-re-composed",
    "company": "Google",
    "title": "It's all about the angle: Your photos, re-composed",
@@ -769,19 +1346,34 @@
    "sorted_by": "groq"
   },
   {
+   "url": "https://slack.engineering/managing-context-in-long-run-agentic-applications",
+   "company": "Slack",
+   "title": "Managing context in long-run agentic applications",
+   "published": "2026-04-13",
+   "added": "2026-11-08",
+   "problem": "agents",
+   "summary": "Implemented mechanisms for coordinating multiple long‑running agents to stay aligned and reason coherently over extended periods.",
+   "tags": [
+    "Tool calling",
+    "Multi-agent",
+    "Agents"
+   ],
+   "sorted_by": "groq"
+  },
+  {
    "url": "https://research.google/blog/towards-developing-future-ready-skills-with-generative-ai",
    "company": "Google",
    "title": "Towards developing future-ready skills with generative AI",
    "published": "2026-04-13",
    "added": "2026-11-07",
-   "problem": "cost",
-   "summary": "Created a generative AI sandbox that simulates conversations to assess future-ready skills for students, enabling scalable, automated evaluation.",
+   "problem": "evals",
+   "summary": "Created a generative‑AI system that simulates conversations to automatically assess students' future‑ready skills, matching human expert scores.",
    "tags": [
-    "LLMs",
-    "RAG"
+    "LLM-as-judge",
+    "Evals",
+    "Prompting"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
   },
   {
    "url": "https://research.google/blog/improving-the-academic-workflow-introducing-two-ai-agents-for-better-figures-and-peer-review",
@@ -790,14 +1382,13 @@
    "published": "2026-04-08",
    "added": "2026-11-07",
    "problem": "agents",
-   "summary": "Built two AI agents that generate academic figures and automatically review papers, reducing manual effort and improving review consistency.",
+   "summary": "Built two multi‑agent systems that automatically generate research figures and perform rigorous peer‑review, reducing manual effort for scientists.",
    "tags": [
+    "Multi-agent",
     "Agents",
-    "LLMs",
-    "RAG"
+    "Tool calling"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
   },
   {
    "url": "https://research.google/blog/evaluating-alignment-of-behavioral-dispositions-in-llms",
@@ -806,13 +1397,12 @@
    "published": "2026-04-03",
    "added": "2026-11-07",
    "problem": "evals",
-   "summary": "Created a framework to assess how closely LLMs' behavioral tendencies match human social norms using situational judgment tests.",
+   "summary": "They created a framework turning psychological questionnaires into large-scale situational tests to measure how closely LLM behavior matches human social tendencies.",
    "tags": [
-    "LLMs",
-    "Guardrails"
+    "LLM-as-judge",
+    "Evals"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
   },
   {
    "url": "https://engineering.klarna.com/beyond-prompting-how-algorithmic-evolution-doubled-our-training-speed-8f874af3080d",
@@ -835,15 +1425,14 @@
    "title": "Vibe Coding XR: Accelerating AI + XR prototyping with XR Blocks and Gemini",
    "published": "2026-03-25",
    "added": "2026-11-07",
-   "problem": "llm",
-   "summary": "The team built a workflow where Gemini LLM interprets natural language prompts to generate physics‑aware WebXR code, enabling rapid XR prototyping.",
+   "problem": "agents",
+   "summary": "The team built a workflow where Gemini interprets natural language prompts to generate physics‑aware WebXR apps, enabling rapid XR prototyping.",
    "tags": [
-    "LLMs",
+    "Tool calling",
     "Agents",
-    "Multimodal"
+    "Prompting"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
   },
   {
    "url": "https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression",
@@ -851,15 +1440,14 @@
    "title": "TurboQuant: Redefining AI efficiency with extreme compression",
    "published": "2026-03-24",
    "added": "2026-11-07",
-   "problem": "rag",
-   "summary": "Developed quantization algorithms to compress high‑dimensional vectors, reducing memory use and speeding up similarity lookups in vector search systems.",
+   "problem": "cost",
+   "summary": "Developed TurboQuant quantization methods to compress LLM and vector search embeddings, cutting memory use and latency without losing accuracy.",
    "tags": [
-    "Embeddings",
-    "Vector search",
-    "Cost"
+    "Quantisation",
+    "Cost",
+    "Vector search"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
   },
   {
    "url": "https://research.google/blog/improving-breast-cancer-screening-workflows-with-machine-learning",
@@ -867,13 +1455,13 @@
    "title": "Improving breast cancer screening workflows with machine learning",
    "published": "2026-03-17",
    "added": "2026-11-07",
-   "problem": "vision",
-   "summary": "Developed and evaluated an AI mammography system to improve cancer detection accuracy and reduce radiologist workload in NHS screening.",
+   "problem": "evals",
+   "summary": "They evaluated a machine‑learning mammography system in retrospective and prospective studies to improve cancer detection and reduce radiologist workload.",
    "tags": [
-    "Evals"
+    "Evals",
+    "Multimodal"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
   },
   {
    "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting",
@@ -882,12 +1470,12 @@
    "published": "2026-03-12",
    "added": "2026-11-07",
    "problem": "predict",
-   "summary": "Developed and deployed AI models that forecast urban flash floods up to 24 hours ahead to improve early warning systems.",
+   "summary": "Developed an AI model trained on news data to forecast urban flash floods up to 24 hours ahead, improving early warning for vulnerable cities.",
    "tags": [
-    "Real-time"
+    "Real-time",
+    "Transformers"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
   },
   {
    "url": "https://research.google/blog/exploring-the-feasibility-of-conversational-diagnostic-ai-in-a-real-world-clinical-study",
@@ -896,16 +1484,31 @@
    "published": "2026-03-11",
    "added": "2026-11-07",
    "problem": "evals",
-   "summary": "Deployed a conversational medical AI to collect patient histories in clinics and evaluated its safety and feasibility.",
+   "summary": "Deployed a conversational diagnostic AI to collect patient histories in clinics, measuring safety, feasibility, and clinician/patient perception.",
    "tags": [
-    "LLMs",
-    "Guardrails"
+    "Evals",
+    "Guardrails",
+    "A/B testing"
    ],
-   "sorted_by": "groq",
-   "resort": true
+   "sorted_by": "groq"
+  },
+  {
+   "url": "https://blog.flipkart.tech/from-noise-to-insight-how-llms-are-transforming-threat-intelligence-analysis-17dae388808e",
+   "company": "Flipkart",
+   "title": "From Noise to Insight: How LLMs Are Transforming Threat Intelligence Analysis",
+   "published": "2026-03-03",
+   "added": "2026-11-08",
+   "problem": "safety",
+   "summary": "Built DeepInsight to ingest, structure, and summarize threat alerts with an LLM, reducing manual review and improving false‑positive detection.",
+   "tags": [
+    "Guardrails",
+    "LLMs",
+    "Prompting"
+   ],
+   "sorted_by": "groq"
   }
  ],
- "waiting": 1206,
+ "waiting": 1145,
  "rejected": [
   "https://blog.cloudflare.com/ddos-threat-report-2026-q3",
   "https://blog.cloudflare.com/dns-targeted-zone-builds",
@@ -914,11 +1517,13 @@
   "https://blog.cloudflare.com/full-transaction-waf",
   "https://blog.cloudflare.com/k-isms",
   "https://blog.cloudflare.com/origin-range-requests",
+  "https://blog.cloudflare.com/personal-agents-visibility-control",
   "https://blog.cloudflare.com/php-ctf",
   "https://blog.cloudflare.com/php-vulnerabilities-waf-protection",
   "https://blog.cloudflare.com/post-quantum-geo-key-manager",
   "https://blog.cloudflare.com/private-origins-public-to-private",
   "https://blog.cloudflare.com/q3-2026-internet-disruption-summary",
+  "https://blog.cloudflare.com/trusted-agent-delegation",
   "https://blog.cloudflare.com/typescript-rust-port",
   "https://blog.cloudflare.com/vole-mole",
   "https://blog.cloudflare.com/zero-wire",
@@ -1174,10 +1779,12 @@
   "https://medium.com/agoda-engineering/how-agoda-simulates-booking-flows-to-test-flight-integrations-204ec4f2e128",
   "https://medium.com/agoda-engineering/how-we-cut-the-coupling-tax-in-a-post-booking-api-2156a3175538",
   "https://medium.com/agoda-engineering/how-we-eliminated-configuration-related-outages-and-scaled-consul-management-at-agoda-a6f22199ab98",
+  "https://medium.com/agoda-engineering/key-takeaways-from-agodas-ai-developer-report-2026-82915b88c370",
   "https://medium.com/airbnb-engineering/beyond-synthetic-testing-capturing-and-replaying-real-database-workloads-at-airbnb-cea7ee9b1ab2",
   "https://medium.com/airbnb-engineering/flexible-authentication-reimagining-authentication-for-millions-of-users-at-airbnb-3a8a4c917137",
   "https://medium.com/airbnb-engineering/project-lighthouse-part-3-introducing-project-lighthouse-anonymize-74f8b26653fb",
   "https://medium.com/capital-one-tech/advancing-safe-agentic-ai-asks-symposium-highlights-bbba40b19784",
+  "https://medium.com/capital-one-tech/capital-one-at-emnlp-2026-in-budapest-4f5b6a450ebc",
   "https://medium.com/capital-one-tech/operational-excellence-in-serverless-5es-framework-f3bf3dcd2cda",
   "https://medium.com/capital-one-tech/strengthening-open-source-security-with-socket-7ee8fe88bfec",
   "https://medium.com/mercadolibre-tech/continuous-profiling-at-mercado-libre-turning-flamegraphs-into-fixes-2ee371c32bfd",
@@ -1188,6 +1795,7 @@
   "https://medium.com/myntra-engineering/load-testing-without-touching-production-header-based-routing-with-linkerd-4d0442c27a73",
   "https://medium.com/myntra-engineering/revamping-myntra-app-analytics-persistence-with-kmp-and-sqlite-516751e24d63",
   "https://medium.com/paypal-tech/we-have-moved-to-https-developer-paypal-com-community-blog-2acf7cb138a6",
+  "https://medium.com/pinterest-engineering/introducing-modulelens-zooming-into-pytorch-modules-for-human-and-agentic-engineering-b7e9be9d29f8",
   "https://medium.com/strava-engineering/my-summer-at-strava-375656e322b6",
   "https://medium.com/strava-engineering/summer-at-my-dream-company-a7c46aac76fe",
   "https://medium.com/tripadvisor/how-weekly-operations-reviews-strengthen-engineering-teams-90222a5100b1",
@@ -1204,6 +1812,7 @@
   "https://medium.com/wise-engineering/from-onboarding-to-production-how-i-built-dynamic-vendor-switching-at-wise-876942d6031f",
   "https://medium.com/wise-engineering/observability-at-scale-every-byte-counts-80f5e505d710",
   "https://netflixtechblog.com/behind-the-scenes-evolving-netflixs-ads-event-pipeline-for-live-part-ii-826ebf9ad9fb",
+  "https://netflixtechblog.com/beyond-api-compatibility-building-a-tool-to-measure-the-blast-radius-of-library-changes-9474f2fd4f90",
   "https://netflixtechblog.com/datajunction-as-netflixs-answer-to-the-missing-piece-of-the-modern-data-stack-92af926b40a5",
   "https://netflixtechblog.com/multi-ratio-video-resizing-for-mobile-feed-and-marketing-2e6b42810f49",
   "https://netflixtechblog.com/ontology-driven-observability-building-an-end-to-end-knowledge-graph-at-netflix-scale-421392cf5adf",
@@ -1291,8 +1900,10 @@
   "https://stripe.com/blog/ousd-now-live-on-stripe",
   "https://stripe.com/blog/real-time-stripe-data-postgres",
   "https://stripe.com/blog/stripe-on-stripe-what-we-learned-moving-1b-in-vendor-payments-to-global-payouts",
+  "https://stripe.com/blog/trends-from-money20-20-2026-the-rise-of-hidden-financial-services",
   "https://tech.instacart.com/blueberry-force-multiplier-for-the-on-call-engineer-98c446dfcc12",
   "https://tech.instacart.com/leveraging-pyfixest-for-high-cardinality-marketplace-modeling-at-instacart-3913df91a04b",
+  "https://tech.olx.com/correlation-lied-to-us-rethinking-product-impact-with-causal-inference-5ba47181f7c5",
   "https://tech.olx.com/empowering-innovation-through-structure-93c15614f6d3",
   "https://tech.olx.com/handling-concurrency-on-the-web-with-web-locks-api-163b7e07eddd",
   "https://vercel.com/blog/aws-databases-are-now-live-on-the-vercel-marketplace-and-v0",
@@ -1731,6 +2342,7 @@
   "https://www.honeycomb.io/blog/how-our-support-team-uses-honeycomb-debug-honeycomb",
   "https://www.honeycomb.io/blog/it-can-only-goodhart-happen",
   "https://www.honeycomb.io/blog/lattice-watch-smarter-guardrails-design-system-observability",
+  "https://www.honeycomb.io/blog/our-limits-are-not-our-imagination",
   "https://www.honeycomb.io/blog/prototype-production-aws-agentcore",
   "https://www.honeycomb.io/blog/relational-query-superpowers",
   "https://www.honeycomb.io/blog/running-opentelemetry-collector-lambda",
@@ -1743,8 +2355,10 @@
   "https://www.intercom.com/blog/playing-a-different-game",
   "https://www.intercom.com/blog/ready-for-your-busiest-day-how-we-scale",
   "https://www.intercom.com/blog/salesforce-signs-definitive-agreement-to-acquire-fin",
+  "https://www.intercom.com/blog/the-2026-ai-sentiment-report",
   "https://www.microsoft.com/en-us/research/blog/proof-based-general-purpose-computing-with-magnetar",
   "https://www.microsoft.com/en-us/research/blog/solving-a-31-year-old-grand-challenge-in-mathematics-the-kls-conjecture",
-  "https://www.microsoft.com/en-us/research/podcast/called-to-serve-tech-research-and-positive-impact-with-chris-white"
+  "https://www.microsoft.com/en-us/research/podcast/called-to-serve-tech-research-and-positive-impact-with-chris-white",
+  "https://www.microsoft.com/en-us/research/podcast/microsoft-research-focus-edition-97"
  ]
 }
