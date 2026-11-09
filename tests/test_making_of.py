@@ -38,8 +38,10 @@ def test_page_is_built_with_card_and_sitemap_entry(tmp_path):
     assert f'case-studies/{making_of.SLUG}.html"' in page and 'rel="canonical"' in page
     assert '"@type":"TechArticle"' in page
     # Every section in the table of contents has its heading, in order
-    ids = re.findall(r'<h2 id="([a-z]+)">', page)
+    ids = re.findall(r'<h3 id="([a-z]+)">', page)
     assert ids == [i for i, _ in making_of.TOC]
+    parts = re.findall(r'<header class="part" id="part-(\d)">', page)
+    assert parts == [str(n) for n in range(1, len(making_of.PARTS) + 1)]
     # Figures are numbered from 1 without gaps
     numbers = [int(n) for n in re.findall(r"\[ Fig\. (\d+) \]", page) if n != "0"]
     assert numbers == list(range(1, len(numbers) + 1))
@@ -79,12 +81,13 @@ def test_markdown_copy_reads_well_for_dev_to():
     assert md.startswith("---\ntitle: How I built AI Papers Daily\n")
     assert f"canonical_url: {URL}case-studies/{making_of.SLUG}.html" in md
     assert "\n# How I built AI Papers Daily\n" in md
-    assert all(f"\n## {title}\n" in md for _, title in making_of.TOC)
+    assert all(f"\n### {title}\n" in md for _, title in making_of.TOC)
+    assert all(f"\n## {name}\n" in md for name, _, _ in making_of.PARTS)
     assert "<" not in md.split("---", 2)[2].replace("<!--", "")  # no HTML left over
     assert f"]({URL}assets/making-of/video/morning.mp4)" in md  # videos link to the file, with the poster shown
     assert f"({URL}assets/making-of/img/paper.png)" in md  # images use full links
-    assert "| Signal | Why it counts | How much |" in md
-    assert "Copy for LLM" not in md and "Fig." not in md
+    assert "| Signal | Why it counts | Points |" in md
+    assert "View as Markdown" not in md and "Fig." not in md  # page buttons and figure labels are left out
 
 
 def test_dev_to_link_shows_only_once_set(monkeypatch):
