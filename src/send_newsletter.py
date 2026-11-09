@@ -40,7 +40,7 @@ SITE_DIR = os.path.join(ROOT_DIR, "site")
 FEED_PATH = os.path.join(SITE_DIR, "feed.xml")
 MARKER_DIR = os.path.join(ROOT_DIR, "data", "newsletter")
 CASES_PATH = os.path.join(ROOT_DIR, "data", "cases.json")
-MAX_CASES = 3  # case studies shown in the email on days new ones came in
+MAX_COMPANIES = 3  # companies named in the one-line case-study note before "and N more"
 API_URL = "https://api.buttondown.com/v1/emails"
 SITE_NAME = "AI Papers Daily"
 SITE_URL = (os.environ.get("SITE_URL") or "https://omen-bit.github.io/ai-paper-daily/").rstrip("/") + "/"
@@ -211,7 +211,7 @@ def more_papers(rest: list[dict]) -> str:
     )
 
 
-def new_case_studies(day: str, path: str = CASES_PATH, limit: int = MAX_CASES) -> list[dict]:
+def new_case_studies(day: str, path: str = CASES_PATH) -> list[dict]:
     """The case studies added on this day, newest first. Most days there are none."""
     try:
         with open(path, encoding="utf-8") as f:
@@ -220,31 +220,35 @@ def new_case_studies(day: str, path: str = CASES_PATH, limit: int = MAX_CASES) -
         return []
     fresh = [p for p in posts if p.get("added") == day and str(p.get("url", "")).startswith("https://") and p.get("title")]
     fresh.sort(key=lambda p: p.get("published") or "", reverse=True)
-    return fresh[:limit]
+    return fresh
+
+
+def company_list(posts: list[dict], limit: int = MAX_COMPANIES) -> str:
+    """'NVIDIA, Pinterest and Shopify' or 'NVIDIA, Pinterest, Shopify and 4 more', each company once."""
+    names = list(dict.fromkeys(str(p.get("company") or "").strip() for p in posts if p.get("company")))
+    if not names:
+        return ""
+    if len(names) > limit:
+        return f"{', '.join(names[:limit])} and {len(names) - limit} more"
+    return names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
 
 
 def case_studies(posts: list[dict]) -> str:
-    """New write-ups from company engineering blogs: company, title and our one line about it."""
+    """One line, not a list: how many new case studies came in today, from whom, and a link.
+    Keeps the email short; the case studies page has the details."""
     if not posts:
         return ""
-    items = ""
-    for p in posts:
-        summary = (f'<p style="margin:4px 0 0 0;font-family:{FONT};font-size:14px;line-height:21px;color:{MUTED};">'
-                   f'{esc(clip(p.get("summary"), 180))}</p>') if p.get("summary") else ""
-        items += (f'<div style="padding:0 0 14px 0;">'
-                  f'<p style="margin:0 0 2px 0;font-family:{FONT};font-size:13px;font-weight:700;color:{MUTED};">{esc(p.get("company"))}</p>'
-                  f'<p style="margin:0;font-family:{FONT};font-size:16px;line-height:23px;font-weight:700;">'
-                  f'<a href="{esc(p["url"])}" style="color:{INK};text-decoration:none;">{esc(clip(p.get("title"), 140))}</a></p>'
-                  f'{summary}</div>')
+    n = len(posts)
+    what = "1 new case study" if n == 1 else f"{n} new case studies"
+    who = company_list(posts)
+    from_who = f" from {esc(who)}" if who else ""
     return (
         '<tr><td style="padding:24px 28px 0 28px;">'
-        f'<div style="padding:18px 0 0 0;border-top:1px solid {LINE};">'
-        f'<p style="margin:0 0 12px 0;font-family:{FONT};font-size:11px;font-weight:700;letter-spacing:.08em;'
-        f'text-transform:uppercase;color:{MUTED};">From company blogs</p>'
-        f'{items}'
-        f'<p style="margin:0;"><a href="{SITE_URL}case-studies/index.html?ref=email" style="font-family:{FONT};font-size:14px;'
-        f'font-weight:700;color:{ORANGE};text-decoration:none;">See all case studies →</a></p>'
-        '</div></td></tr>'
+        f'<p style="margin:0;padding:16px 0 0 0;border-top:1px solid {LINE};font-family:{FONT};font-size:15px;'
+        f'line-height:22px;color:{MUTED};"><strong style="color:{INK};">{what}</strong>{from_who} on the site today. '
+        f'<a href="{SITE_URL}case-studies/index.html?ref=email" style="font-weight:700;color:{ORANGE};'
+        f'text-decoration:none;">See how companies use AI →</a></p>'
+        '</td></tr>'
     )
 
 
@@ -362,6 +366,13 @@ def main(day: str | None = None) -> int:
     if os.path.exists(marker):
         print(f"The email for {day} was already sent; skipping.")
         return 0
+    try:
+        import weekly_edition
+        if weekly_edition.replaces_daily(day):
+            print(f"{day} is a Sunday and The Weekly Express is ready; it replaces the daily email.")
+            return 0
+    except Exception as exc:  # never lose the daily email over the weekly check
+        print(f"Weekly check failed ({exc}); sending the daily email.")
     email = compose(day)
     if not email:
         print(f"No edition for {day}; nothing to send.")

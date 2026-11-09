@@ -197,6 +197,16 @@ To read them, run `select * from site_report(28);` in the Supabase SQL editor.
 - Stored full texts that nobody has asked about for 30 days are removed by the daily run.
 </details>
 
+### The Weekly Express (Sundays)
+
+On Sundays the daily email is replaced by **The Weekly Express**, a newspaper-style email with the week's five most upvoted new papers, the case studies published that week and a few numbers. `src/weekly_edition.py` builds it in three steps around one file per week, `data/weekly/<YYYY>-W<NN>.json`:
+
+1. **Collect** (no AI): reads the week's `data/daily/` files and `cases.json`, keeps each paper's highest upvote count, refreshes the top 15 from Hugging Face, ranks the week and saves Figure 1 of the top two papers from arXiv into `data/weekly/<week>/`.
+2. **Write** (Groq): a plain headline and short copy per story, written from the abstract, then checked against the abstract by a second Groq call. Copy that fails twice falls back to the paper's own title and notes. Saved copy is never rewritten, so you can edit the week file by hand before the email goes out.
+3. **Send**: renders the email from the week file and sends it through Buttondown after the site is published, so the hosted masthead (`src/site_assets/weekly-masthead.png`) and figures (copied to `site/weekly/<week>/`) are live.
+
+Set the repository variable `WEEKLY_SEND=draft` to review it in Buttondown first, or `WEEKLY_EMAIL=off` to turn it off. Preview locally with `python src/weekly_edition.py --preview 2026-11-08`.
+
 ## Agents
 
 Four parts of the project are LangGraph agents: graphs of small steps that share one state, with checks and retries between the LLM calls, so a bad answer gets caught instead of published. Every LLM step can fail without stopping the step around it.
@@ -313,6 +323,7 @@ ai-paper-daily/
 │   ├── site_builder.py         Static site generator
 │   ├── discovery.py            RSS feed, sitemap and share images
 │   ├── send_newsletter.py      Daily email through Buttondown
+│   ├── weekly_edition.py       The Weekly Express, the Sunday email
 │   ├── share_fonts/            Fonts for the share images
 │   └── site_assets/            CSS, JavaScript and fonts
 ├── supabase/

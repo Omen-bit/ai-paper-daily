@@ -1765,6 +1765,25 @@ def _making_of_head() -> str:
     return head
 
 
+def copy_weekly_figures(data_dir: str, site_dir: str) -> int:
+    """Figures for The Weekly Express email (weekly_edition.py) live in data/weekly/<week>/
+    and are served from site/weekly/<week>/, so images in past emails keep working."""
+    weekly = os.path.join(data_dir, "weekly")
+    copied = 0
+    if not os.path.isdir(weekly):
+        return 0
+    for week in sorted(os.listdir(weekly)):
+        src = os.path.join(weekly, week)
+        if not os.path.isdir(src):
+            continue
+        for name in os.listdir(src):
+            if name.lower().endswith((".jpg", ".jpeg", ".png")):
+                os.makedirs(os.path.join(site_dir, "weekly", week), exist_ok=True)
+                shutil.copy2(os.path.join(src, name), os.path.join(site_dir, "weekly", week, name))
+                copied += 1
+    return copied
+
+
 def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: str = EXPORT_DIR) -> int:
     """Rebuild site_dir from scratch. Returns the number of paper pages written."""
     global EDITION, LOGOS, LOGO_DEV_CREDIT, SAME_LAB
@@ -1796,6 +1815,8 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
         os.makedirs(os.path.join(site_dir, "assets", "logos"), exist_ok=True)
         for file in set(LOGOS.values()):
             shutil.copy2(os.path.join(data_dir, "logos", file), os.path.join(site_dir, "assets", "logos", file))
+
+    copy_weekly_figures(data_dir, site_dir)
 
     archive = load_archive(export_dir)
     rows, source = trends.trend_rows(archive, papers)

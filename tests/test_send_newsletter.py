@@ -84,3 +84,14 @@ def test_compose_prefers_edition_file(monkeypatch, tmp_path):
     (tmp_path / "2026-11-02.json").write_text(json.dumps(EDITION), encoding="utf-8")
     monkeypatch.setattr(sn, "DATA_DIR", str(tmp_path))
     assert sn.compose("2026-11-02")["subject"].startswith("SpecSlot")
+
+
+def test_case_studies_are_one_line_with_a_count():
+    posts = [{"company": "NVIDIA"}, {"company": "Pinterest"}, {"company": "NVIDIA"}, {"company": "Meta"},
+             {"company": "Stripe"}]
+    row = sn.case_studies(posts)
+    assert "5 new case studies</strong> from NVIDIA, Pinterest, Meta and 1 more on the site today" in row
+    assert "case-studies/index.html?ref=email" in row
+    assert row.count("<p") == 1  # a single line, no list of titles
+    assert "1 new case study</strong> from Apple" in sn.case_studies([{"company": "Apple"}])
+    assert sn.case_studies([]) == ""
