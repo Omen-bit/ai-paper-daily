@@ -1203,6 +1203,13 @@
   "source": "website https://www.ukim.edu.mk",
   "v": 6
  },
+ "St Petersburg University": {
+  "checked": "2026-11-09",
+  "file": "st-petersburg-university.png",
+  "qid": "Q27621",
+  "source": "website https://spbu.ru/",
+  "v": 6
+ },
  "Stable AI": {
   "checked": "2026-11-07",
   "file": "stable-ai.png",
@@ -1657,6 +1664,13 @@
   "file": "university-of-zurich.png",
   "qid": "Q206702",
   "source": "website https://uzh.ch/de.html",
+  "v": 6
+ },
+ "Universität Trier": {
+  "checked": "2026-11-09",
+  "file": "universit-t-trier.png",
+  "qid": "Q702486",
+  "source": "website https://www.uni-trier.de/",
   "v": 6
  },
  "Vanderbilt University": {
