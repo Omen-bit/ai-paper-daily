@@ -45,9 +45,9 @@ def test_page_has_the_buttons_and_the_contents_bar():
     html = build_paper(REC)
     assert 'data-md-copy data-md="2611.00001.md"' in html
     assert 'href="2611.00001.md" data-md-view' in html
-    assert 'class="np-otp"' in html
+    assert 'class="rd-toc"' not in html  # the details column holds no contents list, so it fits one screen
     for sec in ("minute", "numbers", "abstract", "build", "ask-sec"):
-        assert f'href="#{sec}"' in html and f'id="{sec}"' in html
+        assert f'id="{sec}"' in html
     assert 'href="#fits"' not in html
 
 

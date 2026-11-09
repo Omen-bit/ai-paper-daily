@@ -217,7 +217,7 @@ def test_published_dates_and_database_archive(tmp_path):
     assert [(p["i"], p["d"], p.get("x", 0)) for p in listing] == [("2610.1", "2026-10-28", 0), ("2503.7", "2025-03-04", 1)]
     assert listing[1]["n"] == 4 and len(listing[1]["a"]) == 3
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
-    assert '<span class="dp-k">Published</span><time datetime="2026-10-28">' in page
+    assert '<time datetime="2026-10-28">2026.10.28</time>' in page
     assert not os.path.exists(os.path.join(site_dir, "paper", "2503.7.html"))
 
 
@@ -420,9 +420,21 @@ def test_paper_page_shows_links_lineage_and_terms(tmp_path):
     build_site(data_dir, site_dir)
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
     assert "Where it fits" in page and "Older &lt;work&gt;" in page and "No papers cite it yet" in page
-    assert "Try it" in page and "org/model-x" in page and "★ 1.2k" in page and "0 demos" in page
+    assert "Try it" in page and "org/model-x" in page and "★ 1.2k" in page and "0 demos" not in page
     assert 'class="term"' in page and "Numbers that describe what moved" in page
     assert 'data-level="simple"' in page and 'data-level-text="expert"' in page
+
+
+def test_try_it_only_shows_what_really_exists(tmp_path):
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [_paper("2610.1")], "2026-10-31", data_dir=data_dir)
+    links = {"2610.1": {"checked": "2026-10-31", "hf": {"models": {"n": 0, "top": []},
+                                                        "datasets": {"n": 0, "top": []}, "spaces": {"n": 0, "top": []}}}}
+    with open(os.path.join(data_dir, "links.json"), "w", encoding="utf-8") as f:
+        json.dump(links, f)
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
+    assert "Try it" not in page and "on Hugging Face" not in page
 
 
 def test_paper_page_without_links_leaves_those_parts_out(tmp_path):

@@ -214,6 +214,7 @@ SLUGS = {"rag": "rag", "agents": "agents", "evals": "evaluation", "cost": "cost-
          "safety": "guardrails", "llm": "llm-products", "recs": "recommendations", "ads": "ads",
          "predict": "forecasting", "vision": "vision"}
 PER_SECTION = 3  # cards per topic on the main page
+NEWEST = 4  # newest write-ups at the top of the main page
 
 
 def filters(all_posts: list[dict], posts: list[dict], current: str = "") -> str:
@@ -308,9 +309,12 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
         lead = (f"Write-ups from {len(companies)} company engineering blogs about AI running in real products, "
                 "grouped by topic. Each card opens the original post on the company’s own blog.")
         # Our own write-up about building this site leads, beside the newest company post
+        # The newest write-ups lead, the latest one large; our own "how I built it" card follows them
         sections = [f'<section class="cs-sec"><div class="cs-sec-head"><h2>Newest</h2></div>'
-                    f'<ul class="cs-grid">{making_of.card()}{"".join(card(p) for p in posts[:1])}</ul></section>']
-        for k in TOPICS:
+                    f'<ul class="cs-grid">{"".join(card(p) for p in posts[:NEWEST])}{making_of.card()}</ul></section>']
+        # Topics with the freshest write-ups come first
+        latest = {k: max((p.get("published") or "" for p in posts if p["problem"] == k), default="") for k in TOPICS}
+        for k in sorted(TOPICS, key=lambda t: latest[t], reverse=True):
             these = [p for p in posts if p["problem"] == k]
             if not these:
                 continue

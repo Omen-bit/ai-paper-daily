@@ -369,6 +369,7 @@
       var word = iso === key(now) ? "today" : (now.setDate(now.getDate() - 1), iso === key(now)) ? "yesterday" : "";
       if (!word) return;
       pill.querySelector("time").textContent = word;
+      pill.hidden = false;
       if (word === "today") pill.classList.add("is-today");
     });
 
@@ -409,12 +410,14 @@
         skimAbs.classList.toggle("no-skim", !on);
         skimLegend.classList.toggle("no-skim", !on);
         skimBtn.setAttribute("aria-pressed", on ? "true" : "false");
-        skimBtn.textContent = on ? "Hide colours" : "Show colours";
+        skimBtn.textContent = on ? "Hide colours" : (rdSkim ? "Colour to skim" : "Show colours");
       };
-      paintSkim(load("apd.skim", true));
+      // The reading layout starts plain; the older layout kept its colours on
+      var rdSkim = !!document.querySelector(".rd");
+      paintSkim(rdSkim ? load("apd.skim.rd", false) : load("apd.skim", true));
       skimBtn.addEventListener("click", function () {
         var on = skimBtn.getAttribute("aria-pressed") !== "true";
-        store("apd.skim", on);
+        store(rdSkim ? "apd.skim.rd" : "apd.skim", on);
         paintSkim(on);
       });
     }
@@ -498,7 +501,7 @@
         });
       };
       // A # link on each heading, so any section can be shared
-      Array.prototype.forEach.call(document.querySelectorAll(".np-sec[id] > h2"), function (h) {
+      Array.prototype.forEach.call(document.querySelectorAll(".np-sec[id] > h2, .rd-sec[id] > h2:not(.sr-only)"), function (h) {
         var a = document.createElement("a");
         a.className = "np-hash";
         a.href = "#" + h.parentNode.id;
@@ -511,7 +514,10 @@
         otpTick = false;
         var max = root.scrollHeight - root.clientHeight;
         otpBar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, root.scrollTop / max) : 0) + ")";
-        var line = otp.getBoundingClientRect().bottom + 24, cur = -1;
+        var pct = otp.querySelector("[data-rd-pct]");
+        if (pct) pct.textContent = Math.round(100 * (max > 0 ? Math.min(1, root.scrollTop / max) : 0)) + "%";
+        // The reading layout keeps its list in the side column, so read from a third of the way down the screen
+        var line = otp.classList.contains("rd-toc") ? innerHeight * 0.33 : otp.getBoundingClientRect().bottom + 24, cur = -1;
         otpSecs().forEach(function (sec, i) { if (sec && sec.getBoundingClientRect().top <= line) cur = i; });
         otpLinks.forEach(function (a, i) {
           if (i === cur) {
@@ -896,6 +902,18 @@
       if (askFab) { askFab.setAttribute("aria-expanded", "false"); askFab.focus(); }
     };
     if (askFab) askFab.addEventListener("click", function () { openAsk(true); });
+    // Every "Ask this paper" link on the page brings the box into view and puts the cursor in it
+    var jumpAsk = function () {
+      openAsk(true);
+      ask.classList.remove("is-flash"); void ask.offsetWidth; ask.classList.add("is-flash");
+    };
+    document.querySelectorAll("[data-ask-jump]").forEach(function (b) { b.addEventListener("click", jumpAsk); });
+    // "a" also jumps there, unless the reader is typing somewhere
+    if (document.querySelector(".rd-askbar")) document.addEventListener("keydown", function (e) {
+      var t = e.target, tag = t && t.tagName;
+      if (e.key !== "a" || e.metaKey || e.ctrlKey || e.altKey || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable)) return;
+      e.preventDefault(); jumpAsk();
+    });
     var askClose = ask.querySelector("[data-ask-close]");
     if (askClose) askClose.addEventListener("click", closeAsk);
     document.addEventListener("keydown", function (e) {
@@ -1848,7 +1866,8 @@
   var all = [], matches = [], shown = 0, newest = "";
 
   var VIEWS = {
-    "": { label: "papers, newest first" },
+    "": { label: "papers, with our picks, new and trending mixed in", mix: true },
+    "new": { label: "papers, newest first" },
     week: { label: "most upvoted papers of the last 7 days",
             keep: function (p) { return p.u > 0 && (p.w || p.d) >= weekAgo(); },
             order: function (a, b) { return b.u - a.u; } },
@@ -1981,6 +2000,7 @@
     var badge = "";
     if (p.f === 1) badge = '<span class="pc-badge pc-badge-pick">★ Our pick</span>';
     else if (p.f === 2) badge = '<span class="pc-badge pc-badge-hot">Trending</span>';
+    else if (newest && (p.w || p.d) >= newest) badge = '<span class="pc-badge pc-badge-new">New</span>';
     else if (p.h) badge = '<span class="pc-badge" title="Not on the Hugging Face daily list">Not on HF yet</span>';
     var chips = "";
     if (p.u && stat.caption !== "upvotes on HF") chips += '<span class="sig sig-up" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
@@ -2056,7 +2076,7 @@
     } else {
       var n = matches.length.toLocaleString();
       count.textContent = view ? n + " " + VIEWS[view].label
-        : matches.length === all.length ? n + " papers, newest first" : n + " of " + all.length.toLocaleString() + " papers";
+        : matches.length === all.length ? n + " " + VIEWS[""].label : n + " of " + all.length.toLocaleString() + " papers";
     }
     if (lab) {
       if (!(meaning.checked && q.value.trim().length >= 3)) {
@@ -2069,6 +2089,32 @@
       count.appendChild(document.createTextNode(" "));
       count.appendChild(pill);
     }
+  }
+
+  // The default view: a steady blend, so the first screen always holds a
+  // top pick, something just added, something people are upvoting, and
+  // then the wider library, instead of only the newest day.
+  function mix(list) {
+    var day = function (p) { return p.w || p.d || ""; };
+    var fresh0 = newest ? new Date(Date.parse(newest) - 2 * 864e5).toISOString().slice(0, 10) : "";
+    var week = weekAgo();
+    var picks = list.filter(function (p) { return p.f === 1; })
+      .sort(function (a, b) { return day(b) < day(a) ? -1 : day(b) > day(a) ? 1 : 0; });
+    var hot = list.filter(function (p) { return p.f === 2 || (p.u > 0 && day(p) >= week); })
+      .sort(function (a, b) { return ((b.f === 2) - (a.f === 2)) || (b.u - a.u); });
+    var fresh = list.filter(function (p) { return day(p) >= fresh0; })
+      .sort(function (a, b) { return (b.s || 0) - (a.s || 0); });
+    var queues = [picks, fresh, hot, fresh, list], at = [0, 0, 0, 0, 0];
+    var seen = {}, out = [], left = true;
+    while (out.length < list.length && left) {
+      left = false;
+      for (var k = 0; k < queues.length; k++) {
+        var qu = queues[k];
+        while (at[k] < qu.length && seen[qu[at[k]].i]) at[k]++;
+        if (at[k] < qu.length) { seen[qu[at[k]].i] = true; out.push(qu[at[k]]); at[k]++; left = true; }
+      }
+    }
+    return out;
   }
 
   function keepFiltered(list) {
@@ -2126,6 +2172,7 @@
       return words.every(function (w) { return hay.indexOf(w) >= 0; });
     });
     if (VIEWS[view].order) matches.sort(VIEWS[view].order);
+    else if (VIEWS[view].mix && !words.length) matches = mix(matches);
     render(true);
     syncUrl();
   }
@@ -2180,4 +2227,95 @@
     });
 
 
+})();
+
+// ---- Paper page, reading layout: the title opens large, then shrinks into the side column as you scroll ----
+(function () {
+  // Opening screen: the title is sized so it, the paper details and the first
+  // lines of the paper all fit on the first screen. The title then scrolls
+  // away normally, and only once it is gone does the short copy appear at
+  // the top of the sticky details column.
+  var big = document.querySelector("[data-rd-big]"), small = document.querySelector("[data-rd-small]");
+  var stick = document.querySelector("[data-rd-stick]"), hero = big && big.closest(".rd-hero");
+  var askbar = stick && stick.querySelector(".rd-askbar");
+  if (!big || !small || !stick || !hero) return;
+  var ticking = false;
+  var fit = function () {
+    big.style.fontSize = "";
+    if (innerWidth <= 900) return;
+    var max = parseFloat(getComputedStyle(big).fontSize);
+    // Leave room under the title for the details and the paper's first lines
+    var room = innerHeight - (big.getBoundingClientRect().top + window.scrollY) - 34 - 44 - Math.max(220, innerHeight * 0.27);
+    if (big.offsetHeight <= room) return;
+    var lo = 40, hi = max;
+    for (var k = 0; k < 9; k++) {
+      var mid = (lo + hi) / 2;
+      big.style.fontSize = mid + "px";
+      if (big.offsetHeight <= room) lo = mid; else hi = mid;
+    }
+    big.style.fontSize = Math.floor(lo) + "px";
+  };
+  var place = function () {
+    // The short title sits just above the details, so the details line up
+    // with the paper on the first screen and the title fills in above them
+    var last = askbar || small;
+    stick.style.setProperty("--rd-sh", innerWidth <= 900 ? "0px" :
+      (last.offsetTop + last.offsetHeight + parseFloat(getComputedStyle(last).marginBottom) - small.offsetTop) + "px");
+  };
+  // Tied to the scroll position, so it moves exactly as fast as the reader
+  // scrolls and reverses when they scroll back. The big title fades as its
+  // last line rises past the short title's place; the short title and the
+  // ask button then rise into it, as a crossfade rather than a jump.
+  var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+  var out = function (t) { return 1 - Math.pow(1 - t, 3); };
+  var put = function (el, q) {
+    if (!el) return;
+    var e = out(q);
+    el.style.opacity = e.toFixed(3);
+    el.style.transform = e >= 1 ? "" : "translateY(" + ((1 - e) * 18).toFixed(2) + "px)";
+    el.classList.toggle("is-on", q > .6);
+  };
+  var paint = function () {
+    ticking = false;
+    if (innerWidth <= 900) {
+      big.style.opacity = ""; small.classList.remove("is-on");
+      [small, askbar].forEach(function (el) { if (el) el.style.opacity = el.style.transform = ""; });
+      return;
+    }
+    var bb = big.getBoundingClientRect(), st = small.getBoundingClientRect();
+    if (still) {
+      var gone = bb.bottom <= st.top + 8;
+      small.classList.toggle("is-on", gone); if (askbar) askbar.classList.toggle("is-on", gone);
+      return;
+    }
+    // Measured against where the short title will rest (the column's sticky
+    // top), so the first screen is untouched and nothing moves until the
+    // reader scrolls. The big title has faded out by the time its last line
+    // reaches the short title, which then rises in over the next stretch.
+    var rest = (parseFloat(getComputedStyle(stick).top) || 0) + st.height * .3;
+    var from = Math.min(bb.bottom + window.scrollY, rest + 320);
+    big.style.opacity = (.04 + .96 * clamp((bb.bottom - rest) / Math.max(1, from - rest))).toFixed(3);
+    var q = clamp((rest - bb.bottom) / Math.max(120, st.height * .8));
+    put(small, q);
+    put(askbar, clamp(q * 1.35 - .35));
+  };
+  var ask = function () { if (!ticking) { ticking = true; requestAnimationFrame(paint); } };
+  // The details column never scrolls on its own: if it is taller than the
+  // screen, the details table is set a little smaller until it fits
+  var details = stick.querySelector(".rd-details");
+  var shrink = function () {
+    if (!details) return;
+    details.style.zoom = "";
+    if (innerWidth <= 900) return;
+    var room = innerHeight - (parseFloat(getComputedStyle(stick).top) || 0) - 12;
+    var other = stick.scrollHeight - details.offsetHeight;
+    var z = (room - other) / details.offsetHeight;
+    if (z < 1) details.style.zoom = String(Math.max(.78, Math.floor(z * 100) / 100));
+  };
+  var redo = function () { fit(); place(); shrink(); paint(); };
+  redo();
+  window.addEventListener("scroll", ask, { passive: true });
+  window.addEventListener("resize", redo);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redo);
 })();
