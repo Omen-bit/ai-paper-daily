@@ -186,7 +186,8 @@ def test_email_lists_case_studies_added_today(tmp_path):
     fresh = nl.new_case_studies("2026-11-09", path)
     assert [p["url"] for p in fresh] == ["https://x/1"]
     block = nl.case_studies(fresh)
-    assert "From company blogs" in block and "Fresh one" in block and 'href="https://x/1"' in block
+    # One line, not a list: how many came in, from whom, and a link to the case studies page
+    assert "1 new case study" in block and "from Netflix" in block and "case-studies/index.html" in block
     assert nl.case_studies([]) == ""
 
 
