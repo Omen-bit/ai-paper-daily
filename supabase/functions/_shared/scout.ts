@@ -289,3 +289,44 @@ export function rankInput(description: string, needs: Need[], candidates: Candid
   ).join("\n\n");
   return `Project:\n${description}\n\nNeeds:\n${needList}\n\nCandidate papers:\n\n${papers}`;
 }
+
+// ---- Teams that built something like it: company case studies close to the project ----
+export type CaseMatch = {
+  url: string; company: string; title: string; published: string | null; problem: string;
+  summary: string; issue: string; result: string; tags: string[]; similarity: number;
+};
+export type CasePick = Omit<CaseMatch, "similarity"> & { needs: string[]; similarity: number };
+export const CASE_FLOOR = 0.77; // gte-small similarity a write-up needs to count as "something like this"
+export const CASE_SPREAD = 0.06; // and it must be this close to the best one, so a weak tail isn't shown
+export const MAX_CASES = 6;
+const CASE_STOP = new Set(("with that this from your their into using used based about which while what when where " +
+  "build make makes need needs want have will they them other more less than also only just like each find " +
+  "data model models system project users user people").split(" "));
+
+function caseWords(text: string): Set<string> {
+  return new Set((text.toLowerCase().match(/[a-z][a-z0-9-]{3,}/g) ?? []).filter((w) => !CASE_STOP.has(w)));
+}
+
+/**
+ * The case studies to show: close in meaning to the whole project, best first,
+ * each tagged with the parts it shares words with (so the page can say "Matches part 02").
+ */
+export function pickCases(rows: CaseMatch[], needs: Need[], floor = CASE_FLOOR, max = MAX_CASES): CasePick[] {
+  const sorted = [...rows].filter((r) => r && r.url && r.title).sort((a, b) => b.similarity - a.similarity);
+  if (!sorted.length || sorted[0].similarity < floor) return [];
+  const best = sorted[0].similarity;
+  const needWords = needs.map((n) => ({ id: n.id, w: caseWords(`${n.label} ${n.query}`) }));
+  const seen = new Set<string>();
+  const out: CasePick[] = [];
+  for (const r of sorted) {
+    if (r.similarity < floor || best - r.similarity > CASE_SPREAD) break;
+    const key = `${r.company}|${r.title}`.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const text = caseWords([r.title, r.summary, r.issue, (r.tags ?? []).join(" ")].join(" "));
+    const matched = needWords.filter((n) => [...n.w].some((w) => text.has(w))).map((n) => n.id);
+    out.push({ ...r, tags: (r.tags ?? []).slice(0, 4), needs: matched, similarity: Math.round(r.similarity * 1000) / 1000 });
+    if (out.length >= max) break;
+  }
+  return out;
+}

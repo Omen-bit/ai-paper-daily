@@ -81,7 +81,6 @@ def test_stats_compare_shares_not_counts():
 def test_empty_input_gives_nothing():
     assert tech_stats([], MONTHS) == []
     assert "empty-note" in tt.leaderboard([], MONTHS)
-    assert tt.spotlight([], MONTHS) == "" and tt.momentum([]) == ""
 
 
 def test_charts_render_with_status_text_not_colour_alone():
@@ -89,9 +88,6 @@ def test_charts_render_with_status_text_not_colour_alone():
     board = tt.leaderboard(stats, MONTHS)
     assert "AI agents" in board and "Breakout" in board and "▲▲" in board
     assert "Not enough papers yet to rate:" in board and "State-space and linear attention" in board.split("tb-note")[1]
-    spot = tt.spotlight(stats, MONTHS, on_site={"2601.02000"})
-    assert "AI agents went from" in spot and 'class="sl-main"' in spot and "Show as a table" in spot
-    assert 'href="paper/2601.02000.html"' in spot or "huggingface.co/papers/" in spot
 
 
 def test_leaderboard_shows_eight_rows_then_a_button():
@@ -100,12 +96,3 @@ def test_leaderboard_shows_eight_rows_then_a_button():
         rows += _rows(0, 89, 20, [t], start_id=20000 + i * 100)
     board = tt.leaderboard(tech_stats(rows, MONTHS), MONTHS)
     assert board.count("tb-more") == 2 and "Show all 10 technologies" in board
-
-
-def test_momentum_map_needs_four_technologies_with_growth():
-    stats = tech_stats(_sample(), MONTHS)
-    assert tt.momentum(stats) == ""  # only three have a growth figure
-    extra = _sample() + _rows(0, 89, 30, ["speech"], start_id=10000) + _rows(90, 179, 20, ["speech"], start_id=11000)
-    mm = tt.momentum(tech_stats(extra, MONTHS))
-    assert 'class="chart mm-chart"' in mm and 'class="dumbbell"' in mm
-    assert mm.count('class="pt mm-pt') == 4

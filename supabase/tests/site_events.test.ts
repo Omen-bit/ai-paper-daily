@@ -19,5 +19,5 @@ test("every event passes the database check in schema.sql", () => {
   const pattern = sql.match(/what !~ '([^']+)'/)![1];
   const re = new RegExp(pattern);
   for (const e of SITE_EVENTS) assert.ok(re.test(e), e);
-  assert.equal(SITE_EVENTS.length, 42);
+  assert.equal(SITE_EVENTS.length, 44);
 });

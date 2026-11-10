@@ -235,7 +235,7 @@ create or replace function public.bump_site(what text)
 returns void
 language plpgsql security definer set search_path = '' as $$
 begin
-  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code)|src_(direct|google|bing|duckduckgo|hn|reddit|x|linkedin|github|producthunt|discord|telegram|newsletter|rss|other)|subscribe_(rss|email|confirmed))$' then
+  if what !~ '^(visit_(new|return_7d|return_old)|click_(pick|trending|runner_up|most_read)|seen_(pick|trending|runner_up|most_read)_(yes|no)|scout_(click|save|dismiss|more|case|brief)|breakdown_load|out_(pdf|arxiv|hf|code)|src_(direct|google|bing|duckduckgo|hn|reddit|x|linkedin|github|producthunt|discord|telegram|newsletter|rss|other)|subscribe_(rss|email|confirmed))$' then
     raise exception 'unknown site event %', what;
   end if;
   insert into public.site_stats as s (day, event, n) values (current_date, what, 1)
@@ -343,3 +343,59 @@ revoke all on function public.match_sections(text, text, int) from public, anon,
 revoke all on function public.prune_fulltext(int) from public, anon, authenticated;
 grant execute on function public.match_sections(text, text, int) to service_role;
 grant execute on function public.prune_fulltext(int) to service_role;
+
+-- Company case studies (data/cases.json), so Scout can suggest teams that built something
+-- like the visitor's project. The pipeline writes rows; the embed function fills the vector.
+create table if not exists public.cases (
+  url        text primary key,
+  company    text not null,
+  title      text not null,
+  published  date,
+  problem    text not null default '',      -- the Case studies topic, e.g. rag, agents, cost
+  summary    text not null default '',
+  issue      text not null default '',
+  result     text not null default '',
+  tags       text[] not null default '{}',
+  embedding  extensions.vector(384),        -- gte-small over title, problem, solution and tags
+  updated_at timestamptz not null default now()
+);
+create index if not exists cases_missing_embedding_idx on public.cases (url) where embedding is null;
+alter table public.cases enable row level security;
+drop policy if exists "Anyone can read cases" on public.cases;
+create policy "Anyone can read cases" on public.cases for select using (true);
+grant select on public.cases to anon, authenticated;
+
+-- Clear the vector when the text changes, so it gets embedded again
+create or replace function public.cases_touch() returns trigger
+language plpgsql set search_path = '' as $$
+begin
+  new.updated_at := now();
+  if tg_op = 'UPDATE' and (new.title is distinct from old.title or new.summary is distinct from old.summary
+     or new.issue is distinct from old.issue or new.tags is distinct from old.tags)
+     and new.embedding::text is not distinct from old.embedding::text then
+    new.embedding := null;
+  end if;
+  return new;
+end $$;
+drop trigger if exists cases_touch on public.cases;
+create trigger cases_touch before insert or update on public.cases
+  for each row execute function public.cases_touch();
+
+-- Scout: the case studies closest in meaning to a project. A few hundred rows, so no index is needed.
+drop function if exists public.match_cases(extensions.vector, int);
+create or replace function public.match_cases(
+  query_embedding extensions.vector(384),
+  match_count int default 12
+) returns table (
+  url text, company text, title text, published date, problem text, summary text, issue text, result text,
+  tags text[], similarity float
+)
+language sql stable set search_path = '' as $$
+  select c.url, c.company, c.title, c.published, c.problem, c.summary, c.issue, c.result, c.tags,
+         1 - (c.embedding operator(extensions.<=>) query_embedding) as similarity
+  from public.cases c
+  where c.embedding is not null
+  order by c.embedding operator(extensions.<=>) query_embedding
+  limit least(match_count, 30);
+$$;
+grant execute on function public.match_cases(extensions.vector, int) to anon, authenticated;

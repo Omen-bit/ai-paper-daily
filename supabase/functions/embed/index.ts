@@ -51,6 +51,29 @@ Deno.serve(async (req) => {
     embedded++;
   }
 
-  const { count } = await db.from("papers").select("id", { count: "exact", head: true }).is("embedding", null);
-  return json({ embedded, remaining: count ?? 0 });
+  // Company case studies, once every paper has its vector (Scout suggests them by meaning)
+  if (embedded < limit && Date.now() - started < TIME_BUDGET_MS) {
+    const { data: cases } = await db.from("cases").select("url,title,problem,issue,summary,tags")
+      .is("embedding", null).limit(limit - embedded);
+    for (const c of cases ?? []) {
+      if (embedded > 0 && Date.now() - started > TIME_BUDGET_MS) break;
+      const vector = await model.run(caseText(c), { mean_pool: true, normalize: true });
+      const { error: updateError } = await db.from("cases")
+        .update({ embedding: JSON.stringify(vector) }).eq("url", c.url);
+      if (updateError) return json({ error: updateError.message, embedded }, 500);
+      embedded++;
+    }
+  }
+
+  const [{ count }, { count: casesLeft }] = await Promise.all([
+    db.from("papers").select("id", { count: "exact", head: true }).is("embedding", null),
+    db.from("cases").select("url", { count: "exact", head: true }).is("embedding", null),
+  ]);
+  return json({ embedded, remaining: (count ?? 0) + (casesLeft ?? 0) });
 });
+
+type CaseRow = { title: string; problem: string; issue: string; summary: string; tags: string[] };
+/** What a case study is about, in the words a project description would use. */
+function caseText(c: CaseRow): string {
+  return [c.title, c.issue, c.summary, (c.tags ?? []).join(", ")].filter(Boolean).join("\n\n").slice(0, 2000);
+}

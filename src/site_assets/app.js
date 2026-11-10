@@ -1239,6 +1239,18 @@
     paintSaved();
   }
 
+  // Shared by All papers and Project Scout cards
+  // Text covers: a tinted band per topic that stands in for a thumbnail, with no image to load
+  var COVER_WORD = {
+    "llms": "LLM", "generative-ai": "GEN AI", "computer-vision": "VISION", "audio-speech": "AUDIO",
+    "alignment": "ALIGN", "reasoning-agents": "AGENTS", "ml-theory": "THEORY", "ai-science": "SCIENCE",
+    "code-ai": "CODE", "safety-privacy": "SAFETY", "efficient-ai": "EFF AI", "multimodal": "MULTI", "other-ml": "ML"
+  };
+  // Where the lab logos live, for labMark(): its logo on its brand colour, or its initials
+  var LABS_SVG = (function () {
+    var css = document.querySelector('link[href*="assets/style.css"]');
+    return css ? css.getAttribute("href").replace("style.css", "labs.svg") : "assets/labs.svg";
+  })();
   // ---- Project Scout: describe a project, get a reading plan ----
   // Same rules as looksLikeCode() in supabase/functions/_shared/scout.ts.
   var CODE_PATTERNS = [
@@ -1294,16 +1306,26 @@
       });
     });
 
+    // The All papers index: which papers have a page here, plus each one's lab and one-line summary for the cards
+    var paperIndex = {};
     var siteIds = function () {
       if (onSiteIds) return Promise.resolve(onSiteIds);
-      return fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
-        .then(function (list) { onSiteIds = {}; list.forEach(function (id) { onSiteIds[id] = true; }); return onSiteIds; });
+      return fetch("data/papers.json").then(function (r) { if (!r.ok) throw new Error("index"); return r.json(); })
+        .then(function (list) {
+          onSiteIds = {};
+          list.forEach(function (p) { paperIndex[p.i] = p; if (!p.x) onSiteIds[p.i] = true; });
+          return onSiteIds;
+        })
+        .catch(function () {
+          return fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+            .then(function (list) { onSiteIds = {}; list.forEach(function (id) { onSiteIds[id] = true; }); return onSiteIds; });
+        });
     };
 
     // ---- Results: the papers most relevant to the project, best first ----
     var FIT_LABEL = { strong: "Strong match", related: "Related", unchecked: "Not checked" };
     var NEED_COLORS = ["#3B5BDB", "#B4530F", "#7C3AED", "#0E7490"];
-    var STATUS_LABEL = { covered: "Covered", partial: "Gap", missing: "Gap" };
+    var STATUS_LABEL = { covered: "Covered", partial: "Partly", missing: "Gap" };
     var FIRST_SHOWN = 10;
     var paperHref = function (p, onSite) {
       return onSite[p.id] ? "paper/" + esc(p.id) + ".html" : "https://huggingface.co/papers/" + esc(p.id);
@@ -1324,110 +1346,177 @@
       return Object.assign({}, data, { version: 3, plan: plan, coverage: cov, gaps: [] });
     };
 
+    // The brief as text: for the visitor's notes, or to paste into an AI assistant
+    var needNum = function (data, id) {
+      var i = (data.needs || []).map(function (n) { return n.id; }).indexOf(id);
+      return i < 0 ? "" : (i < 9 ? "0" : "") + (i + 1);
+    };
     var asMarkdown = function (data, description) {
-      var lines = ["# " + (data.summary || description), ""];
-      (data.coverage || []).forEach(function (c) {
-        lines.push("- **" + c.label + "**: " + (c.status === "covered" ? "covered" : "gap") + " (" + c.strong + " strong, " + c.related + " related)");
+      var lines = ["# " + (data.summary || description), "", "> " + description, ""];
+      var plan = data.plan || [];
+      (data.coverage || []).forEach(function (c, i) {
+        lines.push("## Part " + (i + 1) + ": " + c.label + " (" + (c.status === "covered" ? "covered" : "open problem") + ")", "");
+        var mine = plan.filter(function (p) { return (p.needs || [])[0] === c.need; });
+        if (!mine.length) lines.push("No paper in our library covers this part yet.");
+        mine.forEach(function (p) {
+          lines.push("- [" + p.title + "](https://arxiv.org/abs/" + p.id + ")" + " (" + FIT_LABEL[p.fit] + (p.score != null ? ", " + p.score + "/100" : "") + ")" +
+            (p.why ? "\n  " + p.why : "") + (p.code_url ? "\n  Code: " + p.code_url : ""));
+        });
+        lines.push("");
       });
-      lines.push("", "## Papers");
-      (data.plan || []).forEach(function (p, i) {
-        lines.push((i + 1) + ". [" + p.title + "](https://arxiv.org/abs/" + p.id + ")" + " (" + FIT_LABEL[p.fit] + (p.score != null ? ", " + p.score + "/100" : "") + ")" +
-          (p.why ? "\n   " + p.why : "") + (p.code_url ? "\n   Code: " + p.code_url : ""));
-      });
-      lines.push("", "Made with Project Scout, AI Papers Daily");
+      if ((data.cases || []).length) {
+        lines.push("## Teams that built something like this", "");
+        data.cases.forEach(function (c) { lines.push("- [" + c.company + ": " + c.title + "](" + c.url + ")" + (c.summary ? "\n  " + c.summary : "")); });
+        lines.push("");
+      }
+      lines.push("Made with Project Scout, AI Papers Daily");
       return lines.join("\n");
+    };
+    var asPrompt = function (data, description) {
+      return "I want to build this project:\n\n" + description + "\n\n" +
+        "Below is a research brief for it: the parts it needs, the most relevant recent AI papers for each part, " +
+        "and the parts no paper covers yet. Use it to help me design the system. Suggest an architecture, " +
+        "say which paper's method to use for each part and why, and propose how to handle the open problems.\n\n" +
+        asMarkdown(data, description);
+    };
+
+    // ---- Case study cards, drawn like the Case studies page (case_pages.post_card) ----
+    var BRANDS = { c: {}, p: {}, svg: "data/case-brands.svg" };
+    try { BRANDS = JSON.parse(scoutForm.getAttribute("data-brands")) || BRANDS; } catch (e) { /* plain initials */ }
+    var caseLogo = function (company, cls) {
+      var b = BRANDS.c[company] || [];
+      if (b[0]) return '<svg class="' + cls + (b[3] ? " cs-ink" : "") + '" aria-hidden="true"><use href="' + esc(BRANDS.svg) + "#b-" + esc(b[0]) + '"/></svg>';
+      if (b[2]) return '<img class="' + cls + ' cs-img" src="case-studies/logos/' + esc(b[2]) + '" alt="" loading="lazy" decoding="async">';
+      return '<span class="' + cls + ' cs-mono" style="--b:' + esc(b[1] || "#5D5C63") + '" aria-hidden="true">' + esc((company || "?").charAt(0).toUpperCase()) + "</span>";
+    };
+    var BOOKMARK = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>';
+    var host = function (url) { return String(url || "").split("://").pop().split("/")[0].replace(/^www\./, ""); };
+    var caseCard = function (c, data) {
+      var nums = (c.needs || []).map(function (id) { return needNum(data, id); }).filter(Boolean);
+      var isSaved = saved.some(function (s) { return s.id === "cs:" + c.url; });
+      var tags = (c.tags || []).slice(0, 3).map(function (t) { return '<li><span class="cs-tag">' + esc(t) + "</span></li>"; }).join("");
+      var body = c.issue ? '<p class="cs-issue"><b>Problem</b> ' + esc(c.issue) + "</p>" + (c.summary ? '<p class="cs-fix"><b>Solution</b> ' + esc(c.summary) + "</p>" : "")
+        : (c.summary ? "<p>" + esc(c.summary) + "</p>" : "");
+      var when = c.published ? '<time datetime="' + esc(c.published) + '">' + esc(longDay(c.published)) + "</time>" : "";
+      return '<li class="cs-card" style="--c:var(--l-' + esc(c.problem || "llm") + ");--b:" + esc((BRANDS.c[c.company] || [])[1] || "#5D5C63") + '">' +
+        '<div class="cs-cover">' + caseLogo(c.company, "cs-big") + '<span class="cs-co">' + caseLogo(c.company, "cs-badge") + esc(c.company) + "</span>" + when +
+        '<span class="cs-topic">' + esc(BRANDS.p[c.problem] || "Case study") + "</span></div>" +
+        '<div class="cs-body"><h3><a class="cs-link" href="' + esc(c.url) + '" rel="noopener" target="_blank" data-sb-case>' + esc(c.title) + "</a></h3>" + body +
+        (tags ? '<ul class="cs-tags" aria-label="Techniques">' + tags + "</ul>" : "") +
+        (nums.length ? '<p class="sb-matches">Matches part' + (nums.length > 1 ? "s " + nums.slice(0, -1).join(", ") + " and " + nums[nums.length - 1] : " " + nums[0]) + "</p>" : "") +
+        '<div class="cs-foot"><span class="cs-src">Read on ' + esc(host(c.url)) + ' ↗</span><button class="cs-save" type="button" data-sb-case-save="' + esc(c.url) + '" aria-pressed="' + isSaved + '">' + BOOKMARK +
+        '<span>' + (isSaved ? "Saved" : "Save") + "</span></button></div></div></li>";
+    };
+
+    // ---- Results: a build brief. The project, a map of its parts, the papers for each part, and teams that built it ----
+    var ring = function (score, r) {
+      var c = 2 * Math.PI * r, v = Math.max(0, Math.min(100, score || 0)) / 100 * c;
+      return '<svg viewBox="0 0 ' + (2 * r + 8) + " " + (2 * r + 8) + '" aria-hidden="true"><circle class="sb-ring-bg" cx="' + (r + 4) + '" cy="' + (r + 4) + '" r="' + r + '"/>' +
+        '<circle class="sb-ring-fg" cx="' + (r + 4) + '" cy="' + (r + 4) + '" r="' + r + '" stroke-dasharray="' + v.toFixed(1) + " " + c.toFixed(1) + '" transform="rotate(-90 ' + (r + 4) + " " + (r + 4) + ')"/></svg>';
+    };
+    var shortTitle = function (t) { var s = String(t || "").split(/:\s/)[0]; return s.length <= 48 ? s : s.slice(0, 46) + "…"; };
+    var readiness = function (cov) {
+      var ready = cov.filter(function (c) { return c.status === "covered"; }).length, n = cov.length;
+      var head = !n ? "Searched as one part" : ready === n ? "Buildable today" : ready >= n / 2 ? "Mostly buildable" : ready ? "Early, with open problems" : "Open research";
+      var sub = !n ? "" : ready === n ? "Every part has a proven paper to build on."
+        : (ready ? plural(ready, "part has", "parts have") + " proven papers. " : "") +
+          plural(n - ready, "part", "parts") + " you’ll build yourself or watch for.";
+      // Each ring segment is one part: green when covered, orange when not
+      var r = 40, circ = 2 * Math.PI * r, gap = n > 1 ? 6 : 0, seg = n ? (circ - gap * n) / n : circ;
+      var segs = cov.map(function (c, i) {
+        return '<circle class="' + (c.status === "covered" ? "rg-ok" : "rg-gap") + '" cx="48" cy="48" r="' + r + '" stroke-dasharray="' + seg.toFixed(1) + " " + (circ - seg).toFixed(1) +
+          '" stroke-dashoffset="' + (-(i * (seg + gap))).toFixed(1) + '" transform="rotate(-90 48 48)"/>';
+      }).join("");
+      return '<div class="sb-ready"><div class="sb-ring-big"><svg viewBox="0 0 96 96" aria-hidden="true">' + segs + "</svg>" +
+        "<b>" + ready + "/" + n + "</b><span>Ready</span></div><div><p class=\"sb-ready-h\">" + head + "</p><p>" + esc(sub) + "</p></div></div>";
     };
 
     var paintPlan = function (raw, description, at) {
       var data = upgrade(raw);
       siteIds().then(function (onSite) {
         var needs = (data.needs || []).filter(function (nd) { return nd.label; });
-        var colorOf = {}, labelOf = {};
-        needs.forEach(function (nd, i) { colorOf[nd.id] = NEED_COLORS[i % NEED_COLORS.length]; labelOf[nd.id] = nd.label; });
         var cov = data.coverage || [];
-        var state = { need: "", code: false, recent: false, all: false, dismissed: (raw.dismissed || []).slice() };
+        var plan = data.plan || [];
+        var cases = data.cases || [];
+        var state = { code: false, recent: false, open: {}, dismissed: (raw.dismissed || []).slice() };
         var sixMonthsAgo = new Date(Date.now() - 182 * 864e5).toISOString().slice(0, 10);
+        var hasPlan = plan.length > 0;
+        var home = function (p) { return (p.needs || [])[0] || (cov[0] && cov[0].need) || ""; };
+        var casesFor = function (id) { return cases.filter(function (c) { return (c.needs || []).indexOf(id) >= 0; }); };
 
-        var needTag = function (id) {
-          return labelOf[id] ? '<span class="sx-tag" style="--n:' + colorOf[id] + '">' + esc(labelOf[id]) + "</span>" : "";
-        };
+        // One paper, drawn like an All papers card with its fit score on the cover
         var entry = function (p) {
           var local = onSite[p.id];
+          var x = paperIndex[p.id] || {};
+          var topic = (p.categories && p.categories[0]) || (x.c && x.c[0]) || "other-ml";
           var isSaved = saved.some(function (s) { return s.id === p.id; });
-          var score = p.score != null ? p.score : "–";
-          var meta = (p.submitted || p.first_seen ? "<span>" + esc(shortDay(p.submitted || p.first_seen)) + " " + String(p.submitted || p.first_seen).slice(0, 4) + "</span>" : "") +
-            (p.code_url ? '<a class="sx-code" href="' + esc(p.code_url) + '" rel="noopener">Code</a>' : "") +
-            (p.hf_upvotes ? '<span class="sx-up">▲ ' + p.hf_upvotes + "</span>" : "") +
-            (local ? "" : '<span class="sx-up">On Hugging Face</span>');
-          return '<article class="sx-entry fit-' + esc(p.fit) + (readIds[p.id] ? " is-read" : "") + '" data-id="' + esc(p.id) + '">' +
-            '<div class="sx-score"><b>' + score + "</b>" + (p.score != null ? '<i style="--w:' + p.score + '%"></i>' : "") +
-            '<span class="sx-fit">' + FIT_LABEL[p.fit] + "</span></div>" +
-            '<div class="sx-body"><h3><a href="' + paperHref(p, onSite) + '"' + (local ? "" : ' rel="noopener"') + ' data-sx-open>' + esc(p.title) + "</a></h3>" +
-            (p.why ? '<p class="sx-why">' + esc(p.why) + "</p>" : "") +
-            '<div class="sx-row">' + (p.needs || []).map(needTag).join("") + '<span class="sx-meta">' + meta + "</span>" +
-            '<span class="sx-acts"><button class="sx-act" type="button" data-sx-save aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? "Saved" : "Save") + '">' +
-            (isSaved ? "★" : "☆") + "<span>" + (isSaved ? " Saved" : " Save") + "</span></button>" +
-            '<a class="sx-act" href="papers.html?q=' + encodeURIComponent(p.title) + '&amp;m=1" data-sx-more>More like this</a>' +
-            '<button class="sx-act sx-ghost" type="button" data-sx-dismiss aria-label="Not relevant">✕<span> Not relevant</span></button></span></div></div></article>';
+          var day = String(p.submitted || p.first_seen || x.d || "").slice(0, 10);
+          var also = (p.needs || []).slice(1).map(function (id) { return needNum(data, id); }).filter(Boolean);
+          var authors = (p.authors || x.a || []).slice(0, 2).map(esc).join(", ");
+          var extra = (p.n_authors || x.n || 0) - Math.min(2, (p.authors || x.a || []).length);
+          if (extra > 0) authors += " +" + extra;
+          var chips = (p.code_url ? '<a class="sig sb-code" href="' + esc(p.code_url) + '" rel="noopener">Code</a>' : "") +
+            (p.hf_upvotes ? '<span class="sig sig-up" title="Upvotes on Hugging Face">▲ ' + p.hf_upvotes + "</span>" : "") +
+            (also.length ? '<span class="sig sb-also">Also helps part ' + also.join(", ") + "</span>" : "") +
+            (readIds[p.id] ? '<span class="pcard-read">✓ Read</span>' : "") +
+            (local ? "" : '<span class="sig sig-arxiv">On Hugging Face</span>');
+          return '<article class="pcard sb-paper t-' + esc(topic) + " fit-" + esc(p.fit) + (readIds[p.id] ? " is-read" : "") + '" data-id="' + esc(p.id) + '">' +
+            '<div class="pc-cover sb-cover"><div class="pc-cover-top"><a class="pc-topic" href="papers.html?cat=' + esc(topic) + '"><span class="dot"></span>' +
+            esc(scoutNames[topic] || topic) + "</a></div>" +
+            '<div class="pc-word" aria-hidden="true">' + esc(COVER_WORD[topic] || "ML") + "</div>" +
+            '<div class="sb-score">' + (p.score != null ? ring(p.score, 26) + "<b>" + p.score + "</b>" : "<b>–</b>") + "</div>" +
+            '<span class="sb-fit">' + FIT_LABEL[p.fit] + "</span></div>" +
+            '<div class="pc-body">' + (x.o || authors ? '<p class="pcard-by">' + (x.o ? labMark(x) + '<span class="org-name">' + esc(x.o) + "</span>" + (authors ? '<span class="by-sep">·</span>' : "") : "") +
+            '<span class="by-auth">' + authors + "</span></p>" : "") +
+            '<h3 title="' + esc(p.title) + '"><a href="' + paperHref(p, onSite) + '"' + (local ? "" : ' rel="noopener"') + " data-sx-open>" + esc(p.title) + "</a></h3>" +
+            (x.m ? '<p class="pcard-sum">' + esc(x.m) + "</p>" : "") +
+            (p.why ? '<div class="sb-why"><span>Why it fits your project</span>' + esc(p.why) + "</div>" : "") +
+            (chips ? '<div class="pcard-tags sb-tags">' + chips + "</div>" : "") +
+            '<div class="pcard-foot">' + (day ? '<p class="pcard-dates"><span class="date-pill is-pub"><span class="dp-k">Published</span><time datetime="' + esc(day) + '">' + esc(longDay(day)) + "</time></span></p>" : "") +
+            '<span class="sb-acts"><a class="sb-act" href="papers.html?q=' + encodeURIComponent(p.title) + '&amp;m=1" data-sx-more>More like this</a>' +
+            '<button class="sb-act" type="button" data-sx-dismiss>Not relevant</button></span>' +
+            '<button class="quick-save" type="button" data-sx-save aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? "Saved" : "Save this paper") + '">' + (isSaved ? "✓" : "+") + "</button></div>" +
+            "</div></article>";
         };
 
-        var needRows = cov.map(function (c) {
-          var sub = c.strong ? plural(c.strong, "strong paper", "strong papers") + (c.related ? ", " + c.related + " related" : "")
-            : c.related ? "Only " + plural(c.related, "related paper", "related papers") : "No papers yet";
-          return '<li><button class="sx-need" type="button" data-sx-need="' + esc(c.need) + '" aria-pressed="false" style="--n:' + colorOf[c.need] + '">' +
-            '<span class="sx-sq"></span><span class="sx-nl">' + esc(c.label) + '</span><span class="sx-st st-' + esc(c.status) + '">' + STATUS_LABEL[c.status] + "</span>" +
-            '<span class="sx-nsub">' + sub + "</span></button></li>";
-        }).join("");
-        var chips = '<button class="sx-chip" type="button" data-sx-need="" aria-pressed="true">All<b>' + (data.plan || []).length + "</b></button>" +
-          cov.map(function (c) {
-            return '<button class="sx-chip" type="button" data-sx-need="' + esc(c.need) + '" aria-pressed="false"><span class="sx-dot st-' + esc(c.status) + '"></span>' +
-              esc(c.label) + "<b>" + (c.strong + c.related) + "</b></button>";
-          }).join("") + '<button class="sx-chip" type="button" data-sx-toggle="code" aria-pressed="false">Code released</button>';
-        var hasPlan = (data.plan || []).length > 0;
-
-        out.innerHTML = '<div class="sx">' +
-          '<aside class="sx-brief">' +
-          '<p class="sx-kicker">' + (at ? "Your last Scout, " + esc(ago(at)) : "Your project") + "</p>" +
-          '<p class="sx-prompt"><span class="sx-ptext">' + esc(description) + "</span></p>" +
-          '<div class="sx-pfoot"><span>' + (data.searched ? "Searched " + Number(data.searched).toLocaleString() + " papers" : "") + "</span>" +
-          '<button type="button" data-sx-edit>Edit and search again</button></div>' +
-          (cov.length ? '<div class="sx-needs-head"><p class="sx-kicker sx-hide-sm">What it needs</p>' +
-            '<button type="button" class="sx-edit-parts" data-sx-parts>Edit parts</button></div><ul class="sx-needs">' + needRows + "</ul>" : "") +
-          '<div class="sx-filters"><label><input type="checkbox" data-sx-toggle="code"> Code released</label>' +
-          '<label><input type="checkbox" data-sx-toggle="recent"> Last 6 months</label></div>' +
-          (cov.length ? '<div class="sx-chips">' + chips + "</div>" : "") +
-          '<div class="sx-tools">' + (hasPlan ? '<button class="btn btn-primary btn-sm" type="button" data-scout-watch aria-pressed="false">Watch this project</button>' +
-            '<button class="btn btn-outline btn-sm" type="button" data-scout-copy><span>Copy as Markdown</span></button>' : "") +
-          '<button class="btn btn-outline btn-sm" type="button" data-scout-new>Start over</button></div>' +
-          "</aside>" +
-          '<section class="sx-results"><div class="sx-head"><h2>Papers to build on</h2><p data-sx-count></p></div>' +
-          (data.mode === "basic" && hasPlan ? '<p class="sx-note">Relevance scoring was unavailable, so these are the closest papers by search and haven’t been checked for fit.</p>' : "") +
-          ((data.expanded || []).length ? '<p class="sx-again">Searched again for: ' + data.expanded.map(function (q) { return "“" + esc(q) + "”"; }).join(", ") + ".</p>" : "") +
-          '<div data-sx-list></div>' +
-          '<div class="feedback" data-feedback="scout"><span data-feedback-q>Were these papers relevant?</span>' +
-          '<button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, relevant</button>' +
-          '<button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not really</button></div>' +
-          "</section></div>";
-
-        var listEl = out.querySelector("[data-sx-list]");
-        var countEl2 = out.querySelector("[data-sx-count]");
-        var gapsHtml = function () {
-          var gaps = cov.filter(function (c) { return c.status !== "covered" && (!state.need || state.need === c.need); }).map(function (c) {
-            var g = (data.gaps || []).filter(function (x) { return x.need === c.need; })[0];
-            var tries = (g && g.try || []).map(function (t) {
-              return '<a class="qchip" href="papers.html?q=' + encodeURIComponent(t) + '&amp;m=1">' + esc(t) + "</a>";
-            }).join("");
-            var need = needs.filter(function (nd) { return nd.id === c.need; })[0];
-            var why = c.related ? "The related papers above are the closest we have."
-              : c.considered ? "Scout read the " + plural(c.considered, "closest paper", "closest papers") + " for this part, and none fit your project well enough to show."
-              : "Nothing in our library covers this part.";
-            var scholar = need && need.query ? '<a class="text-link" href="https://scholar.google.com/scholar?q=' + encodeURIComponent(need.query) + '" rel="noopener">Search all research on Google Scholar</a>' : "";
-            return '<div class="sx-gap"><p><b>No strong paper for “' + esc(c.label) + '” yet.</b> ' + why + "</p>" +
-              (tries || scholar ? '<div class="sx-try">' + (tries ? "<span>Try searching for</span>" + tries : "") + scholar + "</div>" : "") + "</div>";
+        // The build map: one card per part, in the order to build them
+        var mapCard = function (c, i) {
+          var mine = plan.filter(function (p) { return home(p) === c.need; });
+          var best = mine.filter(function (p) { return p.fit === "strong"; })[0];
+          var ok = c.status === "covered";
+          var label = !ok ? "Open problem" : i === 0 ? "Start here" : "Build on";
+          var segs = [0, 1, 2].map(function (k) {
+            return '<i class="' + (k < c.strong ? "s-strong" : k < c.strong + c.related ? "s-rel" : "") + '"></i>';
           }).join("");
-          return gaps ? gaps + scopeNote() : "";
+          var teams = casesFor(c.need);
+          var marks = teams.slice(0, 3).map(function (t) { return caseLogo(t.company, "sb-team"); }).join("");
+          var pick = best ? "Best pick: <b>" + esc(shortTitle(best.title)) + "</b>" + (best.why ? ", " + esc(best.why.charAt(0).toLowerCase() + best.why.slice(1)).replace(/\.$/, "") : "")
+            : c.related ? "No strong paper yet. " + plural(c.related, "related paper is", "related papers are") + " close."
+            : "No paper covers this part yet. A chance to build something new.";
+          return '<li class="sb-part ' + (ok ? "is-ok" : "is-gap") + '"><a href="#sb-need-' + esc(c.need) + '">' +
+            '<p class="sb-part-top"><span>' + needNum(data, c.need) + " · " + label + '</span><span class="sb-pill">' + STATUS_LABEL[c.status] + "</span></p>" +
+            "<h3>" + esc(c.label) + '</h3><p class="sb-seg" aria-hidden="true">' + segs + "</p>" +
+            '<p class="sb-pick">' + pick + "</p>" +
+            '<p class="sb-part-foot"><span class="sb-teams">' + (teams.length ? marks + plural(teams.length, "team shipped this", "teams shipped this") : ok ? "" : "Watch this part") + "</span>" +
+            "<span>" + plural(mine.length, "paper", "papers") + "</span></p></a></li>";
         };
-        // What the library holds, so a gap reads as "not in our library", not "nobody has studied this"
+
+        var gapPanel = function (c) {
+          var g = (data.gaps || []).filter(function (x) { return x.need === c.need; })[0];
+          var need = needs.filter(function (nd) { return nd.id === c.need; })[0];
+          var tries = (g && g.try || []).map(function (t) {
+            return '<a class="qchip" href="papers.html?q=' + encodeURIComponent(t) + '&amp;m=1">' + esc(t) + "</a>";
+          }).join("");
+          var why = c.related ? "The related papers below are the closest we have; you’ll need to adapt them."
+            : c.considered ? "Scout read the " + plural(c.considered, "closest paper", "closest papers") + " for this part, and none fit your project well enough to show."
+            : "Nothing in our library covers this part.";
+          var scholar = need && need.query ? '<a class="sb-scholar" href="https://scholar.google.com/scholar?q=' + encodeURIComponent(need.query) + '" rel="noopener">Search all research on Google Scholar ↗</a>' : "";
+          return '<div class="sb-open"><div><p class="sb-open-k">Open problem · ' + (c.related ? "no strong paper yet" : "no paper yet") + "</p>" +
+            "<p class=\"sb-open-h\">" + why + "</p>" +
+            (tries ? '<div class="sb-try"><span>Try searching for</span>' + tries + "</div>" : "") + scholar + "</div>" +
+            (hasPlan ? '<button class="btn sb-watch-need" type="button" data-sb-watch>Watch for papers</button>' : "") + "</div>";
+        };
+
         var scopeNote = function () {
           var lib = data.library || {};
           var n = lib.papers || data.searched;
@@ -1437,64 +1526,126 @@
             "Scout only searches " + (n ? Number(n).toLocaleString() + " " : "the ") + "AI papers from " + sources + range + ". " +
             "Older work, and research outside these areas, isn’t included.</p>";
         };
+
+        var strongCount = plan.filter(function (p) { return p.fit === "strong"; }).length;
+        var mins = strongCount * 8;
+        var techniques = [];
+        cases.forEach(function (c) { (c.tags || []).forEach(function (t) { if (techniques.indexOf(t) < 0 && techniques.length < 8) techniques.push(t); }); });
+        var heading = description.length <= 170 ? description : (data.summary || description.slice(0, 160) + "…");
+        var searchedLine = (data.searched ? "Searched " + Number(data.searched).toLocaleString() + " papers" : "Searched our papers") +
+          (data.cases_searched ? " and " + Number(data.cases_searched).toLocaleString() + " company case studies" : "");
+
+        out.innerHTML = '<div class="sb">' +
+          '<header class="sb-hero"><div class="sb-hero-text">' +
+          '<p class="sb-eyebrow"><b>/ Project Scout</b> · ' + (at ? "Your last Scout, " + esc(ago(at)) : "Build brief") + "</p>" +
+          '<h2 class="sb-h">“' + esc(heading) + "”</h2>" +
+          (heading !== description ? '<details class="sb-full"><summary>Your full description</summary><p>' + esc(description) + "</p></details>" : "") +
+          '<p class="sb-meta">' + searchedLine + ' · <button type="button" data-sx-edit>Edit project</button> · <button type="button" data-sx-parts>Edit parts</button> · <button type="button" data-scout-new>Start over</button></p>' +
+          '<div class="sb-tools">' + (hasPlan ? '<button class="btn btn-primary" type="button" data-sb-prompt><span>Copy brief for my AI assistant</span></button>' +
+            '<button class="btn btn-outline" type="button" data-sb-share><span>Share link</span></button>' +
+            '<button class="btn btn-outline" type="button" data-sb-md><span>Download as Markdown</span></button>' : "") + "</div></div>" +
+          (cov.length ? readiness(cov) : "") + "</header>" +
+          (cov.length ? '<section class="sb-map"><p class="sb-label"><span>/ Your build map</span><span>The parts of your project, in the order to build them</span></p>' +
+            '<ol class="sb-parts">' + cov.map(mapCard).join("") + "</ol></section>" : "") +
+          '<div class="sb-cols"><section class="sb-main">' +
+          '<div class="sb-filters"><span data-sx-count></span><label><input type="checkbox" data-sx-toggle="code"> Code released</label>' +
+          '<label><input type="checkbox" data-sx-toggle="recent"> Last 6 months</label></div>' +
+          (data.mode === "basic" && hasPlan ? '<p class="sx-note">Relevance scoring was unavailable, so these are the closest papers by search and haven’t been checked for fit.</p>' : "") +
+          ((data.expanded || []).length ? '<p class="sx-again">Searched again for: ' + data.expanded.map(function (q) { return "“" + esc(q) + "”"; }).join(", ") + ".</p>" : "") +
+          '<div data-sx-list></div></section>' +
+          '<aside class="sb-aside">' +
+          (strongCount ? '<div class="sb-box"><p class="sb-box-k">Your reading plan</p><p class="sb-big">' + mins + " min</p>" +
+            "<p>to read our summaries of the " + plural(strongCount, "strong paper", "strong papers") + ", about 8 minutes each.</p>" +
+            '<p class="sb-plan-bar">' + cov.filter(function (c) { return c.strong; }).map(function (c) {
+              return '<i style="flex:' + c.strong + '" title="Part ' + needNum(data, c.need) + ": " + plural(c.strong, "paper", "papers") + '"></i>';
+            }).join("") + "</p></div>" : "") +
+          (techniques.length ? '<div class="sb-box"><p class="sb-box-k">Techniques teams used</p><p class="sb-techs">' +
+            techniques.map(function (t) { return '<a href="papers.html?q=' + encodeURIComponent(t) + '&amp;m=1">' + esc(t) + "</a>"; }).join("") + "</p></div>" : "") +
+          '<div class="sb-box feedback" data-feedback="scout"><span data-feedback-q>Were these papers relevant?</span>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-vote="useful">Yes, relevant</button>' +
+          '<button class="btn btn-outline btn-sm" type="button" data-vote="not_useful">Not really</button></div>' +
+          "</aside></div>" +
+          (cases.length ? '<section class="sb-cases"><p class="sb-label"><span>/ Built in production</span></p>' +
+            '<div class="sb-cases-head"><div><h2>' + (cases.length === 1 ? "1 team already shipped something like this" : cases.length + " teams already shipped something like this") + "</h2>" +
+            "<p>Read how they built it before you choose your design. These are real engineering write-ups from our Case studies.</p></div>" +
+            '<a class="text-link" href="case-studies/index.html">See all case studies</a></div>' +
+            '<ul class="cs-grid cs-plain sb-case-grid">' + cases.map(function (c) { return caseCard(c, data); }).join("") + "</ul></section>" : "") +
+          (hasPlan ? '<section class="sb-watch"><div><h2>Get told when a paper fills <span>your gap.</span></h2>' +
+            "<p>We check every new paper each morning against this project, and show matches on the home page. It stays in this browser.</p></div>" +
+            '<button class="btn" type="button" data-scout-watch aria-pressed="false">Watch this project</button></section>' : "") +
+          "</div>";
+
+        var listEl = out.querySelector("[data-sx-list]");
+        var countEl2 = out.querySelector("[data-sx-count]");
         var render = function () {
-          var shown = (data.plan || []).filter(function (p) {
+          var shown = plan.filter(function (p) {
             if (state.dismissed.indexOf(p.id) >= 0) return false;
-            if (state.need && (p.needs || []).indexOf(state.need) < 0) return false;
             if (state.code && !p.code_url) return false;
             if (state.recent && String(p.submitted || p.first_seen || "") < sixMonthsAgo) return false;
             return true;
           });
-          var strong = shown.filter(function (p) { return p.fit !== "related"; });
-          var related = shown.filter(function (p) { return p.fit === "related"; });
-          var limit = state.all ? Infinity : FIRST_SHOWN;
-          var html = strong.slice(0, limit).map(entry).join("");
-          var left = Math.max(0, limit - strong.length);
-          if (related.length && left > 0) {
-            html += '<div class="sx-split">Related <small>Close to your project, but would need adapting</small></div>' +
-              related.slice(0, left).map(entry).join("");
-          }
-          var hidden = shown.length - Math.min(shown.length, limit);
-          if (hidden > 0) html += '<button class="sx-more" type="button" data-sx-all>Show ' + plural(hidden, "more paper", "more papers") + "</button>";
-          if (!shown.length) {
-            html = '<div class="sx-empty"><b>' + (hasPlan ? "No papers match these filters." : "No relevant papers in our database yet.") + "</b>" +
-              (hasPlan ? "Clear a filter to see them again." : "Try naming the task and the data, for example “summarise legal contracts” instead of “legal AI app”.") + "</div>";
-          }
-          listEl.innerHTML = html + gapsHtml();
-          var nStrong = strong.length, nRel = related.length;
-          countEl2.textContent = data.mode === "basic" ? plural(shown.length, "paper", "papers") : nStrong + " strong, " + nRel + " related";
-          Array.prototype.forEach.call(out.querySelectorAll("[data-sx-need]"), function (b) {
-            b.setAttribute("aria-pressed", b.getAttribute("data-sx-need") === state.need ? "true" : "false");
-          });
-          Array.prototype.forEach.call(out.querySelectorAll("[data-sx-toggle]"), function (el) {
-            var on = !!state[el.getAttribute("data-sx-toggle")];
-            if (el.type === "checkbox") el.checked = on; else el.setAttribute("aria-pressed", on ? "true" : "false");
-          });
+          var parts = cov.length ? cov : [{ need: "", label: "Your project", status: shown.length ? "covered" : "missing", strong: 0, related: 0 }];
+          var html = parts.map(function (c, i) {
+            var mine = shown.filter(function (p) { return !c.need || home(p) === c.need; });
+            var strong = mine.filter(function (p) { return p.fit !== "related"; });
+            var related = mine.filter(function (p) { return p.fit === "related"; });
+            var ok = c.status === "covered";
+            var open = state.open[c.need] || !strong.length;
+            var trends = (c.trends || []).map(function (t) {
+              return '<span class="sb-trend ' + (t.dir === "down" ? "down" : "up") + '">' + esc(t.label) + " <b>" + esc(t.value) + "</b></span>";
+            }).join("");
+            return '<section class="sb-need" id="sb-need-' + esc(c.need) + '"><header><span class="sb-num' + (ok ? "" : " is-gap") + '">' + (needNum(data, c.need) || "01") + "</span>" +
+              "<div><h2>" + esc(c.label) + "</h2>" + (trends ? '<p class="sb-trends">' + trends + "</p>" : "") + "</div></header>" +
+              (ok ? "" : gapPanel(c)) +
+              strong.map(entry).join("") +
+              (related.length ? (open ? (strong.length ? '<p class="sb-split">Related <small>Close to your project, but would need adapting</small></p>' : "") + related.map(entry).join("")
+                : '<button class="sb-more" type="button" data-sb-open="' + esc(c.need) + '">Show ' + plural(related.length, "related paper", "related papers") + "</button>") : "") +
+              (!mine.length && ok ? '<p class="sx-empty"><b>No papers match these filters.</b>Clear a filter to see them again.</p>' : "") +
+              "</section>";
+          }).join("");
+          if (!hasPlan) html = '<div class="sx-empty"><b>No relevant papers in our database yet.</b>Try naming the task and the data, for example “summarise legal contracts” instead of “legal AI app”.</div>' + html;
+          if (cov.some(function (c) { return c.status !== "covered"; })) html += scopeNote();
+          listEl.innerHTML = html;
+          var nStrong = shown.filter(function (p) { return p.fit !== "related"; }).length;
+          countEl2.textContent = data.mode === "basic" ? plural(shown.length, "paper", "papers") : nStrong + " strong, " + (shown.length - nStrong) + " related";
+          Array.prototype.forEach.call(out.querySelectorAll("[data-sx-toggle]"), function (el) { el.checked = !!state[el.getAttribute("data-sx-toggle")]; });
         };
         var remember = function () {
           var last = load("apd.scout", null);
           if (last && last.description === description) { last.data.dismissed = state.dismissed; store("apd.scout", last); }
         };
+        var watchBtn = out.querySelector("[data-scout-watch]");
 
         // One handler per paint (assigned, not added), so an older result's state can't answer clicks
         out.onclick = function (e) {
           var t = e.target.closest ? e.target : null;
           if (!t) return;
-          var needBtn = t.closest("[data-sx-need]");
-          if (needBtn) {
-            var id = needBtn.getAttribute("data-sx-need");
-            state.need = state.need === id ? "" : id;
-            render(); return;
+          var openBtn = t.closest("[data-sb-open]");
+          if (openBtn) { state.open[openBtn.getAttribute("data-sb-open")] = true; render(); return; }
+          if (t.closest("[data-sb-watch]") && watchBtn) {
+            if (watchBtn.getAttribute("aria-pressed") !== "true") watchBtn.click();
+            watchBtn.scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
           }
-          var tog = t.closest("button[data-sx-toggle]");
-          if (tog) { var k = tog.getAttribute("data-sx-toggle"); state[k] = !state[k]; render(); return; }
-          if (t.closest("[data-sx-all]")) { state.all = true; render(); return; }
           var undo = t.closest("[data-sx-undo]");
           if (undo) { var u = undo.getAttribute("data-sx-undo"); state.dismissed = state.dismissed.filter(function (x) { return x !== u; }); remember(); render(); return; }
-          var card = t.closest(".sx-entry");
+          var cs = t.closest("[data-sb-case-save]");
+          if (cs) {
+            var url = cs.getAttribute("data-sb-case-save"), cid = "cs:" + url;
+            var c = cases.filter(function (x) { return x.url === url; })[0] || {};
+            var was = saved.some(function (s) { return s.id === cid; });
+            saved = was ? saved.filter(function (s) { return s.id !== cid; }) : [{ id: cid, t: c.title, u: url, c: c.company, at: Date.now() }].concat(saved);
+            store("apd.saved", saved);
+            cs.setAttribute("aria-pressed", was ? "false" : "true");
+            cs.querySelector("span").textContent = was ? "Save" : "Saved";
+            showSavedCount();
+            return;
+          }
+          if (t.closest("[data-sb-case]")) { track("site", "scout_case"); return; }
+          var card = t.closest(".sb-paper");
           if (!card) return;
           var pid = card.getAttribute("data-id");
-          var p = (data.plan || []).filter(function (x) { return x.id === pid; })[0];
+          var p = plan.filter(function (x) { return x.id === pid; })[0];
           if (t.closest("[data-sx-open]")) { track("site", "scout_click"); return; }
           if (t.closest("[data-sx-more]")) { track("site", "scout_more"); return; }
           if (t.closest("[data-sx-dismiss]")) {
@@ -1509,8 +1660,8 @@
             store("apd.saved", saved);
             if (!on) track("site", "scout_save");
             sv.setAttribute("aria-pressed", on ? "false" : "true");
-            sv.setAttribute("aria-label", on ? "Save" : "Saved");
-            sv.innerHTML = (on ? "☆" : "★") + "<span>" + (on ? " Save" : " Saved") + "</span>";
+            sv.setAttribute("aria-label", on ? "Save this paper" : "Saved");
+            sv.textContent = on ? "+" : "✓";
             showSavedCount();
           }
         };
@@ -1526,8 +1677,7 @@
           out.onclick = null;
           out.innerHTML = introHtml; desc.value = ""; paintCount(); desc.focus();
         });
-        var partsBtn = out.querySelector("[data-sx-parts]");
-        if (partsBtn) partsBtn.addEventListener("click", function () {
+        out.querySelector("[data-sx-parts]").addEventListener("click", function () {
           scoutWrap.classList.remove("has-results");
           out.onclick = null;
           paintSplit({ summary: data.summary, needs: data.needs, planned: true }, description, true);
@@ -1537,13 +1687,38 @@
           desc.value = description; paintCount(); desc.focus();
           scoutForm.scrollIntoView({ behavior: "smooth", block: "start" });
         });
-        var copyBtn = out.querySelector("[data-scout-copy]");
-        if (copyBtn) copyBtn.addEventListener("click", function () {
-          if (navigator.clipboard) navigator.clipboard.writeText(asMarkdown(data, description)).then(function () { confirmLabel(copyBtn, "Copied"); });
+        var copyText = function (btn, text, done) {
+          if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { confirmLabel(btn, done); });
+        };
+        var promptBtn = out.querySelector("[data-sb-prompt]");
+        if (promptBtn) promptBtn.addEventListener("click", function () { copyText(promptBtn, asPrompt(data, description), "Copied. Paste it into your AI assistant"); track("site", "scout_brief"); });
+        var shareBtn = out.querySelector("[data-sb-share]");
+        if (shareBtn) shareBtn.addEventListener("click", function () {
+          var url = location.origin + location.pathname + "?project=" + encodeURIComponent(description);
+          copyText(shareBtn, url, "Link copied");
         });
-        var watchBtn = out.querySelector("[data-scout-watch]");
+        var mdBtn = out.querySelector("[data-sb-md]");
+        if (mdBtn) mdBtn.addEventListener("click", function () {
+          var blob = new Blob([asMarkdown(data, description)], { type: "text/markdown" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "scout-brief.md";
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+        });
         if (watchBtn && window.apdWatch) window.apdWatch.wire(watchBtn, data, description);
         scoutWrap.classList.add("has-results");
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitScoutChips); else fitScoutChips();
+      });
+    };
+    // One row of chips per card, like All papers: chips that would be cut off are hidden
+    var fitScoutChips = function () {
+      Array.prototype.forEach.call(out.querySelectorAll(".sb-tags"), function (row) {
+        var kids = row.children, right = row.getBoundingClientRect().right + 0.5, cut = false;
+        for (var i = 0; i < kids.length; i++) {
+          kids[i].hidden = false;
+          if (cut || kids[i].getBoundingClientRect().right > right) { kids[i].hidden = true; cut = true; }
+        }
       });
     };
 
@@ -1721,7 +1896,14 @@
     });
 
     // Bring back the last plan from this browser
-    var last = load("apd.scout", null);
+    // A shared brief link (scout.html?project=...) fills in the description, ready to run
+    var shared = new URLSearchParams(location.search).get("project");
+    if (shared) {
+      desc.value = shared.slice(0, 1000);
+      paintCount();
+      desc.focus();
+    }
+    var last = shared ? null : load("apd.scout", null);
     if (last && last.data && last.data.plan) {
       desc.value = last.description || "";
       paintCount();
@@ -1902,12 +2084,6 @@
     return d.toISOString().slice(0, 10);
   }
 
-  // Text covers: a tinted band per topic that stands in for a thumbnail, with no image to load
-  var COVER_WORD = {
-    "llms": "LLM", "generative-ai": "GEN AI", "computer-vision": "VISION", "audio-speech": "AUDIO",
-    "alignment": "ALIGN", "reasoning-agents": "AGENTS", "ml-theory": "THEORY", "ai-science": "SCIENCE",
-    "code-ai": "CODE", "safety-privacy": "SAFETY", "efficient-ai": "EFF AI", "multimodal": "MULTI", "other-ml": "ML"
-  };
   // Words that can follow a number and say what it measures ("4x faster", "38% less")
   var STAT_WORDS = /^(faster|slower|less|more|fewer|smaller|larger|bigger|cheaper|better|higher|lower|speedup|speed-up|reduction|improvement|gain|memory|compute|accuracy|cost|latency|throughput|parameters|params|tokens|weights|compression|error|errors)$/i;
   var STAT_STOP = /^(with|than|on|in|for|by|and|at|to|without|of|over|while|from|across|the|a|an|vs)$/i;
@@ -1965,11 +2141,7 @@
       '<span class="sig-i" aria-hidden="true">i</span><span class="sig-tip" role="tooltip">' + tip + "</span></button>";
   }
 
-  // The lab's square mark, drawn like site_builder.lab_mark: its logo on its brand colour, or its initials
-  var LABS_SVG = (function () {
-    var css = document.querySelector('link[href*="assets/style.css"]');
-    return css ? css.getAttribute("href").replace("style.css", "labs.svg") : "assets/labs.svg";
-  })();
+  // The lab's square mark, drawn like site_builder.lab_mark (LABS_SVG is set above, before Project Scout)
   function labMark(p) {
     if (p.oi) {
       return '<span class="org-mark has-img" aria-hidden="true"><img src="' + esc(LABS_SVG.replace(/labs\.svg(\?.*)?$/, "logos/") + p.oi) +

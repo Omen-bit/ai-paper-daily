@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   type Candidate, cleanDescription, coverageOf, descriptionProblem, fallbackRanking, fuseLists, looksLikeCode,
-  MAX_NEEDS, type Match, type Need, parseNeeds, parseRanking, rankInput, singleNeed, userNeeds,
+  type CaseMatch, MAX_NEEDS, type Match, type Need, parseNeeds, parseRanking, pickCases, rankInput, singleNeed, userNeeds,
 } from "../functions/_shared/scout.ts";
 
 const PLAIN = [
@@ -136,4 +136,34 @@ test("parts edited by the visitor are cleaned, numbered and checked", () => {
   assert.match((userNeeds([{ label: "x", query: "word ".repeat(20) }]) as { error: string }).error, /under/);
   const many = Array.from({ length: MAX_NEEDS + 1 }, (_, i) => ({ label: `Part ${i}`, query: `search phrase number ${i}` }));
   assert.match((userNeeds(many) as { error: string }).error, /at most/);
+});
+
+const CASE = (url: string, similarity: number, extra: Partial<CaseMatch> = {}): CaseMatch => ({
+  url, company: "Acme", title: `Write-up ${url}`, published: "2026-10-01", problem: "rag",
+  summary: "", issue: "", result: "", tags: [], similarity, ...extra,
+});
+
+test("case studies: close to the project, best first, tagged with the parts they match", () => {
+  const needs: Need[] = [
+    { id: "n1", label: "Read the PDFs", query: "PDF document parsing with page layout" },
+    { id: "n2", label: "Find the right passage", query: "retrieval reranking for question answering" },
+  ];
+  const picked = pickCases([
+    CASE("b", 0.80, { title: "Reranking passages at scale", tags: ["Reranking"] }),
+    CASE("a", 0.83, { title: "Parsing millions of PDF invoices", summary: "Layout-aware document parsing." }),
+    CASE("far", 0.70),
+    CASE("tail", 0.765),
+  ], needs);
+  assert.deepEqual(picked.map((c) => c.url), ["a", "b"]);
+  assert.deepEqual(picked[0].needs, ["n1"]);
+  assert.deepEqual(picked[1].needs, ["n2"]);
+});
+
+test("case studies: nothing close enough means none, and repeats are dropped", () => {
+  assert.deepEqual(pickCases([CASE("a", 0.6)], []), []);
+  assert.deepEqual(pickCases([], []), []);
+  const twice = pickCases([CASE("a", 0.9, { title: "Same" }), CASE("b", 0.89, { title: "Same" })], []);
+  assert.equal(twice.length, 1);
+  const many = pickCases(Array.from({ length: 10 }, (_, i) => CASE(`u${i}`, 0.9 - i * 0.001)), []);
+  assert.equal(many.length, 6);
 });

@@ -166,6 +166,25 @@ def test_scout_page_has_describe_only_form(tmp_path):
     assert 'href="scout.html"' in open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
 
 
+def test_scout_draws_case_covers_like_the_case_studies_page(tmp_path):
+    import case_studies
+    from site_builder import brand_sprite_file, scout_brands
+    posts = [{"url": "https://ex.com/a", "company": "Databricks", "title": "T", "problem": "rag", "summary": "S"},
+             {"url": "https://ex.com/b", "company": "Tiny Startup", "title": "T2", "problem": "cost", "summary": "S"}]
+    brands = json.loads(scout_brands(posts))
+    assert set(brands["c"]) == {"Databricks", "Tiny Startup"}
+    assert brands["c"]["Tiny Startup"][0] == "" and brands["c"]["Tiny Startup"][1].startswith("#")
+    assert brands["p"]["rag"] and brands["svg"] == "data/case-brands.svg"
+    assert brand_sprite_file(posts).startswith('<svg xmlns="http://www.w3.org/2000/svg">')
+    data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
+    save_day([_paper("2610.1")], [_paper("2610.1")], "2026-10-31", data_dir=data_dir)
+    case_studies.save(posts, os.path.join(data_dir, "cases.json"))
+    build_site(data_dir, site_dir)
+    page = open(os.path.join(site_dir, "scout.html"), encoding="utf-8").read()
+    assert "data-brands=" in page and "Databricks" in page
+    assert os.path.exists(os.path.join(site_dir, "data", "case-brands.svg"))
+
+
 def test_paper_page_has_ask_box(tmp_path):
     from site_builder import ASK_URL
     data_dir, site_dir = str(tmp_path / "data"), str(tmp_path / "site")
@@ -231,7 +250,7 @@ def test_trends_page_is_built_and_linked(tmp_path):
     (export_dir / "papers.json").write_text(json.dumps({"papers": rows}), encoding="utf-8")
     build_site(data_dir, site_dir, str(export_dir))
     page = open(os.path.join(site_dir, "trends.html"), encoding="utf-8").read()
-    assert "<h1>Trends</h1>" in page and "Topic share, month by month" in page
+    assert 'class="trend-hero"' in page and "Topic share, month by month" in page
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
     assert 'href="trends.html"' in home and 'href="archive.html"' not in home.split("</nav>")[0]
     archive = open(os.path.join(site_dir, "archive.html"), encoding="utf-8").read()
@@ -252,9 +271,10 @@ def test_trends_page_tracks_technologies(tmp_path):
     (export_dir / "papers.json").write_text(json.dumps({"papers": rows}), encoding="utf-8")
     build_site(data_dir, site_dir, str(export_dir))
     page = open(os.path.join(site_dir, "trends.html"), encoding="utf-8").read()
-    assert "Technologies to watch" in page and "AI agents" in page
-    assert "Breakout of the season" in page and "Every technology, month by month" not in page
-    assert page.index("Technologies to watch") < page.index("Topic share, month by month")
+    assert "AI research is becoming" not in page or "agent research" in page
+    assert "Momentum, all" in page and "AI agents" in page and 'class="mb"' in page
+    assert "Show as a table" in page and 'class="tech-board"' in page
+    assert page.index("Momentum, all") < page.index("Topic share, month by month")
     assert "assets/style.css?v=" in page and "assets/app.js?v=" in page
 
 

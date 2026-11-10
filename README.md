@@ -341,6 +341,15 @@ ai-paper-daily/
 ```
 </details>
 
+### Building the site on your computer
+
+```bash
+python src/supabase_sync.py --export-only   # downloads the year of papers Trends needs (SUPABASE_URL and SUPABASE_SECRET_KEY in .env)
+python src/site_builder.py                  # writes site/
+```
+
+Without the export, the site still builds, but Trends is hidden because the site's own papers cover only a few weeks.
+
 ## License
 
 Released under the [MIT License](LICENSE).

@@ -12,6 +12,8 @@
 //      (fallback: the fused order, marked as not checked)
 //   5. If a need has no strong paper, search once more with the ranker's
 //      suggested phrases and score only the new papers (round 2)
+//   6. Company case studies close to the whole project, from the cases table
+//      (match_cases in schema.sql), each tagged with the parts it matches
 // Steps 1-5 are an agent loop (_shared/scout_agent.ts) run as a LangGraph graph
 // (_shared/scout_graph.ts). SCOUT_ENGINE=loop runs the same steps without
 // LangGraph, and Scout falls back to that by itself if LangGraph fails to load.
@@ -19,8 +21,8 @@
 import { db, guard, json, safely, underLimit } from "../_shared/http.ts";
 import { groq } from "../_shared/groq.ts";
 import {
-  cleanDescription, descriptionProblem, type Match, type Library, MIN_SIMILARITY, type Need, NEEDS_PROMPT, parseNeeds,
-  SOURCES, userNeeds,
+  type CaseMatch, type CasePick, cleanDescription, descriptionProblem, type Match, type Library, MIN_SIMILARITY, type Need,
+  NEEDS_PROMPT, parseNeeds, pickCases, SOURCES, userNeeds,
 } from "../_shared/scout.ts";
 import { initialState, runScoutLoop, type ScoutDeps, type ScoutState } from "../_shared/scout_agent.ts";
 import { runScoutGraph } from "../_shared/scout_graph.ts";
@@ -87,6 +89,24 @@ async function library(): Promise<Library> {
   return value;
 }
 
+/** Company case studies close to the project, and how many Scout looked through. Never fails: [] when the table is missing. */
+let casesCount: { at: number; n: number | null } | null = null;
+async function similarCases(description: string, needs: Need[]): Promise<{ cases: CasePick[]; searched: number | null }> {
+  try {
+    const vector = await model.run(description, { mean_pool: true, normalize: true });
+    const { data, error } = await db.rpc("match_cases", { query_embedding: JSON.stringify(vector), match_count: 12 });
+    if (error) throw new Error(error.message);
+    if (!casesCount || Date.now() - casesCount.at > 3600_000) {
+      const { count } = await db.from("cases").select("url", { count: "exact", head: true });
+      casesCount = { at: Date.now(), n: count ?? null };
+    }
+    return { cases: pickCases((data ?? []) as CaseMatch[], needs), searched: casesCount.n };
+  } catch (e) {
+    console.error("similar cases", String(e));
+    return { cases: [], searched: null };
+  }
+}
+
 Deno.serve(safely("scout", async (req) => {
   const blocked = guard(req);
   if (blocked) return blocked;
@@ -142,7 +162,7 @@ Deno.serve(safely("scout", async (req) => {
         code_url: c.code_url ?? null, hf_upvotes: c.hf_upvotes ?? 0, similarity: Math.round((c.similarity ?? 0) * 1000) / 1000,
       };
     });
-    const scope = await library();
+    const [scope, similar] = await Promise.all([library(), similarCases(description, s.needs)]);
     return json(req, {
       version: 3,
       summary: s.summary,
@@ -157,6 +177,9 @@ Deno.serve(safely("scout", async (req) => {
       engine,
       searched: scope.papers,
       library: scope,
+      // Teams that built something like it (Case studies), each with the parts it matches
+      cases: similar.cases,
+      cases_searched: similar.searched,
       floor: FLOOR,
       mode: s.mode,
     });

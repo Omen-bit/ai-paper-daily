@@ -390,7 +390,7 @@ def _article(actions: str) -> str:
 {part(4)}
 
 {h2("trends", "Trends")}
-<p>The Trends page shows a year of AI research as charts: technologies to watch, each topic's share of papers month by month, momentum by topic, and words on the rise. The charts are drawn by the build script itself, as plain images, so the site needs no chart library. Two rules keep them honest:</p>
+<p>The Trends page opens with a headline written from the numbers, then tells the year in five charts: the topic that grew most, the momentum of every tracked technology, research against what companies build, technologies off their peak, and words on the rise. Below them sit each topic's share month by month and the year in papers. The charts are drawn by the build script itself, as plain images, so the site needs no chart library. Two rules keep them honest:</p>
 <ul class="feat"><li><b>One steady source.</b> The trend lines use Hugging Face's daily lists for the whole year. Mixing in my own newer data would make recent weeks look bigger than they are.</li>
 <li><b>Shares, not counts.</b> A topic is "growing" only if its share of all papers grew, comparing the last 90 days with the 90 before. Very small topics get no growth number at all, because a jump from 2 papers to 4 is not a trend.</li></ul>
 {shot("trends.png", "Technologies to watch", "Technologies to watch, ranked by their share of recent papers.")}

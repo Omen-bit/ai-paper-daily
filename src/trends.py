@@ -186,7 +186,7 @@ def rising_words(rows: list[dict], months: list[str], recent: int = 3, k: int = 
         if ratio < 1.3:
             continue
         line = [by_m[m] / per_month_titles[m] if per_month_titles[m] else 0 for m in months]
-        out.append({"word": w, "now": rate_now, "ratio": ratio, "line": line, "count": a})
+        out.append({"word": w, "now": rate_now, "before": rate_before, "ratio": ratio, "line": line, "count": a})
     out.sort(key=lambda x: -(x["ratio"] * min(1.0, x["count"] / 20)))
     return out[:k]
 

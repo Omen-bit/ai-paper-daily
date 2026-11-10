@@ -19,6 +19,7 @@ import os
 import shutil
 import sys
 import urllib.parse
+from collections import Counter
 from datetime import date, timedelta
 
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,6 +32,7 @@ import discovery
 import labs
 import lab_logos
 import tech_trends
+import trend_story
 import trends
 import case_pages
 import case_studies
@@ -764,7 +766,26 @@ SCOUT_EXAMPLES = [
 ]
 
 
-def build_scout_page() -> str:
+def scout_brands(posts: list[dict]) -> str:
+    """What Scout needs to draw case study covers like the Case studies page: per company its logo
+    (sprite id, brand colour, saved icon file, drawn in ink), and the name of each problem."""
+    companies = sorted({p["company"] for p in posts if p.get("company")})
+    brands = {co: [case_pages._slug(co), case_pages.brand_hex(co), case_pages.LOGO_FILES.get(co, ""),
+                   int(case_pages._dark_brand(co))] for co in companies}
+    problems = {k: case_pages.problem_name(k) for k in case_pages.TOPIC_INFO}
+    return json.dumps({"c": brands, "p": problems, "svg": "data/case-brands.svg"}, separators=(",", ":"))
+
+
+def brand_sprite_file(posts: list[dict]) -> str:
+    """The case study logos as one SVG file, so Scout's case cards can point at them with <use>."""
+    sprite = case_pages.sprite(p["company"] for p in posts if p.get("company"))
+    if not sprite:
+        return '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
+    return sprite.replace('<svg class="cs-sprite" aria-hidden="true" focusable="false">',
+                          '<svg xmlns="http://www.w3.org/2000/svg">', 1)
+
+
+def build_scout_page(brands: str = "") -> str:
     examples = "".join(f'<button class="example" type="button" data-example="{esc(e)}">{esc(e)}</button>'
                        for e in SCOUT_EXAMPLES)
     body = f"""<section class="page-head scout-head">
@@ -772,7 +793,7 @@ def build_scout_page() -> str:
   <p>Describe what you want to build. Scout searches more than 8,000 AI papers and shows the ones most relevant to your project, best first, with why each one fits. If a part of your project has no good paper, it says so.</p>
 </section>
 <div class="scout">
-  <form class="card pad scout-form" data-scout data-url="{SCOUT_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" novalidate>
+  <form class="card pad scout-form" data-scout data-url="{SCOUT_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" data-brands="{esc(brands)}" novalidate>
     <label class="field-label" for="desc">Describe your project</label>
     <p class="field-hint" id="desc-hint">Plain words, no code. Say what it does, who it's for, and any limits, like “runs on a phone” or “no GPU”.</p>
     <textarea class="input textarea" id="desc" rows="7" maxlength="1000" aria-describedby="desc-hint desc-error"></textarea>
@@ -797,7 +818,8 @@ def build_scout_page() -> str:
                 description="Describe your project and get the AI papers most relevant to it, best first.")
 
 
-def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[str] | None = None) -> str:
+def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[str] | None = None,
+                      cases: list[dict] | None = None) -> str:
     months = trends.last_months(rows, 12)
     if not trends_ready(rows):
         body = """<section class="page-head"><h1>Trends</h1>
@@ -806,65 +828,87 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
     names = CATEGORY_NAMES
     per = trends.topic_counts(rows, months)
     top = trends.top_topics(per, 5)
-    moves = trends.movers(rows, months)
-    end = max(r["day"] for r in rows)
-    last30 = sum(1 for r in rows if r["day"] > (date.fromisoformat(end) - timedelta(days=30)).isoformat())
+    month_totals = Counter(r["day"][:7] for r in rows)
     code = trends.code_share(rows, months)
-    rising = next((m for m in moves if m["enough"] and m["delta"] > 0), None)
+    code_months = trend_story.full_months(months, month_totals)
+    code_now = next((m, v) for m, v, _ in code if m == code_months[-1])
     tech = tech_trends.tech_stats(rows, months)
-    spot = tech_trends.spotlight_pick(tech)
-    rated = [t for t in tech if t["status"] != "few"]
-    if spot:
-        fastest = (esc(spot["name"]), tech_trends.change(spot["growth"]) + " share in 90 days")
-    elif rising:
-        fastest = (esc(names.get(rising["topic"], rising["topic"])), trends.pts(rising["delta"]) + " in 3 months")
-    else:
-        fastest = ("—", "Needs more history")
-    tiles = [
-        ("Papers in a year", f"{len(rows):,}", f"of {n_all:,} in our database" if n_all > len(rows) else "in our database"),
-        ("Last 30 days", f"{last30:,}", "new papers"),
-        ("Share code", trends.pct(code[-1][1]), f"in {trends._month_label(code[-1][0], True)}"),
-        ("Rising fastest", *fastest),
-    ]
-    tiles_html = "".join(
-        '<div class="stat"><span class="label">{}</span><strong{}>{}</strong><span>{}</span></div>'.format(
-            k, ' class="stat-text"' if len(v) > 8 else "", v, s)
-        for k, v, s in tiles)
     words = trends.rising_words(rows, months)
     field = trends.field_shares_json(rows, months)
     first, last = trends._month_label(months[0], True), trends._month_label(months[-1], True)
-    tech_html = ""
-    if rated:
-        board = section_head("Technologies to watch",
-                             "Each technology’s share of new papers in the last 90 days, against the 90 days before. Click one to see its papers.")
-        tech_html += f'''
-<section class="block">
-  {board}
-  {tech_trends.leaderboard(tech, months)}
+
+    shift = trend_story.topic_shift(per, months, names)
+    rp = trend_story.research_vs_practice(tech, cases or [])
+    peaks = trend_story.off_peak(tech, months, month_totals)
+    head, lede, stats = trend_story.opening(shift, tech, rp, code_now)
+    stats_html = "".join(f'<p class="th-stat tone-{tone}"><strong>{v}</strong><span>{label}</span></p>'
+                         for v, tone, label in stats)
+    src_note = f"Source: {esc(source)}, {first} to {last}."
+    cards = []
+    if shift:
+        g = shift["rise_line"][-1] / max(shift["rise_line"][0], 0.001)
+        flat = abs(shift["base_line"][-1] - shift["base_line"][0]) < 0.15 * max(shift["base_line"][0], 0.001)
+        title = (f'{esc(shift["rise_name"])} grew {trend_story._times(g)} while {esc(shift["base_name"])} '
+                 f'{"stayed flat" if flat else "moved less"}')
+        cards.append(trend_story.card(
+            "01", "The topic shift", title,
+            "Each line is a topic’s share of that month’s papers. Hover or tab through the months.",
+            trend_story._times(g), f"share of all papers, {trends._month_label(shift['months'][0])} to "
+            f"{trends._month_label(shift['months'][-1])}", "up",
+            trend_story.topic_shift_chart(shift), src_note, trend_story.topic_shift_table(shift)))
+    mb = trend_story.momentum_bars(tech)
+    if mb:
+        rated = [t for t in tech if t["growth"] and t["status"] in ("breakout", "rising", "steady", "cooling")]
+        best = max(rated, key=lambda t: t["growth"])
+        second = (sorted((t["growth"] for t in rated), reverse=True) + [1.0])[1]
+        title = (f'{esc(best["name"])} grew almost twice as fast as anything else' if best["growth"] - 1 >= 1.7 * (second - 1) > 0
+                 else f'{esc(best["name"])} is growing fastest' if best["growth"] >= 1.05
+                 else "No technology is gaining share this season")
+        cards.append(trend_story.card(
+            "02", f"Momentum, all {len(rated)} technologies", title,
+            "Change in each technology’s share of new papers, last 90 days against the 90 before. Click one to see its papers.",
+            tech_trends.change(best["growth"]), f"{esc(best['name'].lower())}, the season’s fastest grower", "up",
+            mb, src_note, tech_trends.leaderboard(tech, months)))
+    if rp:
+        lead = rp["practice"][0]
+        names_p = trend_story.name_list([r["name"] for r in rp["practice"]])
+        names_r = trend_story.name_list([r["name"] for r in rp["research"]])
+        ratio = lead["case"] / lead["paper"] if lead["paper"] else 0
+        cards.append(trend_story.card(
+            "03", "Research against production",
+            f"Companies build with {esc(names_p)}; research has moved on to {esc(names_r)}",
+            f"Share of new papers against share of the {rp['n']} company case studies that mention each technology.",
+            trend_story._times(ratio) if ratio else "—", f"more common in production: {esc(lead['name'].lower())}", "up",
+            trend_story.research_vs_practice_chart(rp),
+            "Case studies matched by keyword in their title, summary and tags. " + src_note,
+            trend_story.research_vs_practice_table(rp)))
+    if peaks:
+        deep = max(peaks, key=lambda r: r["drop"])
+        n_words = ["No", "One", "Two", "Three", "Four", "Five"][len(peaks)]
+        cards.append(trend_story.card(
+            "04", "Off the peak",
+            f'{n_words} technolog{"y is" if len(peaks) == 1 else "ies are"} well below {"its" if len(peaks) == 1 else "their"} best month',
+            f"The hatched bar is each one’s highest monthly share this year; the solid bar is {trends._month_label(peaks[0]['now_month'])}.",
+            f"−{round(deep['drop'] * 100)}%", f"{esc(deep['name'].lower())}, peak to now", "down",
+            trend_story.off_peak_chart(peaks), src_note, trend_story.off_peak_table(peaks)))
+    if words:
+        lead = words[0]
+        cards.append(trend_story.card(
+            "05", "Words on the rise", f"“{esc(lead['word'])}” is the word of the season",
+            "Title words used much more in the last three months than in the months before. Click one to see its papers.",
+            f"{lead['ratio']:.1f}×", f"“{esc(lead['word'])}” in titles", "up",
+            trend_story.words_chart(words[:6]), "Share of paper titles containing each word. " + src_note,
+            trend_story.words_table(words)))
+    body = f"""<section class="trend-hero">
+  <p class="th-eyebrow">/ Trends · {len(rows):,} papers · {first} to {last}</p>
+  <h1>{head}</h1>
+  <p class="th-lede">{lede}</p>
+  <div class="th-stats">{stats_html}</div>
+  <p class="th-source">From {len(rows):,} {esc(source)}{f", of {n_all:,} in our database" if n_all > len(rows) else ""}. Updated every morning.</p>
 </section>
-'''
-        sl = tech_trends.spotlight(tech, months, on_site)
-        if sl:
-            tech_html += f'''
-<section class="block">
-  {section_head("Breakout of the season", "The fastest-growing technology, with the year’s most upvoted papers on it marked")}
-  <div class="card pad chart-box">{sl}</div>
-</section>
-'''
-        mm = tech_trends.momentum(tech)
-        if mm:
-            tech_html += f'''
-<section class="block">
-  {section_head("Momentum map", "How big each technology is, against how fast its share is changing. Hover or tab to a dot for its numbers.")}
-  <div class="card pad chart-box">{mm}</div>
-</section>
-'''
-    body = f"""<section class="page-head">
-  <h1>Trends</h1>
-  <p>What AI research is about right now, from {len(rows):,} {esc(source)}, {first} to {last}. Updated every morning.</p>
-</section>
-<div class="stats">{tiles_html}</div>
-{tech_html}
+<div class="story">{"".join(cards)}</div>
+
+<div class="trend-more">
 <section class="block">
   {section_head("Topic share, month by month", "Each band is a topic’s share of that month’s papers. Hover or tab through the months.")}
   <div class="card pad chart-box">{trends.share_area(per, months, top, names)}
@@ -873,24 +917,40 @@ def build_trends_page(rows: list[dict], source: str, n_all: int, on_site: set[st
 
 <section class="split split-even">
   <div class="block">
-    {section_head("Words on the rise", "Title words used much more in the last 3 months than before")}
-    <div class="card pad">{trends.word_rows(words, months)}</div>
-  </div>
-  <div class="block">
     {section_head("You vs the field", "Topics of the papers you opened here, against the last 3 months")}
     <div class="card pad" data-you-field data-field='{esc(field)}' data-names="{esc(json.dumps(names))}">
       <p class="empty-note" data-you-empty>Open a few papers and this chart shows how your reading compares with what’s being published. It uses this browser’s history only.</p>
       <div data-you-chart hidden></div>
     </div>
   </div>
+  <div class="block">
+    {section_head("Code with the paper", "Share of papers that link to their code, month by month")}
+    <div class="card pad code-months">{code_bars(code)}</div>
+  </div>
 </section>
 
 <section class="block">
   {section_head("The year in papers", "Papers per day. Stronger colour means a busier day.")}
-  <div class="card pad">{trends.calendar(trends.daily_counts(rows), end)}</div>
-</section>"""
+  <div class="card pad">{trends.calendar(trends.daily_counts(rows), end_day(rows))}</div>
+</section>
+</div>"""
     return page("Trends", body, active="trends", path="trends.html",
                 description="Which AI technologies are growing in research right now: agents, reasoning, RAG and more, plus topic shares and code availability.")
+
+
+def end_day(rows: list[dict]) -> str:
+    return max(r["day"] for r in rows)
+
+
+def code_bars(code: list[tuple[str, float, int]]) -> str:
+    """One small bar per month: the share of that month's papers with a code link."""
+    if not code:
+        return ""
+    top = max(v for _, v, _ in code) or 1
+    bars = "".join(f'<li title="{esc(trends._month_label(m, True))}: {trends.pct(v)} of {n:,} papers">'
+                   f'<span class="cm-v">{trends.pct(v)}</span><i style="height:{v / top * 100:.1f}%"></i>'
+                   f'<span class="cm-m">{trends._month_label(m)}</span></li>' for m, v, n in code)
+    return f'<ol class="cm" aria-label="Share of papers with code, by month">{bars}</ol>'
 
 
 LAB_KINDS = [("", "All"), ("company", "Companies"), ("university", "Universities"), ("lab", "Labs and startups")]
@@ -1940,10 +2000,13 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     rows, source = trends.trend_rows(archive, papers)
     global SHOW_TRENDS
     SHOW_TRENDS = trends_ready(rows)
+    if not SHOW_TRENDS:
+        print("  [site] Trends hidden: it needs 3 months of papers and only the site's own papers are here. "
+              "For a local build, run: python src/supabase_sync.py --export-only")
     _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows))
-    _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers), set(papers)))
+    _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers), set(papers),
+                                                                       case_studies.load(os.path.join(data_dir, "cases.json"))))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())
-    _write(os.path.join(site_dir, "scout.html"), build_scout_page())
     _write(os.path.join(site_dir, "archive.html"), build_archive(days, papers))
     _write(os.path.join(site_dir, "saved.html"), build_saved_page())
     _write(os.path.join(site_dir, "subscribed.html"), build_subscribed_page())
@@ -1986,6 +2049,15 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
                                           SITE_URL, THEME_SCRIPT, _making_of_head())
     except Exception as exc:
         print(f"  [site] WARNING: case study pages failed: {exc}")
+    # Scout draws case study covers like the Case studies page, so it is built after them (they save the logos)
+    posts = case_studies.load(os.path.join(data_dir, "cases.json"))
+    try:
+        _write(os.path.join(site_dir, "data", "case-brands.svg"), brand_sprite_file(posts))
+        brands = scout_brands(posts)
+    except Exception as exc:  # Scout falls back to initials on brand colours
+        print(f"  [site] WARNING: Scout case logos failed: {exc}")
+        brands = ""
+    _write(os.path.join(site_dir, "scout.html"), build_scout_page(brands))
     failed = 0
     for rec in papers.values():
         prev_id, next_id = neighbours.get(rec["id"], (None, None))

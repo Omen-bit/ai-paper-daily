@@ -9,6 +9,10 @@ Usage:
   python src/supabase_sync.py --backfill-hf 365
                                        also load a year of Hugging Face daily
                                        papers (search only, no site pages)
+  python src/supabase_sync.py --export-only
+                                       only download the papers the website's
+                                       Trends and All papers pages need, into
+                                       build/supabase (for a local build)
 
 Every run also exports the papers for the website, prepares today's picks for
 "Ask this paper", and removes saved full texts nobody has asked about lately.
@@ -50,6 +54,37 @@ def _config() -> dict | None:
     return {"url": url, "key": key, "secret": secret}
 
 
+def _read_config() -> dict | None:
+    """What a read-only export needs: the project URL and a key. No SYNC_SECRET."""
+    url = os.environ.get("SUPABASE_URL", "").strip().rstrip("/")
+    key = os.environ.get("SUPABASE_SECRET_KEY", "").strip()
+    return {"url": url, "key": key, "secret": ""} if url and key else None
+
+
+def _load_env() -> None:
+    """Read .env when python-dotenv is installed, so local runs pick up the keys."""
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+
+def export_only() -> int:
+    """Download the website's export without syncing anything. Returns 1 when the keys are missing."""
+    _load_env()
+    cfg = _read_config()
+    if not cfg:
+        print("[supabase] Set SUPABASE_URL and SUPABASE_SECRET_KEY in .env to download the export.")
+        return 1
+    n = export_papers(cfg)
+    try:
+        save_most_read(cfg)
+    except Exception as exc:  # the counts table is optional
+        print(f"[supabase] save_most_read skipped: {exc}")
+    return 0 if n else 1
+
+
 def _headers(key: str) -> dict:
     headers = {"apikey": key, "Content-Type": "application/json"}
     if key.startswith("eyJ"):  # legacy service_role keys are JWTs and also go in Authorization
@@ -72,6 +107,40 @@ def to_row(rec: dict) -> dict:
         "code_url": rec.get("code_url") or None,
         "source": rec.get("source") or None,
     }
+
+
+def case_rows(posts: list[dict]) -> list[dict]:
+    """data/cases.json posts as rows of the cases table, which Scout searches by meaning."""
+    rows = []
+    for p in posts:
+        if not (p.get("url") and p.get("company") and p.get("title")):
+            continue
+        rows.append({
+            "url": p["url"], "company": p["company"], "title": p["title"],
+            "published": (p.get("published") or "")[:10] or None, "problem": p.get("problem") or "",
+            "summary": p.get("summary") or "", "issue": p.get("issue") or "", "result": p.get("result") or "",
+            "tags": [t for t in p.get("tags") or [] if isinstance(t, str)],
+        })
+    return rows
+
+
+def upsert_cases(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
+    """Upload the case studies. Never fails the sync: the cases table is new and may not exist yet."""
+    import case_studies
+    rows = case_rows(case_studies.load(os.path.join(data_dir, "cases.json")))
+    if not rows:
+        return 0
+    headers = dict(_headers(cfg["key"]), Prefer="resolution=merge-duplicates,return=minimal")
+    try:
+        for start in range(0, len(rows), BATCH):
+            r = session.post(f"{cfg['url']}/rest/v1/cases?on_conflict=url", json=rows[start:start + BATCH],
+                             headers=headers, timeout=TIMEOUT)
+            if r.status_code >= 300:
+                raise RuntimeError(f"({r.status_code}) {r.text[:200]}")
+    except Exception as exc:
+        print(f"[supabase] Case studies not uploaded; run supabase/schema.sql to add the cases table. {exc}")
+        return 0
+    return len(rows)
 
 
 def select_rows(days: list[dict], everything: bool) -> list[dict]:
@@ -172,7 +241,10 @@ def sync(everything: bool = False, data_dir: str = DATA_DIR, session=requests, b
     if backfill_days:
         print(f"[supabase] Loading {backfill_days} days of Hugging Face papers...")
         backfill_hf(cfg, backfill_days, session)
-    print(f"[supabase] Embedded {embed_pending(cfg, session)} papers.")
+    n_cases = upsert_cases(cfg, data_dir, session)
+    if n_cases:
+        print(f"[supabase] Uploaded {n_cases} case studies for Scout.")
+    print(f"[supabase] Embedded {embed_pending(cfg, session)} papers and case studies.")
     return len(rows)
 
 
@@ -270,6 +342,8 @@ def prune_fulltext(cfg: dict, session=requests) -> int:
 
 
 def main() -> int:
+    if "--export-only" in sys.argv:
+        return export_only()
     try:
         days = 0
         if "--backfill-hf" in sys.argv:

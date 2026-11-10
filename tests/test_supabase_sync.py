@@ -216,3 +216,56 @@ def test_prune_fulltext_calls_the_cleanup(monkeypatch):
 
     assert sync.prune_fulltext({"url": "https://x.supabase.co", "key": "k", "secret": "s"}, session=Session()) == 3
     assert calls == [("https://x.supabase.co/rest/v1/rpc/prune_fulltext", {"days": 30})]
+
+
+def test_export_only_needs_no_sync_secret(monkeypatch, tmp_path):
+    import supabase_sync
+    monkeypatch.setenv("SUPABASE_URL", "https://x.supabase.co/")
+    monkeypatch.setenv("SUPABASE_SECRET_KEY", "sb_secret_abc")
+    monkeypatch.delenv("SYNC_SECRET", raising=False)
+    assert supabase_sync._config() is None
+    assert supabase_sync._read_config() == {"url": "https://x.supabase.co", "key": "sb_secret_abc", "secret": ""}
+    calls = []
+    monkeypatch.setattr(supabase_sync, "_load_env", lambda: None)
+    monkeypatch.setattr(supabase_sync, "export_papers", lambda cfg: calls.append("papers") or 5)
+    monkeypatch.setattr(supabase_sync, "save_most_read", lambda cfg: calls.append("most_read") or 0)
+    assert supabase_sync.export_only() == 0
+    assert calls == ["papers", "most_read"]
+
+
+def test_export_only_without_keys_says_what_to_set(monkeypatch, capsys):
+    import supabase_sync
+    monkeypatch.delenv("SUPABASE_URL", raising=False)
+    monkeypatch.delenv("SUPABASE_SECRET_KEY", raising=False)
+    monkeypatch.setattr(supabase_sync, "_load_env", lambda: None)
+    assert supabase_sync.export_only() == 1
+    assert "SUPABASE_URL" in capsys.readouterr().out
+
+
+def test_case_studies_are_uploaded_for_scout(monkeypatch, tmp_path):
+    import case_studies
+    _env(monkeypatch)
+    data = str(tmp_path)
+    save_day([_paper("a")], [_paper("a")], "2026-10-30", data_dir=data)
+    case_studies.save([{"url": "https://ex.com/a", "company": "Acme", "title": "RAG at Acme", "problem": "rag",
+                        "summary": "S", "tags": ["RAG", 3], "published": "2026-10-01"},
+                       {"url": "https://ex.com/b", "company": "", "title": "No company"}],
+                      os.path.join(data, "cases.json"))
+    session = FakeSession()
+    sync.sync(data_dir=data, session=session)
+    url, rows, headers = next(c for c in session.calls if "/rest/v1/cases" in c[0])
+    assert url == "https://x.supabase.co/rest/v1/cases?on_conflict=url"
+    assert rows == [{"url": "https://ex.com/a", "company": "Acme", "title": "RAG at Acme", "published": "2026-10-01",
+                     "problem": "rag", "summary": "S", "issue": "", "result": "", "tags": ["RAG"]}]
+
+
+def test_a_missing_cases_table_never_fails_the_sync(monkeypatch, tmp_path, capsys):
+    import case_studies
+    _env(monkeypatch)
+    data = str(tmp_path)
+    case_studies.save([{"url": "https://ex.com/a", "company": "Acme", "title": "T", "problem": "rag"}],
+                      os.path.join(data, "cases.json"))
+    session = FakeSession(upload_status=404)
+    assert sync.upsert_cases(sync._config(), data, session) == 0
+    assert "run supabase/schema.sql" in capsys.readouterr().out
+
