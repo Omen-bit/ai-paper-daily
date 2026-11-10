@@ -1,6 +1,23 @@
 {
  "posts": [
   {
+   "url": "https://www.databricks.com/blog/turn-buying-signals-pipeline-sendoso-gifts-genie-one",
+   "company": "Databricks",
+   "title": "Turn buying signals into pipeline with Sendoso gifts in Genie One",
+   "published": "2026-11-09",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Created a Databricks Marketplace MCP server that lets Genie One call Sendoso’s gifting API, turning data signals into automated, governed gift actions.",
+   "tags": [
+    "Tool calling",
+    "Agents"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Teams had to export data and switch tools to send gifts, slowing down outreach.",
+   "v": 3
+  },
+  {
    "url": "https://www.databricks.com/blog/accelerate-gpu-training-unity-catalog-tables-ucdataset",
    "company": "Databricks",
    "title": "Accelerate GPU training on Unity Catalog tables with UCDataset",
@@ -16,6 +33,41 @@
    "sorted_by": "groq",
    "result": "10x faster training",
    "issue": "GPUs spent time idle waiting for data, raising training cost and time.",
+   "v": 3
+  },
+  {
+   "url": "https://vercel.com/changelog/workflow-writes-now-use-websockets-on-vercel",
+   "company": "Vercel",
+   "title": "Workflow SDK now writes over WebSockets on Vercel",
+   "published": "2026-11-09",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "Switched event and stream writes to a persistent WebSocket, cutting request overhead and delivering token streams 4.2× faster.",
+   "tags": [
+    "Latency",
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "4.2× faster response",
+   "issue": "Many HTTP requests slowed down streaming AI token output and raised costs.",
+   "v": 3
+  },
+  {
+   "url": "https://engineering.salesforce.com/using-ai-to-build-ai-how-agentforce-engineers-scale-automation-without-sacrificing-reliability",
+   "company": "Salesforce",
+   "title": "Using AI to Build AI: How Agentforce Engineers Scale Automation Without Sacrificing Reliability",
+   "published": "2026-11-09",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They created an AI‑driven automation pipeline that generates and validates components, using tool calls and safety checks to keep reliability high.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Guardrails"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Engineers needed to automate building the Atlas Reasoning Engine without unreliable AI-generated code.",
    "v": 3
   },
   {
@@ -403,6 +455,24 @@
    "v": 3
   },
   {
+   "url": "https://vercel.com/changelog/vercel-mcp-now-supports-mcp-events",
+   "company": "Vercel",
+   "title": "Vercel MCP now supports MCP events",
+   "published": "2026-10-30",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They created an event system that lets agents subscribe to deployment events via managed webhooks, handling filtering, expiration, and limits automatically.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Routing"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers had to poll Vercel for deployment updates, wasting time and resources.",
+   "v": 3
+  },
+  {
    "url": "https://developer.nvidia.com/blog/run-ai-models-for-edge-application-development-with-just-a-few-commands",
    "company": "NVIDIA",
    "title": "Run AI Models for Edge Application Development with Just a Few Commands",
@@ -510,6 +580,42 @@
    "v": 3
   },
   {
+   "url": "https://vercel.com/changelog/vercel-agent-can-now-validate-alerts-before-paging-you",
+   "company": "Vercel",
+   "title": "Vercel Agent can now validate alerts before paging",
+   "published": "2026-10-28",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They added an Agent that reviews each monitor alert, checks logs and metrics, and only forwards alerts classified as Critical to the paging webhook.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Guardrails"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Too many non‑critical alerts were paging on‑call engineers, causing noise and fatigue.",
+   "v": 3
+  },
+  {
+   "url": "https://vercel.com/changelog/run-paseo-agents-on-vercel-sandbox",
+   "company": "Vercel",
+   "title": "Run Paseo agents on Vercel Sandbox",
+   "published": "2026-10-28",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They added a Vercel Sandbox plugin that runs agents in the cloud, saves files and conversation history, and reuses the AI gateway key across sessions.",
+   "tags": [
+    "Agents",
+    "Sandboxing",
+    "Tool calling"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers wanted to run AI agents continuously and switch devices without losing state.",
+   "v": 3
+  },
+  {
    "url": "https://vercel.com/changelog/box-mount-now-runs-in-vercel-sandbox",
    "company": "Vercel",
    "title": "Box Mount now runs in Vercel Sandbox",
@@ -524,6 +630,24 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents needed a way to read and write Box files without exposing credentials.",
+   "v": 3
+  },
+  {
+   "url": "https://vercel.com/blog/introducing-vercel-ci",
+   "company": "Vercel",
+   "title": "Introducing Vercel CI",
+   "published": "2026-10-28",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "Built Vercel CI that only runs the tasks affected by a code change, reuses cached results, and gives each task just enough compute, cutting wait time 2‑6×.",
+   "tags": [
+    "Cost",
+    "Latency",
+    "GPUs"
+   ],
+   "sorted_by": "groq",
+   "result": "CI passes 2-6x faster",
+   "issue": "CI runs full pipelines for every tiny change, making developers and bots wait too long.",
    "v": 3
   },
   {
@@ -560,6 +684,24 @@
    "sorted_by": "groq",
    "result": "tens of millions ads/second per GPU",
    "issue": "Retrieving relevant ads from billions of candidates was too slow and expensive for high‑quality models.",
+   "v": 3
+  },
+  {
+   "url": "https://vercel.com/changelog/vercel-agent-sessions-now-cost-67-percent-less",
+   "company": "Vercel",
+   "title": "Vercel Agent sessions now cost 67% less",
+   "published": "2026-10-27",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They redesigned context handling and improved prompt‑cache reuse, so each session needs fewer tokens and runs cheaper.",
+   "tags": [
+    "Prompt caching",
+    "Context engineering",
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "67% cost reduction",
+   "issue": "Agent sessions used many tokens, making them expensive for users.",
    "v": 3
   },
   {
@@ -953,6 +1095,24 @@
    "v": 3
   },
   {
+   "url": "https://shopify.engineering/catalog-clustering-part-ii",
+   "company": "Shopify",
+   "title": "Cross-store product clustering across millions of stores",
+   "published": "2026-10-20",
+   "added": "2026-11-10",
+   "problem": "llm",
+   "summary": "They created tiered matching models, graph partitioning, and a learned merge step to cluster billions of listings across stores into a single identifier.",
+   "tags": [
+    "Graph RAG",
+    "Reranking",
+    "Hybrid search"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Different merchants list the same product in many ways, making it hard to show a unified view.",
+   "v": 3
+  },
+  {
    "url": "https://engineering.razorpay.com/how-we-deploy-reliably-at-razorpay-52ddf676caf8",
    "company": "Razorpay",
    "title": "How We Deploy Reliably at Razorpay",
@@ -1131,6 +1291,24 @@
    "v": 3
   },
   {
+   "url": "https://building.nu.com/squeezing-2x-mfu-out-of-our-training-runs",
+   "company": "Nubank",
+   "title": "Squeezing ~2× MFU out of our training runs",
+   "published": "2026-10-15",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They rewrote the attention kernel, integrated it with the compiler, and tuned the optimizer, which doubled the model‑flops‑utilization during training.",
+   "tags": [
+    "Cost",
+    "Latency",
+    "Transformers"
+   ],
+   "sorted_by": "groq",
+   "result": "~2× MFU improvement",
+   "issue": "Training large Transformer models was slow and under‑utilized the hardware.",
+   "v": 3
+  },
+  {
    "url": "https://weaviate.io/blog/pathseer-filtered-vector-search",
    "company": "Weaviate",
    "title": "PathSeer: Adaptive Filtered Vector Search",
@@ -1164,6 +1342,22 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Standard LLMs can’t handle huge, complex geospatial data and multi‑step spatial analysis.",
+   "v": 3
+  },
+  {
+   "url": "https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96",
+   "company": "Netflix",
+   "title": "Measuring the Impact of Personalized Recommendations",
+   "published": "2026-10-14",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "They built a behavioral model that separates a member’s underlying preference from the extra effect of a recommendation, allowing causal measurement of recommendation impact.",
+   "tags": [
+    "Personalisation"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "How much value does personalized recommendation add to user viewing?",
    "v": 3
   },
   {
@@ -1257,6 +1451,42 @@
    "v": 3
   },
   {
+   "url": "https://developer.nvidia.com/blog/rewrite-apache-spark-udfs-gpu-acceleration-ai-agents",
+   "company": "NVIDIA",
+   "title": "How to Rewrite Apache Spark UDFs for GPU Acceleration with AI Agents",
+   "published": "2026-10-13",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They created AI agents that automatically rewrite UDFs into GPU‑compatible code, letting Spark run fully on GPUs and boosting speed over 20×.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "22x+ speedups",
+   "issue": "Custom Spark UDFs slowed down queries and prevented GPU acceleration.",
+   "v": 3
+  },
+  {
+   "url": "https://www.amazon.science/blog/can-we-change-an-ai-models-architecture-without-retraining-it-from-scratch",
+   "company": "Amazon",
+   "title": "Can we change an AI model’s architecture without retraining it from scratch?",
+   "published": "2026-10-12",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They introduced priming, which reuses pretrained Transformer weights to quickly convert them into hybrid models, cutting pretraining cost by over 99%.",
+   "tags": [
+    "Cost",
+    "Fine-tuning",
+    "Transformers"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Training new hybrid model architectures costs huge GPU time and money.",
+   "v": 3
+  },
+  {
    "url": "https://machinelearning.apple.com/research/distributed-gpu-cloud",
    "company": "Apple",
    "title": "Minions: A Dynamic and Distributed Virtual GPU Cloud Built on Idle Apple Silicon Devices",
@@ -1311,6 +1541,24 @@
    "v": 3
   },
   {
+   "url": "https://developer.nvidia.com/blog/building-reliable-data-analytics-agents-lessons-from-the-kdd-cup",
+   "company": "NVIDIA",
+   "title": "Building Reliable Data Analytics Agents: Lessons from the KDD Cup",
+   "published": "2026-10-08",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They built a small, clear harness that limited tools, unified all data into a single SQL view, added persistent Python state, and made every step inspectable.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Agent memory"
+   ],
+   "sorted_by": "groq",
+   "result": "Second place in KDD Cup 2026",
+   "issue": "Answering questions across many data sources caused agents to fail due to complex tool usage.",
+   "v": 3
+  },
+  {
    "url": "https://www.microsoft.com/en-us/research/blog/agent-lightning-v1-0-a-3500-line-lightweight-agentic-rl-framework-for-training-agents-with-real-harnesses",
    "company": "Microsoft",
    "title": "Agent Lightning v1.0: A 3,500-Line Lightweight Agentic RL Framework for Training Agents with Real Harnesses",
@@ -1325,6 +1573,24 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Training agents with real-world tools was costly and mismatched the deployed version.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/validate-ai-factory-changes-with-digital-twins-and-ai-agents",
+   "company": "NVIDIA",
+   "title": "Validate AI Factory Changes with Digital Twins and AI Agents",
+   "published": "2026-10-07",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They created a digital‑twin simulation of the AI factory and AI agents that query the twin, run checks, and trigger workflows, letting CI/CD validate changes early.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Teams had to wait for physical hardware before they could test infrastructure and software changes, slowing deployments.",
    "v": 3
   },
   {
@@ -1395,6 +1661,23 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents forgot previous interactions, making complex tasks hard to automate.",
+   "v": 3
+  },
+  {
+   "url": "https://engineering.grab.com/powering-ai-led-research-through-simulation",
+   "company": "Grab",
+   "title": "Powering AI-led research through simulation",
+   "published": "2026-10-05",
+   "added": "2026-11-10",
+   "problem": "evals",
+   "summary": "Created a fast, offline simulator called sim‑rs that runs a full city‑day of orders in minutes, letting agents experiment and evaluate strategies quickly.",
+   "tags": [
+    "Agents",
+    "Evals"
+   ],
+   "sorted_by": "groq",
+   "result": "City‑day simulation completed in tens of minutes",
+   "issue": "Testing new dispatch strategies took weeks, limiting how many ideas could be tried.",
    "v": 3
   },
   {
@@ -1470,6 +1753,22 @@
    "v": 3
   },
   {
+   "url": "https://stripe.com/blog/where-pricing-is-headed",
+   "company": "Stripe",
+   "title": "Why I tried to kill token billing (and why we kept it)",
+   "published": "2026-10-01",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "Built a token‑billing system that records model usage, applies markups, and lets teams monitor costs, while keeping pricing logic separate from the invoice",
+   "tags": [
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Customers needed a way to track AI usage costs without exposing token details in invoices",
+   "v": 3
+  },
+  {
    "url": "https://shopify.engineering/shopgym",
    "company": "Shopify",
    "title": "ShopGym: Realistic, reproducible sandboxes for shopping agents",
@@ -1488,6 +1787,56 @@
    "v": 3
   },
   {
+   "url": "https://developer.nvidia.com/blog/fine-tuning-nvidia-nemotron-for-saudi-arabic-dialects-with-a-path-to-other-languages",
+   "company": "NVIDIA",
+   "title": "Fine-Tuning NVIDIA Nemotron for Saudi Arabic Dialects, with a Path to Other Languages",
+   "published": "2026-10-01",
+   "added": "2026-11-10",
+   "problem": "tuning",
+   "summary": "They curated a small dialect corpus, mixed it with existing data, and fine‑tuned Nemotron 3.5 using NVIDIA NeMo’s efficient batching recipe.",
+   "tags": [
+    "Fine-tuning"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "ASR struggled with Saudi Arabic dialects and local recording conditions.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/build-local-ai-apps-with-c-and-nvidia-tensorrt-rtx-samples",
+   "company": "NVIDIA",
+   "title": "Build Local AI Apps with C++ and NVIDIA TensorRT RTX Samples",
+   "published": "2026-10-01",
+   "added": "2026-11-10",
+   "problem": "llm",
+   "summary": "Created open‑source C++ samples that export models to ONNX, then use ONNX Runtime with TensorRT for fast GPU‑accelerated inference across platforms.",
+   "tags": [
+    "GPUs"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers needed a way to run AI models locally on Windows, Linux, and ARM without custom runtimes.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/build-applications-on-nvidia-bluefield-faster-with-nvidia-doca-agent-skills",
+   "company": "NVIDIA",
+   "title": "Build Applications on NVIDIA BlueField Faster with NVIDIA DOCA Agent Skills",
+   "published": "2026-10-01",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Created DOCA Agent Skills that give agents verified API signatures, hardware requirements, and build constraints, letting them reason like expert DOCA developers.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Context engineering"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "General AI agents lacked specific knowledge of NVIDIA DOCA, causing guesswork and slow development cycles.",
+   "v": 3
+  },
+  {
    "url": "https://engineering.salesforce.com/how-deterministic-controls-turn-ai-output-into-reliable-prompt-templates",
    "company": "Salesforce",
    "title": "How Deterministic Controls Turn AI Output Into Reliable Prompt Templates",
@@ -1502,6 +1851,42 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Open-ended AI instructions produced inconsistent and unsafe outputs, making prompt templates unreliable.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/tracing-agent-harness-behavior-with-nvidia-nemo-relay",
+   "company": "NVIDIA",
+   "title": "Tracing Agent Harness Behavior with NVIDIA NeMo Relay",
+   "published": "2026-09-30",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They created NeMo Relay, which records every model and tool call, timing, and errors, letting developers trace and compare agent runs to find inefficiencies.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "Evals"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers can’t see why an agent takes extra steps or fails, making it hard to improve efficiency.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/deploying-an-hstu-generative-recommender-with-nvidia-dynamo-triton",
+   "company": "NVIDIA",
+   "title": "Deploying an HSTU Generative Recommender with NVIDIA Dynamo-Triton",
+   "published": "2026-09-30",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "They built a generative recommender served with Dynamo‑Triton, using ahead‑of‑time compiled PyTorch, GPU‑backed KV caching, and an embedding cache to cut latency.",
+   "tags": [
+    "Embeddings",
+    "Latency",
+    "GPUs"
+   ],
+   "sorted_by": "groq",
+   "result": "Up to 5.93× lower latency",
+   "issue": "Personalized recommendations were slow because models had to process long user histories and large item tables.",
    "v": 3
   },
   {
@@ -1625,6 +2010,42 @@
    "v": 3
   },
   {
+   "url": "https://developer.nvidia.com/blog/lower-the-cost-of-building-and-running-visual-ai-agents-with-nvidia-vss-blueprint-3-3",
+   "company": "NVIDIA",
+   "title": "Lower the Cost of Building and Running Visual AI Agents with NVIDIA VSS Blueprint 3.3",
+   "published": "2026-09-29",
+   "added": "2026-11-10",
+   "problem": "vision",
+   "summary": "They released VSS Blueprint 3.3, adding a Build Vision Agent skill for rapid deployment and Adaptive Efficient Video Sampling that cuts VLM token use and GPU load.",
+   "tags": [
+    "Cost",
+    "GPUs",
+    "RAG"
+   ],
+   "sorted_by": "groq",
+   "result": "80% fewer tokens, 46% more concurrent streams",
+   "issue": "Building visual AI agents was expensive and hard to maintain, especially for video ingestion, processing, and search.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/ai-native-by-design-lessons-learned-from-building-nvidia-tensorrt-model-connect",
+   "company": "NVIDIA",
+   "title": "AI Native by Design: Lessons Learned from Building NVIDIA TensorRT Model Connect",
+   "published": "2026-09-29",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Created an open‑source C++ library where AI agents generate candidate implementations, then isolate, test, benchmark, and review each change before shipping.",
+   "tags": [
+    "Agents",
+    "Human review",
+    "Tool calling"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Model developers struggled to get high‑performance TensorRT inference without deep expertise.",
+   "v": 3
+  },
+  {
    "url": "https://huggingface.co/blog/Hcompany/holo4",
    "company": "Hugging Face",
    "title": "Holo4: powering generalist computer-use agents",
@@ -1658,6 +2079,60 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Creating and testing AI agents manually was slow and error‑prone.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/nvidia-open-agent-safety-platform-a-reference-for-continuous-in-silicon-agent-monitoring",
+   "company": "NVIDIA",
+   "title": "NVIDIA Open Agent Safety Platform: A Reference for Continuous In-Silicon Agent Monitoring",
+   "published": "2026-09-28",
+   "added": "2026-11-10",
+   "problem": "safety",
+   "summary": "Created OpenShell, an open‑source runtime that runs agents in a sandbox with kernel‑level isolation and continuous monitoring.",
+   "tags": [
+    "Guardrails",
+    "Sandboxing",
+    "Agents"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "AI agents were breaking out of their test environments and accessing unauthorized systems.",
+   "v": 3
+  },
+  {
+   "url": "https://developer.nvidia.com/blog/add-runtime-controls-to-ai-agents-with-nvidia-openshell",
+   "company": "NVIDIA",
+   "title": "Add Runtime Controls to AI Agents with NVIDIA OpenShell",
+   "published": "2026-09-28",
+   "added": "2026-11-10",
+   "problem": "safety",
+   "summary": "They created OpenShell, a sandbox that enforces policies, limits file and network access, and protects credentials for any AI agent without changing its code.",
+   "tags": [
+    "Sandboxing",
+    "Guardrails",
+    "Agents"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Agents could access too many resources, risking data leaks or unintended actions.",
+   "v": 3
+  },
+  {
+   "url": "https://www.amazon.science/blog/a-kernel-centric-path-to-real-time-video-generation-on-trainium",
+   "company": "Amazon",
+   "title": "A kernel-centric path to real-time video generation on Trainium",
+   "published": "2026-09-25",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They engineered a kernel‑centric pipeline on AWS Trainium, optimizing inference scheduling, bin‑packing, and global networking to serve video frames quickly.",
+   "tags": [
+    "Latency",
+    "Cost",
+    "GPUs"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users needed real‑time video generation with low latency and high efficiency at scale.",
    "v": 3
   },
   {
@@ -1784,6 +2259,24 @@
    "v": 3
   },
   {
+   "url": "https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14",
+   "company": "Pinterest",
+   "title": "Beyond Two Towers: Launching the 3-Tower Engagement Co-Train Model (Part 2)",
+   "published": "2026-09-17",
+   "added": "2026-11-10",
+   "problem": "ads",
+   "summary": "Created a 3‑tower co‑train model that shares embeddings, gives a fast two‑tower score for all ads and a richer three‑tower score for a selected subset, keeping latency low.",
+   "tags": [
+    "Two-tower",
+    "Cost",
+    "Latency"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Ads needed more accurate click predictions without slowing down serving millions of candidates.",
+   "v": 3
+  },
+  {
    "url": "https://medium.com/airbnb-engineering/the-guest-journey-updated-in-real-time-extending-airbnbs-sequence-recommender-with-chronon-8f1582578553",
    "company": "Airbnb",
    "title": "The guest journey, updated in real time: extending Airbnb’s sequence recommender with Chronon",
@@ -1834,6 +2327,23 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Need relevant, authorized enterprise data for each AI request without sending all data in the prompt.",
+   "v": 3
+  },
+  {
+   "url": "https://building.nu.com/designing-claude-for-ears-not-eyes-an-accessibility-skill-for-blind-and-low-vision-users",
+   "company": "Nubank",
+   "title": "Designing Claude for ears, not eyes: An accessibility skill for blind and low-vision users",
+   "published": "2026-09-16",
+   "added": "2026-11-10",
+   "problem": "safety",
+   "summary": "They added rules to the model’s instructions so it speaks clearly and follows screen‑reader conventions, making the assistant usable by audio‑only users",
+   "tags": [
+    "Prompting",
+    "Context engineering"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Blind and low‑vision users struggled to use the chatbot because it was designed for visual interaction",
    "v": 3
   },
   {
@@ -1923,6 +2433,24 @@
    "v": 3
   },
   {
+   "url": "https://shopify.engineering/shop-app-migration",
+   "company": "Shopify",
+   "title": "Migrating Shop app from React Native to native",
+   "published": "2026-09-10",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "The team used AI coding agents to translate React Native screens into native SwiftUI and Jetpack Compose, rebuilding the Shop app in 12 weeks.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "Native app released in 12 weeks",
+   "issue": "Maintaining a shared React Native codebase limited performance and added complexity for iOS and Android.",
+   "v": 3
+  },
+  {
    "url": "https://shopify.engineering/back-to-native",
    "company": "Shopify",
    "title": "Native is now the future of mobile at Shopify",
@@ -1938,6 +2466,24 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Building mobile apps in both Swift and Kotlin doubled development effort and cost.",
+   "v": 3
+  },
+  {
+   "url": "https://medium.com/pinterest-engineering/building-pinterests-vlm-serving-stack-on-nvidia-dynamo-0dce6e93d0f3",
+   "company": "Pinterest",
+   "title": "Building Pinterest’s VLM Serving Stack on NVIDIA Dynamo",
+   "published": "2026-09-10",
+   "added": "2026-11-10",
+   "problem": "vision",
+   "summary": "Pinterest built a VLM serving stack on NVIDIA Blackwell GPUs and Dynamo, using distributed inference, KV cache offloading, and custom routing to handle image‑heavy requests efficiently.",
+   "tags": [
+    "GPUs",
+    "Latency",
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Serving vision‑language models needed low‑latency, cost‑effective inference for Pinterest’s multimodal features.",
    "v": 3
   },
   {
@@ -2340,6 +2886,24 @@
    "v": 3
   },
   {
+   "url": "https://huggingface.co/blog/LiquidAI/lfm25-dspark",
+   "company": "Hugging Face",
+   "title": "Up to 3.2x Faster Inference with LFM2.5-DSpark",
+   "published": "2026-08-20",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They added a lightweight draft model that predicts tokens first, then the main model verifies them, cutting memory reads and speeding up decoding.",
+   "tags": [
+    "Speculative decoding",
+    "Latency",
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "Up to 3.2x faster inference",
+   "issue": "LLM inference was slow, causing high latency for users.",
+   "v": 3
+  },
+  {
    "url": "https://engineeringblog.yelp.com/2026/08/building-menu-vision-real-time-dish-recognition.html",
    "company": "Yelp",
    "title": "Building Menu Vision: Real-Time Dish Recognition",
@@ -2373,6 +2937,58 @@
    "sorted_by": "groq",
    "result": "Latency dropped from 6.8s to 4.2s, throughput rose from 20.2 to 23.4 QPS",
    "issue": "Long prompts made the agent slow and expensive to run.",
+   "v": 3
+  },
+  {
+   "url": "https://medium.com/airbnb-engineering/how-we-knew-covid-was-over-and-what-our-models-had-to-unlearn-c606b9bdb0ab",
+   "company": "Airbnb",
+   "title": "How we knew COVID was over (and what our models had to unlearn)",
+   "published": "2026-08-19",
+   "added": "2026-11-10",
+   "problem": "predict",
+   "summary": "They created a process to decide whether to refit, redesign, or keep a model unchanged, analyzing bias before updating forecasts.",
+   "tags": [
+    "Real-time"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Forecasts kept missing actual demand after COVID, causing biased planning decisions.",
+   "v": 3
+  },
+  {
+   "url": "https://huggingface.co/blog/multi-vector-encoder",
+   "company": "Hugging Face",
+   "title": "Multi-Vector (Late Interaction) Embedding Models with Sentence Transformers",
+   "published": "2026-08-18",
+   "added": "2026-11-10",
+   "problem": "rag",
+   "summary": "They added a multi‑vector model that stores a vector for each token, matching queries token‑by‑token with a MaxSim operation, improving retrieval quality.",
+   "tags": [
+    "RAG",
+    "Embeddings",
+    "Vector search"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Single-vector embeddings lose detail, hurting search accuracy for specific queries.",
+   "v": 3
+  },
+  {
+   "url": "https://huggingface.co/blog/ibm-research/altk-evolve-hmm",
+   "company": "Hugging Face",
+   "title": "How Much Memory Does Your Agent Actually Need?",
+   "published": "2026-08-18",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They built a system that distills past actions into guidelines, then injects either the full set or a compact, task‑specific subset at inference, tuning the amount per model size.",
+   "tags": [
+    "Agent memory",
+    "Prompt caching",
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "+16.1pp task completion, +5% token cost",
+   "issue": "Agents needed to know how much past‑task memory to keep without hurting cost or performance.",
    "v": 3
   },
   {
@@ -2427,6 +3043,24 @@
    "v": 3
   },
   {
+   "url": "https://huggingface.co/blog/amazon/strands-lerobot-streaming-data-loop",
+   "company": "Hugging Face",
+   "title": "Record, train, and deploy from one place with Strands Agents, LeRobot, and Hugging Face Storage Buckets",
+   "published": "2026-08-13",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Created a continuous loop where robot demos are stored in Hugging Face Storage Buckets, read directly for training, and deployed back, avoiding redundant transfers.",
+   "tags": [
+    "Agents",
+    "Cost",
+    "Semantic caching"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Repeated data uploads and downloads slowed training and increased costs as robot recordings grew.",
+   "v": 3
+  },
+  {
    "url": "https://engineering.zalando.com/posts/2026/08/agentic-engineering-at-zalando-a-snapshot.html",
    "company": "Zalando",
    "title": "Agentic Engineering at Zalando: a snapshot",
@@ -2442,6 +3076,24 @@
    "sorted_by": "groq",
    "result": "Supports 2k MAU with six small pods",
    "issue": "Engineers struggled to experiment with LLMs across providers and track usage costs.",
+   "v": 3
+  },
+  {
+   "url": "https://huggingface.co/blog/allenai/olmoearth-embeddings",
+   "company": "Hugging Face",
+   "title": "Introducing OlmoEarth embeddings: Custom embedding exports from OlmoEarth Studio for downstream analysis",
+   "published": "2026-08-12",
+   "added": "2026-11-10",
+   "problem": "rag",
+   "summary": "OlmoEarth Studio now lets users run a model on chosen images and download the resulting embedding vectors as lightweight GeoTIFF files, with options for resolution, time range, and fine‑tuning.",
+   "tags": [
+    "Embeddings",
+    "Vector search",
+    "RAG"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users needed a simple, cheap way to turn satellite images into numeric vectors for search and analysis.",
    "v": 3
   },
   {
@@ -2513,6 +3165,40 @@
    "sorted_by": "groq",
    "issue": "Teams needed a fast, scalable vector store that could handle many use cases and high traffic.",
    "result": "",
+   "v": 3
+  },
+  {
+   "url": "https://huggingface.co/blog/nvidia/magpie-tts-multilingual-voice-agents",
+   "company": "Hugging Face",
+   "title": "Build Low-Latency Multilingual Voice Agents: Open Weights & Full Deployment Control with NVIDIA Magpie TTS",
+   "published": "2026-08-10",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They built a modular speech pipeline using NVIDIA Magpie TTS with open weights, letting them run ASR, LLM, and TTS on their own hardware and tune each part for speed.",
+   "tags": [
+    "Latency",
+    "GPUs",
+    "Small models"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Voice responses were too slow, making the whole conversation feel laggy for users.",
+   "v": 3
+  },
+  {
+   "url": "https://engineering.razorpay.com/ci-doesnt-need-on-demand-moving-our-build-pipelines-to-spot-instances-6fff1cd92ba8",
+   "company": "Razorpay",
+   "title": "CI Doesn’t Need On-Demand: Moving Our Build Pipelines to Spot Instances",
+   "published": "2026-08-05",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "Created a self‑healing Kubernetes layer for GitHub Actions that runs most jobs on spot instances, detects terminations, retries jobs and cleans up pods automatically.",
+   "tags": [
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "99.2% job success, 70–90% cost reduction",
+   "issue": "CI pipelines were too expensive or unreliable when using cheap spot instances.",
    "v": 3
   },
   {
@@ -2638,6 +3324,24 @@
    "v": 3
   },
   {
+   "url": "https://craft.faire.com/virtual-packer-how-faire-estimates-shipping-costs-at-checkout-a17509fac73d",
+   "company": "Faire",
+   "title": "Virtual Packer: How Faire estimates shipping costs at checkout",
+   "published": "2026-07-29",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They built a Virtual Packer that predicts package weight and count, then queries live carrier rates to show a real‑time estimate.",
+   "tags": [
+    "Cost",
+    "Real-time",
+    "Latency"
+   ],
+   "sorted_by": "groq",
+   "result": "35% fewer estimation errors",
+   "issue": "Boutique owners need accurate shipping cost at checkout, but actual rates are unknown until after shipping.",
+   "v": 3
+  },
+  {
    "url": "https://medium.com/airbnb-engineering/eval-driven-development-lessons-from-evaluating-genai-at-scale-e817e5ae5788",
    "company": "Airbnb",
    "title": "Eval-driven development: Lessons from evaluating GenAI at scale",
@@ -2656,6 +3360,42 @@
    "v": 3
   },
   {
+   "url": "https://huggingface.co/blog/nvidia/cosmos-h-dreams",
+   "company": "Hugging Face",
+   "title": "NVIDIA Cosmos-H-Dreams: Bringing Real-Time Generative Simulation to Surgical Robotics",
+   "published": "2026-07-27",
+   "added": "2026-11-10",
+   "problem": "predict",
+   "summary": "Created a real‑time generative simulator that predicts video outcomes from robot motions, using a distilled student model running on one RTX GPU.",
+   "tags": [
+    "Distillation",
+    "Real-time",
+    "GPUs"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Testing surgical robot actions is slow, costly, and risky on real hardware.",
+   "v": 3
+  },
+  {
+   "url": "https://huggingface.co/blog/nunchaku-diffusers",
+   "company": "Hugging Face",
+   "title": "Bringing Nunchaku 4-bit Diffusion Inference to Diffusers",
+   "published": "2026-07-23",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "Integrated 4-bit weight and activation quantization (SVDQuant) into Diffusers, letting users load Nunchaku checkpoints without custom code, cutting memory and speeding inference.",
+   "tags": [
+    "Quantisation",
+    "Latency",
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "12 GB memory, 1.7 s per 1024×1024 image",
+   "issue": "Large diffusion models need too much GPU memory and run slowly on consumer GPUs.",
+   "v": 3
+  },
+  {
    "url": "https://craft.faire.com/autoscience-how-we-built-agent-driven-ml-exploration-at-faire-f3183e7deb29",
    "company": "Faire",
    "title": "Autoscience: How we built agent-driven ML exploration at Faire",
@@ -2671,6 +3411,20 @@
    "sorted_by": "groq",
    "result": "Production model accuracy improved double‑digit percentages",
    "issue": "ML teams could only try a tiny fraction of possible model changes, limiting performance.",
+   "v": 3
+  },
+  {
+   "url": "https://dropbox.tech/infrastructure/how-our-universal-content-processing-platform-riviera-evolved-for-ai-and-beyond",
+   "company": "Dropbox",
+   "title": "How our universal content processing platform Riviera evolved for AI and beyond",
+   "published": "2026-07-20",
+   "added": "2026-11-10",
+   "problem": "tuning",
+   "summary": "Built Riviera, a shared platform that converts files into thumbnails, PDFs, and lightweight videos, scaling to handle billions of transformations daily.",
+   "tags": [],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users needed fast, consistent previews and AI-ready content across many file types.",
    "v": 3
   },
   {
@@ -3058,6 +3812,40 @@
    "v": 3
   },
   {
+   "url": "https://medium.com/expedia-group-tech/the-most-expensive-milliseconds-are-unmeasured-d6cfaaca881d",
+   "company": "Expedia",
+   "title": "The Most Expensive Milliseconds Are Unmeasured",
+   "published": "2026-06-03",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They created a new metric, Native Time to Interactive (NTTI), to measure when key screen components load and become usable, turning performance into a first‑class signal.",
+   "tags": [
+    "Latency"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users felt login screens were slow, eroding trust without obvious errors.",
+   "v": 3
+  },
+  {
+   "url": "https://tech.instacart.com/semantic-ids-product-understanding-at-scale-5283e0288f5a",
+   "company": "Instacart",
+   "title": "Semantic IDs: Product Understanding at Scale",
+   "published": "2026-06-02",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "Created semantic IDs by turning product embeddings into short integer codes with a residual vector quantizer, letting similar items share prefixes and be discovered across categories.",
+   "tags": [
+    "Embeddings",
+    "Quantisation",
+    "Personalisation"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Products in different categories never appear together, hurting new and niche items.",
+   "v": 3
+  },
+  {
    "url": "https://tech.instacart.com/from-scoring-to-spelling-rebuilding-ads-retrieval-at-instacart-cf36b4e8d1bb",
    "company": "Instacart",
    "title": "From Scoring to Spelling: Rebuilding Ads Retrieval at Instacart",
@@ -3199,6 +3987,23 @@
    "v": 3
   },
   {
+   "url": "https://booking.ai/the-causality-gap-measuring-the-true-impact-of-voluntary-adoption-in-digital-marketplaces-ea68b5a35120",
+   "company": "Booking.com",
+   "title": "The Causality Gap: Measuring the True Impact of Voluntary Adoption in Digital Marketplaces",
+   "published": "2026-05-22",
+   "added": "2026-11-10",
+   "problem": "evals",
+   "summary": "They ran a Randomized Encouragement Design and applied Double Machine Learning to separate the impact on people who adopted the feature from the overall rollout effect, revealing where to improve the product or the adoption funnel.",
+   "tags": [
+    "Evals",
+    "A/B testing"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users and partners chose whether to use new features, making it hard to see the real effect of those features.",
+   "v": 3
+  },
+  {
    "url": "https://www.intercom.com/blog/operator-a-look-under-the-hood",
    "company": "Intercom",
    "title": "Operator: A look under the hood",
@@ -3217,6 +4022,22 @@
    "v": 3
   },
   {
+   "url": "https://tech.instacart.com/scaling-personalized-marketing-for-multi-tenant-commerce-platforms-816f0c6a046b",
+   "company": "Instacart",
+   "title": "Scaling Personalized Marketing for Multi-Tenant Commerce Platforms",
+   "published": "2026-05-14",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "Instacart added a per‑retailer workspace in a third‑party marketing platform, automating provisioning and isolating data, templates, and settings",
+   "tags": [
+    "Real-time"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Retailers needed personalized marketing that kept their brand separate from Instacart’s system",
+   "v": 3
+  },
+  {
    "url": "https://blog.hotstar.com/beyond-imitation-teaching-ai-to-speak-like-a-character-in-hindi-476bd33f049a",
    "company": "JioHotstar",
    "title": "Beyond Imitation: Teaching AI to Speak Like a Character in Hindi",
@@ -3232,6 +4053,39 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Hindi speech synthesis lacked emotion and consistency at production scale.",
+   "v": 3
+  },
+  {
+   "url": "https://tech.instacart.com/empowering-carrot-ads-with-domain-adaptive-learning-870730e6add5",
+   "company": "Instacart",
+   "title": "Empowering Carrot Ads with Domain Adaptive Learning",
+   "published": "2026-05-04",
+   "added": "2026-11-10",
+   "problem": "tuning",
+   "summary": "Instacart moved a model trained on its large marketplace to the partner’s site, then fine‑tuned it with the partner’s few clicks, giving better ad rankings.",
+   "tags": [
+    "Fine-tuning"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "New partners had almost no ad interaction data, making it hard to predict which ads users would click.",
+   "v": 3
+  },
+  {
+   "url": "https://medium.com/myntra-engineering/from-products-to-inspiration-inside-the-engine-of-occasion-based-outfit-visualiser-a09f494d43ae",
+   "company": "Myntra",
+   "title": "From Products to Inspiration: Inside the Engine of Occasion-based outfit visualiser",
+   "published": "2026-04-23",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "Created a visual outfit feature that maps items to style recipes, composites images, and uses an LLM‑driven diffusion model to generate realistic scene pictures.",
+   "tags": [
+    "Multimodal",
+    "Reranking"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Shoppers struggled to picture how clothes fit into real-life occasions, causing many to leave the site.",
    "v": 3
   },
   {
@@ -3427,6 +4281,23 @@
    "v": 3
   },
   {
+   "url": "https://eng.lyft.com/predicting-rider-conversion-in-sparse-data-environments-with-bayesian-trees-07227ff92789",
+   "company": "Lyft",
+   "title": "Predicting Rider Conversion in Sparse Data Environments with Bayesian Trees",
+   "published": "2026-03-30",
+   "added": "2026-11-10",
+   "problem": "predict",
+   "summary": "They built a Bayesian tree model that shares information across similar contexts, avoiding over‑fitting and running fast enough for live predictions.",
+   "tags": [
+    "Real-time",
+    "Feature store"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Rider conversion rates were hard to predict because data for specific contexts was extremely sparse.",
+   "v": 3
+  },
+  {
    "url": "https://blog.hotstar.com/ai-video-generation-at-scale-prompts-dont-scale-640c93778df9",
    "company": "JioHotstar",
    "title": "AI Video Generation at Scale — Prompts Don’t Scale",
@@ -3460,6 +4331,76 @@
    "sorted_by": "groq",
    "issue": "Creating XR experiences required complex code and hardware setup, slowing down experimentation.",
    "result": "Prototypes generated in under 60 seconds",
+   "v": 3
+  },
+  {
+   "url": "https://eng.lyft.com/beyond-a-b-testing-using-surrogacy-and-region-splits-to-measure-long-term-effects-in-marketplaces-9cb06d628f2d",
+   "company": "Lyft",
+   "title": "Beyond A/B Testing: Using Surrogacy and Region-Splits to Measure Long-Term Effects in Marketplaces",
+   "published": "2026-03-25",
+   "added": "2026-11-10",
+   "problem": "evals",
+   "summary": "They built a framework that splits regions and uses surrogate metrics to predict long‑term outcomes of pricing and incentive changes in the marketplace.",
+   "tags": [
+    "Evals",
+    "A/B testing"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Deciding how much to spend on driver incentives or rider prices without knowing long‑term effects was risky.",
+   "v": 3
+  },
+  {
+   "url": "https://replit.com/blog/live-from-hq-agent4-launch-pt2",
+   "company": "Replit",
+   "title": "Live from Replit HQ Part 2",
+   "published": "2026-03-23",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "They created Agent 4, a pipeline of specialized models that plans task order, runs parallel jobs, and uses coding models to automatically resolve most merge conflicts, surfacing only edge cases to the user.",
+   "tags": [
+    "Agents",
+    "Planning",
+    "Multi-agent"
+   ],
+   "sorted_by": "groq",
+   "result": "90% of conflicts resolve automatically",
+   "issue": "Multiple AI agents editing the same code caused merge conflicts and coordination problems.",
+   "v": 3
+  },
+  {
+   "url": "https://www.etsy.com/codeascraft/making-ads-count-using-mmoe-and-auxiliary-tasks-to-better-connect-buyers--sellers",
+   "company": "Etsy",
+   "title": "Making Ads Count: Using MMoE and Auxiliary Tasks to Better Connect Buyers & Sellers",
+   "published": "2026-03-20",
+   "added": "2026-11-10",
+   "problem": "ads",
+   "summary": "They added a Multigate Mixture of Experts architecture and used add‑to‑cart events as an extra training signal to better predict purchase intent and rank ads.",
+   "tags": [
+    "Reranking",
+    "Hybrid search"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Buyers struggled to find the right items and sellers couldn’t reach interested customers.",
+   "v": 3
+  },
+  {
+   "url": "https://replit.com/blog/whats-changed-agent3-to-agent4",
+   "company": "Replit",
+   "title": "What’s changed from Replit Agent 3 to Agent 4",
+   "published": "2026-03-19",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Agent 4 lets users describe any kind of artifact, builds it with integrated tools, and offers a unified Design Canvas that shows live previews and mockups side‑by‑side, working for all artifact types.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Developers had to choose an artifact type early and use a separate design mode, slowing and complicating app creation.",
    "v": 3
   },
   {
@@ -3497,6 +4438,24 @@
    "v": 3
   },
   {
+   "url": "https://replit.com/blog/vibe-coding-data-apps-replit-databricks",
+   "company": "Replit",
+   "title": "Vibe Coding Enterprise Data Apps with Replit and Databricks",
+   "published": "2026-03-13",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Created a connector that lets Replit’s coding agent call Databricks APIs, so apps can read and write trusted data without manual credential handling.",
+   "tags": [
+    "Tool calling",
+    "Agents",
+    "RAG"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Teams needed to build apps that could safely use sensitive, governed enterprise data.",
+   "v": 3
+  },
+  {
    "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting",
    "company": "Google",
    "title": "Protecting cities with AI-driven flash flood forecasting",
@@ -3511,6 +4470,40 @@
    "sorted_by": "groq",
    "issue": "Cities lacked early warnings for rapid flash floods, putting residents at risk.",
    "result": "Up to 24‑hour advance notice",
+   "v": 3
+  },
+  {
+   "url": "https://replit.com/blog/introducing-agent-4-built-for-creativity",
+   "company": "Replit",
+   "title": "Introducing Replit Agent 4: Built for Creativity",
+   "published": "2026-03-11",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Replit created Agent 4, an autonomous assistant that takes simple prompts, plans tasks, calls tools, and iterates code and design in the same environment, letting users focus on creativity.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Planning"
+   ],
+   "sorted_by": "groq",
+   "result": "Production‑ready apps shipped 10× faster",
+   "issue": "Developers spent too much time coordinating design and code, slowing creative work.",
+   "v": 3
+  },
+  {
+   "url": "https://blog.hotstar.com/monetisation-multi-period-dash-x-exoplayer-db8e8c00e521",
+   "company": "JioHotstar",
+   "title": "Monetisation : Multi-period DASH x ExoPlayer",
+   "published": "2026-03-04",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They rewrote ExoPlayer’s ad handling to support multi‑period DASH, letting the player insert new content blocks on the fly.",
+   "tags": [
+    "Cost"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users needed to add region‑specific ads and legal text without re‑encoding each video, which was slow and expensive.",
    "v": 3
   },
   {
@@ -3529,6 +4522,24 @@
    "sorted_by": "groq",
    "issue": "Analysts were overwhelmed by noisy, unstructured threat alerts and struggled to spot real risks.",
    "result": "",
+   "v": 3
+  },
+  {
+   "url": "https://replit.com/blog/building-ar-mobile-app-on-replit",
+   "company": "Replit",
+   "title": "Building Spookseek AR on Replit: How a Designer Shipped an AR Ghost Hunting Game in a Week",
+   "published": "2026-02-27",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "She used Replit Agent to write and run the 3D AR code, iterating daily and deploying a TestFlight build within a week.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Prompting"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "A designer with no coding experience needed to create a real AR ghost‑hunting game fast.",
    "v": 3
   },
   {
@@ -3568,6 +4579,42 @@
    "v": 3
   },
   {
+   "url": "https://medium.com/tripadvisor/travel-plus-experience-meets-data-at-viator-9037bfbd677c",
+   "company": "Tripadvisor",
+   "title": "Travel Plus Experience Meets Data at Viator",
+   "published": "2026-02-22",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "Created data pipelines and attribution models that rank and filter results, showing only the most relevant, personalized experiences.",
+   "tags": [
+    "Personalisation",
+    "Reranking",
+    "Hybrid search"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Travelers saw hundreds of irrelevant options, making it hard to pick the right activity.",
+   "v": 3
+  },
+  {
+   "url": "https://eng.lyft.com/scaling-localization-with-ai-at-lyft-b04dca99e6ee",
+   "company": "Lyft",
+   "title": "Scaling Localization with AI at Lyft",
+   "published": "2026-02-19",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They built an AI‑driven translation pipeline that drafts translations with LLMs, then lets linguists review them, keeping quality high while cutting turnaround to minutes.",
+   "tags": [
+    "Prompting",
+    "Guardrails",
+    "Latency"
+   ],
+   "sorted_by": "groq",
+   "result": "30‑minute SLA for 95% of translations",
+   "issue": "Users needed new languages quickly, but human translation was slow and expensive.",
+   "v": 3
+  },
+  {
    "url": "https://blog.hotstar.com/building-scalable-validation-framework-for-video-generation-6c67d1177ce2",
    "company": "JioHotstar",
    "title": "Gen AI Video — Building Scalable Validation Framework",
@@ -3586,6 +4633,24 @@
    "v": 3
   },
   {
+   "url": "https://research.google/blog/small-models-big-results-achieving-superior-intent-extraction-through-decomposition",
+   "company": "Google",
+   "title": "Small models, big results: Achieving superior intent extraction through decomposition",
+   "published": "2026-01-22",
+   "added": "2026-11-10",
+   "problem": "cost",
+   "summary": "They split intent detection into two steps: a tiny multimodal model summarizes each screen, then another small model reads the summaries to predict overall intent, all on‑device.",
+   "tags": [
+    "Small models",
+    "Cost",
+    "Latency"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Mobile agents needed to understand user intent without sending data to servers, which is slow, expensive, and risky.",
+   "v": 3
+  },
+  {
    "url": "https://www.etsy.com/codeascraft/how-etsy-uses-llms-to-improve-search-relevance",
    "company": "Etsy",
    "title": "How Etsy Uses LLMs to Improve Search Relevance",
@@ -3601,6 +4666,24 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Buyers saw search results that were close but not exactly what they wanted, hurting satisfaction.",
+   "v": 3
+  },
+  {
+   "url": "https://open.nytimes.com/how-the-new-york-times-is-scaling-unit-test-coverage-using-ai-tools-fa796bf9b8d2",
+   "company": "The New York Times",
+   "title": "How The New York Times is scaling Unit Test Coverage using AI Tools",
+   "published": "2026-01-13",
+   "added": "2026-11-10",
+   "problem": "llm",
+   "summary": "Engineers used generative AI agents to automatically write unit tests, then humans reviewed and refined them, quickly raising coverage on critical code.",
+   "tags": [
+    "Agents",
+    "Human review",
+    "Prompting"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Test coverage lagged behind rapid feature development, causing extra manual testing.",
    "v": 3
   },
   {
@@ -3692,6 +4775,74 @@
    "v": 3
   },
   {
+   "url": "https://www.etsy.com/codeascraft/reducing-experiment-duration-with-predicted-control-variates",
+   "company": "Etsy",
+   "title": "Reducing experiment duration with predicted control variates",
+   "published": "2025-11-25",
+   "added": "2026-11-10",
+   "problem": "evals",
+   "summary": "They added predicted control variates to their A/B testing platform, cutting metric variance and shortening experiment time.",
+   "tags": [
+    "A/B testing",
+    "Evals"
+   ],
+   "sorted_by": "groq",
+   "result": "Average experiment duration reduced by 3 days",
+   "issue": "Experiments took too long, slowing product improvements.",
+   "v": 3
+  },
+  {
+   "url": "https://replit.com/blog/data-connectors",
+   "company": "Replit",
+   "title": "Data Connectors",
+   "published": "2025-11-20",
+   "added": "2026-11-10",
+   "problem": "agents",
+   "summary": "Replit added native, OAuth‑based connectors for Snowflake, Databricks, and BigQuery, letting the Agent securely discover schemas and build data apps instantly.",
+   "tags": [
+    "Agents",
+    "Tool calling",
+    "Guardrails"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Teams had to store database credentials manually, creating security risks and slowing down data app development.",
+   "v": 3
+  },
+  {
+   "url": "https://medium.com/tripadvisor/redefining-personalization-in-the-customer-experience-fd6525a2e6b3",
+   "company": "Tripadvisor",
+   "title": "Redefining personalization in the customer experience",
+   "published": "2025-11-03",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "Tripadvisor added a contextual entry point in its AI trip builder that lets travelers start recommendations from a specific place, like a hotel or attraction",
+   "tags": [
+    "Personalisation"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Users felt overwhelmed planning trips and wanted more tailored guidance",
+   "v": 3
+  },
+  {
+   "url": "https://medium.com/tripadvisor/making-the-best-first-impression-using-machine-learning-to-optimize-photo-selection-0767e82e4fe8",
+   "company": "Tripadvisor",
+   "title": "Making the best first impression: Using machine learning to optimize photo selection",
+   "published": "2025-10-30",
+   "added": "2026-11-10",
+   "problem": "recs",
+   "summary": "They built an AI system that looks at all photos, scores them for visual appeal and relevance, and automatically picks the best one to show first",
+   "tags": [
+    "Reranking",
+    "Embeddings"
+   ],
+   "sorted_by": "groq",
+   "result": "Higher click‑through rates and bookings",
+   "issue": "Choosing the right first photo for a listing was hard and slowed bookings",
+   "v": 3
+  },
+  {
    "url": "https://medium.com/tripadvisor/scaling-our-existing-tagging-system-with-hybrid-graph-semantic-search-2322bdaa5b8d",
    "company": "Tripadvisor",
    "title": "Scaling our existing tagging system with Hybrid Graph-Semantic Search",
@@ -3744,9 +4895,26 @@
    "result": "",
    "issue": "The product taxonomy was growing too fast for manual updates, causing inconsistencies and hurting discoverability.",
    "v": 3
+  },
+  {
+   "url": "https://medium.com/mercadolibre-tech/how-we-are-using-ai-in-mercado-libres-accessibility-team-e960b83283a9",
+   "company": "Mercado Libre",
+   "title": "How we are using AI in Mercado Libre’s accessibility team",
+   "published": "2025-10-08",
+   "added": "2026-11-10",
+   "problem": "safety",
+   "summary": "They built an AI assistant that pulls trusted internal resources, adds clear context, and checks answers against standards to avoid hallucinations.",
+   "tags": [
+    "Guardrails",
+    "Context engineering"
+   ],
+   "sorted_by": "groq",
+   "result": "",
+   "issue": "Designers and developers needed quick, accurate answers to accessibility questions without relying on the limited accessibility team.",
+   "v": 3
   }
  ],
- "waiting": 759,
+ "waiting": 251,
  "rejected": [
   "https://blog.cloudflare.com/ddos-threat-report-2026-q3",
   "https://blog.cloudflare.com/dns-targeted-zone-builds",
@@ -3800,16 +4968,21 @@
   "https://building.nu.com/beyond-a-b-testing-designing-experiments-when-the-space-is-too-large-to-explore",
   "https://building.nu.com/beyond-the-dashboard-what-i-learned-about-data-without-an-analytical-background",
   "https://building.nu.com/beyond-the-data-what-a-business-analyst-does-at-nubank",
+  "https://building.nu.com/feature-stores-in-real-time-ml-part-3-examples-from-nubank",
   "https://building.nu.com/from-support-to-root-cause-what-a-cx-person-really-does-at-nubank",
   "https://building.nu.com/from-using-ai-to-operating-with-ai-what-changes-in-product-management-when-the-bottlenecks-disappear",
   "https://building.nu.com/the-code-was-the-easy-part-lessons-from-contributing-to-the-clojure-language",
   "https://building.nu.com/when-the-team-plays-pix-pauses-what-the-world-cup-teaches-us-about-outliers",
+  "https://craft.faire.com/accelerating-product-development-in-the-ai-age-how-faire-developed-product-builders-fe70044854b5",
+  "https://craft.faire.com/pick-it-up-play-with-it-share-what-you-found-2761b55ac6cd",
   "https://craft.faire.com/staying-close-to-the-craft-in-a-rapidly-shifting-industry-cf7a108f524e",
+  "https://craft.faire.com/the-pm-role-is-being-rewritten-heres-what-we-think-comes-next-26a8bf41dfe6",
   "https://craft.faire.com/you-need-to-design-the-conditions-for-great-work-to-happen-f80de4d8a2ad",
   "https://developer.nvidia.com/blog/code-test-and-deploy-on-one-machine-with-nvidia-rtx-spark",
   "https://developer.nvidia.com/blog/cuda-toolkit-13-4-adds-windows-on-arm-support-and-greater-control-over-shared-gpus",
   "https://developer.nvidia.com/blog/faster-scientific-image-analysis-with-nvidia-cuphoton",
   "https://developer.nvidia.com/blog/from-wafer-out-to-first-token-codifying-supply-chain-expertise-with-nemotron-and-palantir-foundry",
+  "https://developer.nvidia.com/blog/make-a-robot-arm-feel-weightless-with-nvidia-holoscan-5",
   "https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support",
   "https://developer.nvidia.com/blog/scale-av-perception-across-vehicle-platforms-with-nvidia-omniverse-nurec",
   "https://developer.nvidia.com/blog/scaling-decision-optimization-to-100-million-variables-and-beyond-with-mpdlp-in-nvidia-cuopt",
@@ -3841,6 +5014,7 @@
   "https://discord.com/blog/discord-patch-notes-march-6-2026",
   "https://discord.com/blog/discord-patch-notes-may-4-2026",
   "https://discord.com/blog/discord-patch-notes-november-4-2025",
+  "https://discord.com/blog/discord-patch-notes-november-9-2026",
   "https://discord.com/blog/discord-patch-notes-october-6-2026",
   "https://discord.com/blog/discord-patch-notes-october-7-2025",
   "https://discord.com/blog/discord-patch-notes-september-8-2026",
@@ -3882,20 +5056,28 @@
   "https://discord.com/blog/safer-for-teens-same-discord-for-adults",
   "https://discord.com/blog/save-and-display-your-faves-add-discord-shop-marvel-rivals-items-to-your-profiles-wishlist",
   "https://discord.com/blog/tracing-discords-elixir-systems-without-melting-everything",
+  "https://discord.com/blog/unlock-level-up-flex-discord-profile-badges-got-an-upgrade",
   "https://discord.com/blog/updated-requirements-to-how-apps-access-data-in-servers",
   "https://discord.com/blog/you-bar",
+  "https://dropbox.tech/culture/learnings-from-deploying-ai-at-company-scale",
   "https://dropbox.tech/developers/new-dropbox-api-documentation",
+  "https://dropbox.tech/infrastructure/improving-infrastructure-efficiency-for-growing-demand-in-the-age-of-ai",
   "https://dropbox.tech/security/how-our-inhouse-auditor-tests-cookie-behavior-across-hundreds-of-web-surfaces",
   "https://eng.lyft.com/from-chaos-to-clarity-2ab50856d0c8",
   "https://eng.lyft.com/from-day-1-to-production-building-lyfts-analytics-rides-intelligence-assistant-as-onboarding-5c5643c192d9",
   "https://eng.lyft.com/how-we-built-a-smarter-pickup-experience-for-gated-communities-47416e9df029",
+  "https://eng.lyft.com/metric-semantic-layer-how-lyft-governs-and-scales-key-data-definitions-56bee3643c29",
   "https://eng.lyft.com/refreshing-the-travel-time-map-behind-lyfts-marketplace-rebuilding-neighborhood-reachability-5be3efbc82ea",
   "https://eng.lyft.com/rerouting-the-stream-how-lyft-moved-to-the-apache-flink-operator-36f20246d250",
   "https://engineering.atspotify.com/2026/10/introducing-spotify-technology-proven-at-spotify-now-yours",
+  "https://engineering.atspotify.com/2026/11/ai-product-management-at-spotify-a-view-from-three-angles",
   "https://engineering.atspotify.com/2026/9/ai-changed-how-spotify-builds-what-we-learned-and-fixed-about-quality-at-higher-velocity",
   "https://engineering.atspotify.com/2026/9/why-spotify-is-not-using-bayesian-a-b-testing",
   "https://engineering.fb.com/2026/10/19/data-center-engineering/inside-prometheus-meta-gigawatt-scale-supercluster",
+  "https://engineering.fb.com/2026/10/26/open-source/ocp-summit-2026-meta-networking-talks",
+  "https://engineering.fb.com/2026/10/27/developer-tools/python-typing-survey-2026-ai-tools-checker-landscape",
   "https://engineering.fb.com/2026/10/27/security/privacylib",
+  "https://engineering.fb.com/2026/11/09/developer-tools/extending-lldb-to-debug-applications-that-span-cpus-and-gpus",
   "https://engineering.grab.com/app-stability-at-scale-with-a-layered-defense",
   "https://engineering.grab.com/automated-merchant-review-summary-system-with-integrated-feedback",
   "https://engineering.grab.com/data-mesh-at-grab-part-three",
@@ -3923,6 +5105,7 @@
   "https://engineeringblog.yelp.com/2026/05/optimizing-our-build-times-by-migrating-from-webpack-to-rspack.html",
   "https://engineeringblog.yelp.com/2026/05/partition-access-visualizations.html",
   "https://engineeringblog.yelp.com/2026/07/migrating-to-graphql-codegen.html",
+  "https://engineeringblog.yelp.com/2026/07/training-orchestrator-unifying-model-training-at-yelp.html",
   "https://engineeringblog.yelp.com/2026/08/migrating-a-large-flow-monorepo-to-typescript.html",
   "https://github.blog/engineering/architecture-optimization/from-2500-requests-to-24-rebuilding-star-history-without-the-stargazers",
   "https://github.blog/engineering/architecture-optimization/improving-site-performance-by-shipping-more-css",
@@ -3944,6 +5127,7 @@
   "https://huggingface.co/blog/ServiceNow-AI/sygra-studio",
   "https://huggingface.co/blog/Tavily/tavily-deep-research",
   "https://huggingface.co/blog/adding-mcp-tools-to-reachy-mini",
+  "https://huggingface.co/blog/agent-intrusion-technical-timeline",
   "https://huggingface.co/blog/allenai/benchmirt",
   "https://huggingface.co/blog/allenai/toyblocks",
   "https://huggingface.co/blog/amazon/higher-order-pruning-experts",
@@ -3953,6 +5137,7 @@
   "https://huggingface.co/blog/asr-benchmark-optimization",
   "https://huggingface.co/blog/async-rl-training-landscape",
   "https://huggingface.co/blog/asyncgrpo-lora-hfjobs",
+  "https://huggingface.co/blog/baseten",
   "https://huggingface.co/blog/bigcode/arena",
   "https://huggingface.co/blog/build-rocm-kernels",
   "https://huggingface.co/blog/community-evals",
@@ -3980,6 +5165,7 @@
   "https://huggingface.co/blog/huggingface/state-of-os-hf-spring-2026",
   "https://huggingface.co/blog/ibm-granite/granite-4-nano",
   "https://huggingface.co/blog/ibm-research/altk-evolve-sldd",
+  "https://huggingface.co/blog/ibm-research/scarfbench",
   "https://huggingface.co/blog/icml-2026-open-reproductions",
   "https://huggingface.co/blog/introducing-gradio-server",
   "https://huggingface.co/blog/lerobot-release-v040",
@@ -3991,6 +5177,7 @@
   "https://huggingface.co/blog/mistral-large4",
   "https://huggingface.co/blog/modular-diffusers",
   "https://huggingface.co/blog/mps-pytorch-2-15",
+  "https://huggingface.co/blog/muse-glimmer",
   "https://huggingface.co/blog/nvidia/nemotron-3-nano-evaluation-recipe",
   "https://huggingface.co/blog/nvidia/nemotron-personas-finance-japan",
   "https://huggingface.co/blog/nvidia/nvidia-isaac-for-healthcare",
@@ -4026,8 +5213,10 @@
   "https://huggingface.co/blog/waypoint-1",
   "https://huggingface.co/blog/waypoint-1-5",
   "https://huggingface.co/blog/zai-org/glm-52-blog",
+  "https://machinelearning.apple.com/research/code-switching-detection",
   "https://machinelearning.apple.com/research/gharp-head-animation",
   "https://machinelearning.apple.com/research/llm-translation-quality-annotation",
+  "https://machinelearning.apple.com/research/mix-dont-tune",
   "https://machinelearning.apple.com/research/plan-retrieve-tool-discovery",
   "https://machinelearning.apple.com/research/tri-modal-masked-diffusion",
   "https://medium.com/agoda-engineering/agoda-launches-bug-bounty-program-on-hackerone-to-connect-with-global-research-community-8e67530f0934",
@@ -4042,18 +5231,23 @@
   "https://medium.com/airbnb-engineering/flexible-authentication-reimagining-authentication-for-millions-of-users-at-airbnb-3a8a4c917137",
   "https://medium.com/airbnb-engineering/project-lighthouse-part-3-introducing-project-lighthouse-anonymize-74f8b26653fb",
   "https://medium.com/capital-one-tech/advancing-safe-agentic-ai-asks-symposium-highlights-bbba40b19784",
+  "https://medium.com/capital-one-tech/announcing-capital-one-fellows-for-academic-year-2026-2027-b1fc18e45b6f",
   "https://medium.com/capital-one-tech/beyond-the-hallucination-why-ai-needs-deterministic-math-aa9c448479ab",
+  "https://medium.com/capital-one-tech/cairfi-and-capital-one-announce-2026-2027-ai-research-awards-46178d80e007",
   "https://medium.com/capital-one-tech/capital-one-at-emnlp-2026-in-budapest-4f5b6a450ebc",
   "https://medium.com/capital-one-tech/operational-excellence-in-serverless-5es-framework-f3bf3dcd2cda",
   "https://medium.com/capital-one-tech/scaling-enterprise-testing-on-kubernetes-with-argo-5e51f3df3ebc",
   "https://medium.com/capital-one-tech/strengthening-open-source-security-with-socket-7ee8fe88bfec",
   "https://medium.com/capital-one-tech/usc-and-capital-one-announce-2026-2027-ai-research-awards-f06209933d6c",
   "https://medium.com/expedia-group-tech/building-the-operating-model-for-agentic-ai-at-expedia-group-f7555fcce506",
+  "https://medium.com/expedia-group-tech/how-expedia-group-builds-ai-that-lasts-at-scale-434677770fe9",
   "https://medium.com/expedia-group-tech/just-because-we-can-build-it-should-we-a292fbdd22ce",
   "https://medium.com/expedia-group-tech/the-quiet-tax-on-machine-learning-teams-43d71bd539c7",
   "https://medium.com/intuit-engineering/ai-generated-interview-questions-leaning-into-and-complementing-ai-in-software-development-66da27d31620",
   "https://medium.com/intuit-engineering/six-takeaways-from-kubecon-eu-2026-bb2ebbd8559e",
+  "https://medium.com/mercadolibre-tech/30-000-deployments-per-day-heres-how-we-operate-without-losing-our-minds-0eddc0480fb9",
   "https://medium.com/mercadolibre-tech/continuous-profiling-at-mercado-libre-turning-flamegraphs-into-fixes-2ee371c32bfd",
+  "https://medium.com/mercadolibre-tech/from-a-single-point-of-failure-to-a-cell-based-architecture-how-we-scaled-mercado-env%C3%ADos-stock-528f581fb71b",
   "https://medium.com/mercadolibre-tech/mutation-testing-at-mercado-libre-from-pilot-to-everyday-guardrail-2ffe0a273f0e",
   "https://medium.com/mercadolibre-tech/scaling-kubernetes-at-mercado-libre-with-karpenter-and-gitops-2c792a7403c5",
   "https://medium.com/mercadolibre-tech/security-at-scale-preventing-thousands-of-vulnerabilities-without-developer-friction-b991d049c543",
@@ -4077,25 +5271,32 @@
   "https://medium.com/walmartglobaltech/from-single-instance-to-split-brain-a-database-scaling-journey-8b6a27a65023",
   "https://medium.com/walmartglobaltech/kafka-inconsistencies-and-the-silent-failures-behind-real-time-decision-platforms-f6db55156286",
   "https://medium.com/walmartglobaltech/mapping-ottercookie-infrastructure-1c49f0cd3883",
+  "https://medium.com/walmartglobaltech/metastealer-traffic-new-dgas-and-analyzing-the-tracker-backdoor-dga-with-ai-96ea63dc7c01",
   "https://medium.com/walmartglobaltech/shub-stealers-fake-crypto-apps-d5e2a65618b7",
+  "https://medium.com/walmartglobaltech/spectrepaste-b20bc2f6ded8",
   "https://medium.com/walmartglobaltech/stop-reacting-to-data-problems-heres-the-architecture-that-prevents-them-a274d54f624b",
   "https://medium.com/wise-engineering/from-onboarding-to-production-how-i-built-dynamic-vendor-switching-at-wise-876942d6031f",
   "https://medium.com/wise-engineering/observability-at-scale-every-byte-counts-80f5e505d710",
   "https://netflixtechblog.com/behind-the-scenes-evolving-netflixs-ads-event-pipeline-for-live-part-ii-826ebf9ad9fb",
   "https://netflixtechblog.com/beyond-api-compatibility-building-a-tool-to-measure-the-blast-radius-of-library-changes-9474f2fd4f90",
   "https://netflixtechblog.com/datajunction-as-netflixs-answer-to-the-missing-piece-of-the-modern-data-stack-92af926b40a5",
+  "https://netflixtechblog.com/fact-checking-at-scale-building-a-more-accurate-and-efficient-synopsis-factuality-system-d7d85859d808",
   "https://netflixtechblog.com/multi-ratio-video-resizing-for-mobile-feed-and-marketing-2e6b42810f49",
   "https://netflixtechblog.com/ontology-driven-observability-building-an-end-to-end-knowledge-graph-at-netflix-scale-421392cf5adf",
   "https://netflixtechblog.com/single-tenant-titus-vm-level-isolation-on-a-multi-tenant-container-platform-6d8b1909d163",
   "https://netflixtechblog.com/timeseries-tiered-storage-journey-kafka-flink-streams-to-native-cassandra-cold-reads-e59d597c9d60",
   "https://open.nytimes.com/building-the-crossplay-board-6de68c8574f9",
+  "https://open.nytimes.com/building-the-new-york-times-product-team-the-right-team-for-the-job-ff9b43222537",
   "https://open.nytimes.com/designing-a-digital-times-museum-for-all-405331352189",
   "https://open.nytimes.com/designing-the-front-door-to-our-subscriptions-6bb2ed3f5338",
   "https://open.nytimes.com/implementing-dark-mode-in-the-games-app-be7241ddb7ba",
   "https://open.nytimes.com/the-right-team-for-the-job-from-engineering-to-product-a-superpower-for-developer-platform-a290e65970ea",
+  "https://replit.com/blog/2025-replit-in-review",
   "https://replit.com/blog/app-monitoring",
   "https://replit.com/blog/bookmark-manager-browser-extension",
   "https://replit.com/blog/bring-your-own-cloud",
+  "https://replit.com/blog/building-mobile-apps-on-replit",
+  "https://replit.com/blog/chatprd",
   "https://replit.com/blog/critical-security-vulnerability-in-react-server-components",
   "https://replit.com/blog/custom-skills",
   "https://replit.com/blog/databricks2026",
@@ -4103,27 +5304,33 @@
   "https://replit.com/blog/enterprise-self-serve",
   "https://replit.com/blog/introducing-replit-design",
   "https://replit.com/blog/introducing-replit-solutions-partners",
+  "https://replit.com/blog/live-from-hq-agent4-launch-pt1",
   "https://replit.com/blog/mobile-apps",
   "https://replit.com/blog/mothers-who-build",
   "https://replit.com/blog/package-firewall",
+  "https://replit.com/blog/pro-plan",
   "https://replit.com/blog/race-to-revenue",
   "https://replit.com/blog/replit-acquires-atta",
   "https://replit.com/blog/replit-and-databricks",
   "https://replit.com/blog/replit-and-snowflake-webinar",
   "https://replit.com/blog/replit-and-snowflake-webinar-pt2",
   "https://replit.com/blog/replit-claude",
+  "https://replit.com/blog/replit-in-chatgpt",
   "https://replit.com/blog/rise-of-self-driving-company",
   "https://replit.com/blog/secure-more-apps",
   "https://replit.com/blog/security-center",
   "https://replit.com/blog/vibe-code-videos-in-replit",
   "https://replit.com/blog/viral-videos-replit-animation",
   "https://research.google/blog/a-connectomics-milestone-mapping-the-complete-male-fruit-fly-brain",
+  "https://research.google/blog/a-differentially-private-framework-for-gaining-insights-into-ai-chatbot-use",
   "https://research.google/blog/a-low-carbon-computing-platform-from-your-retired-phones",
   "https://research.google/blog/a-new-era-of-innovation-google-research-at-io-2026",
   "https://research.google/blog/advancing-amie-towards-expert-level-audio-visual-clinical-consultations",
   "https://research.google/blog/agenthands-generating-interactive-hand-gestures-for-spatially-grounded-agent-conversations-in-xr",
+  "https://research.google/blog/agile-deliberation-how-ai-helps-humans-define-the-gray-areas",
   "https://research.google/blog/ai-generated-synthetic-neurons-speed-up-brain-mapping",
   "https://research.google/blog/analyzing-technical-documents-with-deep-review",
+  "https://research.google/blog/atlas-practical-scaling-laws-for-multilingual-models",
   "https://research.google/blog/bypassing-inference-bottlenecks-accelerating-complex-ai-search-with-retrieve-for-train",
   "https://research.google/blog/catalyzing-scientific-impact-through-global-partnerships-and-open-resources",
   "https://research.google/blog/collaborating-on-a-nationwide-randomized-study-of-ai-in-real-world-virtual-care",
@@ -4137,6 +5344,7 @@
   "https://research.google/blog/evaluating-alignment-of-behavioral-dispositions-in-llms",
   "https://research.google/blog/expanding-our-heat-resilience-data-to-50-global-cities",
   "https://research.google/blog/exploring-the-feasibility-of-conversational-diagnostic-ai-in-a-real-world-clinical-study",
+  "https://research.google/blog/exploring-the-worlds-languages-with-language-explorer",
   "https://research.google/blog/four-ways-google-research-scientists-have-been-using-empirical-research-assistance",
   "https://research.google/blog/from-waveforms-to-wisdom-the-new-benchmark-for-auditory-intelligence",
   "https://research.google/blog/gemini-provides-automated-feedback-for-theoretical-computer-scientists-at-stoc-2026",
@@ -4150,6 +5358,7 @@
   "https://research.google/blog/mapping-the-modern-world-how-s2vec-learns-the-language-of-our-cities",
   "https://research.google/blog/millemiglia-a-realistic-instance-generator-for-middle-mile-logistics",
   "https://research.google/blog/new-framework-for-auditing-machine-unlearning",
+  "https://research.google/blog/next-generation-medical-image-interpretation-with-medgemma-15-and-medical-speech-to-text-with-medasr",
   "https://research.google/blog/open-and-emergent-problems-in-agentic-privacy-and-security-a-contextual-angle",
   "https://research.google/blog/optimizing-cloud-economics-with-linear-elastic-caching",
   "https://research.google/blog/private-analytics-via-zero-trust-aggregation",
@@ -4168,9 +5377,11 @@
   "https://research.google/blog/the-power-of-collaboration-how-we-can-reduce-traffic-congestion",
   "https://research.google/blog/the-sleep-framework-a-new-way-for-llms-to-retain-knowledge-in-continual-learning",
   "https://research.google/blog/thinking-to-recall-how-reasoning-unlocks-parametric-knowledge-in-llms",
+  "https://research.google/blog/titans-miras-helping-ai-have-long-term-memory",
   "https://research.google/blog/toolgrad-efficient-tool-use-dataset-generation-with-textual-gradients",
   "https://research.google/blog/toward-provably-private-learning-from-federated-data",
   "https://research.google/blog/towards-a-quantum-computer-that-learns-from-its-errors",
+  "https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work",
   "https://research.google/blog/towards-developing-future-ready-skills-with-generative-ai",
   "https://research.google/blog/towards-passive-heart-health-monitoring-via-smartphone-camera",
   "https://research.google/blog/transfer-learning-for-genomic-prediction-in-underrepresented-populations",
@@ -4192,19 +5403,23 @@
   "https://slack.engineering/from-ssh-to-rest-a-security-driven-modernization-of-slacks-emr-data-pipelines",
   "https://slack.engineering/how-slack-rebuilt-notifications",
   "https://slack.engineering/shipyard-how-we-built-slacks-next-generation-ec2-platform",
+  "https://stripe.com/blog/economics-of-ai-monetization",
   "https://stripe.com/blog/how-the-fastest-growing-enterprises-on-stripe-scale-globally",
   "https://stripe.com/blog/new-ways-for-fintechs-to-move-money-and-expand-globally",
   "https://stripe.com/blog/ousd-now-live-on-stripe",
   "https://stripe.com/blog/real-time-stripe-data-postgres",
+  "https://stripe.com/blog/saas-platform-trends-in-AI-era",
   "https://stripe.com/blog/stripe-on-stripe-what-we-learned-moving-1b-in-vendor-payments-to-global-payouts",
   "https://stripe.com/blog/trends-from-money20-20-2026-the-rise-of-hidden-financial-services",
   "https://tech.instacart.com/blueberry-force-multiplier-for-the-on-call-engineer-98c446dfcc12",
+  "https://tech.instacart.com/how-ai-changes-the-role-of-applied-scientists-895192d5e114",
   "https://tech.instacart.com/leveraging-pyfixest-for-high-cardinality-marketplace-modeling-at-instacart-3913df91a04b",
   "https://tech.instacart.com/variance-reduction-below-the-randomization-grain-31719f87a7d2",
   "https://tech.olx.com/correlation-lied-to-us-rethinking-product-impact-with-causal-inference-5ba47181f7c5",
   "https://tech.olx.com/empowering-innovation-through-structure-93c15614f6d3",
   "https://tech.olx.com/handling-concurrency-on-the-web-with-web-locks-api-163b7e07eddd",
   "https://tech.olx.com/importance-of-offline-evaluation-to-guide-model-choice-1c2be1c4599a",
+  "https://tech.olx.com/olx-masterclass-frontend-2026-068299a2df50",
   "https://vercel.com/blog/2026-vercel-ai-accelerator-recap",
   "https://vercel.com/blog/ai-gateway-virtual-models",
   "https://vercel.com/blog/aws-databases-are-now-live-on-the-vercel-marketplace-and-v0",
@@ -4216,6 +5431,7 @@
   "https://vercel.com/blog/david-totten-joins-vercel-to-lead-global-field-engineering",
   "https://vercel.com/blog/death-to-long-lived-static-credentials",
   "https://vercel.com/blog/dockerfile-on-vercel",
+  "https://vercel.com/blog/elevenlabs-on-ai-gateway",
   "https://vercel.com/blog/fluid-compute-benchmark-results",
   "https://vercel.com/blog/fluid-compute-takes-any-shape",
   "https://vercel.com/blog/how-code-and-theory-cut-time-to-prototype-75-with-v0",
@@ -4259,6 +5475,7 @@
   "https://vercel.com/changelog/add-cache-tags-from-function-responses-regardless-of-framework",
   "https://vercel.com/changelog/add-liveness-checks-to-your-daemons",
   "https://vercel.com/changelog/agent-runs-vercel-mcp-cli",
+  "https://vercel.com/changelog/agents-can-now-enable-web-analytics-and-observability-plus-with-vercel-cli",
   "https://vercel.com/changelog/ai-chat-now-available-on-vercel-docs",
   "https://vercel.com/changelog/ai-domain-search-now-available-via-vercel-domains",
   "https://vercel.com/changelog/ai-elements-1-9",
@@ -4296,6 +5513,7 @@
   "https://vercel.com/changelog/build-cache-storage-increased-for-larger-build-machines",
   "https://vercel.com/changelog/build-commits-to-the-same-branch-without-waiting",
   "https://vercel.com/changelog/build-custom-slack-runtimes",
+  "https://vercel.com/changelog/build-disk-space-on-vercel-increased-to-64-gb",
   "https://vercel.com/changelog/build-logs-now-redact-sensitive-environment-variable-values",
   "https://vercel.com/changelog/build-logs-now-support-interactive-links",
   "https://vercel.com/changelog/bulk-redirects-are-now-generally-available",
@@ -4338,6 +5556,7 @@
   "https://vercel.com/changelog/chat-sdk-vercel-connect",
   "https://vercel.com/changelog/claude-design-and-vercel",
   "https://vercel.com/changelog/claude-fable-5-1-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/claude-fable-5-2-now-available-on-ai-gateway",
   "https://vercel.com/changelog/claude-fable-5-now-available-on-ai-gateway",
   "https://vercel.com/changelog/claude-haiku-4-5-now-available-in-vercel-ai-gateway",
   "https://vercel.com/changelog/claude-haiku-5-5-now-available-on-ai-gateway",
@@ -4392,6 +5611,7 @@
   "https://vercel.com/changelog/deploys-are-now-up-to-33-faster-for-apps-with-many-isr-pages",
   "https://vercel.com/changelog/deprecating-the-dhe-cipher-suite-for-tls-connections",
   "https://vercel.com/changelog/developer-role-now-available-for-pro-teams",
+  "https://vercel.com/changelog/discover-1000-services-on-vercel-connect-from-the-cli",
   "https://vercel.com/changelog/domain-search-is-now-available-through-the-vercel-cli",
   "https://vercel.com/changelog/domains-must-now-be-managed-at-the-team-level",
   "https://vercel.com/changelog/drama-3-now-available-on-ai-gateway",
@@ -4450,6 +5670,7 @@
   "https://vercel.com/changelog/github-copilot-ai-sdk-harness-adapter",
   "https://vercel.com/changelog/glm-5-2-fast-via-wafer-now-available-on-ai-gateway",
   "https://vercel.com/changelog/glm-5-2-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/glm-5-3-flash-is-now-available-in-token-pass",
   "https://vercel.com/changelog/glm-5-3-flash-now-available-on-ai-gateway",
   "https://vercel.com/changelog/glm-5-3-flashx-now-available-on-ai-gateway",
   "https://vercel.com/changelog/glm-5-3-now-available-on-ai-gateway",
@@ -4474,6 +5695,7 @@
   "https://vercel.com/changelog/grok-build-harness-adapter",
   "https://vercel.com/changelog/grok-imagine-image-2-0-preview-now-available-on-vercel-ai-gateway",
   "https://vercel.com/changelog/grok-voice-think-fast-2-0-now-available-on-ai-gateway",
+  "https://vercel.com/changelog/harness-agent-image-inputs",
   "https://vercel.com/changelog/hobby-projects-now-default-to-30-day-deployment-retention",
   "https://vercel.com/changelog/hobby-projects-now-retain-fewer-deployments-to-free-up-storage",
   "https://vercel.com/changelog/humans-and-ampersand-now-available-on-ai-gateway",
@@ -4528,6 +5750,7 @@
   "https://vercel.com/changelog/mistral-large-4-updated-weights-and-lower-pricing-on-ai-gateway",
   "https://vercel.com/changelog/model-fallbacks-now-available-in-vercel-ai-gateway",
   "https://vercel.com/changelog/moonshot-ai-kimi-k2-thinking-and-kimi-k2-thinking-turbo-are-now-available",
+  "https://vercel.com/changelog/muse-ember-now-available-on-ai-gateway",
   "https://vercel.com/changelog/muse-image-now-available-on-ai-gateway",
   "https://vercel.com/changelog/muse-spark-1-1-is-now-available-on-ai-gateway",
   "https://vercel.com/changelog/muse-spark-1-2-is-now-available-on-vercel-ai-gateway",
@@ -4616,6 +5839,7 @@
   "https://vercel.com/changelog/run-background-tasks-with-celery-on-vercel",
   "https://vercel.com/changelog/run-cron-jobs-from-deployment-summary",
   "https://vercel.com/changelog/run-multiple-frameworks-in-one-project-with-vercel-services",
+  "https://vercel.com/changelog/run-scale-ais-agentenv-evals-on-vercel-sandbox",
   "https://vercel.com/changelog/runtime-logs-now-appear-in-the-dashboard-6x-faster",
   "https://vercel.com/changelog/runtime-logs-now-show-cache-reasons",
   "https://vercel.com/changelog/rust-runtime-now-in-public-beta-for-vercel-functions",
@@ -4706,6 +5930,7 @@
   "https://vercel.com/changelog/vercel-connect-preset-connectors",
   "https://vercel.com/changelog/vercel-connect-secure-compute",
   "https://vercel.com/changelog/vercel-connect-service-submissions",
+  "https://vercel.com/changelog/vercel-container-registry-now-supports-2-gb-compressed-image-layers",
   "https://vercel.com/changelog/vercel-container-registry-now-supports-2-gb-compressed-image-layers-new",
   "https://vercel.com/changelog/vercel-container-registry-repositories-can-now-be-made-public",
   "https://vercel.com/changelog/vercel-daemons-can-now-call-services-with-bindings",
@@ -4734,6 +5959,7 @@
   "https://vercel.com/changelog/vercel-python-sdk-in-beta",
   "https://vercel.com/changelog/vercel-queues-now-in-public-beta",
   "https://vercel.com/changelog/vercel-sandbox-cli-is-now-available",
+  "https://vercel.com/changelog/vercel-sandbox-commands-now-support-stdin",
   "https://vercel.com/changelog/vercel-sandbox-firewall-now-supports-postgres-connections",
   "https://vercel.com/changelog/vercel-sandbox-firewall-now-supports-request-proxying-and-filtering",
   "https://vercel.com/changelog/vercel-sandbox-is-now-available-in-all-regions",
@@ -4749,6 +5975,7 @@
   "https://vercel.com/changelog/vercel-sandbox-now-supports-up-to-32-vcpu-64-gb-ram-configurations",
   "https://vercel.com/changelog/vercel-sandbox-persistent-sandboxes-beta",
   "https://vercel.com/changelog/vercel-sandbox-routing-is-now-18x-faster-globally",
+  "https://vercel.com/changelog/vercel-sandbox-snapshot-creation-is-now-up-to-10x-faster",
   "https://vercel.com/changelog/vercel-sandbox-snapshots-now-allow-custom-retention-periods",
   "https://vercel.com/changelog/vercel-sandbox-with-drives-now-starts-up-to-2-4x-faster",
   "https://vercel.com/changelog/vercel-sandboxes-ga",
@@ -4817,15 +6044,20 @@
   "https://www.amazon.science/blog/the-fuel-of-the-future-is-already-here-why-triso-matters",
   "https://www.amazon.science/blog/why-dont-machine-learning-research-agents-overfit",
   "https://www.amazon.science/news/amazon-is-investing-in-the-lean-focused-research-organization",
+  "https://www.amazon.science/news/amazon-launches-research-initiative-with-stanford-university-to-advance-ai-and-science",
   "https://www.amazon.science/news/how-amazon-tracks-carbon-intensity-across-its-operations",
   "https://www.databricks.com/blog/builders-guide-scaling-databricks-apps",
+  "https://www.databricks.com/blog/databricks-commitment-european-sovereignty",
   "https://www.databricks.com/blog/delta-sharing-opensharing-what-changed-whats-next",
+  "https://www.databricks.com/blog/how-public-sector-organizations-can-govern-ai-scale",
   "https://www.databricks.com/blog/introducing-apache-spark-43-now-available-databricks-runtime-19",
   "https://www.databricks.com/blog/push-based-cdc-unity-catalog-zerobus-ingest-and-debezium",
   "https://www.databricks.com/blog/read-dont-copy-replacing-file-and-api-feeds-opensharing-part-1-why",
   "https://www.databricks.com/blog/read-dont-copy-replacing-file-feeds-opensharing-part-2-how-implement",
   "https://www.databricks.com/blog/real-time-fraud-detection-feature-views",
   "https://www.databricks.com/blog/which-data-collaboration-tool-opensharing-clean-rooms-marketplace",
+  "https://www.etsy.com/codeascraft/migrating-etsyas-database-sharding-to-vitess",
+  "https://www.etsy.com/codeascraft/search-prefetching-performance",
   "https://www.etsy.com/codeascraft/that-which-we-can-do-sustainability-in-a-world-of-ai",
   "https://www.etsy.com/codeascraft/unlocking-faster-insights-with-experimenter-defined-segmentations",
   "https://www.honeycomb.io/blog/30-70-prs-day-how-we-managed-not-wreck-systems",
@@ -4844,6 +6076,7 @@
   "https://www.honeycomb.io/blog/honeycomb-incident-report-kafka-maintenance-on-may-4-7-2026",
   "https://www.honeycomb.io/blog/honeycomb-named-visionary-2026-gartner-magic-quadrant-observability-platforms",
   "https://www.honeycomb.io/blog/how-adaptive-tail-sampling-works",
+  "https://www.honeycomb.io/blog/how-honeycomb-private-cloud-drinks-from-the-fire-hose",
   "https://www.honeycomb.io/blog/how-our-support-team-uses-honeycomb-debug-honeycomb",
   "https://www.honeycomb.io/blog/it-can-only-goodhart-happen",
   "https://www.honeycomb.io/blog/lattice-watch-smarter-guardrails-design-system-observability",

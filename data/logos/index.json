@@ -111,6 +111,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "AutoLab": {
+  "checked": "2026-11-10",
+  "file": "autolab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "BOLD-Quant-Team": {
   "checked": "2026-11-06",
   "file": "bold-quant-team.png",
@@ -544,6 +551,13 @@
   "qid": "Q716822",
   "v": 6
  },
+ "HCLTech Robotics": {
+  "checked": "2026-11-10",
+  "file": "hcltech-robotics.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "HKU": {
   "checked": "2026-11-07",
   "file": "hku.png",
@@ -710,6 +724,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Institute for Computer Science, Artificial intelligence and Technology": {
+  "checked": "2026-11-10",
+  "file": "institute-for-computer-science-artificial-intelligence-and-t.png",
+  "qid": "Q135917731",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Institute of Automation": {
   "checked": "2026-11-07",
   "file": "institute-of-automation.png",
@@ -785,6 +806,13 @@
   "v": 4
  },
  "Klaipėda University": {},
+ "Kuaishou": {
+  "checked": "2026-11-10",
+  "file": "kuaishou.png",
+  "qid": "Q47015540",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "LINs lab": {
   "checked": "2026-11-05",
   "file": "lins-lab.png",
@@ -806,12 +834,26 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "MARS Lab": {
+  "checked": "2026-11-10",
+  "file": "mars-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "MIT": {
   "checked": "2026-11-06",
   "file": "mit.png",
   "qid": "Q49108",
   "source": "Hugging Face",
   "v": 4
+ },
+ "MIT Media Lab": {
+  "checked": "2026-11-10",
+  "file": "mit-media-lab.png",
+  "qid": "Q1373549",
+  "source": "website https://www.media.mit.edu",
+  "v": 6
  },
  "MMLab-CUHK": {
   "checked": "2026-11-07",
@@ -977,6 +1019,13 @@
   "source": "website https://www.ntua.gr",
   "v": 6
  },
+ "Netease Youdao": {
+  "checked": "2026-11-10",
+  "file": "netease-youdao.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "New York University Abu Dhabi": {
   "checked": "2026-11-07",
   "file": "new-york-university-abu-dhabi.png",
@@ -1004,6 +1053,13 @@
   "qid": "Q34433",
   "source": "Hugging Face",
   "v": 4
+ },
+ "PROFOUND": {
+  "checked": "2026-11-10",
+  "file": "profound.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "Pacific Northwest National Laboratory": {
   "checked": "2026-11-07",
@@ -1073,6 +1129,13 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 3
+ },
+ "Samsung": {
+  "checked": "2026-11-10",
+  "file": "samsung.png",
+  "qid": "Q20718",
+  "source": "Hugging Face",
+  "v": 6
  },
  "Scale AI": {
   "checked": "2026-11-05",
@@ -1336,6 +1399,13 @@
   "source": "website https://www.tcu.edu",
   "v": 6
  },
+ "The Fin AI": {
+  "checked": "2026-11-10",
+  "file": "the-fin-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "The Hebrew University of Jerusalem": {
   "checked": "2026-11-06",
   "file": "the-hebrew-university-of-jerusalem.png",
@@ -1508,6 +1578,13 @@
   "qid": "Q951305",
   "source": "Hugging Face",
   "v": 4
+ },
+ "University of Central Florida": {
+  "checked": "2026-11-10",
+  "file": "university-of-central-florida.png",
+  "qid": "Q143451",
+  "source": "Hugging Face",
+  "v": 6
  },
  "University of Chinese Academy of Sciences": {
   "checked": "2026-11-07",
