@@ -760,9 +760,9 @@ ASK_SUGGESTIONS = ["What problem does it solve?", "What would I need to try it?"
 SCOUT_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/scout"
 
 SCOUT_EXAMPLES = [
-    "A voice notes app that turns speech into text fully offline on an Android phone, with no server.",
-    "A helper that reads our customer support tickets and drafts replies, running on one laptop without a GPU.",
-    "A chatbot for my college library that answers questions from our PDF catalogue and cites the page it used.",
+    ("Offline voice notes", "A voice notes app that turns speech into text fully offline on an Android phone, with no server."),
+    ("Support reply drafts", "A helper that reads our customer support tickets and drafts replies, running on one laptop without a GPU."),
+    ("Library chatbot", "A chatbot for my college library that answers questions from our PDF catalogue and cites the page it used."),
 ]
 
 
@@ -785,30 +785,58 @@ def brand_sprite_file(posts: list[dict]) -> str:
                           '<svg xmlns="http://www.w3.org/2000/svg">', 1)
 
 
-def build_scout_page(brands: str = "") -> str:
-    examples = "".join(f'<button class="example" type="button" data-example="{esc(e)}">{esc(e)}</button>'
-                       for e in SCOUT_EXAMPLES)
-    body = f"""<section class="page-head scout-head">
-  <h1>Project Scout</h1>
-  <p>Describe what you want to build. Scout searches more than 8,000 AI papers and shows the ones most relevant to your project, best first, with why each one fits. If a part of your project has no good paper, it says so.</p>
+def _scout_preview() -> str:
+    """The right side of the empty Scout page: a small sample brief, so people see what they will get."""
+    parts = [("01", "Read the PDFs", "Covered", "", "s-strong s-strong s-rel"),
+             ("02", "Find the passage", "Covered", "", "s-strong s-strong s-strong"),
+             ("03", "Cite the page", "Gap", " is-gap", "x x x")]
+    part_html = "".join(
+        f'<li class="shp-part{gap}"><p class="sb-part-top"><span>{n}</span><span class="sb-pill">{st}</span></p>'
+        f'<b>{label}</b><p class="sb-seg">{"".join(f"<i class={chr(34)}{c}{chr(34)}></i>" for c in seg.split())}</p></li>'
+        for n, label, st, gap, seg in parts)
+    teams = "".join(f'<i style="background:{c}">{t}</i>' for t, c in (("U", "#111"), ("D", "#FF3621"), ("N", "#E50914")))
+    return f"""<div class="sh-preview" aria-hidden="true">
+      <div class="shp-top">
+        <div class="sb-ring-big shp-ring"><svg viewBox="0 0 104 104"><circle class="rg-gap" cx="52" cy="52" r="44"/><circle class="rg-ok" cx="52" cy="52" r="44" pathLength="100" stroke-dasharray="64 36" transform="rotate(-90 52 52)"/></svg><b>2/3</b><span>Ready</span></div>
+        <div><p class="shp-kicker">Sample brief</p><p class="shp-h">Library chatbot that cites the page</p><p class="shp-sub">2 of 3 parts have a strong paper. 1 is an open problem.</p></div>
+      </div>
+      <ol class="shp-parts">{part_html}</ol>
+      <div class="shp-row">
+        <div class="shp-paper"><span class="shp-cover">PARSE</span><div><p class="shp-score"><b>91</b> Strong fit</p><p class="shp-t">Youtu-Parsing-Omni: one encoder for every page layout</p><p class="shp-why">Keeps each block’s page number, so part 03 can cite it.</p></div></div>
+        <div class="shp-cases"><span class="shp-teams">{teams}</span><p><b>3 teams</b> shipped something like this</p></div>
+      </div>
+    </div>"""
+
+
+def build_scout_page(brands: str = "", n_cases: int = 0) -> str:
+    examples = "".join(f'<button class="example" type="button" data-example="{esc(text)}"><b>{esc(title)}</b>'
+                       f'<span>{esc(text)}</span></button>' for title, text in SCOUT_EXAMPLES)
+    cases = f" · {n_cases:,} case studies" if n_cases else ""
+    body = f"""<section class="page-head scout-head sh">
+  <p class="sb-eyebrow"><b>/ Project Scout</b> · 8,000+ papers{cases}</p>
+  <h1 class="sh-h">What do you want to build?</h1>
+  <p class="sh-lede">Describe it in plain words. Scout splits it into parts, finds the papers that fit each part, shows teams that built something similar, and says plainly where research has no answer yet.</p>
 </section>
 <div class="scout">
-  <form class="card pad scout-form" data-scout data-url="{SCOUT_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" data-brands="{esc(brands)}" novalidate>
+  <form class="card scout-form" data-scout data-url="{SCOUT_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" data-brands="{esc(brands)}" novalidate>
     <label class="field-label" for="desc">Describe your project</label>
     <p class="field-hint" id="desc-hint">Plain words, no code. Say what it does, who it's for, and any limits, like “runs on a phone” or “no GPU”.</p>
-    <textarea class="input textarea" id="desc" rows="7" maxlength="1000" aria-describedby="desc-hint desc-error"></textarea>
-    <div class="field-foot"><span class="field-error" id="desc-error" role="alert" hidden></span><span class="char-count" data-count>0 / 1000</span></div>
-    <button class="btn btn-primary btn-block" type="submit" data-scout-go>Find papers</button>
-    <div class="examples"><span class="label">Or try an example</span>{examples}</div>
+    <div class="sh-box">
+      <textarea class="input textarea" id="desc" rows="6" maxlength="1000" aria-describedby="desc-hint desc-error" placeholder="e.g. An app that…"></textarea>
+      <div class="sh-box-foot"><span class="char-count" data-count>0 / 1000</span><button class="btn btn-primary" type="submit" data-scout-go>Find papers</button></div>
+    </div>
+    <div class="field-foot"><span class="field-error" id="desc-error" role="alert" hidden></span></div>
+    <div class="examples"><span class="label">Or start from an example</span>{examples}</div>
     <p class="fine">Your description goes to our search service and to Groq, which plans the search. We don't store it.</p>
   </form>
   <section class="scout-out" data-scout-out aria-live="polite">
-    <div class="card pad scout-intro">
-      <span class="label">How it works</span>
+    <div class="scout-intro">
+      <p class="sb-label"><span>What you get</span><span>A build brief for your project</span></p>
+      {_scout_preview()}
       <ol class="how">
-        <li><b>You describe</b> the project in a few sentences.</li>
-        <li><b>Scout splits it</b> into the parts it needs. You can check and edit the parts, then it searches each one by meaning and by keywords.</li>
-        <li><b>Every paper found is scored</b> for how well it fits your project. You get the best ones first, with why each fits.</li>
+        <li><b>Parts, not keywords.</b> Scout splits your idea into the pieces it needs. You can edit them before it searches.</li>
+        <li><b>Papers scored for fit.</b> Each part gets the best papers, with why each one fits and a reading order.</li>
+        <li><b>Real teams and real gaps.</b> Case studies from teams that shipped something similar, and the parts no paper covers yet.</li>
       </ol>
     </div>
   </section>
@@ -2057,7 +2085,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     except Exception as exc:  # Scout falls back to initials on brand colours
         print(f"  [site] WARNING: Scout case logos failed: {exc}")
         brands = ""
-    _write(os.path.join(site_dir, "scout.html"), build_scout_page(brands))
+    _write(os.path.join(site_dir, "scout.html"), build_scout_page(brands, len(posts)))
     failed = 0
     for rec in papers.values():
         prev_id, next_id = neighbours.get(rec["id"], (None, None))

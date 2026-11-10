@@ -294,7 +294,7 @@ def test_home_has_a_hidden_watched_projects_section(tmp_path):
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
     assert "data-watch " in home and "Your projects" in home and "/functions/v1/search" in home
     scout = open(os.path.join(site_dir, "scout.html"), encoding="utf-8").read()
-    assert "has no good paper, it says so." in scout and "page-scout" in scout
+    assert "where research has no answer yet" in scout and "page-scout" in scout
 
 
 def test_picks_show_when_the_paper_came_out(tmp_path):
