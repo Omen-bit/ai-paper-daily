@@ -526,7 +526,7 @@ def _tail() -> str:
           if AUTHOR_GITHUB else "")
     devto = f'<li><a href="{_esc(DEVTO_URL)}" rel="noopener">This post on dev.to {ARROW}</a></li>' if DEVTO_URL else ""
     return f"""
-<div class="cta"><div><b>Get the pick every morning</b><span>One paper, explained, at 07:00 IST.</span></div><a class="btn" href="../index.html#subscribe">Subscribe {ARROW}</a></div>
+<div class="cta"><div><b>Get the free newsletter</b><span>One paper, explained, every morning at 07:00 IST.</span></div><a class="btn" href="../index.html#subscribe">Subscribe for free {ARROW}</a></div>
 
 <section id="author" class="author"><p class="lbl">/About the author</p>
 <div class="who"><span class="av">{_initials(AUTHOR)}</span><div><h3>{AUTHOR}</h3><p>Builds AI Papers Daily.</p></div></div></section>

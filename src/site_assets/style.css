@@ -2403,10 +2403,13 @@ a.rd-fit-row:hover .rd-fit-h { text-decoration: underline; text-decoration-thick
 .oss-tip { position: absolute; top: calc(100% + 10px); right: 0; z-index: 50; width: 270px; padding: 12px 14px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.45; white-space: normal; box-shadow: 0 16px 40px -12px rgb(0 0 0 / .4); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .15s, transform .15s, visibility .15s; pointer-events: none; }
 .oss-tip b { display: block; margin-bottom: 2px; font-weight: 600; }
 .oss:hover .oss-tip, .oss-btn:focus-visible + .oss-tip { opacity: 1; visibility: visible; transform: none; }
-@media (max-width: 1240px) { .oss-by { display: none; } }
-@media (max-width: 1000px) { .oss-txt, .oss-arrow { display: none; } .oss-btn { padding: 0 5px 0 10px; } }
+@media (max-width: 1400px) { .oss-by { display: none; } }
+@media (max-width: 1240px) { .oss-txt, .oss-arrow { display: none; } .oss-btn { padding: 0 5px 0 10px; } }
 @media (max-width: 680px) { .oss-by { display: inline; font-size: 12px; } .oss-btn { height: 42px; } .oss-tip { display: none; } }
 @media (max-width: 400px) { .oss-by { display: none; } }
+/* With the Subscribe button there is no room for the name on phones: it moves to the footer */
+@media (max-width: 680px) { .header-actions:has(.hdr-sub) .oss-by { display: none; } }
+@media (max-width: 540px) { .bar-in:has(.hdr-sub) .brand-name { display: none; } }
 @media (prefers-reduced-motion: reduce) { .oss-btn, .oss-btn:hover, .oss-btn:active { transition: none; transform: none; } }
 .rd-actions .rd-more-menu[open] > summary { width: auto; display: inline-flex; }
 /* The credit takes room in the top bar: search folds to its icon earlier, and the logo stays on small phones */

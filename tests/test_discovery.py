@@ -101,7 +101,7 @@ def test_email_signup_stays_on_the_site_once_buttondown_is_set(tmp_path, monkeyp
     site_dir = _build(tmp_path)
     index = _read(site_dir, "index.html")
     assert "data-sub-box" in index and "data-sub-done" in index and "data-sub-mini" in index
-    assert 'data-sub-jump' in index and "Get it by email" in index  # header button
+    assert 'data-sub-jump' in index and "Subscribe free" in index  # header button
     assert 'name="embed" value="1"' in index
 
     youre_in = _read(site_dir, "subscribed.html")

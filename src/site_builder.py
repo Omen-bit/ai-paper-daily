@@ -321,7 +321,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
       {nav("saved.html", "Saved", "saved", "bookmark", '<span class="nav-count" data-saved-count hidden></span>')}
     </nav>
     <div class="header-actions">
-      {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump><span class="nav-long">Get it by email</span><span class="nav-short">Subscribe</span></a>' if BUTTONDOWN_USER else ""}
+      {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump>Subscribe free</a>' if BUTTONDOWN_USER else ""}
       <span class="oss">
         <span class="oss-by">Built by <b>{MADE_BY}</b></span>
         <a class="oss-btn" href="{REPO_URL}" rel="noopener" aria-describedby="oss-tip">
@@ -341,7 +341,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
   <div class="wrap foot-in">
     <span>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.{' Some lab logos by <a href="https://logo.dev" rel="noopener">Logo.dev</a>.' if LOGO_DEV_CREDIT else ""}</span>
     <span>Summaries are written by AI. Papers are ranked by measured signals, not by AI: <a href="{root}methodology.html">how ranking works</a>.</span>
-    <span><a href="{root}feed.xml" data-subscribe="rss">RSS feed</a>{f' · <a href="https://buttondown.com/{BUTTONDOWN_USER}" rel="noopener">Daily email</a>' if BUTTONDOWN_USER else ""}</span>
+    <span><a href="{root}feed.xml" data-subscribe="rss">RSS feed</a>{f' · <a href="https://buttondown.com/{BUTTONDOWN_USER}" rel="noopener">Free newsletter</a>' if BUTTONDOWN_USER else ""} · Built by <a href="{REPO_URL}" rel="noopener">{MADE_BY}</a>, open source on GitHub</span>
   </div>
 </footer>
 <script src="{root}assets/app.js?v={ASSET_V}" defer></script>
@@ -499,13 +499,13 @@ def subscribe_box(root: str = "") -> str:
 </section>"""
     action = f"https://buttondown.com/api/emails/embed-subscribe/{BUTTONDOWN_USER}"
     return f"""<section class="subscribe" id="subscribe" aria-labelledby="sub-title" data-sub-box>
-  <div class="subscribe-copy"><h2 id="sub-title">Get tomorrow’s pick</h2><p>One paper a day in your inbox, explained in plain language. Free, and you can leave any time.</p></div>
+  <div class="subscribe-copy"><h2 id="sub-title">Subscribe to the free newsletter</h2><p>One paper a day in your inbox, explained in plain language. Free forever, and you can leave any time.</p></div>
   <div class="subscribe-act" data-sub-ask>
     <form class="subscribe-form" action="{action}" method="post" target="_blank" data-subscribe-form>
       <label class="sr-only" for="sub-email">Email address</label>
       <input class="input" id="sub-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
       <input type="hidden" name="embed" value="1">
-      <button class="btn btn-primary" type="submit">Subscribe</button>
+      <button class="btn btn-primary" type="submit">Subscribe for free</button>
     </form>
     {rss}
   </div>
