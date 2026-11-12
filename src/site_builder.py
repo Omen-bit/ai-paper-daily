@@ -282,7 +282,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
                 f' data-website-id="{UMAMI_WEBSITE_ID}" data-auto-track="false"></script>')
 
     def nav(href, label, key, ic, extra=""):
-        current = ' aria-current="page"' if key == active else ""
+        current = ' aria-current="page" data-current' if key == active else ""
         return f'<a href="{root}{href}"{current}>{icon(ic, 18, "nav-ic")}<span class="nav-label">{label}</span>{extra}</a>'
 
     return f"""<!doctype html>
@@ -302,6 +302,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 <link rel="preload" href="{root}assets/fonts/geist-pixel-square.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{root}assets/style.css?v={ASSET_V}">
 <link rel="icon" href="{FAVICON}">
+<script type="speculationrules">{{"prefetch":[{{"where":{{"and":[{{"href_matches":"/*"}},{{"not":{{"href_matches":"*.md"}}}}]}},"eagerness":"moderate"}}]}}</script>
 </head>
 <body{f' class="{body_class}"' if body_class else ""}>
 <a class="skip" href="#main">Skip to content</a>
@@ -318,7 +319,6 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     </nav>
     <div class="header-actions">
       {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump><span class="nav-long">Get it by email</span><span class="nav-short">Subscribe</span></a>' if BUTTONDOWN_USER else ""}
-      <a class="cmdk" href="{root}papers.html" data-search-trigger>{icon("search", 15)}<span>Search papers or an idea</span><kbd>/</kbd></a>
       <a class="made-by" href="{REPO_URL}" rel="noopener" title="Open-source code on GitHub">{icon("github", 16)}<span><small>Made by</small> {MADE_BY}</span></a>
       <button class="icon-button" type="button" data-theme-toggle aria-label="Switch light or dark theme" data-tip="Switch theme">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
     </div>

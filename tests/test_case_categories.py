@@ -150,3 +150,12 @@ def test_chip_row_has_arrows_fades_and_room_at_the_end():
     assert re.search(r"prefers-reduced-motion: reduce\) \{ \.cs-chipbar", css)
     js = open(APP, encoding="utf-8").read()
     assert "[data-cs-chipbar]" in js and "focusin" in js and "prefers-reduced-motion" in js
+
+
+def test_site_shows_the_last_twelve_months_of_write_ups():
+    import case_pages
+    posts = [{"url": "a", "published": "2026-11-01"}, {"url": "b", "published": "2025-11-02"},
+             {"url": "c", "published": "2025-10-31"}, {"url": "d"}]
+    kept = [p["url"] for p in case_pages.recent(posts)]
+    assert kept == ["a", "b", "d"]  # measured from the newest post; undated posts stay
+    assert case_pages.recent([]) == []

@@ -2399,3 +2399,24 @@ a.rd-fit-row:hover .rd-fit-h { text-decoration: underline; text-decoration-thick
   .header-actions .cmdk { flex: none; width: 40px; min-width: 0; padding: 0; justify-content: center; } .cmdk span, .cmdk kbd { display: none; }
 }
 @media (max-width: 380px) { .brand { display: flex; } .header-actions { gap: 6px; } }
+
+/* ---- Smooth taps and page changes ---- */
+/* No grey or blue box on tap (mobile browsers draw one by default); keyboard focus still shows */
+html { -webkit-tap-highlight-color: transparent; }
+a, button, summary, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+:focus:not(:focus-visible) { outline: none; }
+.nav a { transition: background-color .18s ease, color .18s ease, transform .12s ease; }
+.nav a:active { transform: scale(.94); }
+/* Pages cross-fade into each other; the top bar and the phone menu stay in place */
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+.nav { view-transition-name: site-nav; }
+::view-transition-old(root) { animation: 140ms ease-out both vt-out; }
+::view-transition-new(root) { animation: 200ms ease-out both vt-in; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  .nav a { transition: none; } .nav a:active { transform: none; }
+}
+.cs-cap { margin: 0 0 12px; font-size: 13px; color: var(--muted); }

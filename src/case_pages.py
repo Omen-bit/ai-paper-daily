@@ -31,6 +31,12 @@ MIN_CASES = 3  # a proposed category gets its own chip and page from this many w
 PALETTE = 8    # --l-x0 .. --l-x7 in style.css, for the proposed categories
 CUSTOM: dict[str, tuple[str, str]] = {}  # key -> (name, about) of the proposed categories shown
 PAGE_SIZE = 24
+# New write-ups arrive every week (100+ a month), so the website keeps it focused:
+# it shows the last 12 months, and the main page's search and filters cover the newest
+# INDEX_FEED of them (each topic page still covers all of its own). Older posts stay in
+# data/cases.json and in Supabase, so Scout still finds every one.
+WINDOW_DAYS = 365
+INDEX_FEED = 150
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "case_brands.json"), encoding="utf-8") as _f:
@@ -249,6 +255,20 @@ def custom_categories(posts: list[dict], min_cases: int = MIN_CASES) -> dict[str
     return out
 
 
+def recent(posts: list[dict], days: int = WINDOW_DAYS) -> list[dict]:
+    """The posts published within `days` of the newest one. Measured from the newest post, not
+    today, so a quiet spell never empties the pages."""
+    import datetime
+    dates = [p.get("published") or "" for p in posts if p.get("published")]
+    if not dates:
+        return posts
+    try:
+        cutoff = (datetime.date.fromisoformat(max(dates)[:10]) - datetime.timedelta(days=days)).isoformat()
+    except ValueError:
+        return posts
+    return [p for p in posts if (p.get("published") or max(dates))[:10] >= cutoff]
+
+
 def _clean(posts: list[dict]) -> list[dict]:
     good = []
     for p in posts:
@@ -351,7 +371,7 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
     """Write the Case studies pages: the main page with a section per topic, and one page per topic.
     page is site_builder.page; logo_dir holds the icons case_logos.py saved. It also writes "How I built
     AI Papers Daily" (making_of.py), whose card leads the main page. Returns the paths for the sitemap."""
-    posts = _clean(posts)
+    posts = recent(_clean(posts))
     companies = {p["company"] for p in posts}
     LOGO_FILES.clear()
     for company in companies:
@@ -400,9 +420,11 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
                 f'<div><h2><i aria-hidden="true"></i><a href="{page_slug(k)}.html">{esc(problem_name(k))}</a></h2>'
                 f'<p>{esc(topic_about(k))}</p></div>{see}</div>'
                 f'<ul class="cs-grid cs-plain">{"".join(card(p) for p in these[:PER_SECTION])}</ul></section>')
+        capped = (f'<p class="cs-cap">Searching the newest {INDEX_FEED} write-ups. Open a topic above to search all of its write-ups.</p>'
+                  if len(posts) > INDEX_FEED else "")
         inner = f"""{filters(posts, posts)}
 <div data-cs-sections>{"".join(sections)}</div>
-<div data-cs-results hidden>{status(len(posts))}{feed(posts, " cs-plain")}</div>"""
+<div data-cs-results hidden>{status(min(len(posts), INDEX_FEED))}{capped}{feed(posts[:INDEX_FEED], " cs-plain")}</div>"""
     else:
         lead = ("Write-ups from company engineering blogs about AI running in real products, grouped by topic. "
                 "Each card will open the original post on the company’s own blog.")

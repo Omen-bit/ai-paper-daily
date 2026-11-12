@@ -68,6 +68,22 @@
     });
   }
 
+  // ---- Menu: the tapped tab lights up at once, before the next page arrives ----
+  Array.prototype.forEach.call(document.querySelectorAll(".nav a"), function (a) {
+    a.addEventListener("click", function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+      Array.prototype.forEach.call(document.querySelectorAll(".nav a[aria-current]"), function (o) { o.removeAttribute("aria-current"); });
+      a.setAttribute("aria-current", "page");
+    });
+  });
+  // Coming back with the Back button shows the right tab again
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    Array.prototype.forEach.call(document.querySelectorAll(".nav a"), function (a) {
+      if (a.hasAttribute("data-current")) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+  });
+
   // ---- "/" jumps to search from anywhere ----
   document.addEventListener("keydown", function (e) {
     if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
