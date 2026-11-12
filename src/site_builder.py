@@ -36,6 +36,7 @@ import trend_story
 import trends
 import case_pages
 import case_studies
+import ranking_pages
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SITE_DIR = os.path.join(ROOT_DIR, "site")
@@ -195,6 +196,10 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
                     rec["summary"] = rec.get("summary") or old.get("summary")
                     rec["featured_on"] = old.get("featured_on")
                     rec["slot"] = old.get("slot")
+                    # Its page explains the ranking of the day it was picked
+                    for key in ("score", "score_parts", "evidence", "claims", "rank", "of", "judge"):
+                        if old.get(key) is not None:
+                            rec[key] = old[key]
                 if not rec.get("abstract"):
                     rec["abstract"] = old.get("abstract", "")
                 for key in ("curator", "code_url"):
@@ -320,7 +325,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 <footer class="site-footer">
   <div class="wrap foot-in">
     <span>Built from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face Papers</a>. Updated every morning.{' Some lab logos by <a href="https://logo.dev" rel="noopener">Logo.dev</a>.' if LOGO_DEV_CREDIT else ""}</span>
-    <span>Summaries are written by AI. Check the paper before you rely on them.</span>
+    <span>Summaries are written by AI. Papers are ranked by measured signals, not by AI: <a href="{root}methodology.html">how ranking works</a>.</span>
     <span><a href="{root}feed.xml" data-subscribe="rss">RSS feed</a>{f' · <a href="https://buttondown.com/{BUTTONDOWN_USER}" rel="noopener">Daily email</a>' if BUTTONDOWN_USER else ""}</span>
   </div>
 </footer>
@@ -1763,7 +1768,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
 
     ask_jump = (f'<button class="rd-askbar" type="button" data-ask-jump aria-controls="ask">{icon("ask", 16)}'
                 f'<span>Ask this paper a question</span><kbd>A</kbd></button>') if abstract else ""
-    sections = "\n    ".join(x for x in (minute, numbers_html, abstract_sec, full, ideas_html, fits,
+    sections = "\n    ".join(x for x in (minute, numbers_html, ranking_pages.why_ranked(rec), abstract_sec, full, ideas_html, fits,
                                          rd_resources(rec, links), ask_html) if x)
 
     done = ""
@@ -2107,8 +2112,26 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
         _write(os.path.join(site_dir, "feed.xml"), discovery.build_feed(papers, SITE_URL, SITE_NAME, TAGLINE))
     except Exception as exc:  # readers keep yesterday's feed items; the site still publishes
         print(f"  [site] WARNING: RSS feed failed: {exc}")
+    # How ranking works, with the newest day's scores to download
+    latest = next((d for d in days if any(ranking_pages.has_breakdown(r) for r in d.get("papers") or [])), None)
+    js, csv_text = ranking_pages.score_exports(latest)
+    if js:
+        _write(os.path.join(site_dir, "data", "scores-latest.json"), js)
+        _write(os.path.join(site_dir, "data", "scores-latest.csv"), csv_text)
+    board = None
+    try:
+        with open(os.path.join(data_dir, "scoreboard.json"), encoding="utf-8") as f:
+            board = json.load(f)
+    except (OSError, ValueError):
+        pass
+    _write(os.path.join(site_dir, "methodology.html"),
+           page("How papers are ranked", ranking_pages.methodology_body(board, latest["date"] if js else ""),
+                description="How AI Papers Daily ranks papers: a published formula over GitHub, Hugging Face, "
+                            "Hacker News and Semantic Scholar numbers, checked against citations 30 days later.",
+                path="methodology.html"))
+
     newest = days[0]["date"] if days else ""
-    pages = [("", newest), ("papers.html", newest), ("scout.html", ""), ("archive.html", newest), ("labs.html", newest)]
+    pages = [("", newest), ("papers.html", newest), ("methodology.html", newest), ("scout.html", ""), ("archive.html", newest), ("labs.html", newest)]
     if SHOW_TRENDS:
         pages.append(("trends.html", newest))
     pages += [(p, newest) for p in case_paths]

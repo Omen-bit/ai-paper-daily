@@ -38,7 +38,7 @@ The best new AI paper each day, plus the one everyone is reading,<br>explained s
 
 Hundreds of AI papers land on arXiv every day, and most people never get past the titles.
 
-AI Papers Daily reads all of them every morning and publishes a small edition: **one top pick**, shortlisted by a scoring model and chosen by an LLM judge, and **one trending paper** the community is upvoting on Hugging Face. Each one is explained in plain words, from a ten-second summary to what you would need to build with it.
+AI Papers Daily reads all of them every morning and publishes a small edition: **one top pick**, ranked by a published formula over measured signals (GitHub, Hugging Face, Hacker News, Semantic Scholar), not by an LLM, and **one trending paper** the community is upvoting on Hugging Face. Each one is explained in plain words, from a ten-second summary to what you would need to build with it.
 
 Behind the picks sits a library of about a year of AI research, **more than 8,000 papers**, that you can search by meaning, question directly and plan projects from.
 
@@ -109,8 +109,9 @@ Every morning at 01:30 UTC (07:00 IST) the **Daily edition** workflow fetches ev
 flowchart LR
     A["arXiv<br/>7 ML categories"] --> C["Classify<br/>13 research topics"]
     B["Hugging Face<br/>Daily Papers"] --> C
-    C --> D["Score<br/>shortlist of 6"]
-    D --> J2["LLM judge<br/>pairwise, LangChain"]
+    C --> S["Evidence<br/>GitHub, HF, HN, S2,<br/>novelty, checked claims"]
+    S --> D["Score out of 100<br/>shortlist of 6"]
+    D --> J2["LLM tie-break<br/>only within 3 points"]
     J2 --> E["Write notes<br/>draft, check, repair, ground"]
     E --> F[("data/<br/>daily JSON")]
     F --> L["Links and labs<br/>code, citations, logos"]
@@ -139,18 +140,23 @@ The site itself is static. Its live features call **Supabase Edge Functions** st
 <summary><strong>How papers are picked</strong></summary>
 <br>
 
-Every point comes from evidence about the paper, never from buzzwords in its abstract:
+Every paper gets a score out of 100 from public numbers, in four capped groups so no single source decides the pick. The [Methodology page](https://omen-bit.github.io/ai-paper-daily/methodology.html) and `src/scorer.py` have the full formula.
 
-- **Community.** Hugging Face upvotes on a log scale, 8 points for each doubling.
-- **Hand-picked.** Making Hugging Face's Daily Papers list.
-- **Code.** Released code, from Hugging Face or a link in the abstract. Worth about one doubling of upvotes.
-- **Lab.** A lab named by direct evidence (see below), with more for a well-known one.
-- **Cross-over.** A small bonus for papers that span two or more research topics.
+| Group | Max | Signals |
+| :--- | ---: | :--- |
+| Builder evidence | 40 | Code released, GitHub stars, stars gained since the day before, models / datasets / demos on Hugging Face |
+| Community attention | 30 | Hugging Face upvotes, Hacker News points |
+| Author track record | 15 | Median author h-index on Semantic Scholar, known lab |
+| What the paper shows | 15 | Benchmark results quoted word for word from the abstract, novelty against the last 90 days |
+
+The numbers come from `src/signals.py` (plain HTTP, no AI), saved each day in `data/signals/`. `src/novelty.py` measures how far a paper's words are from the last 90 days of papers (TF-IDF). `src/claims.py` is the LLM's only part in the ranking: it lists the benchmark results an abstract claims, and code keeps a claim only if its sentence and number appear word for word in the abstract. Answers are cached by arXiv ID, so no paper is sent twice. A signal that couldn't be looked up gets the day's median and is marked "estimated", never counted as zero. Every paper page shows "Why this ranked" with these numbers.
 
 The best-scored paper is the pick. The most upvoted of the rest becomes Trending, from a different topic than the pick whenever one has enough upvotes.
 Once the site has enough views, the home page shows the week's most read paper in the second slot instead.
 
-The scorer then shortlists its top 6, and an LLM judge compares them two at a time (15 comparisons), judging novelty, evidence, reproducibility and usefulness to builders. The paper that wins the most comparisons is the pick. Without a Groq key, or with `PICK_JUDGE=off`, the best score is the pick. `python scripts/backtest_picker.py --judge` compares the judge with the scorer.
+Only when the leaders are within 3 points does an LLM judge compare them two at a time to break the tie, and the paper's page says so. Without a Groq key, or with `PICK_JUDGE=off`, the best score is the pick.
+
+**Does it work?** `scripts/scoreboard.py` runs weekly (`scoreboard.yml`) and checks every saved day against what happened 30 days later: Semantic Scholar citations and GitHub stars, not Hugging Face upvotes, which the ranking reads itself. It compares the live ranking with upvotes alone, the earlier scorers and random picks, and with each signal group removed. The results are in `data/scoreboard.json` and on the Methodology page.
 
 By default the picks come from the papers fetched that morning. Set the repository variable `PICK_FROM` to `yesterday` to pick from the previous day's papers instead, once their upvotes have had a day to build up. Run `python scripts/backtest_picker.py --day-late` first to compare the two.
 
@@ -217,12 +223,12 @@ Four parts of the project are LangGraph agents: graphs of small steps that share
 
 ```mermaid
 flowchart LR
-    fetch --> classify --> choose_pool --> shortlist --> judge --> pick --> notes --> save
+    fetch --> classify --> choose_pool --> evidence --> shortlist --> judge --> pick --> notes --> save
     fetch -.->|"nothing fetched"| stop((stop))
     pick -.->|"nothing picked"| stop
 ```
 
-The **judge** (`src/judge.py`, LangChain on Groq) compares the scorer's top 6 two at a time, with the sides shuffled, on novelty, evidence, reproducibility and usefulness to builders. The paper that wins most comparisons is the pick. If more than a quarter of the comparisons fail, the best score is the pick.
+The **evidence** step gathers novelty, the measured signals and the checked benchmark claims; every source is optional and a failure leaves its signals unknown. The **judge** (`src/judge.py`, LangChain on Groq) only runs when the leaders are within 3 points, and compares just those papers two at a time, with the sides shuffled. If more than a quarter of the comparisons fail, the best score is the pick.
 
 ### Curator
 
@@ -301,14 +307,19 @@ ai-paper-daily/
 │   ├── daily-digest.yml        Daily edition: pick, sync, build, deploy, email
 │   ├── supabase-functions.yml  Deploys the Edge Functions
 │   ├── supabase-sync.yml       One-time full sync and history backfill
+│   ├── scoreboard.yml          Weekly ranking scoreboard
 │   └── tests.yml               Python and TypeScript tests on every push
 ├── src/
 │   ├── main.py                 Pipeline entry point
 │   ├── pipeline_graph.py       The daily run as a LangGraph graph
-│   ├── judge.py                LLM judge: compares the shortlist two at a time
+│   ├── judge.py                LLM tie-break between near-equal leaders
+│   ├── signals.py              GitHub, Hugging Face, Hacker News and Semantic Scholar numbers per paper
+│   ├── novelty.py              Distance from the last 90 days of papers (TF-IDF)
+│   ├── claims.py               Benchmark claims, kept only if quoted word for word
+│   ├── ranking_pages.py        "Why this ranked" and the Methodology page
 │   ├── fetcher.py              arXiv and Hugging Face fetcher
 │   ├── classifier.py           Research topic classifier
-│   ├── scorer.py               Scoring: top pick and trending
+│   ├── scorer.py               Score out of 100: top pick and trending
 │   ├── curator.py              Notes for each pick (LangGraph: draft, check, repair, ground)
 │   ├── groq_summarizer.py      Groq client with model fallback
 │   ├── paper_store.py          Daily JSON records in data/
@@ -332,6 +343,7 @@ ai-paper-daily/
 │   └── tests/                  Edge Function tests
 ├── scripts/
 │   ├── backtest_picker.py      Replays saved days to measure the picker
+│   ├── scoreboard.py           Checks the ranking against citations and stars 30 days later
 │   ├── run_evals.py            Scores Scout and Ask on the eval sets
 │   └── code_review_agent.py    Weekly review that opens issues (LangGraph)
 ├── evals/                      Eval sets for Scout and Ask, and saved results

@@ -18,7 +18,7 @@ SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SRC_DIR)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 2: score out of 100 with score_parts, evidence, claims, rank
 
 # The pipeline reads every new arXiv paper (often 1,000+ a day) but only the
 # best of them are written to data/, so the repo stays small. The rest were
@@ -63,6 +63,13 @@ def to_record(paper: dict, date_str: str, featured: bool) -> dict:
         "source": paper.get("source", ""),
         "hf_upvotes": paper.get("hf_upvotes", 0),
         "score": paper.get("score"),
+        # Why it ranked: points per signal, the numbers behind them and its place that day
+        "score_parts": paper.get("score_parts") or None,
+        "evidence": paper.get("evidence") or None,
+        "claims": paper.get("claims") or None,
+        "rank": paper.get("rank"),
+        "of": paper.get("of"),
+        "judge": paper.get("judge") if featured else None,
         "badges": _badge_labels(paper.get("badges")),
         "featured": featured,
         "slot": paper.get("slot") if featured else None,

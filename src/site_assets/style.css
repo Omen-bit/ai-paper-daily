@@ -2331,3 +2331,48 @@ a.rd-fit-row:hover .rd-fit-h { text-decoration: underline; text-decoration-thick
 @media (max-width: 900px) {
   .rd-fit-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "h h" "y c"; padding: 14px 0; }
 }
+
+/* ---------- Why this ranked (paper page) and the Methodology page ---------- */
+.rk-total { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin: 0 0 18px !important; }
+.rk-total b { font: 500 48px/1 var(--sans); letter-spacing: -.04em; color: var(--ink); }
+.rk-total b small { font-size: 20px; color: var(--muted); letter-spacing: 0; }
+.rk-total span { flex: 1 1 260px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.rk-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; border-top: 1px solid var(--ink); }
+.rk-g { padding: 14px 0 12px; border-bottom: 1px solid var(--line); min-width: 0; }
+.rk-h { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 8px !important; font-size: 15px; font-weight: 600; }
+.rk-h b { font-variant-numeric: tabular-nums; }
+.rk-h small { font-weight: 400; color: var(--muted); }
+.rk-bar { height: 6px; border-radius: 3px; background: var(--line-2); overflow: hidden; }
+.rk-bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.rk-ev { margin: 10px 0 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.rk-ev li + li { margin-top: 3px; }
+.rk-ev a { color: inherit; }
+.rk-est { display: inline-block; margin-left: 4px; padding: 0 6px; border: 1px dashed var(--muted); border-radius: 4px; font-size: 11px; line-height: 18px; color: var(--muted); }
+.rk-claims { margin-top: 22px; }
+.rk-claims ol { margin: 0; padding-left: 1.3em; }
+.rk-claims li { margin: 0 0 12px; font-size: 15px; line-height: 1.5; }
+.rk-claims li span { color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.rk-claims q { display: block; margin-top: 3px; color: var(--muted); font-size: 14px; }
+.rk-judge { margin-top: 18px !important; padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--accent-wash); font-size: 14px; line-height: 1.5; }
+@media (max-width: 640px) {
+  .rk-grid { grid-template-columns: minmax(0, 1fr); }
+  .rk-total b { font-size: 40px; }
+}
+
+.mt { max-width: 780px; margin: 40px auto 72px; padding-inline: var(--gutter); }
+.mt h1 { margin: 8px 0 16px; font: 500 clamp(36px, 6vw, 60px)/1.02 var(--sans); letter-spacing: -.045em; text-wrap: balance; }
+.mt h2 { margin: 2em 0 .6em; font: 500 28px/1.15 var(--sans); letter-spacing: -.03em; }
+.mt p, .mt li { font-size: 17px; line-height: 1.65; }
+.mt p { margin: 0 0 1em; max-width: 68ch; }
+.mt ul { padding-left: 1.2em; } .mt li + li { margin-top: 6px; }
+.mt a { color: var(--accent-ink); }
+.mt .rd-pill { color: var(--ink); margin: 4px 6px 4px 0; }
+.mt-lede { font-size: 20px !important; color: var(--ink); }
+.mt-table { overflow-x: auto; margin: 0 0 1.2em; border-top: 1px solid var(--ink); }
+.mt table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.mt th, .mt td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.mt td:not(:first-child), .mt thead th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mt thead th { font-weight: 500; color: var(--muted); font-size: 13px; }
+.mt .mt-group th { padding-top: 16px; font-weight: 600; }
+.mt .mt-group th:last-child { text-align: right; }
+.rk .rd-src a, .rk-ev a { text-decoration: underline; text-underline-offset: 3px; }

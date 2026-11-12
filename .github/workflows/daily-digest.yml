@@ -67,7 +67,12 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODELS: ${{ vars.GROQ_MODELS }}
           PICK_FROM: ${{ vars.PICK_FROM }} # "yesterday" picks from the previous day's papers; empty = today
-          PICK_JUDGE: ${{ vars.PICK_JUDGE }} # "off" skips the LLM judge; empty = on
+          PICK_JUDGE: ${{ vars.PICK_JUDGE }} # "off" skips the LLM tie-break; empty = on
+          PICK_CLAIMS: ${{ vars.PICK_CLAIMS }} # "off" skips benchmark claim extraction; empty = on
+          # Signals for the ranking (signals.py): GitHub stars with the built-in token, and an
+          # optional free Semantic Scholar key for a higher rate limit
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
           # Optional LangSmith tracing: add the LANGSMITH_API_KEY secret to turn it on
           LANGSMITH_TRACING: ${{ secrets.LANGSMITH_API_KEY != '' }}
           LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}

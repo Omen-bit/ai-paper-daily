@@ -1,36 +1,62 @@
 """
 scorer.py
-Scores every candidate paper and picks the day's two papers.
+Scores every candidate paper out of 100 from measured evidence and picks the day's two papers.
 
-Each point comes from evidence about the paper, not from the words in its abstract:
-  community   Hugging Face upvotes, on a log scale so each doubling of upvotes adds the same points
-  listed      the paper made Hugging Face's hand-picked Daily Papers list
-  code        code is released (Hugging Face's repo field, or a code link in the abstract)
-  lab         the lab is known from direct evidence (labs.py): a known lab, or any named one
-  topics      the paper spans two or more research topics
+The score is four capped groups, so no single source can decide the pick on its own:
 
-Words like "novel" or "we propose" are left out: nearly every abstract uses them,
-so they only added noise. The two picks also come from different topics when possible.
-scripts/backtest_picker.py measures the picker against later upvotes.
+  Builder evidence (40)      code released 8, GitHub stars 16, stars gained since yesterday 10,
+                             models / datasets / demos on Hugging Face 6
+  Community attention (30)   Hugging Face upvotes 20, Hacker News points 10
+  Author track record (15)   median author h-index on Semantic Scholar 10, known lab 5
+  What the paper shows (15)  benchmark results it claims, each checked against the abstract 10,
+                             novelty against the last 90 days of papers 5
+
+Counts use a log scale, so each doubling adds the same points and one viral number
+can't swamp the rest. The numbers come from signals.py (GitHub, Hugging Face,
+Hacker News, Semantic Scholar), claims.py and novelty.py; every one is saved with the
+paper and shown on its page ("Why this ranked"), and docs/methodology.md explains them.
+
+A signal we could not look up (a service was down, or Semantic Scholar hasn't indexed
+the paper yet) is "not known", not zero: it gets the median of the day's papers that
+were looked up, and the page marks it as estimated. Papers that were never looked up
+(the long tail of arXiv) score only on what the feeds say: code, upvotes, lab, novelty.
+
+Words like "novel" or "we propose" are left out: nearly every abstract uses them.
+The two picks also come from different topics when possible.
+scripts/scoreboard.py checks the ranking against citations and stars 30 days later.
 """
 
 import math
 import re
+import statistics
 from typing import Optional
 
 import labs
 
-# Points per signal. Released code or a known lab is worth about one doubling of upvotes.
-COMMUNITY_PER_DOUBLING = 8   # points for each doubling of upvotes (plus one)
-COMMUNITY_CAP = 64           # reached at about 255 upvotes
-LISTED_POINTS = 8
+# (group key, label, [(signal key, max points)]). Group maxima add up to 100.
+GROUPS = [
+    ("builder", "Builder evidence", [("code", 8), ("stars", 16), ("stars_gain", 10), ("artifacts", 6)]),
+    ("community", "Community attention", [("upvotes", 20), ("hn", 10)]),
+    ("authors", "Author track record", [("h_index", 10), ("lab", 5)]),
+    ("content", "What the paper shows", [("claims", 10), ("novelty", 5)]),
+]
+MAX_POINTS = {sig: pts for _, _, sigs in GROUPS for sig, pts in sigs}
+
+# Points per doubling for the log-scaled counts
+PER_DOUBLING = {"stars": 2.0, "stars_gain": 1.5, "upvotes": 3.0, "hn": 1.5, "h_index": 2.0}
 CODE_POINTS = 8
-KNOWN_LAB_POINTS = 6
-NAMED_LAB_POINTS = 3
-MULTI_TOPIC_POINTS = 2
+KNOWN_LAB_POINTS = 5
+NAMED_LAB_POINTS = 2.5
+POINTS_PER_CLAIM = 4
+ARTIFACT_POINTS = {"hf_models": 3, "hf_datasets": 2, "hf_spaces": 1}
+
+# Signals that get the day's median when a lookup failed, and the evidence key each reads
+ESTIMATED = {"stars_gain": "stars_gain", "hn": "hn_points", "h_index": "h_index"}
 
 # A paper needs this many Hugging Face upvotes to fill the "Trending" slot
 MIN_TRENDING_UPVOTES = 5
+# The LLM judge only breaks ties: papers within this many points of the leader
+TIE_MARGIN = 3
 
 SURVEY_TITLE_PATTERNS = [
     r"\bsurvey\b", r"\breview\b", r"\boverview\b", r"\btutorial\b",
@@ -75,49 +101,158 @@ def is_survey(paper: dict) -> bool:
             or any(re.search(p, abstract) for p in SURVEY_ABSTRACT_PATTERNS))
 
 
+def log_points(signal: str, n) -> float:
+    """Points for a count: PER_DOUBLING[signal] per doubling of (n + 1), capped at the signal's maximum."""
+    if n is None:
+        return 0.0
+    return min(MAX_POINTS[signal], PER_DOUBLING[signal] * math.log2(1 + max(0, float(n))))
+
+
 def community_points(upvotes) -> float:
-    """8 points per doubling of upvotes: 1 -> 8, 7 -> 24, 31 -> 40, 127 -> 56, 255+ -> 64."""
-    n = max(0, int(upvotes or 0))
-    return min(COMMUNITY_CAP, COMMUNITY_PER_DOUBLING * math.log2(1 + n))
+    """Hugging Face upvotes: 3 points per doubling, up to 20 (reached at about 100 upvotes)."""
+    return log_points("upvotes", int(upvotes or 0))
 
 
-def score_paper(paper: dict) -> dict:
+def day_medians(papers: list[dict]) -> dict:
+    """The median of each estimable signal over the papers whose lookup worked."""
+    out = {}
+    looked = [p["signals"] for p in papers if (p.get("signals") or {}).get("fetched")]
+    for key in ESTIMATED.values():
+        if key == "stars_gain":
+            vals = [s[key] for s in looked if s.get("repo") and s.get(key) is not None]
+        else:
+            vals = [s[key] for s in looked if s.get(key) is not None]
+        if vals:
+            out[key] = statistics.median(vals)
+    return out
+
+
+def novelty_ranks(papers: list[dict]) -> None:
+    """Set paper["novelty_pct"]: the share of the day's papers that are less novel (0..1)."""
+    scored = sorted((p for p in papers if p.get("novelty") is not None), key=lambda p: p["novelty"])
+    n = len(scored)
+    for i, p in enumerate(scored):
+        p["novelty_pct"] = round(i / (n - 1), 3) if n > 1 else 0.5
+
+
+def score_paper(paper: dict, medians: Optional[dict] = None) -> dict:
     """
-    Score a paper and assign badges. Adds 'score' (a whole number), 'score_parts'
-    (points per signal, for debugging and the backtest) and 'badges' to the paper.
+    Score a paper out of 100 and assign badges. Adds 'score' (a whole number),
+    'score_parts' (points per signal), 'evidence' (the raw numbers behind them,
+    shown on the paper's page) and 'badges' to the paper.
     """
-    parts = {}
-    badges = []
+    medians = medians or {}
+    sig = paper.get("signals") or {}
+    looked_up = bool(sig.get("fetched"))
+    parts, evidence, estimated, badges = {}, {}, [], []
 
-    parts["community"] = round(community_points(paper.get("hf_upvotes")), 1)
+    def value(signal: str, key: str):
+        v = sig.get(key)
+        if v is None and looked_up and signal in ESTIMATED and key in medians:
+            if signal == "stars_gain" and not sig.get("repo"):
+                return None
+            estimated.append(signal)
+            return medians[key]
+        return v
 
-    if "HuggingFace" in (paper.get("source") or ""):
-        parts["listed"] = LISTED_POINTS
-        badges.append(("🔥", "Trending on HF"))
-
-    if has_code(paper):
+    # Builder evidence
+    code = has_code(paper)
+    if code:
         parts["code"] = CODE_POINTS
         badges.append(("💻", "Code released"))
+    evidence["code"] = code
+    if sig.get("stars") is not None:
+        evidence["stars"] = sig["stars"]
+        parts["stars"] = log_points("stars", sig["stars"])
+    gain = value("stars_gain", "stars_gain")
+    if gain is not None:
+        evidence["stars_gain"] = gain
+        parts["stars_gain"] = log_points("stars_gain", gain)
+    arts = {k: int(sig.get(k) or 0) for k in ARTIFACT_POINTS}
+    if any(arts.values()):
+        evidence.update({k: v for k, v in arts.items() if v})
+        parts["artifacts"] = min(MAX_POINTS["artifacts"], sum(ARTIFACT_POINTS[k] for k, v in arts.items() if v))
 
+    # Community attention
+    upvotes = int(paper.get("hf_upvotes") or 0)
+    evidence["upvotes"] = upvotes
+    parts["upvotes"] = community_points(upvotes)
+    if "HuggingFace" in (paper.get("source") or ""):
+        badges.append(("🔥", "Trending on HF"))
+    hn = value("hn", "hn_points")
+    if hn is not None:
+        evidence["hn_points"] = hn
+        if sig.get("hn_url"):
+            evidence["hn_url"] = sig["hn_url"]
+        parts["hn"] = log_points("hn", hn)
+
+    # Author track record
+    h = value("h_index", "h_index")
+    if h is not None:
+        evidence["h_index"] = h
+        parts["h_index"] = log_points("h_index", h)
     lab = lab_of(paper)
     if lab:
         known = bool(labs.canonical(lab)) or lab in labs.BRANDS
         parts["lab"] = KNOWN_LAB_POINTS if known else NAMED_LAB_POINTS
+        evidence["lab"] = lab
         if known:
             badges.append(("🏛️", lab))
 
-    if len(topics(paper)) >= 2:
-        parts["topics"] = MULTI_TOPIC_POINTS
-        badges.append(("🔀", "Interdisciplinary"))
+    # What the paper shows
+    claims = paper.get("claims") or []
+    if claims:
+        evidence["claims"] = len(claims)
+        parts["claims"] = min(MAX_POINTS["claims"], POINTS_PER_CLAIM * len(claims))
+    if paper.get("novelty_pct") is not None:
+        evidence["novelty"] = paper.get("novelty")
+        evidence["novelty_pct"] = paper["novelty_pct"]
+        parts["novelty"] = round(MAX_POINTS["novelty"] * paper["novelty_pct"], 1)
 
-    # Surveys keep their badge but get no points: the picks are meant to be new work
+    if len(topics(paper)) >= 2:
+        badges.append(("🔀", "Interdisciplinary"))
+    # Surveys keep their badge but are not meant to be the pick: they lose their claims and novelty points
     if is_survey(paper):
         badges.append(("📖", "Survey / Review"))
+        parts.pop("claims", None)
+        parts.pop("novelty", None)
 
+    parts = {k: round(v, 1) for k, v in parts.items() if v}
+    if estimated:
+        evidence["estimated"] = sorted(set(estimated))
     paper["score"] = round(sum(parts.values()))
     paper["score_parts"] = parts
+    paper["evidence"] = evidence
     paper["badges"] = badges[:3]
     return paper
+
+
+def group_points(parts: dict) -> list[dict]:
+    """The score by group, for the page: [{key, label, points, max}], in GROUPS order."""
+    out = []
+    for key, label, sigs in GROUPS:
+        out.append({"key": key, "label": label,
+                    "points": round(sum(parts.get(s, 0) for s, _ in sigs), 1),
+                    "max": sum(m for _, m in sigs)})
+    return out
+
+
+def score_all(papers: list[dict]) -> list[dict]:
+    """Score every paper against the day's medians and novelty ranks; best first, with 'rank' and 'of' set."""
+    medians = day_medians(papers)
+    novelty_ranks(papers)
+    ranked = sorted((score_paper(p, medians) for p in papers), key=_rank_key)
+    for i, p in enumerate(ranked, 1):
+        p["rank"], p["of"] = i, len(ranked)
+    return ranked
+
+
+def tied_with_leader(ranked: list[dict], margin: int = TIE_MARGIN, most: int = 4) -> list[dict]:
+    """The leader and the papers within `margin` points of it, for the LLM tie-break (at most `most`)."""
+    if not ranked:
+        return []
+    top = ranked[0]["score"]
+    return [p for p in ranked if p["score"] >= top - margin][:most]
 
 
 def score_and_rank_papers(papers: list[dict], top_n: int = 2) -> list[dict]:
@@ -127,7 +262,7 @@ def score_and_rank_papers(papers: list[dict], top_n: int = 2) -> list[dict]:
     """
     if not papers:
         return []
-    scored = sorted((score_paper(p) for p in papers), key=_rank_key)
+    scored = score_all(papers)
     scored[0]["badges"] = ([("⭐", "Top Pick")] + scored[0]["badges"])[:4]
     selected = scored[:top_n]
     print(f"\n🏆 Top {top_n} papers selected:")
@@ -152,7 +287,7 @@ def select_daily(papers: list[dict], prefer: Optional[str] = None) -> list[dict]
     """
     Pick the day's two papers, each for a different reason:
       1. "pick": the best paper by score, or the paper with id `prefer` when it is
-         among them (the LLM judge's choice from the shortlist, see judge.py).
+         among them (the LLM judge's tie-break between near-equal leaders, see judge.py).
       2. "trending": the most upvoted of the rest, from a different topic than the pick
          when one has enough upvotes. When nothing has enough upvotes, the best-scored
          paper from another topic ("runner-up").
@@ -160,7 +295,7 @@ def select_daily(papers: list[dict], prefer: Optional[str] = None) -> list[dict]
     """
     if not papers:
         return []
-    ranked = sorted((score_paper(p) for p in papers), key=_rank_key)
+    ranked = score_all(papers)
     if prefer:
         chosen = next((i for i, p in enumerate(ranked) if p.get("id") == prefer), 0)
         ranked.insert(0, ranked.pop(chosen))

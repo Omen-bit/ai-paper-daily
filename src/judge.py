@@ -71,7 +71,7 @@ def enabled() -> bool:
     return bool((os.environ.get("GROQ_API_KEY") or "").strip())
 
 
-def make_llm(schema=None):
+def make_llm(schema=None, model_list: Optional[list[str]] = None):
     """A structured-output chat model on Groq (Verdict unless told otherwise), with the next model as a fallback."""
     from langchain_openai import ChatOpenAI
 
@@ -84,7 +84,7 @@ def make_llm(schema=None):
         )
         return llm.with_structured_output(schema or Verdict, method="json_mode")
 
-    chain, *rest = [one(m) for m in models()[:2]]
+    chain, *rest = [one(m) for m in (model_list or models())[:2]]
     return chain.with_fallbacks(rest) if rest else chain
 
 

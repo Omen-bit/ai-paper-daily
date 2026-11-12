@@ -41,21 +41,73 @@ def deps(tmp_path, papers, **over):
         "save_day": save_day,
         "data_dir": str(tmp_path),
         "shortlist_size": 3,
+        "score_novelty": lambda papers, date, data_dir=None: 0,
+        "collect_signals": lambda papers, date, data_dir=None: {},
+        "extract_claims": lambda papers: 0,
+        "claims_size": 8,
     }
     d.update(over)
     return d, calls
 
 
-def test_a_full_run_uses_the_judges_pick_and_saves(tmp_path, monkeypatch):
+def test_a_near_tie_goes_to_the_judge_and_its_pick_is_saved(tmp_path, monkeypatch):
     monkeypatch.delenv("PICK_FROM", raising=False)
-    papers = [_p("old", 99), _p("a", 50), _p("b", 30, "vision"), _p("c", 20, "robotics"), _p("d", 1)]
+    # 50, 45 and 40 upvotes score 17, 17 and 16: all within 3 points, so the judge breaks the tie
+    papers = [_p("old", 99), _p("a", 50), _p("b", 45, "vision"), _p("c", 40, "robotics"), _p("d", 1)]
     d, calls = deps(tmp_path, papers)
     state = pipeline_graph.run_day("2026-11-06", d)
     assert state["status"] == "ok" and calls["judge"] == 1
     assert [p["id"] for p in state["shortlist"]] == ["a", "b", "c"]  # "old" was featured recently
+    assert [p["id"] for p in state["tied"]] == ["a", "b", "c"]
     assert state["selected"][0]["id"] == "c" and state["selected"][0]["slot"] == "pick"
     assert state["selected"][0]["judge"]["reason"] == "Clearer results."
+    assert state["selected"][0]["judge"]["tie_break"] is True
     assert calls["saved"] == (4, ["c", "a"], "2026-11-06")
+
+
+def test_a_clear_leader_never_reaches_the_judge(tmp_path, monkeypatch):
+    monkeypatch.delenv("PICK_FROM", raising=False)
+    papers = [_p("a", 200), _p("b", 3, "vision"), _p("c", 1, "robotics")]
+    d, calls = deps(tmp_path, papers)
+    state = pipeline_graph.run_day("2026-11-06", d)
+    assert calls["judge"] == 0 and state["selected"][0]["id"] == "a"
+    assert "judge" not in state["selected"][0]
+
+
+def test_evidence_feeds_the_score(tmp_path, monkeypatch):
+    monkeypatch.delenv("PICK_FROM", raising=False)
+    seen = {}
+
+    def collect(papers, date, data_dir=None):
+        seen["order"] = [p["id"] for p in papers]
+        for p in papers:
+            if p["id"] == "b":  # the less upvoted paper has a popular repo and a big HN thread
+                p["signals"] = {"fetched": True, "repo": "x/y", "stars": 900, "stars_gain": 400,
+                                "hn_points": 300, "h_index": None}
+        return {}
+
+    def claims(papers):
+        seen["claims"] = [p["id"] for p in papers]
+        return 0
+
+    d, calls = deps(tmp_path, [_p("a", 60), _p("b", 20, "vision")], collect_signals=collect, extract_claims=claims)
+    state = pipeline_graph.run_day("2026-11-06", d)
+    assert seen["order"] == ["a", "b"]  # looked up best first
+    assert seen["claims"][0] == "b"     # claims are read for the new order
+    assert state["selected"][0]["id"] == "b"
+    assert state["selected"][0]["evidence"]["stars"] == 900
+
+
+def test_a_failing_evidence_source_does_not_stop_the_edition(tmp_path, monkeypatch):
+    monkeypatch.delenv("PICK_FROM", raising=False)
+
+    def boom(*a, **k):
+        raise RuntimeError("service down")
+
+    d, _ = deps(tmp_path, [_p("a", 50), _p("b", 5, "vision")], collect_signals=boom, score_novelty=boom,
+                extract_claims=boom)
+    state = pipeline_graph.run_day("2026-11-06", d)
+    assert state["status"] == "ok" and state["selected"][0]["id"] == "a"
 
 
 def test_without_the_judge_the_best_score_is_the_pick(tmp_path, monkeypatch):
@@ -107,4 +159,4 @@ def test_yesterday_mode_picks_from_the_saved_day_and_saves_today(tmp_path, monke
 def test_the_graph_has_the_documented_steps():
     graph = pipeline_graph.build_graph(deps("/tmp", [])[0])
     nodes = set(graph.get_graph().nodes)
-    assert {"fetch", "classify", "choose_pool", "shortlist", "judge", "pick", "notes", "save"} <= nodes
+    assert {"fetch", "classify", "choose_pool", "evidence", "shortlist", "judge", "pick", "notes", "save"} <= nodes

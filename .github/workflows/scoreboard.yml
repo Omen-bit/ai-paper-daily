@@ -1,0 +1,61 @@
+name: Ranking scoreboard
+
+# Once a week: check how the ranking did against what happened to each paper 30 days
+# later (Semantic Scholar citations and GitHub stars), and save data/scoreboard.json.
+# The Methodology page shows it on the next daily build. See scripts/scoreboard.py.
+on:
+  schedule:
+    - cron: "0 22 * * 6" # Sunday 03:30 IST
+  workflow_dispatch:
+    inputs:
+      min_age:
+        description: "Only judge days at least this many days old"
+        default: "30"
+
+concurrency:
+  group: scoreboard
+  cancel-in-progress: false
+
+jobs:
+  scoreboard:
+    name: Score the ranking
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write # commit data/scoreboard.json
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check the ranking against 30-day outcomes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
+        run: python scripts/scoreboard.py --min-age ${{ inputs.min_age || '30' }}
+
+      - name: Commit the scoreboard
+        run: |
+          git config user.name "Omen-bit"
+          git config user.email "darshanchougule821@gmail.com"
+          git add data/scoreboard.json data/scoreboard
+          if git diff --staged --quiet; then
+            echo "Scoreboard unchanged."
+            exit 0
+          fi
+          git commit -m "data: ranking scoreboard for $(date +'%Y-%m-%d')"
+          for attempt in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push origin main && exit 0
+            echo "Push failed, retrying ($attempt/3)..."
+            sleep 5
+          done
+          exit 1
