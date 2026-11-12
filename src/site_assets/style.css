@@ -2376,3 +2376,26 @@ a.rd-fit-row:hover .rd-fit-h { text-decoration: underline; text-decoration-thick
 .mt .mt-group th { padding-top: 16px; font-weight: 600; }
 .mt .mt-group th:last-child { text-align: right; }
 .rk .rd-src a, .rk-ev a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---- Decluttered: one topic label per card, a "More" menu on the paper page ---- */
+.pc-word { display: none; }
+.rd-more-menu { position: relative; }
+.rd-more-menu > summary { list-style: none; cursor: pointer; }
+.rd-more-menu > summary::-webkit-details-marker { display: none; }
+.rd-more-box { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.rd-more-box .rd-lbl { margin: 6px 0 0; }
+.rd-more-box pre { max-width: 100%; overflow-x: auto; }
+.rd-pill-explain { border-color: var(--accent, #ff4f00); color: var(--accent, #ff4f00); }
+
+/* ---- Top bar credit: who made the site, linking to its open-source code ---- */
+.made-by { display: inline-flex; align-items: center; gap: 8px; flex: none; height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.made-by small { font-size: 12px; font-weight: 400; color: var(--muted); }
+.made-by:hover { border-color: var(--ink); }
+@media (max-width: 1100px) { .made-by small { display: none; } }
+@media (max-width: 380px) { .made-by { padding: 0 10px; font-size: 13px; } }
+.rd-actions .rd-more-menu[open] > summary { width: auto; display: inline-flex; }
+/* The credit takes room in the top bar: search folds to its icon earlier, and the logo stays on small phones */
+@media (max-width: 1240px) {
+  .header-actions .cmdk { flex: none; width: 40px; min-width: 0; padding: 0; justify-content: center; } .cmdk span, .cmdk kbd { display: none; }
+}
+@media (max-width: 380px) { .brand { display: flex; } .header-actions { gap: 6px; } }

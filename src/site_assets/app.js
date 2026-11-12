@@ -102,20 +102,6 @@
     var d = new Date(ms);
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
   }
-  // ---- Ticker: time until the next edition (01:30 UTC every day) ----
-  var nextEl = document.querySelector("[data-next-edition]");
-  if (nextEl) {
-    var tick = function () {
-      var now = new Date(), next = new Date(now);
-      next.setUTCHours(1, 30, 0, 0);
-      if (next <= now) next.setUTCDate(next.getUTCDate() + 1);
-      var mins = Math.floor((next - now) / 60000);
-      nextEl.textContent = "Next edition in " + String(Math.floor(mins / 60)).padStart(2, "0") + ":" + String(mins % 60).padStart(2, "0");
-    };
-    tick();
-    setInterval(tick, 30000);
-  }
-
   // ---- Home: read marks on the pick cards ----
   Array.prototype.forEach.call(document.querySelectorAll(".pick[data-id]"), function (card) {
     if (readIds[card.getAttribute("data-id")]) card.querySelector(".pick-read").hidden = false;
@@ -618,6 +604,9 @@
           '<button type="button" data-note-remove="' + i + '">Remove</button></li>';
       }).join("");
       emptyNote.hidden = mine.length > 0;
+      // The notes box appears once the reader has a note
+      var notesBox = emptyNote.closest("[data-notes]");
+      if (notesBox) notesBox.hidden = mine.length === 0;
     };
     var saveNotes = function () {
       allNotes = load(notesKey, {});
@@ -744,6 +733,7 @@
         "We couldn’t find these sections in the paper’s web version. The PDF has everything.";
       if (d.summary && bdShort) {
         bdShort.querySelector("[data-bd-short-text]").textContent = d.summary;
+        bdShort.hidden = false;
         var src = bdShort.querySelector("[data-bd-short-src]");
         if (src) src.textContent = "Written by AI from the full paper. Every number in it was checked against the paper.";
       }
@@ -920,6 +910,12 @@
       if (e.key === "Escape" && ask.classList.contains("is-open")) closeAsk();
     });
     window.apdAsk = function (question) { openAsk(false); askQuestion(question); };
+    // "Explain this paper": a plain-words walk through the whole paper, answered from the full text
+    Array.prototype.forEach.call(document.querySelectorAll("[data-explain]"), function (b) {
+      b.addEventListener("click", function () {
+        window.apdAsk("Explain this whole paper in plain words: the problem, the main idea, how it works and the result.");
+      });
+    });
 
     askForm.addEventListener("submit", function (e) { e.preventDefault(); askQuestion(askInput.value); });
     askInput.addEventListener("input", function () { askErr.hidden = true; });
@@ -2081,15 +2077,32 @@
     var kinds = Array.prototype.slice.call(document.querySelectorAll("[data-lab-kind]"));
     var count = document.querySelector("[data-lab-count]");
     var all = count.textContent;
+    // Show the biggest 30 labs first; the rest wait behind "Show all labs"
+    var LIMIT = 30, kind = "", open = false;
+    var moreBtn = document.createElement("button");
+    moreBtn.type = "button"; moreBtn.className = "btn btn-outline"; moreBtn.hidden = true;
+    var moreWrap = document.createElement("div");
+    moreWrap.className = "center"; moreWrap.appendChild(moreBtn);
+    grid.parentNode.insertBefore(moreWrap, grid.nextSibling);
+    function paint() {
+      var n = 0;
+      Array.prototype.forEach.call(grid.querySelectorAll(".lab-card"), function (c) {
+        var fits = !kind || c.getAttribute("data-kind") === kind;
+        if (fits) n++;
+        c.hidden = !fits || (!open && n > LIMIT);
+      });
+      moreBtn.hidden = open || n <= LIMIT;
+      moreBtn.textContent = "Show all " + n + " labs";
+      return n;
+    }
+    moreBtn.addEventListener("click", function () { open = true; paint(); });
+    paint();
     kinds.forEach(function (b) {
       b.addEventListener("click", function () {
-        var k = b.getAttribute("data-lab-kind"), n = 0;
+        kind = b.getAttribute("data-lab-kind"); open = false;
         kinds.forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
-        Array.prototype.forEach.call(grid.querySelectorAll(".lab-card"), function (c) {
-          c.hidden = !!k && c.getAttribute("data-kind") !== k;
-          if (!c.hidden) n++;
-        });
-        count.textContent = k ? n + " " + b.textContent.toLowerCase() : all;
+        var n = paint();
+        count.textContent = kind ? n + " " + b.textContent.toLowerCase() : all;
       });
     });
   })();
@@ -2167,7 +2180,7 @@
       }
       return { value: value, caption: caption.length ? caption.join(" ") : "key result" };
     }
-    if (p.u) return { value: '<small aria-hidden="true">▲</small>' + p.u, caption: "upvotes on HF", html: true };
+    if (p.u) return { value: '<small aria-hidden="true">▲</small>' + p.u, caption: "upvotes on Hugging Face", html: true };
     if ((p.w || p.d) === newest) return { value: "New", caption: "in the latest batch" };
     return { value: esc(shortDate(p.d)), caption: "published", html: true };
   }
@@ -2236,7 +2249,7 @@
     else if (newest && (p.w || p.d) >= newest) badge = '<span class="pc-badge pc-badge-new">New</span>';
     else if (p.h) badge = '<span class="pc-badge" title="Not on the Hugging Face daily list">Not on HF yet</span>';
     var chips = "";
-    if (p.u && stat.caption !== "upvotes on HF") chips += '<span class="sig sig-up" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
+    if (p.u && stat.caption !== "upvotes on Hugging Face") chips += '<span class="sig sig-up" title="Upvotes on Hugging Face">▲ ' + p.u + "</span>";
     var used = [];
     if (p.um) used.push(p.um + (p.um === 1 ? " model" : " models"));
     if (p.us) used.push(p.us + (p.us === 1 ? " Space" : " Spaces"));
@@ -2423,6 +2436,8 @@
   var timer;
   q.addEventListener("input", function () {
     clearTimeout(timer);
+    // A few words describing an idea search by meaning; a title or name searches by words
+    meaning.checked = q.value.trim().split(/\s+/).length >= 4;
     timer = setTimeout(apply, meaning.checked ? 450 : 120);  // wait for a pause before asking the server
   });
   [cat, meaning].forEach(function (el) { el.addEventListener("change", apply); });

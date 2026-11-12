@@ -219,7 +219,7 @@ def test_most_read_takes_second_slot_once_readers_are_enough(tmp_path):
     assert ">Most read<" in home and "25 readers this week" in home
     assert "data-daily" not in home and "Topic pulse" not in home
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
-    assert 'data-feedback="2610.1"' in page and 'data-vote="useful"' in page
+    assert "data-feedback=" not in page  # the "worth your time?" question was removed
 
 
 def test_published_dates_and_database_archive(tmp_path):
@@ -313,13 +313,14 @@ def test_picks_show_when_the_paper_came_out(tmp_path):
     assert "Trending since" in old
 
 
-def test_featured_cards_ask_if_the_paper_was_seen_before():
+def test_featured_cards_no_longer_ask_if_the_paper_was_seen_before():
     from site_builder import featured_card, seen_check
     rec = {"id": "2610.00001", "title": "T", "abstract": "A.", "submitted": "2026-10-30", "slot": "pick"}
     html = featured_card(rec, 1, "")
-    assert 'data-slot="pick"' in html and 'data-seen="2610.00001"' in html
-    assert seen_check(dict(rec, slot="most-read")) == ""  # asked on the top pick only
-    assert seen_check(dict(rec, slot=None)) == ""  # editions from before slots existed
+    assert 'data-slot="pick"' in html and "data-seen=" not in html
+    assert "Today’s pick" in html
+    assert "Pick of the day" in featured_card(rec, 1, "../", past=True)  # a past day's page is not "today"
+    assert seen_check(dict(rec, slot="most-read")) == ""
 
 
 def test_lead_sentence_takes_the_first_sentence_and_cuts_long_ones():
@@ -463,4 +464,5 @@ def test_paper_page_without_links_leaves_those_parts_out(tmp_path):
     build_site(data_dir, site_dir)
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
     assert "Where it fits" not in page and "Try it" not in page
-    assert "data-breakdown" in page and "np-mbar" in page
+    assert "data-breakdown" in page and "np-mbar" not in page  # no floating bar over the phone menu
+    assert "data-explain" in page and "Made by" in page

@@ -191,6 +191,15 @@ def methodology_body(board: dict | None, latest_date: str = "") -> str:
   <p class="mt-lede">Every candidate paper gets a score out of 100 from public numbers we look up each morning.
   An LLM does not pick the papers. It writes the summaries, and it lists the benchmark results an abstract claims, which code then checks word for word.</p>
 
+  <h2>In short</h2>
+  <ul class="mt-short">
+    <li><b>Do people use it?</b> Code on GitHub, how fast it gains stars, and models or demos built on it.</li>
+    <li><b>Are people talking about it?</b> Upvotes on Hugging Face and points on Hacker News.</li>
+    <li><b>Who wrote it?</b> How often the authors' past work is cited, and whether a known lab is behind it.</li>
+    <li><b>What does it show?</b> Real benchmark results in the abstract, and how new the idea is compared with recent papers.</li>
+  </ul>
+  <p>The details below are for readers who want the exact formula.</p>
+
   <h2>The formula</h2>
   <p>Four groups, each capped, so no single source decides the pick. Counts use a log scale: every doubling adds the same points, so one viral number can't swamp the rest.</p>
   <div class="mt-table"><table><thead><tr><th scope="col">Signal</th><th scope="col">Max points</th></tr></thead>{"".join(groups)}</table></div>

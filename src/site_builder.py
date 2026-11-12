@@ -70,6 +70,7 @@ CATEGORY_NAMES["other-ml"] = "Other ML"
 # Icons drawn from Lucide (ISC licence), inlined so the site makes no extra requests
 ICONS = {
     "search": '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    "github": '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
     "ask": '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
     "arrow": '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
     "back": '<path d="m15 18-6-6 6-6"/>',
@@ -215,6 +216,10 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
 # Layout
 # ---------------------------------------------------------------------------
 
+# The site's open-source code, and who made it (shown in the header and footer)
+REPO_URL = "https://github.com/Omen-bit/ai-paper-daily"
+MADE_BY = "Darshan Chougule"
+
 # Edition strip shown on every page; set by build_site
 EDITION = ""
 # Lab name -> its official logo file in assets/logos/ (lab_logos.py); set by build_site
@@ -300,7 +305,6 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 </head>
 <body{f' class="{body_class}"' if body_class else ""}>
 <a class="skip" href="#main">Skip to content</a>
-<div class="ticker" aria-hidden="true"><div class="wrap ticker-in">{edition}<span class="ticker-next" data-next-edition>Updated every morning</span></div></div>
 <header class="site-header">
   <div class="wrap bar-in">
     <a class="brand" href="{root}index.html" aria-label="{SITE_NAME}, home"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">AI PAPERS<em>/DAILY</em></span></a>
@@ -315,6 +319,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     <div class="header-actions">
       {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump><span class="nav-long">Get it by email</span><span class="nav-short">Subscribe</span></a>' if BUTTONDOWN_USER else ""}
       <a class="cmdk" href="{root}papers.html" data-search-trigger>{icon("search", 15)}<span>Search papers or an idea</span><kbd>/</kbd></a>
+      <a class="made-by" href="{REPO_URL}" rel="noopener" title="Open-source code on GitHub">{icon("github", 16)}<span><small>Made by</small> {MADE_BY}</span></a>
       <button class="icon-button" type="button" data-theme-toggle aria-label="Switch light or dark theme" data-tip="Switch theme">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
     </div>
   </div>
@@ -401,7 +406,7 @@ def pick_minutes(rec: dict) -> int:
     return max(1, round(words / 200))
 
 
-def featured_card(rec: dict, rank: int, root: str) -> str:
+def featured_card(rec: dict, rank: int, root: str, past: bool = False) -> str:
     notes = rec.get("curator") or {}
     if notes.get("tldr"):
         blurb = f'<p class="pick-blurb"><b>In short</b>{esc(notes["tldr"])}</p>'
@@ -414,6 +419,8 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
                 first = first[:217].rsplit(" ", 1)[0] + "…"
             blurb = f'<p class="pick-blurb"><b>From the abstract</b>{esc(first)}.</p>' if first else ""
     label = slot_label(rec, rank)
+    if past and label == "Today’s pick":
+        label = "Pick of the day"  # a past day's page is not "today"
     why = ""
     if rec.get("slot") == "trending" and rec.get("hf_upvotes"):
         why = f'<span class="pick-why">{int(rec["hf_upvotes"])} upvotes on Hugging Face</span>'
@@ -436,7 +443,7 @@ def featured_card(rec: dict, rank: int, root: str) -> str:
 # Slots whose cards ask "Seen this already?". The answers, and the clicks on
 # each card, show whether readers get something from us that Hugging Face
 # didn't already give them.
-MEASURED_SLOTS = ("pick",)
+MEASURED_SLOTS: tuple = ()
 
 
 def seen_check(rec: dict) -> str:
@@ -707,15 +714,15 @@ def papers_tabs(current: str, root: str = "") -> str:
     """All papers and the day-by-day archive are two views of the same papers."""
     tab = lambda href, label, key: (f'<a href="{root}{href}"{" aria-current=page" if key == current else ""}>{label}</a>')
     return (f'<nav class="tabs" aria-label="Papers views">{tab("papers.html", "All papers", "papers")}'
-            f'{tab("labs.html", "By lab", "labs")}{tab("archive.html", "By day", "archive")}</nav>')
+            f'{tab("labs.html", "By lab", "labs")}</nav>')
 
 
 # Quick views on the papers page: value, label
 PAPER_VIEWS = [
-    ("", "Mix"),
+    ("", "Recommended"),
     ("new", "Newest"),
     ("week", "Trending this week"),
-    ("nothf", "Not on HF yet"),
+    ("nothf", "Not on Hugging Face yet"),
     ("picks", "Our picks"),
     ("code", "Has code"),
     ("easy", "Beginner-friendly"),
@@ -730,13 +737,13 @@ def build_papers_page() -> str:
     body = f"""<section class="page-head page-head-tight">
   {papers_tabs("papers")}
   <h1>All papers</h1>
-  <p>Every AI paper we track, each with a one-line summary. Search by words, or describe an idea and search by meaning.</p>
+  <p>Every AI paper we track, each with a one-line summary. Search by title or author, or describe an idea in a few words.</p>
 </section>
 <div class="pbar">
   <div class="pbar-search">
     <label class="sr-only" for="q">Search papers</label>
     <span class="input-wrap">{icon("search", 16)}<input class="input" id="q" type="search" placeholder="Search titles and authors, or describe an idea" autocomplete="off"></span>
-    <label class="toggle toggle-meaning"><input id="meaning" type="checkbox"> By meaning</label>
+    <label class="toggle toggle-meaning" hidden><input id="meaning" type="checkbox"> By meaning</label>
   </div>
   <div class="chips" role="group" aria-label="Show">
     {chips}
@@ -1065,7 +1072,7 @@ def build_day(day: dict, papers: dict) -> str:
     featured_ids = day.get("featured", [])
     featured = [papers[i] for i in featured_ids if i in papers]
     rest = [papers[p["id"]] for p in day["papers"] if p["id"] not in featured_ids]
-    cards = "\n".join(featured_card(r, n, "../") for n, r in enumerate(featured, 1))
+    cards = "\n".join(featured_card(r, n, "../", past=True) for n, r in enumerate(featured, 1))
     rest_html = ""
     if rest:
         rows = "\n".join(paper_row(r, "../") for r in rest)
@@ -1603,7 +1610,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     # --- The opening screen: where the paper sits on the site, then the title at full size ---
     kicker = ['<a href="../papers.html">All papers</a>',
               f'<a class="rd-topic" href="../papers.html?cat={esc(topic)}">{esc(category_name(topic))}</a>']
-    if rec.get("featured"):
+    # "Top pick on <day>" already says it was picked; the badge stays only for other slots like Trending
+    if rec.get("featured") and not (rec.get("featured_on") and rec.get("slot") in (None, "pick")):
         kicker.append(f'<span class="rd-badge">{"" if rec.get("slot") == "trending" else "★ "}{esc(slot_label(rec))}</span>')
     if rec.get("featured_on"):
         kicker.append(f'<a href="../day/{esc(rec["featured_on"])}.html">Top pick on {esc(nice_date(rec["featured_on"], with_year=False))}</a>')
@@ -1612,8 +1620,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     hero_lab = lab_of(rec, links)
     if hero_lab:
         kicker.append(f'<a class="rd-kicker-lab" href="{esc(lab_href(hero_lab, "../"))}">{lab_mark(hero_lab)}{esc(hero_lab)}</a>')
-    crosses = "".join(f'<span class="rd-x rd-x-{p}" aria-hidden="true">+</span>' for p in ("tl", "tc", "tr", "bl", "bc", "br"))
-    hero = f"""<header class="rd-hero">{crosses}
+    hero = f"""<header class="rd-hero">
     <p class="rd-kicker">{'<span aria-hidden="true">/</span>'.join(kicker)}</p>
     <h1 class="rd-big {size_cls}" data-rd-big>{title}</h1>
   </header>"""
@@ -1645,7 +1652,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     code_pill = (f'<a class="rd-pill" href="{esc(rec["code_url"])}" rel="noopener" data-out="code">{icon("code", 15)}Code</a>'
                  if rec.get("code_url") else "")
     details = f"""<section class="rd-details" aria-label="Paper details">
-      <p class="rd-lbl">/ Paper details <span class="rd-size" role="group" aria-label="Text size"><button type="button" data-size="-1" aria-label="Make text smaller">A−</button><button type="button" data-size="1" aria-label="Make text larger">A+</button></span></p>
+      <p class="rd-lbl">/ Paper details</p>
       {lab_lead}
       <dl class="rd-md">
         {rd_row("Published:", when)}
@@ -1654,15 +1661,18 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         {rd_row("Signals:", '<span class="rd-dot" aria-hidden="true">·</span>'.join(signals))}
       </dl>
       <div class="rd-actions"><a class="rd-pill rd-pill-solid" href="{esc(rec.get('pdf_url'))}" rel="noopener" data-out="pdf">Read the PDF {icon("external", 14)}</a>
-          <button class="rd-pill" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>
-          <a class="rd-pill" href="{esc(rec.get('url'))}" rel="noopener" data-out="arxiv">arXiv</a>{code_pill}
-          <button class="rd-pill" type="button" data-md-copy data-md="{pid}.md">{icon("copy", 15)}<span>Copy for LLM</span></button>
-          <a class="rd-pill" href="{pid}.md" data-md-view>{icon("file", 15)}<span>Markdown</span></a>
-          <details class="cite rd-cite">
-            <summary class="rd-pill">{icon("quote", 15)}<span>BibTeX</span></summary>
-            <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
-          </details>
-          <button class="rd-pill" type="button" data-share>{icon("share", 15)}<span>Share</span></button></div>
+          {'<button class="rd-pill rd-pill-explain" type="button" data-explain>' + icon("ask", 15) + '<span>Explain this paper</span></button>' if abstract else ""}
+          <button class="rd-pill" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>{code_pill}
+          <button class="rd-pill" type="button" data-share>{icon("share", 15)}<span>Share</span></button>
+          <details class="cite rd-cite rd-more-menu">
+            <summary class="rd-pill">More</summary>
+            <div class="cite-box rd-more-box">
+              <a class="rd-pill" href="{esc(rec.get('url'))}" rel="noopener" data-out="arxiv">Open on arXiv</a>
+              <button class="rd-pill" type="button" data-md-copy data-md="{pid}.md">{icon("copy", 15)}<span>Copy for LLM</span></button>
+              <a class="rd-pill" href="{pid}.md" data-md-view>{icon("file", 15)}<span>Markdown</span></a>
+              <p class="rd-lbl">Cite (BibTeX)</p><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button>
+            </div>
+          </details></div>
     </section>"""
 
     # --- In short: the summary is the opening paragraph ---
@@ -1683,8 +1693,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
         tldr_html = with_terms(esc(short), terms, used_terms)
         src = "Written by AI from the paper" if notes.get("tldr") else "Written by AI from the abstract"
     else:
-        tldr_html = esc(lead_sentence(tidy_tex(abstract), 400))
-        src = "The abstract's first sentence. A short summary appears once the full paper is read."
+        tldr_html = ""
+        src = ""
     rows = [("What's new", notes.get("whats_new")), ("Key result", notes.get("key_result")),
             ("Why it matters", notes.get("why_it_matters") if notes.get("tldr") else None)]
     rows = [r for r in rows if r[1]]
@@ -1698,7 +1708,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
             checked = ('<span class="rd-ok">Every number here appears in the abstract</span>' if ok == len(nums)
                        else f'<span>{ok} of {len(nums)} numbers here appear in the abstract</span>')
     heading = "Curator's notes" if notes.get("tldr") else "In short"
-    minute = f"""<section class="rd-sec rd-first" id="minute" data-bd-short-box><h2 class="sr-only">{heading}</h2>
+    minute = f"""<section class="rd-sec rd-first" id="minute" data-bd-short-box{"" if short else " hidden"}><h2 class="sr-only">{heading}</h2>
       {levels}<p class="rd-lede" data-bd-short-text data-level-out>{tldr_html}</p>{level_texts}
       <p class="rd-src rd-src-ai"><span class="rd-tag">{heading}</span><span data-bd-short-src>{src}</span>{checked}<a href="https://github.com/Omen-bit/ai-paper-daily/issues/new?title=Mistake%20on%20{pid}" rel="noopener">Report a mistake</a></p>
       {parts}
@@ -1715,11 +1725,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
     abstract_sec = ""
     if abstract:
         abstract_sec = f"""<section class="rd-sec" id="abstract"><h2>Abstract</h2>
-      <p class="rd-src rd-src-paper"><span class="rd-tag">From the paper</span>The authors' own words.
-        <span class="rd-skim" data-skim-legend><span class="skim-key skim-goal"><i></i>Problem</span><span class="skim-key skim-method"><i></i>Method</span><span class="skim-key skim-result"><i></i>Result</span></span>
-        <button class="rd-link" type="button" data-skim-toggle aria-pressed="false">Colour to skim</button></p>
+      <p class="rd-src rd-src-paper"><span class="rd-tag">From the paper</span>The authors' own words.</p>
       <div class="np-abs rd-abs prose" data-prose>{abstract_html(abstract, [t for t in terms if t["term"].lower() not in used_terms])}</div>
-      <p class="rd-note">Select any text to highlight it or add a note. Something unclear? <button class="rd-link" type="button" data-ask-jump aria-controls="ask">Ask this paper</button></p>
     </section>"""
 
     want_summary = "" if short else ' data-summary="1"'
@@ -1766,8 +1773,6 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       </div>
     </section>"""
 
-    ask_jump = (f'<button class="rd-askbar" type="button" data-ask-jump aria-controls="ask">{icon("ask", 16)}'
-                f'<span>Ask this paper a question</span><kbd>A</kbd></button>') if abstract else ""
     sections = "\n    ".join(x for x in (minute, numbers_html, ranking_pages.why_ranked(rec), abstract_sec, full, ideas_html, fits,
                                          rd_resources(rec, links), ask_html) if x)
 
@@ -1785,7 +1790,6 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
   <article class="paper rd-cols" data-paper-id="{pid}" data-title="{title}" data-topics="{esc(' '.join(rec.get('categories') or ['other-ml']))}">
     <aside class="rd-side"><div class="rd-stick" data-rd-stick>
       <p class="rd-small {size_cls}" data-rd-small aria-hidden="true">{title}</p>
-      {ask_jump}
       {details}
     </div></aside>
     <div class="rd-main">
@@ -1794,21 +1798,11 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       <div class="rd-notes" data-notes><p class="rd-lbl">/ Your notes</p>
         <p class="rd-note" data-notes-empty>Select text in the abstract to highlight it or add a note. They stay in this browser.</p>
         <ol class="note-list" data-notes-list></ol></div>
-      <div class="feedback rd-feedback" data-feedback="{pid}">
-        <span data-feedback-q>Was this paper worth your time?</span>
-        <button class="rd-pill" type="button" data-vote="useful">Yes, useful</button>
-        <button class="rd-pill" type="button" data-vote="not_useful">Not for me</button>
-      </div>
       {done}
     </div>
   </article>
   {related_html}
   {subscribe_box("../")}
-</div>
-<div class="np-mbar">
-  <a class="btn btn-primary" href="{esc(rec.get('pdf_url'))}" rel="noopener" data-out="pdf">Read the PDF {icon("external", 14)}</a>
-  {'<button class="btn btn-outline" type="button" data-ask-open aria-controls="ask">Ask</button>' if abstract else ""}
-  <button class="btn btn-outline btn-icon" type="button" data-save aria-pressed="false" aria-label="Save this paper">{icon("bookmark", 16)}<span class="sr-only">Save</span></button>
 </div>"""
     desc = notes.get("tldr") or summary or abstract[:160]
     return page(rec["title"], body, root="../", description=desc, path=f"paper/{rec['id']}.html", body_class="rd-page",
