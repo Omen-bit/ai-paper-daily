@@ -323,7 +323,6 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     <div class="header-actions">
       {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump>Subscribe free</a>' if BUTTONDOWN_USER else ""}
       <span class="oss">
-        <span class="oss-by">Built by <b>{MADE_BY}</b></span>
         <a class="oss-btn" href="{REPO_URL}" rel="noopener" aria-describedby="oss-tip">
           <span class="oss-main">{icon("github", 17)}<span class="oss-txt"><small>Open source</small><span>View on GitHub</span></span>{icon("arrow-up-right", 13, "oss-arrow")}</span>
           <span class="oss-star">{STAR_SVG}<span>Star</span></span>
@@ -1672,17 +1671,15 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       </dl>
       <div class="rd-actions"><a class="rd-pill rd-pill-solid" href="{esc(rec.get('pdf_url'))}" rel="noopener" data-out="pdf">Read the PDF {icon("external", 14)}</a>
           {'<button class="rd-pill rd-pill-explain" type="button" data-explain>' + icon("ask", 15) + '<span>Explain this paper</span></button>' if abstract else ""}
-          <button class="rd-pill" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>{code_pill}
-          <button class="rd-pill" type="button" data-share>{icon("share", 15)}<span>Share</span></button>
-          <details class="cite rd-cite rd-more-menu">
-            <summary class="rd-pill">More</summary>
-            <div class="cite-box rd-more-box">
-              <a class="rd-pill" href="{esc(rec.get('url'))}" rel="noopener" data-out="arxiv">Open on arXiv</a>
-              <button class="rd-pill" type="button" data-md-copy data-md="{pid}.md">{icon("copy", 15)}<span>Copy for LLM</span></button>
-              <a class="rd-pill" href="{pid}.md" data-md-view>{icon("file", 15)}<span>Markdown</span></a>
-              <p class="rd-lbl">Cite (BibTeX)</p><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button>
-            </div>
-          </details></div>
+          <button class="rd-pill" type="button" data-save aria-pressed="false">{icon("bookmark", 15)}<span>Save</span></button>
+          <a class="rd-pill" href="{esc(rec.get('url'))}" rel="noopener" data-out="arxiv">arXiv</a>{code_pill}
+          <button class="rd-pill" type="button" data-md-copy data-md="{pid}.md">{icon("copy", 15)}<span>Copy for LLM</span></button>
+          <a class="rd-pill" href="{pid}.md" data-md-view>{icon("file", 15)}<span>Markdown</span></a>
+          <details class="cite rd-cite">
+            <summary class="rd-pill">{icon("quote", 15)}<span>BibTeX</span></summary>
+            <div class="cite-box"><pre data-bibtex>{esc(bibtex(rec))}</pre><button class="btn btn-primary btn-sm" type="button" data-copy-bibtex>Copy BibTeX</button></div>
+          </details>
+          <button class="rd-pill" type="button" data-share>{icon("share", 15)}<span>Share</span></button></div>
     </section>"""
 
     # --- In short: the summary is the opening paragraph ---
@@ -1783,6 +1780,8 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
       </div>
     </section>"""
 
+    ask_jump = (f'<button class="rd-askbar" type="button" data-ask-jump aria-controls="ask">{icon("ask", 16)}'
+                f'<span>Ask this paper a question</span><kbd>A</kbd></button>') if abstract else ""
     sections = "\n    ".join(x for x in (minute, numbers_html, ranking_pages.why_ranked(rec), abstract_sec, full, ideas_html, fits,
                                          rd_resources(rec, links), ask_html) if x)
 
@@ -1800,6 +1799,7 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
   <article class="paper rd-cols" data-paper-id="{pid}" data-title="{title}" data-topics="{esc(' '.join(rec.get('categories') or ['other-ml']))}">
     <aside class="rd-side"><div class="rd-stick" data-rd-stick>
       <p class="rd-small {size_cls}" data-rd-small aria-hidden="true">{title}</p>
+      {ask_jump}
       {details}
     </div></aside>
     <div class="rd-main">

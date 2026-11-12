@@ -2377,41 +2377,29 @@ a.rd-fit-row:hover .rd-fit-h { text-decoration: underline; text-decoration-thick
 .mt .mt-group th:last-child { text-align: right; }
 .rk .rd-src a, .rk-ev a { text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---- Decluttered: one topic label per card, a "More" menu on the paper page ---- */
+/* ---- Decluttered: one topic label per card ---- */
 .pc-word { display: none; }
-.rd-more-menu { position: relative; }
-.rd-more-menu > summary { list-style: none; cursor: pointer; }
-.rd-more-menu > summary::-webkit-details-marker { display: none; }
-.rd-more-box { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-.rd-more-box .rd-lbl { margin: 6px 0 0; }
-.rd-more-box pre { max-width: 100%; overflow-x: auto; }
 .rd-pill-explain { border-color: var(--accent, #ff4f00); color: var(--accent, #ff4f00); }
 
 /* ---- Top bar credit: who built the site, and its open-source code on GitHub ---- */
 .oss { position: relative; display: inline-flex; align-items: center; gap: 12px; flex: none; }
-.oss-by { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.oss-by b { color: var(--ink); font-weight: 600; }
-.oss-btn { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 5px 0 12px; border-radius: 12px; background: var(--ink); color: var(--bg); white-space: nowrap; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s; }
+.oss-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 4px 0 11px; border-radius: 10px; background: var(--ink); color: var(--bg); white-space: nowrap; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s; }
 .oss-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -10px rgb(0 0 0 / .5); }
 .oss-btn:active { transform: scale(.97); }
 .oss-main { display: inline-flex; align-items: center; gap: 8px; }
 .oss-txt { display: flex; flex-direction: column; line-height: 1.05; }
-.oss-txt small { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
-.oss-txt span { font-size: 14px; font-weight: 600; }
+.oss-txt small { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.oss-txt span { font-size: 13px; font-weight: 600; }
 .oss-arrow { opacity: .8; }
-.oss-star { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 700; }
+.oss-star { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 7px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; }
 .oss-tip { position: absolute; top: calc(100% + 10px); right: 0; z-index: 50; width: 270px; padding: 12px 14px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.45; white-space: normal; box-shadow: 0 16px 40px -12px rgb(0 0 0 / .4); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .15s, transform .15s, visibility .15s; pointer-events: none; }
 .oss-tip b { display: block; margin-bottom: 2px; font-weight: 600; }
 .oss:hover .oss-tip, .oss-btn:focus-visible + .oss-tip { opacity: 1; visibility: visible; transform: none; }
-@media (max-width: 1400px) { .oss-by { display: none; } }
 @media (max-width: 1240px) { .oss-txt, .oss-arrow { display: none; } .oss-btn { padding: 0 5px 0 10px; } }
-@media (max-width: 680px) { .oss-by { display: inline; font-size: 12px; } .oss-btn { height: 42px; } .oss-tip { display: none; } }
-@media (max-width: 400px) { .oss-by { display: none; } }
-/* With the Subscribe button there is no room for the name on phones: it moves to the footer */
-@media (max-width: 680px) { .header-actions:has(.hdr-sub) .oss-by { display: none; } }
+@media (max-width: 680px) { .oss-btn { height: 42px; } .oss-star { height: 34px; } .oss-tip { display: none; } }
+/* Phones: the logo name gives way to the Subscribe button */
 @media (max-width: 540px) { .bar-in:has(.hdr-sub) .brand-name { display: none; } }
 @media (prefers-reduced-motion: reduce) { .oss-btn, .oss-btn:hover, .oss-btn:active { transition: none; transform: none; } }
-.rd-actions .rd-more-menu[open] > summary { width: auto; display: inline-flex; }
 /* The credit takes room in the top bar: search folds to its icon earlier, and the logo stays on small phones */
 @media (max-width: 1240px) {
   .header-actions .cmdk { flex: none; width: 40px; min-width: 0; padding: 0; justify-content: center; } .cmdk span, .cmdk kbd { display: none; }
