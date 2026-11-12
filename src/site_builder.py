@@ -71,6 +71,7 @@ CATEGORY_NAMES["other-ml"] = "Other ML"
 ICONS = {
     "search": '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
     "github": '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
+    "arrow-up-right": '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
     "ask": '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
     "arrow": '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
     "back": '<path d="m15 18-6-6 6-6"/>',
@@ -219,6 +220,8 @@ def merge_papers(days: list[dict]) -> dict[str, dict]:
 # The site's open-source code, and who made it (shown in the header and footer)
 REPO_URL = "https://github.com/Omen-bit/ai-paper-daily"
 MADE_BY = "Darshan Chougule"
+STAR_SVG = ('<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
+            '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>')
 
 # Edition strip shown on every page; set by build_site
 EDITION = ""
@@ -282,7 +285,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
                 f' data-website-id="{UMAMI_WEBSITE_ID}" data-auto-track="false"></script>')
 
     def nav(href, label, key, ic, extra=""):
-        current = ' aria-current="page" data-current' if key == active else ""
+        current = ' aria-current="page"' if key == active else ""
         return f'<a href="{root}{href}"{current}>{icon(ic, 18, "nav-ic")}<span class="nav-label">{label}</span>{extra}</a>'
 
     return f"""<!doctype html>
@@ -302,7 +305,7 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
 <link rel="preload" href="{root}assets/fonts/geist-pixel-square.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{root}assets/style.css?v={ASSET_V}">
 <link rel="icon" href="{FAVICON}">
-<script type="speculationrules">{{"prefetch":[{{"where":{{"and":[{{"href_matches":"/*"}},{{"not":{{"href_matches":"*.md"}}}}]}},"eagerness":"moderate"}}]}}</script>
+<script type="speculationrules">{{"prerender":[{{"where":{{"selector_matches":".nav a"}},"eagerness":"moderate"}}],"prefetch":[{{"where":{{"and":[{{"href_matches":"/*"}},{{"not":{{"href_matches":"*.md"}}}}]}},"eagerness":"moderate"}}]}}</script>
 </head>
 <body{f' class="{body_class}"' if body_class else ""}>
 <a class="skip" href="#main">Skip to content</a>
@@ -319,7 +322,14 @@ def page(title: str, body: str, root: str = "", description: str = TAGLINE, acti
     </nav>
     <div class="header-actions">
       {f'<a class="btn btn-primary hdr-sub" href="{root}index.html#subscribe" data-sub-jump><span class="nav-long">Get it by email</span><span class="nav-short">Subscribe</span></a>' if BUTTONDOWN_USER else ""}
-      <a class="made-by" href="{REPO_URL}" rel="noopener" title="Open-source code on GitHub">{icon("github", 16)}<span><small>Made by</small> {MADE_BY}</span></a>
+      <span class="oss">
+        <span class="oss-by">Built by <b>{MADE_BY}</b></span>
+        <a class="oss-btn" href="{REPO_URL}" rel="noopener" aria-describedby="oss-tip">
+          <span class="oss-main">{icon("github", 17)}<span class="oss-txt"><small>Open source</small><span>View on GitHub</span></span>{icon("arrow-up-right", 13, "oss-arrow")}</span>
+          <span class="oss-star">{STAR_SVG}<span>Star</span></span>
+        </a>
+        <span class="oss-tip" id="oss-tip" role="tooltip"><b>This project is open source</b>Read the code or use it in your own project. If you like it, don’t forget to give it a ★ star on GitHub.</span>
+      </span>
       <button class="icon-button" type="button" data-theme-toggle aria-label="Switch light or dark theme" data-tip="Switch theme">{icon("moon", 17, "icon-moon")}{icon("sun", 17, "icon-sun")}</button>
     </div>
   </div>

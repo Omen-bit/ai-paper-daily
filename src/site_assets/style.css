@@ -2387,12 +2387,27 @@ a.rd-fit-row:hover .rd-fit-h { text-decoration: underline; text-decoration-thick
 .rd-more-box pre { max-width: 100%; overflow-x: auto; }
 .rd-pill-explain { border-color: var(--accent, #ff4f00); color: var(--accent, #ff4f00); }
 
-/* ---- Top bar credit: who made the site, linking to its open-source code ---- */
-.made-by { display: inline-flex; align-items: center; gap: 8px; flex: none; height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; white-space: nowrap; }
-.made-by small { font-size: 12px; font-weight: 400; color: var(--muted); }
-.made-by:hover { border-color: var(--ink); }
-@media (max-width: 1100px) { .made-by small { display: none; } }
-@media (max-width: 380px) { .made-by { padding: 0 10px; font-size: 13px; } }
+/* ---- Top bar credit: who built the site, and its open-source code on GitHub ---- */
+.oss { position: relative; display: inline-flex; align-items: center; gap: 12px; flex: none; }
+.oss-by { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.oss-by b { color: var(--ink); font-weight: 600; }
+.oss-btn { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 5px 0 12px; border-radius: 12px; background: var(--ink); color: var(--bg); white-space: nowrap; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s; }
+.oss-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -10px rgb(0 0 0 / .5); }
+.oss-btn:active { transform: scale(.97); }
+.oss-main { display: inline-flex; align-items: center; gap: 8px; }
+.oss-txt { display: flex; flex-direction: column; line-height: 1.05; }
+.oss-txt small { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.oss-txt span { font-size: 14px; font-weight: 600; }
+.oss-arrow { opacity: .8; }
+.oss-star { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 700; }
+.oss-tip { position: absolute; top: calc(100% + 10px); right: 0; z-index: 50; width: 270px; padding: 12px 14px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.45; white-space: normal; box-shadow: 0 16px 40px -12px rgb(0 0 0 / .4); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .15s, transform .15s, visibility .15s; pointer-events: none; }
+.oss-tip b { display: block; margin-bottom: 2px; font-weight: 600; }
+.oss:hover .oss-tip, .oss-btn:focus-visible + .oss-tip { opacity: 1; visibility: visible; transform: none; }
+@media (max-width: 1240px) { .oss-by { display: none; } }
+@media (max-width: 1000px) { .oss-txt, .oss-arrow { display: none; } .oss-btn { padding: 0 5px 0 10px; } }
+@media (max-width: 680px) { .oss-by { display: inline; font-size: 12px; } .oss-btn { height: 42px; } .oss-tip { display: none; } }
+@media (max-width: 400px) { .oss-by { display: none; } }
+@media (prefers-reduced-motion: reduce) { .oss-btn, .oss-btn:hover, .oss-btn:active { transition: none; transform: none; } }
 .rd-actions .rd-more-menu[open] > summary { width: auto; display: inline-flex; }
 /* The credit takes room in the top bar: search folds to its icon earlier, and the logo stays on small phones */
 @media (max-width: 1240px) {
@@ -2407,14 +2422,19 @@ a, button, summary, label { -webkit-tap-highlight-color: transparent; touch-acti
 :focus:not(:focus-visible) { outline: none; }
 .nav a { transition: background-color .18s ease, color .18s ease, transform .12s ease; }
 .nav a:active { transform: scale(.94); }
-/* Pages cross-fade into each other; the top bar and the phone menu stay in place */
+/* Pages cross-fade into each other; the top bar and phone menu stay put, and the
+   highlighted tab glides from the old tab to the new one */
 @view-transition { navigation: auto; }
 .site-header { view-transition-name: site-header; }
 .nav { view-transition-name: site-nav; }
-::view-transition-old(root) { animation: 140ms ease-out both vt-out; }
-::view-transition-new(root) { animation: 200ms ease-out both vt-in; }
+.nav a[aria-current="page"] { view-transition-name: nav-current; }
+::view-transition-group(*) { animation-duration: 320ms; animation-timing-function: cubic-bezier(.22,1,.36,1); }
+::view-transition-group(nav-current) { z-index: 2; }
+::view-transition-old(nav-current), ::view-transition-new(nav-current) { height: 100%; object-fit: fill; }
+::view-transition-old(root) { animation: 160ms cubic-bezier(.4,0,1,1) both vt-out; }
+::view-transition-new(root) { animation: 300ms cubic-bezier(.22,1,.36,1) 40ms both vt-in; }
 @keyframes vt-out { to { opacity: 0; } }
-@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
   .nav a { transition: none; } .nav a:active { transform: none; }
