@@ -1,4 +1,5 @@
 {
+ "last_fetch": "",
  "posts": [
   {
    "url": "https://www.databricks.com/blog/new-genie-autonomous-ai-complex-enterprise-work",
@@ -6,7 +7,7 @@
    "title": "The new Genie: autonomous AI for complex enterprise work",
    "published": "2026-11-11",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "data",
    "summary": "They created Genie, an autonomous AI coworker that uses an ontology for business context, searches the lakehouse, and follows guardrails to run, monitor, and complete tasks automatically.",
    "tags": [
     "Tool calling",
@@ -16,7 +17,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Employees had to manually track and act on long‑running, data‑heavy enterprise tasks, which was time‑consuming and error‑prone.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.databricks.com/blog/genie-genie-ontology-delivers-16-accuracy-less-half-tokens",
@@ -24,7 +26,7 @@
    "title": "Genie with Genie Ontology Delivers 1.6× the Accuracy with Less than Half the Tokens",
    "published": "2026-11-11",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Created Genie with an ontology layer that automatically gathers context from notebooks, dashboards, queries, and documents, letting the agent retrieve and reason over this knowledge.",
    "tags": [
     "Agents",
@@ -34,7 +36,8 @@
    "sorted_by": "groq",
    "result": "91% pass rate, 1.6× accuracy, <50% token usage",
    "issue": "Enterprise users needed AI agents that could answer business questions using scattered analytical assets, not just tables.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.databricks.com/blog/enterprise-context-action-genie-agents-now-analyze-more-data-sources-transform-your-work",
@@ -42,7 +45,7 @@
    "title": "From enterprise context to action: Genie Agents now analyze more data sources to transform your work",
    "published": "2026-11-11",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Databricks expanded Genie Agents to ingest large document collections, use connectors for tools, and provide no‑code, privacy‑preserving interactions that turn natural‑language queries into actions.",
    "tags": [
     "Agents",
@@ -52,7 +55,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams needed agents that could understand both structured and unstructured business data and act within enterprise tools.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.databricks.com/blog/bring-your-business-context-chatgpt-claude-microsoft-copilot-cowork-and-grok-bot",
@@ -60,7 +64,7 @@
    "title": "Bring your business context to ChatGPT, Claude, Microsoft Copilot Cowork and Grok Bot",
    "published": "2026-11-11",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Created Genie Ontology, a governed context layer with plugins for ChatGPT, Claude, Copilot, and Grok Bot, letting agents use definitions, relationships, and routing to fetch accurate data and citations.",
    "tags": [
     "Agents",
@@ -70,7 +74,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents often guess answers because they lack clear business context and data locations.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.databricks.com/blog/announcing-ga-genie-ontology",
@@ -78,7 +83,7 @@
    "title": "Announcing GA of Genie Ontology",
    "published": "2026-11-11",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "data",
    "summary": "They built Genie Ontology, a shared knowledge layer that agents continuously learn from dashboards, SQL, notebooks and docs, while people govern the definitions.",
    "tags": [
     "Agents",
@@ -88,7 +93,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents lacked a complete, up‑to‑date understanding of the whole business, and manual ontologies quickly became outdated.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://shopify.engineering/generative-discovery",
@@ -132,7 +138,7 @@
    "title": "BotPsy: On-Device Personal Assistant with a Sub-Billion-Parameter Agentic Language Model",
    "published": "2026-11-11",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built BotPsy, a 0.8 B‑parameter on‑device model that can call tools and act as a personal assistant for many everyday tasks.",
    "tags": [
     "Tool calling",
@@ -142,7 +148,8 @@
    "sorted_by": "groq",
    "result": "Outperforms all models ≤1.2 B on tool‑use benchmarks",
    "issue": "Cloud LLMs are expensive, unpredictable, and expose user data, while many tasks need only modest intelligence.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.fb.com/2026/11/11/ml-applications/intelligent-delivery-serve-better-ads",
@@ -186,7 +193,7 @@
    "title": "How we rebuilt the Shopify app in 12 weeks",
    "published": "2026-11-10",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created a workflow where AI agents generate most of the Swift and Kotlin code, supported by clear architecture rules, tests, linting and CI feedback to keep the output correct.",
    "tags": [
     "Agents",
@@ -195,7 +202,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed to rebuild a huge mobile app quickly, but manual coding was too slow and error‑prone.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/expedia-group-tech/how-i-taught-an-ai-to-read-my-logs-9c04f1cfa750",
@@ -272,7 +280,7 @@
    "title": "Agent Substrate: Advancing Kubernetes for Agents at Scale",
    "published": "2026-11-10",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created Agent Substrate, an open‑source runtime that pools a few Kubernetes pods, checkpoints idle agent state, and restores it instantly, enabling millions of agents to run with high density.",
    "tags": [
     "Agents",
@@ -282,7 +290,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents spend most time idle or waiting, causing wasted resources and slow response due to Kubernetes pod startup.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.databricks.com/blog/turn-buying-signals-pipeline-sendoso-gifts-genie-one",
@@ -290,7 +299,7 @@
    "title": "Turn buying signals into pipeline with Sendoso gifts in Genie One",
    "published": "2026-11-09",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Created a Databricks Marketplace MCP server that lets Genie One call Sendoso’s gifting API, turning data signals into automated, governed gift actions.",
    "tags": [
     "Tool calling",
@@ -299,7 +308,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams had to export data and switch tools to send gifts, slowing down outreach.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.databricks.com/blog/accelerate-gpu-training-unity-catalog-tables-ucdataset",
@@ -342,7 +352,7 @@
    "title": "Using AI to Build AI: How Agentforce Engineers Scale Automation Without Sacrificing Reliability",
    "published": "2026-11-09",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created an AI‑driven automation pipeline that generates and validates components, using tool calls and safety checks to keep reliability high.",
    "tags": [
     "Tool calling",
@@ -352,7 +362,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Engineers needed to automate building the Atlas Reasoning Engine without unreliable AI-generated code.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/changelog/json-render-and-chat-sdk-agents",
@@ -360,7 +371,7 @@
    "title": "Chat SDK agents can now stream generative UI with json-render",
    "published": "2026-11-06",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created a JSON‑based UI spec that agents output, which json‑render turns into native cards for Slack, Teams, etc., streaming updates as the spec builds.",
    "tags": [
     "Agents",
@@ -370,7 +381,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers had to create separate UI code for each chat platform, slowing down agent responses.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/changelog/ai-gateway-adds-deepseek-search-and-fetch-tools",
@@ -378,7 +390,7 @@
    "title": "AI Gateway adds DeepSeek Search and Fetch tools",
    "published": "2026-11-06",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Added DeepSeek Search and Fetch tools to AI Gateway, letting any model that supports tool calling retrieve page titles, URLs, summaries, and markdown content via a single API key.",
    "tags": [
     "Tool calling",
@@ -388,7 +400,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed a simple way to let LLMs fetch web pages and search results during tool‑calling tasks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83",
@@ -448,7 +461,7 @@
    "title": "Formally verifying agent-written full-stack web apps with PDD Kit",
    "published": "2026-11-05",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created PDD Kit, a toolkit that lets agents generate formal proofs from natural‑language specs, ensuring the code matches the contract for all inputs.",
    "tags": [
     "Agents",
@@ -457,7 +470,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agent‑written code often drifts from the original specification, and tests miss many bugs.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://stripe.com/blog/analyze-your-stripe-data-directly-with-your-agent",
@@ -465,7 +479,7 @@
    "title": "Analyze your Stripe data directly with your agent",
    "published": "2026-11-05",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Stripe added APIs that let agents like Claude retrieve and query over 300 structured tables, generate SQL, and return results for natural‑language prompts.",
    "tags": [
     "Agents",
@@ -475,7 +489,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers wanted to ask AI agents to analyze their Stripe data without writing code.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://shopify.engineering/reflex",
@@ -483,7 +498,7 @@
    "title": "Reflex: an architecture for building mobile apps with agents",
    "published": "2026-11-05",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created Reflex, an MVVM architecture that runs app logic headlessly and exposes state via a CLI, letting agents test iOS and Android with a single test suite.",
    "tags": [
     "Agents"
@@ -491,7 +506,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Testing mobile screens required slow emulator builds, delaying agent-written code verification.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://machinelearning.apple.com/research/faster-retrieval",
@@ -517,7 +533,7 @@
    "title": "How two engineer side projects became the agent taking action inside Dropbox",
    "published": "2026-11-05",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created a sandboxed agent that connects to Dropbox via rclone, uses permission checks and version history to safely modify files and allow rollbacks.",
    "tags": [
     "Agents",
@@ -527,7 +543,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users wanted AI to edit their Dropbox files but needed safety and control over changes.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://dropbox.tech/machine-learning/how-aiassisted-development-helped-us-build-the-new-dropbox-experience",
@@ -586,7 +603,7 @@
    "title": "Introducing Vercel Schedules",
    "published": "2026-11-04",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created Vercel Schedules, an API/SDK that lets code create, update, or cancel one‑time and recurring jobs, which are triggered via queues while the app runs.",
    "tags": [
     "Agents",
@@ -595,7 +612,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed a way for agents and apps to run tasks on dynamic schedules without redeploying or managing separate databases.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/pinterest-engineering/scaling-model-evaluation-at-pinterest-with-ray-part-4-4a96cd12cc11",
@@ -619,7 +637,7 @@
    "title": "Use NVIDIA NeMo to Turn Agent Failures into Tests and Harness Fixes",
    "published": "2026-11-04",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built a loop using NeMo Compass to turn trace logs into prioritized test cases, wrote evaluations with NeMo Eval Author, and refined prompts, routing and memory to fix the agent.",
    "tags": [
     "Agents",
@@ -629,7 +647,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents sometimes pick the wrong tool or miss context, causing task failures.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-uses-ai-agents-to-streamline-ai-factory-operations",
@@ -637,7 +656,7 @@
    "title": "How NVIDIA Uses AI Agents to Streamline AI Factory Operations",
    "published": "2026-11-04",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "NVIDIA built an AI Factory Operations Agent that uses multiple specialized agents, connected via a protocol, to diagnose issues and suggest fixes through a chat interface.",
    "tags": [
     "Tool calling",
@@ -647,7 +666,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "SREs had to check many dashboards manually to find why training performance dropped.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-factory-operations-blueprint-coordinates-ai-agents-to-investigate-production-issues",
@@ -655,7 +675,7 @@
    "title": "How NVIDIA Factory Operations Blueprint Coordinates AI Agents to Investigate Production Issues",
    "published": "2026-11-04",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Created a factory manager AI agent that connects to existing data and tools, monitors operations, finds root causes, and directs robots to fix problems.",
    "tags": [
     "Agents",
@@ -665,7 +685,8 @@
    "sorted_by": "groq",
    "result": "Cost savings up to 20%",
    "issue": "Unplanned factory downtime costs millions and investigating issues takes too much time.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.honeycomb.io/blog/honeycomb-team-agents-ai-sre-done-right",
@@ -673,7 +694,7 @@
    "title": "Honeycomb Team Agents: AI SRE Done Right",
    "published": "2026-11-03",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Created AI agents that read code, logs, runbooks and tickets, set goals, run continuously, and proactively suggest fixes or actions.",
    "tags": [
     "Agents",
@@ -683,7 +704,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "SRE teams spend too much time reacting to alerts instead of preventing problems.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/changelog/vercel-security-review-public-beta",
@@ -708,7 +730,7 @@
    "title": "How Zapier turns ideas into working software in hours with Vercel",
    "published": "2026-11-03",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They used Vercel’s v0 platform to spin up interactive, multi‑view demos in under two hours, letting backend engineers deliver clickable experiences without frontend design time.",
    "tags": [
     "Real-time"
@@ -716,7 +738,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams needed to show partners working prototypes quickly, but the process took weeks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/blog/how-mercor-ships-internal-apps-and-billions-of-production-tokens-on-one-platform",
@@ -759,7 +782,7 @@
    "title": "Vercel MCP now renders deployments as an interactive card",
    "published": "2026-11-02",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created an interactive card for ChatGPT that shows live deployment info and lets the model fetch logs via an open_deployments tool.",
    "tags": [
     "Tool calling",
@@ -768,7 +791,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers wanted to see deployment status and logs directly inside chat without switching tools.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/from-synthetic-enterprise-data-evaluations-to-real-microsoft-copilot-ai-confidence",
@@ -794,7 +818,7 @@
    "title": "Vercel MCP now supports MCP events",
    "published": "2026-10-30",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They created an event system that lets agents subscribe to deployment events via managed webhooks, handling filtering, expiration, and limits automatically.",
    "tags": [
     "Agents",
@@ -804,7 +828,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers had to poll Vercel for deployment updates, wasting time and resources.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/run-ai-models-for-edge-application-development-with-just-a-few-commands",
@@ -830,7 +855,7 @@
    "title": "Build Specialized Agents on a Stack You Control with NVIDIA NemoClaw",
    "published": "2026-10-30",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "NVIDIA released NemoClaw blueprints that bundle model, harness, and governance tools, letting teams plug into existing harnesses like OpenClaw, Hermes, or LangChain and deploy agents safely and efficiently.",
    "tags": [
     "Agents",
@@ -840,7 +865,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed a secure, customizable stack to run specialized agents with enterprise data.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/build-a-validated-kubernetes-runtime-for-nvidia-dynamo",
@@ -884,7 +910,7 @@
    "title": "The fx adapter now runs the harness on the host",
    "published": "2026-10-29",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Moved the harness to run in the host process with libfx, isolating filesystem tools, adding tool filtering, mid‑turn steering, structured output, and session resume.",
    "tags": [
     "Tool calling",
@@ -894,7 +920,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Setting up sandboxed tool execution was complex and kept credentials insecure.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.fb.com/2026/10/29/security/catching-bugs-before-they-land-jittestings-human-on-the-loop-approach-at-full-scale",
@@ -919,7 +946,7 @@
    "title": "Vercel Agent can now validate alerts before paging",
    "published": "2026-10-28",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "They added an Agent that reviews each monitor alert, checks logs and metrics, and only forwards alerts classified as Critical to the paging webhook.",
    "tags": [
     "Agents",
@@ -929,7 +956,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Too many non‑critical alerts were paging on‑call engineers, causing noise and fatigue.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/changelog/run-paseo-agents-on-vercel-sandbox",
@@ -937,7 +965,7 @@
    "title": "Run Paseo agents on Vercel Sandbox",
    "published": "2026-10-28",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They added a Vercel Sandbox plugin that runs agents in the cloud, saves files and conversation history, and reuses the AI gateway key across sessions.",
    "tags": [
     "Agents",
@@ -947,7 +975,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers wanted to run AI agents continuously and switch devices without losing state.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/changelog/box-mount-now-runs-in-vercel-sandbox",
@@ -955,7 +984,7 @@
    "title": "Box Mount now runs in Vercel Sandbox",
    "published": "2026-10-28",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created Box Mount that syncs a Box folder to a Vercel Sandbox directory, letting agents use normal file commands while keeping credentials separate.",
    "tags": [
     "Tool calling",
@@ -964,7 +993,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents needed a way to read and write Box files without exposing credentials.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/blog/introducing-vercel-ci",
@@ -1044,7 +1074,7 @@
    "title": "Anyone can now bring their ideas into the company codebase",
    "published": "2026-10-27",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Replit built Cloud Agents that turn plain‑language requests into safe code changes, test them, and handle pull‑request reviews automatically.",
    "tags": [
     "Agents",
@@ -1054,7 +1084,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Non‑technical team members can't directly modify core code, causing slow review bottlenecks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/expedia-group-tech/beyond-the-prompt-engineering-the-loop-for-software-change-at-scale-9ac26e3b2706",
@@ -1062,7 +1093,7 @@
    "title": "Beyond the Prompt: Engineering the Loop for Software Change at Scale",
    "published": "2026-10-27",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created a Loop system that combines prompts, reusable skills, and sub‑agents to automate iOS component migration, handling failures and decisions autonomously.",
    "tags": [
     "Agents",
@@ -1072,7 +1103,8 @@
    "sorted_by": "groq",
    "result": "Two‑year effort finished in three months",
    "issue": "Large code changes were slow because hidden dependencies and build failures required constant human intervention.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/agoda-engineering/key-takeaways-from-tech-at-agoda-from-assistants-to-ai-agents-b0e9187730bb",
@@ -1080,7 +1112,7 @@
    "title": "Key Takeaways from Tech at Agoda: From Assistants to AI Agents",
    "published": "2026-10-27",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Agoda created AI agents that take on planning, code review, support triage and testing, using clear goals and human approval steps to keep work safe.",
    "tags": [
     "Agents",
@@ -1090,7 +1122,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Engineers wrote code faster, but planning, testing and release became bottlenecks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/fine-tuning-nvidia-nemotron-to-know-local-rules-not-just-local-languages",
@@ -1134,7 +1167,7 @@
    "title": "Making Failure Diagnosis Reliable with Pensive AI",
    "published": "2026-10-26",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "They added an LLM layer to read logs, extract error details, and suggest fixes, while keeping existing rule‑based logic for known cases.",
    "tags": [
     "Tool calling",
@@ -1144,7 +1177,8 @@
    "sorted_by": "groq",
    "result": "AI extraction covers 100% of failures",
    "issue": "Half of failed jobs were unclassified, wasting engineer time.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://vercel.com/blog/how-vercel-agent-accesses-production-safely",
@@ -1215,7 +1249,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Robots struggled to learn walking and obstacle navigation without a coordinated planning and training system.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/flint-interactive-a-language-for-creating-interactive-data-visualizations",
@@ -1233,7 +1268,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users wanted charts they could explore, not just static images.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.amazon.science/blog/the-science-behind-torchneuron-amazons-new-pytorch-backend-for-aws-trainium-chips",
@@ -1258,7 +1294,7 @@
    "title": "We gave AI agents a mobile dev environment",
    "published": "2026-10-22",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created Remote Dev, a cloud‑based Mac environment that gives each AI agent its own sandbox to compile, run simulators, and create PRs, all triggered from Slack.",
    "tags": [
     "Agents",
@@ -1268,7 +1304,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents were overloading developers' laptops when building and testing mobile apps.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/replit-monitoring-agent",
@@ -1276,7 +1313,7 @@
    "title": "Replit Monitoring Agent: Your very own software engineering team",
    "published": "2026-10-22",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Created an autonomous monitoring agent that watches app health, diagnoses problems from logs, writes and validates a fix, and can deploy it automatically.",
    "tags": [
     "Agents",
@@ -1286,7 +1323,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Small teams must manually find and fix app outages, which wastes time and frustrates users.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/microsoft/thinkingbox-training",
@@ -1294,7 +1332,7 @@
    "title": "Turning Database Grading into RL Rewards: Post-Training Agents with ThinkingBox",
    "published": "2026-10-22",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They created ThinkingBox, a system that runs agents against a real database, checks the final state, and uses that check as a reward signal to fine‑tune the agent.",
    "tags": [
     "Agents",
@@ -1304,7 +1342,8 @@
    "sorted_by": "groq",
    "result": "Success rate rose from 51.70% to 60.78%",
    "issue": "Agents often said they finished tasks even when the database still needed work.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/running-frontier-class-ai-models-across-8-nvidia-dgx-spark-nodes",
@@ -1312,7 +1351,7 @@
    "title": "Running Frontier-Class AI Models Across 8 NVIDIA DGX Spark Nodes",
    "published": "2026-10-22",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "NVIDIA built an eight‑node DGX Spark cluster that links eight servers, giving 1 TB unified memory and faster communication, letting huge models run and be served locally.",
    "tags": [
     "Latency",
@@ -1321,7 +1360,8 @@
    "sorted_by": "groq",
    "result": "80 tokens per second generation",
    "issue": "Developers need to run very large models and multiple models together, but single machines lack enough memory and speed.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://shopify.engineering/open-model-task-experts",
@@ -1329,7 +1369,7 @@
    "title": "How Shopify turns open models into task experts",
    "published": "2026-10-21",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created specialized sub‑agents by post‑training open models with a continual learning loop and an LLM judge, then swapped them in for the main model.",
    "tags": [
     "Agents",
@@ -1339,7 +1379,8 @@
    "sorted_by": "groq",
    "result": "7× faster, 90% cheaper",
    "issue": "Token‑heavy tasks cost too much and run slowly on the main model.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/empowering-frontline-maternal-care-with-ai-assisted-ultrasound",
@@ -1399,7 +1440,7 @@
    "title": "How NVIDIA OpenShell Reference Architecture Secures and Governs AI Agent Workloads at Scale",
    "published": "2026-10-21",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They created OpenShell, an open‑source runtime that controls what files, services, and devices an agent can access, adds monitoring, and lets operators block or modify actions.",
    "tags": [
     "Agents",
@@ -1408,7 +1449,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Autonomous agents could perform unsafe actions when working on long, complex tasks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/developing-an-ai-factory-digital-twin-with-an-agent-assisted-workflow",
@@ -1416,7 +1458,7 @@
    "title": "Developing an AI Factory Digital Twin with an Agent-Assisted Workflow",
    "published": "2026-10-21",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created an Omniverse DSX Blueprint with reusable assets and scripts, and added AI agents that gather inputs, assemble OpenUSD scenes, and let engineers review and iterate designs.",
    "tags": [
     "Agents",
@@ -1426,7 +1468,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers struggled to combine site plans, equipment data, and engineering specs into a single, editable digital twin model.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/design-proteins-with-rfd4-proteina-using-reward-guided-inference-time-search",
@@ -1444,7 +1487,8 @@
    "sorted_by": "groq",
    "result": "Faster and uses less memory than the previous version",
    "issue": "Scientists need to explore billions of protein sequences to find therapeutic candidates, but exhaustive search is impossible.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://blog.cloudflare.com/webmcp-commerce",
@@ -1452,7 +1496,7 @@
    "title": "How Commerce.com and Cloudflare are getting storefronts ready for AI agents",
    "published": "2026-10-21",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They added an edge script that injects structured tools into pages, letting agents call exact functions like search_products instead of guessing clicks.",
    "tags": [
     "Tool calling",
@@ -1461,7 +1505,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Merchants needed a way for AI agents to shop on their sites without breaking when pages change.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://shopify.engineering/catalog-clustering-part-ii",
@@ -1505,7 +1550,7 @@
    "title": "Making every harness durable",
    "published": "2026-10-19",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They moved the coding‑agent harnesses to Vercel’s cloud, creating long‑lived processes that keep session state in memory and can run for minutes or hours.",
    "tags": [
     "Agents",
@@ -1515,7 +1560,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed always‑on coding agents without keeping their laptops running.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/thin-orchestrator-ai-agent-architecture",
@@ -1523,7 +1569,7 @@
    "title": "The Thin Orchestrator: How We Made Our AI Agents More Reliable by Giving the Router Less to Do",
    "published": "2026-10-19",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They created a thin orchestrator that only sequences tasks and checks reliability, while 14 specialized agents handle each domain, cutting context overload.",
    "tags": [
     "Agents",
@@ -1533,7 +1579,8 @@
    "sorted_by": "groq",
    "result": "Token usage cut up to 65‑fold",
    "issue": "The main AI agent kept hallucinating because it had to handle all domain knowledge and routing.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/genrecs-tokenization-transforming-ads-recommendation-at-meta-with-stable-model-vocabulary",
@@ -1621,7 +1668,8 @@
    "sorted_by": "groq",
    "result": "Per‑turn latency dropped 90%, overall inference latency 28–54% faster",
    "issue": "Long, costly reasoning slowed multimodal search agents.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://machinelearning.apple.com/research/mlx-distributed-inference",
@@ -1647,7 +1695,7 @@
    "title": "Scale Agentic Coding Workflows with Meta’s Muse Spark Open on NVIDIA GB300 NVL72",
    "published": "2026-10-15",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created Muse Spark Open, an 816B MoE model with a 1 M‑token window that plans, uses tools, observes results, and self‑corrects across entire projects.",
    "tags": [
     "Agents",
@@ -1657,7 +1705,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed an AI that could handle huge codebases and multi-step refactoring without breaking tasks into pieces.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/nvidia-nemotron-3-5-super-vl-powers-specialized-agents-with-multimodal-reasoning",
@@ -1675,7 +1724,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Enterprise workflows need agents that can read documents, follow policies, and use multiple tools in one request.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://building.nu.com/squeezing-2x-mfu-out-of-our-training-runs",
@@ -1729,7 +1779,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Standard LLMs can’t handle huge, complex geospatial data and multi‑step spatial analysis.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96",
@@ -1771,7 +1822,7 @@
    "title": "Optimizing Agent Reliability and Tool Calling Efficiency for Chip Design Using NVIDIA NeMo Gym",
    "published": "2026-10-14",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Used NVIDIA NeMo Gym to test and refine the Siemens Fuse EDA agent, adding verifiers and better tool descriptions, which raised benchmark scores to ~95% and cut agent turns by 66%.",
    "tags": [
     "Agents",
@@ -1781,7 +1832,8 @@
    "sorted_by": "groq",
    "result": "Score ~95%, turns reduced 66%",
    "issue": "AI agents often produce plausible but wrong results, risking errors that spread through chip design workflows.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/airbnb-engineering/castle-training-natural-language-search-before-the-first-real-query-3818ef8b4828",
@@ -1807,7 +1859,7 @@
    "title": "Run fast, private agents on-device with LFM2.5-24B-A2B",
    "published": "2026-10-13",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created a 24B‑parameter MoE model with only 2B active parameters per token, chain‑of‑thought output, large 131K context, and tool‑calling ability, enabling cheap continuous on‑device inference.",
    "tags": [
     "Agents",
@@ -1817,7 +1869,8 @@
    "sorted_by": "groq",
    "result": "Leads on five tool‑use benchmarks, three‑times next best on AutomationBench",
    "issue": "Need fast, private on‑device agents that can reason and use tools without heavy compute.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.razorpay.com/inside-razorpays-rto-model-the-engineering-behind-its-ml-lifecycle-999fe75e66ec",
@@ -1843,7 +1896,7 @@
    "title": "How to Rewrite Apache Spark UDFs for GPU Acceleration with AI Agents",
    "published": "2026-10-13",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created AI agents that automatically rewrite UDFs into GPU‑compatible code, letting Spark run fully on GPUs and boosting speed over 20×.",
    "tags": [
     "Agents",
@@ -1853,7 +1906,8 @@
    "sorted_by": "groq",
    "result": "22x+ speedups",
    "issue": "Custom Spark UDFs slowed down queries and prevented GPU acceleration.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.amazon.science/blog/can-we-change-an-ai-models-architecture-without-retraining-it-from-scratch",
@@ -1933,7 +1987,7 @@
    "title": "Building Reliable Data Analytics Agents: Lessons from the KDD Cup",
    "published": "2026-10-08",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "data",
    "summary": "They built a small, clear harness that limited tools, unified all data into a single SQL view, added persistent Python state, and made every step inspectable.",
    "tags": [
     "Agents",
@@ -1943,7 +1997,8 @@
    "sorted_by": "groq",
    "result": "Second place in KDD Cup 2026",
    "issue": "Answering questions across many data sources caused agents to fail due to complex tool usage.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/agent-lightning-v1-0-a-3500-line-lightweight-agentic-rl-framework-for-training-agents-with-real-harnesses",
@@ -1951,7 +2006,7 @@
    "title": "Agent Lightning v1.0: A 3,500-Line Lightweight Agentic RL Framework for Training Agents with Real Harnesses",
    "published": "2026-10-07",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built Agent Lightning v1.0, a lightweight RL framework that inserts an LLM proxy between the agent and the model, letting the same harness used in production train directly.",
    "tags": [
     "Agents",
@@ -1960,7 +2015,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Training agents with real-world tools was costly and mismatched the deployed version.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/validate-ai-factory-changes-with-digital-twins-and-ai-agents",
@@ -1968,7 +2024,7 @@
    "title": "Validate AI Factory Changes with Digital Twins and AI Agents",
    "published": "2026-10-07",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created a digital‑twin simulation of the AI factory and AI agents that query the twin, run checks, and trigger workflows, letting CI/CD validate changes early.",
    "tags": [
     "Agents",
@@ -1978,7 +2034,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams had to wait for physical hardware before they could test infrastructure and software changes, slowing deployments.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/earth-ais-planetary-geospatial-foundation-models-for-global-public-health",
@@ -2003,7 +2060,7 @@
    "title": "Metrics Board: Building an Agent-ready Metrics Layer",
    "published": "2026-10-06",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "data",
    "summary": "They created Metrics Board, a platform that automates metric creation, enforces quality, and lets LLM agents query metrics in natural language.",
    "tags": [
     "Agents",
@@ -2013,7 +2070,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams struggled with chaotic, unreliable metrics across a massive data lake, making decisions and experiments hard.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development",
@@ -2021,7 +2079,7 @@
    "title": "Building Git infrastructure for agent-scale development",
    "published": "2026-10-06",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created a new storage layer and core services that scale to agent‑level traffic, using sharding, caching, and async pipelines to keep repository actions fast.",
    "tags": [
     "Agents",
@@ -2031,7 +2089,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed Git operations that could handle thousands of AI agents working on code simultaneously.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.salesforce.com/ai-agents-need-memory-building-persistent-memory-for-agentforce",
@@ -2039,7 +2098,7 @@
    "title": "AI Agents Need Memory: Building Persistent Memory for Agentforce",
    "published": "2026-10-05",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created a persistent memory layer that stores conversation context and task state, letting agents recall prior steps across sessions.",
    "tags": [
     "Agent memory",
@@ -2048,7 +2107,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents forgot previous interactions, making complex tasks hard to automate.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.grab.com/powering-ai-led-research-through-simulation",
@@ -2091,7 +2151,7 @@
    "title": "AutoSynthData: Generating Training Data for Enterprise Agents",
    "published": "2026-10-02",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They created AutoSynthData, a system that turns agent failures and a stronger teacher model's successes into many realistic tasks, validates them, and builds a curriculum that focuses on remaining weak spots.",
    "tags": [
     "Synthetic data",
@@ -2101,7 +2161,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Enterprises lacked enough training data for agents to handle their specific tools, rules, and data.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://booking.ai/introducing-agenthub-booking-com-platform-for-modular-travel-ai-agents-68bc521a0f50",
@@ -2109,7 +2170,7 @@
    "title": "Introducing AgentHub: Booking.com Platform for Modular Travel AI Agents",
    "published": "2026-10-02",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built AgentHub, a configuration‑driven platform that lets teams assemble reusable LLM agents, connect them to internal APIs, and run multi‑step workflows.",
    "tags": [
     "Agents",
@@ -2119,7 +2180,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Travel teams needed a fast way to create AI agents that could handle many booking tasks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.amazon.science/blog/graph-centric-agentic-intelligence",
@@ -2127,7 +2189,7 @@
    "title": "Graph-centric agentic intelligence",
    "published": "2026-10-01",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Created an agent that walks real‑time dependency graphs, runs cascaded analytics, and uses causal inference to locate root causes automatically.",
    "tags": [
     "Graph RAG",
@@ -2137,7 +2199,8 @@
    "sorted_by": "groq",
    "result": "95% fault localization accuracy in under 30 seconds",
    "issue": "Ops teams needed AI agents that could understand complex network graphs to pinpoint failures fast.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://stripe.com/blog/where-pricing-is-headed",
@@ -2161,7 +2224,7 @@
    "title": "ShopGym: Realistic, reproducible sandboxes for shopping agents",
    "published": "2026-10-01",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built ShopGym, a sandbox that copies live stores into resettable simulations and creates realistic shopping tasks, letting agents be evaluated consistently.",
    "tags": [
     "Agents",
@@ -2171,7 +2234,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers struggled to train and test shopping agents because real stores constantly change and bots get blocked.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/fine-tuning-nvidia-nemotron-for-saudi-arabic-dialects-with-a-path-to-other-languages",
@@ -2211,7 +2275,7 @@
    "title": "Build Applications on NVIDIA BlueField Faster with NVIDIA DOCA Agent Skills",
    "published": "2026-10-01",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created DOCA Agent Skills that give agents verified API signatures, hardware requirements, and build constraints, letting them reason like expert DOCA developers.",
    "tags": [
     "Agents",
@@ -2221,7 +2285,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "General AI agents lacked specific knowledge of NVIDIA DOCA, causing guesswork and slow development cycles.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.salesforce.com/how-deterministic-controls-turn-ai-output-into-reliable-prompt-templates",
@@ -2246,7 +2311,7 @@
    "title": "Tracing Agent Harness Behavior with NVIDIA NeMo Relay",
    "published": "2026-09-30",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They created NeMo Relay, which records every model and tool call, timing, and errors, letting developers trace and compare agent runs to find inefficiencies.",
    "tags": [
     "Tool calling",
@@ -2256,7 +2321,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers can’t see why an agent takes extra steps or fails, making it hard to improve efficiency.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/deploying-an-hstu-generative-recommender-with-nvidia-dynamo-triton",
@@ -2282,7 +2348,7 @@
    "title": "Introducing AI Ecosystem: Zoom Out to See Your Whole AI Agent Fleet",
    "published": "2026-09-29",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built AI Ecosystem, a view that shows all agents, their calls, costs, and failures in one place, letting users drill into any conversation for details.",
    "tags": [
     "Agents"
@@ -2290,7 +2356,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams running many agents found it hard to see what was wrong across the whole fleet.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.honeycomb.io/blog/agents-need-context-canvas-connectors-ai-agent-visibility",
@@ -2298,7 +2365,7 @@
    "title": "Agents Need Context: Introducing Canvas Connectors, Fleet-wide AI Agent Visibility, and More",
    "published": "2026-09-29",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Built Canvas, a live workspace that pulls in external data via connectors (GitHub, PagerDuty, Confluence, Jira) and shows evidence like graphs, enabling collaborative investigation of agent‑driven failures.",
    "tags": [
     "Agents",
@@ -2307,7 +2374,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams run many AI agents and need more context to understand production incidents quickly.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/how-diffusion-controller-unifies-and-simplifies-ai-image-generation",
@@ -2394,7 +2462,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users wanted to schedule tasks by describing goals in their own words, not by picking preset settings.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/lower-the-cost-of-building-and-running-visual-ai-agents-with-nvidia-vss-blueprint-3-3",
@@ -2420,7 +2489,7 @@
    "title": "AI Native by Design: Lessons Learned from Building NVIDIA TensorRT Model Connect",
    "published": "2026-09-29",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created an open‑source C++ library where AI agents generate candidate implementations, then isolate, test, benchmark, and review each change before shipping.",
    "tags": [
     "Agents",
@@ -2430,7 +2499,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Model developers struggled to get high‑performance TensorRT inference without deep expertise.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/Hcompany/holo4",
@@ -2438,7 +2508,7 @@
    "title": "Holo4: powering generalist computer-use agents",
    "published": "2026-09-28",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Holo4 was trained with supervised and reinforcement learning on many tasks, letting it click, type, write code, and call tools, and it runs on any platform with one model.",
    "tags": [
     "Agents",
@@ -2448,7 +2518,8 @@
    "sorted_by": "groq",
    "result": "Much lower cost per task",
    "issue": "Businesses needed a single AI agent that could work with screens, code, and APIs without switching models.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.salesforce.com/engineering-multi-agent-ai-teams-that-build-and-test-themselves",
@@ -2466,7 +2537,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Creating and testing AI agents manually was slow and error‑prone.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/nvidia-open-agent-safety-platform-a-reference-for-continuous-in-silicon-agent-monitoring",
@@ -2537,7 +2609,8 @@
    "sorted_by": "groq",
    "result": "Substantial gains in multi‑shot narrative consistency and character persistence",
    "issue": "Long‑form video creation kept losing character look and story flow because separate tools failed and drifted.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/09/agentic-platform-open-sourcing-agentic-identity-broker.html",
@@ -2545,7 +2618,7 @@
    "title": "Agentic Platform: Open-Sourcing the Agentic Identity Broker",
    "published": "2026-09-24",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created an open‑source identity broker that records delegation chains and securely exchanges tokens so agents can access third‑party systems on behalf of users.",
    "tags": [
     "Agents",
@@ -2555,7 +2628,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents needed to act for users across services without storing users' access tokens.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/how-swe-serve-exposes-the-gap-between-local-tests-and-live-serving",
@@ -2579,7 +2653,7 @@
    "title": "Agent Memory with Engram: A Practical Guide",
    "published": "2026-09-22",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created Engram, a managed memory service that stores conversation data, extracts facts into topics, and lets agents search past memories before generating replies.",
    "tags": [
     "Agents",
@@ -2589,7 +2663,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents struggled to keep track of past conversations, leading to repetitive or irrelevant responses.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/agoda-engineering/how-agoda-is-evolving-engineering-support-with-ai-agents-c907a54e236e",
@@ -2597,7 +2672,7 @@
    "title": "How Agoda is evolving engineering support with AI agents",
    "published": "2026-09-22",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "support",
    "summary": "Created OpsBot AI, an LLM‑powered Slack bot that reads engineers' problem descriptions, extracts relevant context, fills request forms, and routes tickets to the right team.",
    "tags": [
     "Agents",
@@ -2607,7 +2682,8 @@
    "sorted_by": "groq",
    "issue": "Engineers struggled to collect needed details and route support requests when issues were described in free text.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.salesforce.com/ai-agent-observability-making-silent-production-failures-visible-and-actionable",
@@ -2615,7 +2691,7 @@
    "title": "AI Agent Observability: Making Silent Production Failures Visible and Actionable",
    "published": "2026-09-22",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "The team created Agentforce Health Monitoring, which tracks agent uptime, logs metrics, and alerts ops teams to investigate issues quickly.",
    "tags": [
     "Agents"
@@ -2623,7 +2699,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Silent failures of AI agents in production went unnoticed, hurting reliability.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/enabling-private-high-performance-production-ai-inference-with-nvidia-confidential-computing",
@@ -2649,7 +2726,7 @@
    "title": "Accelerating a ROS 2 Node with an AI Agent and NVIDIA Isaac ROS",
    "published": "2026-09-22",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "An AI coding agent inspects a CUDA‑accelerated ROS 2 node, plans a minimal refactor to use rosidl::Buffer, and verifies zero‑copy GPU transport.",
    "tags": [
     "Agents",
@@ -2659,7 +2736,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Robotics nodes were copying data through CPU memory, slowing down GPU‑accelerated perception.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://shopify.engineering/helix",
@@ -2748,7 +2826,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teachers struggled to create engaging, interactive simulations for every lesson.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14",
@@ -2827,7 +2906,7 @@
    "title": "Translating CUDA Tile Operations from Python to Rust Using Agentic AI",
    "published": "2026-09-16",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created an AI‑driven multi‑agent pipeline that reads Python or Triton kernels, translates them to Rust, validates each step, and benchmarks performance.",
    "tags": [
     "Agents",
@@ -2837,7 +2916,8 @@
    "sorted_by": "groq",
    "result": "99.5% of Python performance achieved",
    "issue": "Developers needed Rust versions of many existing CUDA Tile kernels without rewriting them manually.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/tensorrt-edge-llm-completes-the-mlperf-edge-agentic-benchmark-6-4x-faster-on-jetson-agx-thor",
@@ -2845,7 +2925,7 @@
    "title": "TensorRT Edge-LLM Completes the MLPerf Edge Agentic Benchmark 6.4x Faster on Jetson AGX Thor",
    "published": "2026-09-16",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created TensorRT Edge‑LLM that runs a 27B model on Jetson AGX Thor using FP4 quantization, tree‑based multi‑token prediction, and KV‑cache reuse, cutting inference time dramatically.",
    "tags": [
     "Quantisation",
@@ -2855,7 +2935,8 @@
    "sorted_by": "groq",
    "result": "6.4× faster than reference",
    "issue": "Edge devices struggled to run multi‑step AI agents quickly within tight power and memory limits.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/how-to-use-ai-agents-to-prepare-3d-scenes-for-simulation",
@@ -2873,7 +2954,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Robotics engineers spend lots of time making 3D scenes simulation‑ready, slowing development.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://building.nu.com/designing-claude-for-ears-not-eyes-an-accessibility-skill-for-blind-and-low-vision-users",
@@ -2898,7 +2980,7 @@
    "title": "Beyond the model: Engineering AI infra with scientific judgement",
    "published": "2026-09-15",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Built an investigation framework that extracts, embeds, and clusters data, automating the methodology so teams can run analyses at scale without manual curation.",
    "tags": [
     "Embeddings"
@@ -2906,7 +2988,8 @@
    "sorted_by": "groq",
    "issue": "Need a repeatable, auditable way to analyze large support chats for AI product safety.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/ibm-research/altk-evolve-consistency",
@@ -2924,7 +3007,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents sometimes give different answers to the same request, causing unreliable behavior.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-groq-3-lpx-deterministic-execution-drives-power-efficient-high-interactivity-inference-on-nvidia-vera-rubin",
@@ -2950,7 +3034,7 @@
    "title": "How Canvas Powers the AI Agent Development Feedback Loop",
    "published": "2026-09-14",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Built Canvas to bring telemetry, code history, tickets, and chat into one workspace, letting teams investigate, prioritize, and validate changes automatically.",
    "tags": [
     "Tool calling",
@@ -2959,7 +3043,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users struggled to track agent performance and fix issues across scattered tools.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.salesforce.com/how-ai-agents-get-trusted-customer-context-with-data-360-data-graphs",
@@ -2967,7 +3052,7 @@
    "title": "How AI Agents Get Trusted Customer Context with Data 360 Data Graphs",
    "published": "2026-09-14",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "support",
    "summary": "They built a Data 360 graph that stores verified customer data and connects it to Agentforce, letting agents retrieve trusted context in real time.",
    "tags": [
     "Agents",
@@ -2976,7 +3061,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents lacked reliable, up‑to‑date customer information, leading to generic or incorrect responses.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/pinterest-engineering/evolving-pinterests-embedding-retrieval-platform-aede4e831e01",
@@ -3019,7 +3105,7 @@
    "title": "Migrating Shop app from React Native to native",
    "published": "2026-09-10",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "The team used AI coding agents to translate React Native screens into native SwiftUI and Jetpack Compose, rebuilding the Shop app in 12 weeks.",
    "tags": [
     "Agents",
@@ -3029,7 +3115,8 @@
    "sorted_by": "groq",
    "result": "Native app released in 12 weeks",
    "issue": "Maintaining a shared React Native codebase limited performance and added complexity for iOS and Android.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://shopify.engineering/back-to-native",
@@ -3178,7 +3265,7 @@
    "title": "Frontier Reasoning Reaches the Edge: How to Deploy and Optimize Models on NVIDIA Jetson",
    "published": "2026-09-04",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They explain how to deploy compact open models like Nemotron 3.5 Lightning and Qwen3.8‑27B on Jetson, using distillation, mixture‑of‑experts and inference optimizations to fit memory and speed constraints.",
    "tags": [
     "Distillation",
@@ -3188,7 +3275,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers could not run multi‑step reasoning agents on edge devices, forcing costly cloud calls and risking data exposure.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://developer.nvidia.com/blog/building-a-memory-driven-agent-with-nvidia-nemoclaw",
@@ -3196,7 +3284,7 @@
    "title": "Building a Memory-Driven Agent with NVIDIA NemoClaw",
    "published": "2026-09-04",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built a memory‑driven agent with NVIDIA NemoClaw that stores a structured self‑model in Markdown and a SQLite ledger, retrieves relevant facts, and governs execution.",
    "tags": [
     "Agent memory",
@@ -3206,7 +3294,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "The AI needed ongoing context about people, projects, and decisions to act like a useful chief of staff.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://tech.instacart.com/agentic-machine-learning-modeling-at-instacart-fb3ecd295ee7",
@@ -3214,7 +3303,7 @@
    "title": "Agentic Machine Learning Modeling at Instacart",
    "published": "2026-09-03",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "data",
    "summary": "They built AI agents that suggest, code, and evaluate model options, letting engineers focus on oversight.",
    "tags": [
     "Agents"
@@ -3222,7 +3311,8 @@
    "sorted_by": "groq",
    "issue": "ML engineers spent too much time manually choosing models and settings.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/grpo-with-trl-ifstruct",
@@ -3247,7 +3337,7 @@
    "title": "Give Your Coding Agents a Memory You Own",
    "published": "2026-09-03",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created a local memory layer called funes that indexes agent session logs, chunks them, embeds them, and reranks results so agents can retrieve exact past turns during new tasks.",
    "tags": [
     "RAG",
@@ -3257,7 +3347,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Coding agents forget previous work when a session ends, forcing users to re‑enter context.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.atspotify.com/2026/9/portal-by-spotify-cut-my-claude-code-token-usage-by-90",
@@ -3281,7 +3372,7 @@
    "title": "How River takes security work from a fix to merge",
    "published": "2026-09-02",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "They built River, an AI agent in Slack that automates checking, updating, and merging patches, and routes decisions to engineers when needed.",
    "tags": [
     "Agents",
@@ -3291,7 +3382,8 @@
    "sorted_by": "groq",
    "result": "Backlog down 70%, merge rate rose to 80%",
    "issue": "Security teams struggled with slow, manual patch handling and a growing backlog of vulnerability fixes.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://github.blog/ai-and-ml/github-copilot/how-we-make-ai-coding-more-cost-efficient-without-sacrificing-task-quality",
@@ -3351,7 +3443,7 @@
    "title": "Fin's CTO on Building Great Engineering Organizations in the AI Era",
    "published": "2026-08-31",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "support",
    "summary": "Created an AI‑driven PR review tool that automatically checks code changes using LLMs and observability data, removing the need for human reviewers.",
    "tags": [
     "Agents",
@@ -3360,7 +3452,8 @@
    "sorted_by": "groq",
    "result": "Human reviewers eliminated",
    "issue": "Engineers spent too much time manually reviewing pull requests, slowing development.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting",
@@ -3394,7 +3487,8 @@
    "sorted_by": "groq",
    "issue": "Manual data curation for geospatial models took weeks, slowing critical responses.",
    "result": "Reduced model build time from weeks to minutes",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.amazon.science/blog/when-llm-judges-agree-should-we-believe-them",
@@ -3472,7 +3566,7 @@
    "title": "The Context Tax of Agentic Development",
    "published": "2026-08-25",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They added explicit, structured context that maps UI URLs to actual backends, so both humans and agents can verify and act on the correct environment.",
    "tags": [
     "Context engineering",
@@ -3481,7 +3575,8 @@
    "sorted_by": "groq",
    "issue": "Engineers and agents struggled because environment URLs hid the real backend, causing wrong work and delays.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/ibm-granite/granite-4-2",
@@ -3524,7 +3619,7 @@
    "title": "Does it matter how you feed an agent its context?",
    "published": "2026-08-21",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They compared four ways to give the agent context—single prompt, handoff notes, etc.—and measured cost and performance for the same coding job.",
    "tags": [
     "Agent memory",
@@ -3534,7 +3629,8 @@
    "sorted_by": "groq",
    "issue": "Engineers ran out of token budget while using a coding agent for a complex backend task.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/an-ai-tool-for-prioritizing-candidate-biomarkers-from-wearable-sensor-data",
@@ -3552,7 +3648,8 @@
    "sorted_by": "groq",
    "issue": "Users needed trustworthy biomarkers from wearable data, but existing tools missed statistical rigor.",
    "result": "Recovered known signals, found new convergent biomarkers, and boosted prediction accuracy",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/pwc-search",
@@ -3588,7 +3685,8 @@
    "sorted_by": "groq",
    "result": "Safe routing 99.4% accuracy, quality score rose to 91.0",
    "issue": "Account managers needed reliable AI advice for merchant meetings without giving wrong recommendations.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/LiquidAI/lfm25-dspark",
@@ -3684,7 +3782,7 @@
    "title": "How Much Memory Does Your Agent Actually Need?",
    "published": "2026-08-18",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built a system that distills past actions into guidelines, then injects either the full set or a compact, task‑specific subset at inference, tuning the amount per model size.",
    "tags": [
     "Agent memory",
@@ -3694,7 +3792,8 @@
    "sorted_by": "groq",
    "result": "+16.1pp task completion, +5% token cost",
    "issue": "Agents needed to know how much past‑task memory to keep without hurting cost or performance.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://craft.faire.com/faires-agentic-development-culture-7aeb03f04bcb",
@@ -3702,7 +3801,7 @@
    "title": "Faire’s agentic development culture",
    "published": "2026-08-18",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They built lightweight layers around existing models, encouraging voluntary use and showing benefits to drive natural adoption.",
    "tags": [
     "Agents",
@@ -3711,7 +3810,8 @@
    "sorted_by": "groq",
    "issue": "Engineers wanted to use advanced AI tools early without waiting for vendors.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/black-box-pen-tests",
@@ -3763,7 +3863,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Repeated data uploads and downloads slowed training and increased costs as robot recordings grew.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/08/agentic-engineering-at-zalando-a-snapshot.html",
@@ -3771,7 +3872,7 @@
    "title": "Agentic Engineering at Zalando: a snapshot",
    "published": "2026-08-13",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created a LiteLLM API proxy with pre/post hooks for cost tracking, model retirement, and prompt‑caching injection, plus a chat UI and CLI, running on tiny pods.",
    "tags": [
     "Prompt caching",
@@ -3781,7 +3882,8 @@
    "sorted_by": "groq",
    "result": "Supports 2k MAU with six small pods",
    "issue": "Engineers struggled to experiment with LLMs across providers and track usage costs.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/allenai/olmoearth-embeddings",
@@ -3930,7 +4032,7 @@
    "title": "Spec, review, ship: How AI is changing the way Faire builds software",
    "published": "2026-08-04",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They built a shared specification workflow and AI agents that generate, review, and orchestrate code tasks, letting engineers focus on judgment.",
    "tags": [
     "Agents",
@@ -3940,7 +4042,8 @@
    "sorted_by": "groq",
    "result": "600 pull requests merged",
    "issue": "Engineers struggled to turn vague ideas into working code quickly across many tech stacks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://blog.flipkart.tech/llms-for-relevance-automating-high-quality-product-relevance-labeling-in-flipkart-search-ddd5ca50b584",
@@ -3964,7 +4067,7 @@
    "title": "How AI is transforming analytics at Grab",
    "published": "2026-08-01",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Created an AI agent that automates data prep, query writing, analysis, and report drafting, letting users get answers in minutes.",
    "tags": [
     "Agents",
@@ -3974,7 +4077,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Analysts spent weeks preparing data and generating insights, slowing business decisions.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.etsy.com/codeascraft/kafka-app-thereas-a-skill-for-that",
@@ -4053,7 +4157,7 @@
    "title": "Building an agentic harness that outlasts the model",
    "published": "2026-07-29",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built a multi‑agent harness that scans code, runs tests, and automatically opens pull requests with fixes.",
    "tags": [
     "Agents",
@@ -4062,7 +4166,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Security teams needed a fast, reliable way to find and fix code vulnerabilities.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://craft.faire.com/virtual-packer-how-faire-estimates-shipping-costs-at-checkout-a17509fac73d",
@@ -4142,7 +4247,7 @@
    "title": "Autoscience: How we built agent-driven ML exploration at Faire",
    "published": "2026-07-22",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Built Autoscience, an agent system that proposes, runs, and evaluates model experiments with persistent memory and steering hooks, enabling many more iterations.",
    "tags": [
     "Agents",
@@ -4152,7 +4257,8 @@
    "sorted_by": "groq",
    "result": "Production model accuracy improved double‑digit percentages",
    "issue": "ML teams could only try a tiny fraction of possible model changes, limiting performance.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/airbnb-engineering/personalizing-airbnb-search-by-learning-from-the-guest-journey-bcefd1915624",
@@ -4178,7 +4284,7 @@
    "title": "What Comes After Observability?",
    "published": "2026-07-20",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built AI agents that automatically run queries, call tools, and edit boards, handling longer tasks and scaling to millions of runs each month.",
    "tags": [
     "Agents",
@@ -4188,7 +4294,8 @@
    "sorted_by": "groq",
    "result": "2 million agent‑initiated queries per month",
    "issue": "Ops teams spent too much time manually investigating latency spikes and updating dashboards.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://dropbox.tech/infrastructure/how-our-universal-content-processing-platform-riviera-evolved-for-ai-and-beyond",
@@ -4210,7 +4317,7 @@
    "title": "The Self-Driving Company",
    "published": "2026-07-16",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Replit built a network of AI agents that take goals, gather context, perform work, verify results, and hand off to humans when needed, automating tasks across the company.",
    "tags": [
     "Agents",
@@ -4220,7 +4327,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams needed help with repetitive tasks like incident triage and code reviews, slowing progress.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.razorpay.com/running-hermes-at-razorpay-a-network-isolated-self-improving-second-brain-for-every-employee-f91d56bea3f1",
@@ -4228,7 +4336,7 @@
    "title": "Running Hermes at Razorpay: a Network-isolated, Self-improving “Second Brain” for every Employee",
    "published": "2026-07-12",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created an isolated Kubernetes platform that gives each employee a dedicated Hermes agent, sandboxed storage, and scheduled jobs, letting the agent learn and act autonomously.",
    "tags": [
     "Agents",
@@ -4238,7 +4346,8 @@
    "sorted_by": "groq",
    "result": "15,000 sessions in eight weeks",
    "issue": "Employees needed personal AI assistants that could run continuously without risking security or data leaks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://booking.ai/from-traditional-ml-to-ai-agents-how-booking-com-scales-ai-observability-with-arize-ai-625ac3996c7e",
@@ -4246,7 +4355,7 @@
    "title": "From Traditional ML to AI Agents: How Booking.com Scales AI Observability With Arize AI",
    "published": "2026-07-10",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They integrated Arize AI to collect telemetry and trace every prompt, model call, retrieval and tool use, giving end‑to‑end visibility for all AI systems.",
    "tags": [
     "Agents",
@@ -4256,7 +4365,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Complex AI workflows were hard to debug because many steps happen behind the scenes.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.amazon.science/blog/capturing-token-ids-during-agentic-interactions-for-better-reinforcement-learning",
@@ -4264,7 +4374,7 @@
    "title": "Capturing token IDs during agentic interactions for better reinforcement learning",
    "published": "2026-07-09",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created Turnstile, a Rust proxy that sits between the agent harness and the model, capturing every token ID as it’s generated and exporting a clean trajectory for RL trainers.",
    "tags": [
     "Agents",
@@ -4274,7 +4384,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "RL training needed exact token‑level logs of agent actions, but transcripts lost crucial details.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.honeycomb.io/blog/multi-agent-collaboration-on-shared-canvas",
@@ -4282,7 +4393,7 @@
    "title": "Multi-Agent Collaboration on a Shared Canvas",
    "published": "2026-07-08",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "They created Honeycomb Canvas, a shared whiteboard where each engineer has an independent AI agent that can run in its own isolated micro‑VM yet see peers' work, enabling coordinated, parallel debugging.",
    "tags": [
     "Agents",
@@ -4292,7 +4403,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Engineers needed to debug production issues together without their AI assistants interfering with each other's investigations.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://blog.hotstar.com/getting-past-the-first-frame-building-video-models-that-remember-31f03d0710e1",
@@ -4316,7 +4428,7 @@
    "title": "What Customers Are Doing With AI and Honeycomb",
    "published": "2026-06-30",
    "added": "2026-11-12",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Created an AI‑driven incident‑triage bot that pulls Honeycomb traces, logs, and Kubernetes data to give on‑call engineers full context automatically.",
    "tags": [
     "Tool calling",
@@ -4325,7 +4437,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Engineers struggled to keep up with faster code releases and needed quicker incident triage.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data",
@@ -4384,7 +4497,7 @@
    "title": "Instrumenting AI Agents for the Agent Timeline: A Practical OpenTelemetry Guide",
    "published": "2026-06-29",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They added OpenTelemetry spans with a shared conversation ID to every model, tool, and downstream call, letting Honeycomb render a full timeline of the agent’s actions.",
    "tags": [
     "Agents",
@@ -4394,7 +4507,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Debugging multi-step AI agents in production was hard because failures showed only vague model errors.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/accelerating-gemini-nano-models-on-pixel-with-frozen-multi-token-prediction",
@@ -4473,7 +4587,7 @@
    "title": "Is it agentic enough? Benchmarking open models on your own tooling",
    "published": "2026-06-18",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created a benchmark harness to measure how agents solve tasks with different tools, then redesigned the transformer CLI and examples, letting agents find solutions with far fewer tokens.",
    "tags": [
     "Agents",
@@ -4483,7 +4597,8 @@
    "sorted_by": "groq",
    "result": "Agents used 1.3–1.8× up to 6× fewer tokens",
    "issue": "Agents waste time and tokens when APIs and docs are unclear or hard to use.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/ServiceNow/mosaicleaks",
@@ -4518,7 +4633,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Shopify needed to match the same real‑world products across billions of merchant listings that use different structures.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/amazon/strands-lerobot-hub-to-hardware",
@@ -4526,7 +4642,7 @@
    "title": "From the Hugging Face Hub to robot hardware with Strands Agents and LeRobot",
    "published": "2026-06-17",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created a single Strands agent that wraps LeRobot functions as tools, letting users record, push, simulate, and run policies on real robots with one codebase.",
    "tags": [
     "Agents",
@@ -4536,7 +4652,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Robotics teams had to juggle five separate tools to record demos, train, test, and deploy policies, slowing development.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/agentic-resource-discovery-launch",
@@ -4544,7 +4661,7 @@
    "title": "Agentic Resource Discovery: Let agents search",
    "published": "2026-06-17",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They defined the ARD specification and built a Discover Tool that lets agents search federated registries for tools and skills at runtime using natural‑language queries.",
    "tags": [
     "Agents",
@@ -4554,7 +4671,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents had to pre‑install every tool, making it hard to scale to thousands of capabilities.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/from-pixels-to-planning-earth-ai-for-nature-restoration",
@@ -4614,7 +4732,7 @@
    "title": "How to make the case for giving your AI Agent system access",
    "published": "2026-06-11",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "support",
    "summary": "They added system access to the AI Agent, turning simple scripted tasks into full‑process procedures that can read and write data in CRM, billing, and order tools.",
    "tags": [
     "Tool calling"
@@ -4622,7 +4740,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers asked for changes that the AI could explain but not execute, so support reps still had to intervene.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://slack.engineering/agentic-testing-where-agents-fit-in-the-e2e-testing-stack",
@@ -4630,7 +4749,7 @@
    "title": "Agentic Testing: Where Agents Fit in the E2E Testing Stack",
    "published": "2026-06-11",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They built LLM‑powered agents that automatically generate and run exploratory E2E tests, then compare results with deterministic test suites.",
    "tags": [
     "Agents",
@@ -4639,7 +4758,8 @@
    "sorted_by": "groq",
    "issue": "Testing teams struggled to cover all user paths in end‑to‑end tests.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.intercom.com/blog/extending-fin-as-the-most-open-agent-platform",
@@ -4647,7 +4767,7 @@
    "title": "Extending Fin as the most open Agent platform",
    "published": "2026-06-09",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "support",
    "summary": "They created an open Agent platform with public APIs, CLI, and a proprietary model, letting HubSpot and Freshdesk users add the agent in under an hour.",
    "tags": [
     "Agents"
@@ -4655,7 +4775,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers wanted an AI agent that could work inside their existing helpdesk without switching vendors.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/mishig/spaces-agents-md",
@@ -4663,7 +4784,7 @@
    "title": "How an Agent Built a 3D Paris Gallery by Chaining Two Hugging Face Spaces",
    "published": "2026-06-09",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "An agent was programmed to call two Hugging Face Spaces: one to generate images, another to turn them into 3D Gaussian splats, then automatically combined the results into a web viewer.",
    "tags": [
     "Tool calling",
@@ -4673,7 +4794,8 @@
    "sorted_by": "groq",
    "result": "Live static Space showcasing the gallery",
    "issue": "Creating a 3D Paris gallery required manually using image and 3D tools, which was complex and time‑consuming.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.razorpay.com/from-750-hours-to-2-hours-ai-powered-security-triage-at-razorpay-c8baeac3a1d3",
@@ -4716,7 +4838,7 @@
    "title": "The Open Source Community is backing OpenEnv for Agentic RL",
    "published": "2026-06-08",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Created OpenEnv, an open‑source library that standardizes the interface between any agent, environment, and trainer, letting models use any harness.",
    "tags": [
     "Agents",
@@ -4726,7 +4848,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers lacked a common, open tool to connect agents with diverse environments for training.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag",
@@ -4734,7 +4857,7 @@
    "title": "Unlocking dependable responses with Gemini Enterprise Agent Platform’s Agentic RAG",
    "published": "2026-06-05",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Built a multi‑agent RAG system that plans, reasons, and iteratively searches across corpora, confirming enough context before answering.",
    "tags": [
     "Agents",
@@ -4744,7 +4867,8 @@
    "sorted_by": "groq",
    "issue": "Enterprise queries often need multiple data sources, causing incomplete answers from single-step retrieval.",
    "result": "Accuracy improved up to 34%",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/create-a-custom-shopify-store",
@@ -4752,7 +4876,7 @@
    "title": "Build a custom Shopify storefront on Replit",
    "published": "2026-06-04",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Replit built an Agent that chats with users, provisions a Shopify store, generates a custom front‑end, and links everything, all from a single conversation.",
    "tags": [
     "Tool calling",
@@ -4761,7 +4885,8 @@
    "sorted_by": "groq",
    "result": "Store created in about ten minutes",
    "issue": "Users wanted a fast, conversational way to create and launch a Shopify storefront without manual setup.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://huggingface.co/blog/hf-cli-for-agents",
@@ -4769,7 +4894,7 @@
    "title": "Designing the hf CLI as an agent-optimized way to work with the Hub",
    "published": "2026-06-04",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They added automatic agent detection, created a special agent‑mode output without colors or truncation, and tagged requests, letting agents work faster and with less token usage.",
    "tags": [
     "Agents",
@@ -4778,7 +4903,8 @@
    "sorted_by": "groq",
    "result": "Up to 6× fewer tokens used",
    "issue": "Coding agents had to use many tokens when calling the Hub via CLI or SDK, slowing down multi‑step tasks.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/seo-agent",
@@ -4786,7 +4912,7 @@
    "title": "Meet Replit SEO Agent",
    "published": "2026-06-03",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Created an SEO Agent that scans a live app, reports SEO problems, and applies fixes automatically, while adding semantic HTML and meta tags by default.",
    "tags": [
     "Tool calling",
@@ -4796,7 +4922,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Published apps were hard to find on web and AI search, limiting traffic.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/expedia-group-tech/the-most-expensive-milliseconds-are-unmeasured-d6cfaaca881d",
@@ -4855,7 +4982,7 @@
    "title": "Holo3.1: Fast & Local Computer Use Agents",
    "published": "2026-06-02",
    "added": "2026-11-11",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "Released Holo3.1 with quantized checkpoints (FP8, Q4 GGUF, NVFP4), function‑calling support, and smaller model sizes, boosting robustness and performance across environments.",
    "tags": [
     "Quantisation",
@@ -4865,7 +4992,8 @@
    "sorted_by": "groq",
    "result": "25% faster, accuracy up to 79.3% on mobile",
    "issue": "Users needed computer-use agents that work on desktop, mobile, and any agent framework, not just cloud.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/microsoft-fabric",
@@ -4901,7 +5029,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Enterprises struggled to use AI agents in complex, long‑running workflows with many APIs and strict policies.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://slack.engineering/slack-ai-the-path-to-multi-cloud",
@@ -4926,7 +5055,7 @@
    "title": "Under the River",
    "published": "2026-05-28",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created River, a Slack AI agent, and rebuilt their infrastructure into a single repo with fast CI, caching, and reproducible environments so the agent could help with code tasks.",
    "tags": [
     "Agents",
@@ -4936,7 +5065,8 @@
    "sorted_by": "groq",
    "result": "One in eight merged PRs co‑authored by River",
    "issue": "Engineers faced slow feedback and difficult code changes across many repositories.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.intercom.com/blog/guide-customer-service-knowledge-management-ai",
@@ -4997,7 +5127,7 @@
    "title": "Speed-to-lead is a solved problem",
    "published": "2026-05-25",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "support",
    "summary": "They built an AI Agent that talks to prospects instantly, handling qualification, discovery, and demos in one chat, anytime and in any language.",
    "tags": [
     "Agent memory",
@@ -5007,7 +5137,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers waited hours for a sales rep, losing interest before a reply.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://booking.ai/the-causality-gap-measuring-the-true-impact-of-voluntary-adoption-in-digital-marketplaces-ea68b5a35120",
@@ -5032,7 +5163,7 @@
    "title": "Operator: A look under the hood",
    "published": "2026-05-15",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "Built a production Agent with over 50 specialized tools and 10 skills, plus robust tooling and infrastructure to fetch data, run queries, and orchestrate actions reliably.",
    "tags": [
     "Tool calling",
@@ -5042,7 +5173,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Scaling AI support across thousands of workspaces required reliable, precise actions.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://tech.instacart.com/scaling-personalized-marketing-for-multi-tenant-commerce-platforms-816f0c6a046b",
@@ -5171,7 +5303,7 @@
    "title": "Flow generation through natural language: An agentic modeling approach",
    "published": "2026-04-22",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Shopify fine‑tuned Qwen3‑32B into a tool‑calling agent that converts plain English into Flow workflows, using merchant data and weekly retraining for speed and cost gains.",
    "tags": [
     "Tool calling",
@@ -5181,7 +5313,8 @@
    "sorted_by": "groq",
    "result": "2.2x faster, 68% cheaper",
    "issue": "Store owners find it hard to create Flow automations without coding.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/its-all-about-the-angle-your-photos-re-composed",
@@ -5221,7 +5354,7 @@
    "title": "ReasoningBank: Enabling agents to learn from experience",
    "published": "2026-04-21",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They built ReasoningBank, a memory system that pulls useful patterns from both successful and failed runs, letting agents adapt during use.",
    "tags": [
     "Agents",
@@ -5231,7 +5364,8 @@
    "sorted_by": "groq",
    "issue": "Agents kept repeating the same mistakes because they had no way to learn from past failures.",
    "result": "Higher success rates and fewer steps on web browsing and coding tasks",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/meet-replit-security-agent",
@@ -5302,7 +5436,8 @@
    "sorted_by": "groq",
    "issue": "Multiple long‑running agents lost alignment and context over time, causing incoherent behavior.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/improving-the-academic-workflow-introducing-two-ai-agents-for-better-figures-and-peer-review",
@@ -5320,7 +5455,8 @@
    "sorted_by": "groq",
    "issue": "Researchers spend too much time making complex figures and reviewers are overwhelmed by paper volume.",
    "result": "Figures and reviews outperform existing automated baselines",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/vibe-coding-decks-and-dashboards",
@@ -5328,7 +5464,7 @@
    "title": "Beyond the App: Using Vibe Coding to Ship Decks, Dashboards, and Launch Assets",
    "published": "2026-04-08",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Replit built an AI agent that reads the project code and design system, then generates launch materials like decks and dashboards that match the product’s look and content.",
    "tags": [
     "Tool calling",
@@ -5337,7 +5473,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Product managers spend hours switching tools to create launch decks, dashboards, and assets, causing inconsistency and delays.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://replit.com/blog/product-managers-ship-faster-with-replit",
@@ -5345,7 +5482,7 @@
    "title": "How product managers ship faster using Replit's agentic workflows",
    "published": "2026-04-06",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created an agentic workflow that treats the prototype as the source of truth, automatically updating all related artifacts and keeping everyone aligned.",
    "tags": [
     "Agents",
@@ -5355,7 +5492,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Product managers spent too much time manually syncing docs, decks, and tickets, leading to stale information.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://engineering.klarna.com/beyond-prompting-how-algorithmic-evolution-doubled-our-training-speed-8f874af3080d",
@@ -5416,7 +5554,7 @@
    "title": "Vibe Coding XR: Accelerating AI + XR prototyping with XR Blocks and Gemini",
    "published": "2026-03-25",
    "added": "2026-11-07",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They built a workflow that lets Gemini turn a text prompt into a physics‑aware WebXR app in under a minute, using XR Blocks and a simulated desktop preview.",
    "tags": [
     "Tool calling",
@@ -5426,7 +5564,8 @@
    "sorted_by": "groq",
    "issue": "Creating XR experiences required complex code and hardware setup, slowing down experimentation.",
    "result": "Prototypes generated in under 60 seconds",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://eng.lyft.com/beyond-a-b-testing-using-surrogacy-and-region-splits-to-measure-long-term-effects-in-marketplaces-9cb06d628f2d",
@@ -5451,7 +5590,7 @@
    "title": "Live from Replit HQ Part 2",
    "published": "2026-03-23",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "They created Agent 4, a pipeline of specialized models that plans task order, runs parallel jobs, and uses coding models to automatically resolve most merge conflicts, surfacing only edge cases to the user.",
    "tags": [
     "Agents",
@@ -5461,7 +5600,8 @@
    "sorted_by": "groq",
    "result": "90% of conflicts resolve automatically",
    "issue": "Multiple AI agents editing the same code caused merge conflicts and coordination problems.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.etsy.com/codeascraft/making-ads-count-using-mmoe-and-auxiliary-tasks-to-better-connect-buyers--sellers",
@@ -5503,7 +5643,7 @@
    "title": "What’s changed from Replit Agent 3 to Agent 4",
    "published": "2026-03-19",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Agent 4 lets users describe any kind of artifact, builds it with integrated tools, and offers a unified Design Canvas that shows live previews and mockups side‑by‑side, working for all artifact types.",
    "tags": [
     "Agents",
@@ -5513,7 +5653,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers had to choose an artifact type early and use a separate design mode, slowing and complicating app creation.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/improving-breast-cancer-screening-workflows-with-machine-learning",
@@ -5555,7 +5696,7 @@
    "title": "Vibe Coding Enterprise Data Apps with Replit and Databricks",
    "published": "2026-03-13",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Created a connector that lets Replit’s coding agent call Databricks APIs, so apps can read and write trusted data without manual credential handling.",
    "tags": [
     "Tool calling",
@@ -5565,7 +5706,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams needed to build apps that could safely use sensitive, governed enterprise data.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting",
@@ -5590,7 +5732,7 @@
    "title": "Introducing Replit Agent 4: Built for Creativity",
    "published": "2026-03-11",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "Replit created Agent 4, an autonomous assistant that takes simple prompts, plans tasks, calls tools, and iterates code and design in the same environment, letting users focus on creativity.",
    "tags": [
     "Agents",
@@ -5600,7 +5742,8 @@
    "sorted_by": "groq",
    "result": "Production‑ready apps shipped 10× faster",
    "issue": "Developers spent too much time coordinating design and code, slowing creative work.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://blog.hotstar.com/monetisation-multi-period-dash-x-exoplayer-db8e8c00e521",
@@ -5642,7 +5785,7 @@
    "title": "Building Spookseek AR on Replit: How a Designer Shipped an AR Ghost Hunting Game in a Week",
    "published": "2026-02-27",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "coding",
    "summary": "She used Replit Agent to write and run the 3D AR code, iterating daily and deploying a TestFlight build within a week.",
    "tags": [
     "Agents",
@@ -5652,7 +5795,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "A designer with no coding experience needed to create a real AR ghost‑hunting game fast.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://tech.instacart.com/our-early-journey-to-transform-instacarts-discovery-recommendations-with-llms-cf4591a8602b",
@@ -5775,7 +5919,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "User interfaces were static and hard for people with disabilities to use.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://research.google/blog/sequential-attention-making-ai-models-leaner-and-faster-without-sacrificing-accuracy",
@@ -5868,7 +6013,7 @@
    "title": "Building the Universal Commerce Protocol",
    "published": "2026-01-11",
    "added": "2026-11-09",
-   "problem": "agents",
+   "problem": "platforms",
    "summary": "They created the Universal Commerce Protocol, a layered, extensible API that lets agents discover merchant capabilities, negotiate terms, and complete transactions across any store.",
    "tags": [
     "Agents",
@@ -5878,7 +6023,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Merchants have many different payment, discount, and fulfillment rules, making it hard for AI agents to handle purchases.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://medium.com/mercadolibre-tech/the-silver-shotgun-a-bunch-of-silver-bullets-4a51c57a0fd9",
@@ -5956,7 +6102,7 @@
    "title": "Streamlining Security Investigations with Agents",
    "published": "2025-12-01",
    "added": "2026-11-08",
-   "problem": "agents",
+   "problem": "ops",
    "summary": "They built AI agents that automatically pull data, run queries, and suggest actions to investigate alerts, using tool‑calling and multi‑step reasoning.",
    "tags": [
     "Tool calling",
@@ -5966,7 +6112,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Security engineers were overwhelmed reviewing billions of alerts each day.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://www.etsy.com/codeascraft/reducing-experiment-duration-with-predicted-control-variates",
@@ -6009,7 +6156,7 @@
    "title": "Data Connectors",
    "published": "2025-11-20",
    "added": "2026-11-10",
-   "problem": "agents",
+   "problem": "data",
    "summary": "Replit added native, OAuth‑based connectors for Snowflake, Databricks, and BigQuery, letting the Agent securely discover schemas and build data apps instantly.",
    "tags": [
     "Agents",
@@ -6019,7 +6166,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams had to store database credentials manually, creating security risks and slowing down data app development.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://shopify.engineering/world-class-product-search",
@@ -6124,7 +6272,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "The product taxonomy was growing too fast for manual updates, causing inconsistencies and hurting discoverability.",
-   "v": 3
+   "v": 3,
+   "cat": 2
   },
   {
    "url": "https://discord.com/blog/from-single-node-to-multi-gpu-clusters-how-discord-made-distributed-compute-easy-for-ml-engineers",
@@ -6161,6 +6310,7 @@
   }
  ],
  "waiting": 135,
+ "queue": [],
  "rejected": [
   "https://blog.cloudflare.com/choosing-quepaxa",
   "https://blog.cloudflare.com/ddos-threat-report-2026-q3",

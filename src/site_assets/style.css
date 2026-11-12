@@ -1795,9 +1795,14 @@ a.try-tile:hover { border-color: var(--ink); }
 
 /* ---------- Case studies ---------- */
 :root { --l-rag: #1971c2; --l-agents: #0c8599; --l-evals: #7048e8; --l-cost: #e8590c; --l-tuning: #9c36b5; --l-safety: #c92a2a; --l-llm: #2f9e44;
-  --l-recs: #c2255c; --l-ads: #868e96; --l-predict: #8d5a00; --l-vision: #5c940d; }
+  --l-recs: #c2255c; --l-ads: #868e96; --l-predict: #8d5a00; --l-vision: #5c940d;
+  --l-coding: #3b5bdb; --l-data: #087f5b; --l-ops: #d9480f; --l-support: #a61e4d; --l-platforms: #495057;
+  /* Categories the classifier proposed get one of these, picked from a hash of the name (case_pages.color) */
+  --l-x0: #1864ab; --l-x1: #5f3dc4; --l-x2: #0b7285; --l-x3: #a61e4d; --l-x4: #2b8a3e; --l-x5: #e67700; --l-x6: #862e9c; --l-x7: #5c7cfa; }
 :root[data-theme="dark"] { --l-rag: #4dabf7; --l-agents: #3bc9db; --l-evals: #9775fa; --l-cost: #ff922b; --l-tuning: #da77f2; --l-safety: #ff6b6b; --l-llm: #69db7c;
-  --l-recs: #f06595; --l-ads: #adb5bd; --l-predict: #e8b04b; --l-vision: #a9e34b; }
+  --l-recs: #f06595; --l-ads: #adb5bd; --l-predict: #e8b04b; --l-vision: #a9e34b;
+  --l-coding: #748ffc; --l-data: #38d9a9; --l-ops: #ff8787; --l-support: #f783ac; --l-platforms: #ced4da;
+  --l-x0: #74c0fc; --l-x1: #b197fc; --l-x2: #66d9e8; --l-x3: #faa2c1; --l-x4: #8ce99a; --l-x5: #ffd43b; --l-x6: #e599f7; --l-x7: #91a7ff; }
 .cs-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .cs-wrap { max-width: 1180px; margin: 0 auto; padding-bottom: 72px; font-feature-settings: "tnum" 1; }
 .cs-ink { color: var(--ink); }
@@ -1940,7 +1945,6 @@ a.try-tile:hover { border-color: var(--ink); }
 @media (max-width: 640px) {
   .cs-top { padding-top: 40px; } .cs-top > p { font-size: 16px; }
   .cs-tools { flex-direction: column; align-items: stretch; margin-top: 28px; } .cs-find { max-width: none; } .cs-sel select { width: 100%; min-width: 0; }
-  .cs-chips { flex-wrap: nowrap; overflow-x: auto; margin: 16px -16px 0; padding: 0 16px 4px; scrollbar-width: none; } .cs-chips a { flex: none; min-height: 44px; }
   .cs-grid { grid-template-columns: minmax(0, 1fr); }
   .cs-sec { margin-top: 44px; } .cs-sec-head { flex-direction: column; align-items: flex-start; } .cs-sec-head h2 { font-size: 24px; }
   .cs-grid:not(.cs-plain) > .cs-card:first-child { grid-column: auto; } .cs-grid:not(.cs-plain) > .cs-card:first-child h3 { font-size: 24px; } .cs-grid:not(.cs-plain) > .cs-card:first-child .cs-body { padding: 20px 20px 16px; }
@@ -2011,10 +2015,33 @@ a.try-tile:hover { border-color: var(--ink); }
 .cs-ap .cs-ap-more { box-shadow: none; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
 .cs-ap button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* One row of topics that scrolls sideways, one row for search and company */
-.cs-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 6px; margin-top: 32px; padding: 2px; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
+/* The edge with more chips behind it fades (--fl, --fr); app.js sets data-left / data-right on the
+   bar and shows the arrow buttons on screens with a mouse. Without JavaScript the right edge fades. */
+@property --fl { syntax: "<length>"; inherits: true; initial-value: 0px; }
+@property --fr { syntax: "<length>"; inherits: true; initial-value: 0px; }
+.cs-chipbar { position: relative; margin-top: 32px; --fl: 0px; --fr: 48px; transition: --fl .18s ease, --fr .18s ease; }
+.cs-chipbar[data-js] { --fr: 0px; }
+.cs-chipbar[data-left] { --fl: 56px; }
+.cs-chipbar[data-right] { --fr: 56px; }
+.cs-chips { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; gap: 6px; margin-top: 0; padding: 4px 2px;
+  scroll-padding-inline: 56px; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fl), #000 calc(100% - var(--fr)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fl), #000 calc(100% - var(--fr)), transparent 100%); }
 .cs-chips::-webkit-scrollbar { display: none; }
 .cs-chips a { flex: none; min-height: 36px; padding: 0 13px; font-size: 13.5px; gap: 7px; }
-.cs-chips a:last-child { margin-right: 40px; }
+.cs-chips a:last-child { margin-right: 12px; } /* room after the last chip, so it never sits flush against the edge */
+.cs-chip-arrow { position: absolute; top: 50%; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; margin-top: -16px; padding: 0;
+  border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent), 0 4px 12px -6px color-mix(in srgb, var(--ink) 25%, transparent); }
+.cs-chip-arrow[hidden] { display: none; }
+.cs-chip-arrow svg { width: 16px; height: 16px; }
+.cs-chip-prev { left: 0; } .cs-chip-next { right: 0; }
+.cs-chip-arrow:hover { border-color: color-mix(in srgb, var(--ink) 35%, var(--line)); }
+@media (hover: none), (pointer: coarse), (max-width: 640px) { .cs-chip-arrow { display: none !important; } }
+@media (max-width: 640px) {
+  .cs-chipbar { margin: 20px -16px 0; } .cs-chipbar[data-left] { --fl: 32px; } .cs-chipbar[data-right], .cs-chipbar:not([data-js]) { --fr: 32px; }
+  .cs-chips { padding: 4px 0 4px 16px; scroll-padding-inline: 32px; } .cs-chips a { min-height: 44px; } .cs-chips a:last-child { margin-right: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .cs-chipbar { transition: none; } }
 .cs-tools { align-items: center; gap: 10px; margin-top: 14px; }
 .cs-find { max-width: none; }
 .cs-sel select { min-width: 200px; }

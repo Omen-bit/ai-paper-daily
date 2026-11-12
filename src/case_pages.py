@@ -15,15 +15,21 @@ import math
 import os
 import shutil
 
+import zlib
+
 import case_logos
 import making_of
-from case_sources import BY_NAME, TOPICS as TOPIC_INFO, topic_of
+from case_sources import BY_NAME, TOPICS as TOPIC_INFO, category_norm, category_slug, clean_category, topic_of
 
 DIR = "case-studies"
 ROOT = "../"
-# Topic order on the filter chips: the LLM topics first, then the rest
+# Topic order on the filter chips: the LLM topics first, then the rest; categories the classifier
+# proposed (CUSTOM, filled in by _clean) come after them
 TOPICS = list(TOPIC_INFO)
 SHORT = {k: name for k, (name, _) in TOPIC_INFO.items()}
+MIN_CASES = 3  # a proposed category gets its own chip and page from this many write-ups; fewer stay under their closest topic
+PALETTE = 8    # --l-x0 .. --l-x7 in style.css, for the proposed categories
+CUSTOM: dict[str, tuple[str, str]] = {}  # key -> (name, about) of the proposed categories shown
 PAGE_SIZE = 24
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
@@ -57,7 +63,28 @@ def esc(text) -> str:
 
 
 def problem_name(key: str) -> str:
-    return TOPIC_INFO[key][0]
+    return (TOPIC_INFO.get(key) or CUSTOM.get(key) or ("Case study",))[0]
+
+
+def topic_about(key: str) -> str:
+    return (TOPIC_INFO.get(key) or CUSTOM.get(key) or ("", ""))[1]
+
+
+def topic_keys() -> list[str]:
+    """Every topic in chip order: the stable topics, then the proposed categories."""
+    return TOPICS + [k for k in CUSTOM if k not in TOPIC_INFO]
+
+
+def color(key: str) -> str:
+    """The topic's colour: its own token for the stable topics, and for a proposed category one of the
+    palette tokens picked from a hash of its name, so it keeps the same colour from build to build."""
+    if key in TOPIC_INFO:
+        return f"var(--l-{key})"
+    return f"var(--l-x{zlib.crc32(category_norm(problem_name(key)).encode()) % PALETTE})"
+
+
+def page_slug(key: str) -> str:
+    return SLUGS.get(key) or key
 
 
 def host(url: str) -> str:
@@ -155,7 +182,7 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
            f'<b>{esc(paper[1])}</b></div></a>' if paper else "")
     date = nice_date(post.get("published", ""))
     when = f'<time datetime="{esc(post.get("published", ""))}">{date}</time>' if date else ""
-    return f"""<li class="cs-card" style="--c:var(--l-{problem});--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
+    return f"""<li class="cs-card" style="--c:{color(problem)};--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
 <div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-topic">{esc(problem_name(problem))}</span></div>
 <div class="cs-body"><h3><a class="cs-link" href="{esc(post['url'])}" rel="noopener" target="_blank">{esc(post['title'])}</a></h3>{summary}{tag_html}{rel}
 <div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span><button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
@@ -198,6 +225,30 @@ def related_papers(posts: list[dict], papers: dict, k: int = 2, min_score: float
 
 # ---------- the page
 
+def custom_categories(posts: list[dict], min_cases: int = MIN_CASES) -> dict[str, str]:
+    """The proposed categories with at least min_cases write-ups: normal form -> page key.
+    Names that differ only in case or plural are one category; the name used most is shown."""
+    names: dict[str, dict[str, int]] = {}
+    for p in posts:
+        name = p.get("category")
+        if isinstance(name, str) and name.strip():
+            spelled = names.setdefault(category_norm(name), {})
+            spelled[name.strip()] = spelled.get(name.strip(), 0) + 1
+    out = {}
+    taken = set(TOPIC_INFO) | set(SLUGS.values())
+    for norm, spelled in sorted(names.items(), key=lambda kv: (-sum(kv[1].values()), kv[0])):
+        if sum(spelled.values()) < min_cases:
+            continue
+        shown = clean_category(max(spelled.items(), key=lambda kv: (kv[1], kv[0]))[0]) or "Other"
+        key = category_slug(shown) or "other"
+        while key in taken:
+            key += "-x"
+        taken.add(key)
+        CUSTOM[key] = (shown, f"Write-ups the classifier filed under {shown.lower()}.")
+        out[norm] = key
+    return out
+
+
 def _clean(posts: list[dict]) -> list[dict]:
     good = []
     for p in posts:
@@ -207,30 +258,53 @@ def _clean(posts: list[dict]) -> list[dict]:
                 good.append({**p, "problem": topic})
         except (KeyError, TypeError, AttributeError):
             continue
+    CUSTOM.clear()
+    active = custom_categories(good)
+    for p in good:  # a proposed category with enough write-ups becomes the post's topic; the rest stay under the closest topic
+        name = p.get("category")
+        if isinstance(name, str) and category_norm(name) in active:
+            p["problem"] = active[category_norm(name)]
     return sorted(good, key=lambda p: (p.get("published") or "", p["url"]), reverse=True)
 
 
-SLUGS = {"rag": "rag", "agents": "agents", "evals": "evaluation", "cost": "cost-and-speed", "tuning": "fine-tuning",
+SLUGS = {"rag": "rag", "agents": "agents", "coding": "coding-agents", "data": "data-agents", "ops": "ops-agents",
+         "support": "customer-support", "platforms": "agent-platforms", "evals": "evaluation", "cost": "cost-and-speed", "tuning": "fine-tuning",
          "safety": "guardrails", "llm": "llm-products", "recs": "recommendations", "ads": "ads",
          "predict": "forecasting", "vision": "vision"}
 PER_SECTION = 3  # cards per topic on the main page
 NEWEST = 4  # newest write-ups at the top of the main page
 
 
+CHEVRON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+           'stroke-linejoin="round" aria-hidden="true"><path d="{d}"/></svg>')
+
+
+def chip_row(chips: list[str]) -> str:
+    """The topic chips in one row that scrolls sideways. app.js fades the edge that has more chips
+    behind it and shows the arrow buttons (on screens with a mouse) that scroll the row; on touch
+    screens the row is swiped. Without JavaScript the right edge fades and the row still scrolls.
+    The arrows are left out of the tab order: every chip is a link the keyboard reaches anyway."""
+    arrow = ('<button class="cs-chip-arrow cs-chip-{side}" type="button" tabindex="-1" aria-hidden="true" '
+             'data-cs-chip-{side} hidden>' + CHEVRON + '</button>')
+    return (f'<div class="cs-chipbar" data-cs-chipbar>{arrow.format(side="prev", d="m15 18-6-6 6-6")}'
+            f'<nav class="cs-chips" aria-label="Topics" data-cs-chips>{"".join(chips)}</nav>'
+            f'{arrow.format(side="next", d="m9 18 6-6-6-6")}</div>')
+
+
 def filters(all_posts: list[dict], posts: list[dict], current: str = "") -> str:
     """Topic links (every topic with write-ups), search and the company menu for these posts."""
-    per_topic = {k: sum(1 for p in all_posts if p["problem"] == k) for k in TOPICS}
+    per_topic = {k: sum(1 for p in all_posts if p["problem"] == k) for k in topic_keys()}
     here = ' aria-current="page"'
     chips = [f'<a href="index.html"{here if not current else ""}>All <span>{len(all_posts)}</span></a>']
-    chips += [f'<a href="{SLUGS[k]}.html" style="--c:var(--l-{k})"{here if k == current else ""}>'
-              f'<i aria-hidden="true"></i>{esc(SHORT[k])} <span>{n}</span></a>'
+    chips += [f'<a href="{page_slug(k)}.html" style="--c:{color(k)}"{here if k == current else ""}>'
+              f'<i aria-hidden="true"></i>{esc(problem_name(k))} <span>{n}</span></a>'
               for k, n in per_topic.items() if n]
     per_co: dict[str, int] = {}
     for p in posts:
         per_co[p["company"]] = per_co.get(p["company"], 0) + 1
     options = "".join(f'<option value="{esc(c)}">{esc(c)} ({n})</option>' for c, n in sorted(per_co.items(), key=lambda kv: kv[0].lower()))
-    label = "Search write-ups" if not current else f"Search {SHORT[current]} write-ups"
-    return f"""<nav class="cs-chips" aria-label="Topics">{"".join(chips)}</nav>
+    label = "Search write-ups" if not current else f"Search {problem_name(current)} write-ups"
+    return f"""{chip_row(chips)}
 <div class="cs-tools">
 <div class="cs-find"><label class="sr-only" for="cs-q">{esc(label)}</label><div class="cs-search">{SEARCH}<input id="cs-q" type="search" placeholder="{esc(label)}" autocomplete="off" data-cs-q></div></div>
 <label class="cs-sel" for="cs-co"><span class="sr-only">Company</span><select id="cs-co" data-cs-company><option value="">All companies</option>{options}</select></label>
@@ -238,7 +312,8 @@ def filters(all_posts: list[dict], posts: list[dict], current: str = "") -> str:
 
 
 # Tags that only repeat the topic's own name, left out of that topic's "How they built it" row
-SAME_AS_TOPIC = {"rag": {"RAG"}, "agents": {"Agents"}, "evals": {"Evals"}, "cost": {"Cost"},
+SAME_AS_TOPIC = {"rag": {"RAG"}, "agents": {"Agents"}, "coding": {"Agents", "Code"}, "data": {"Agents"},
+                 "ops": {"Agents"}, "support": {"Agents"}, "platforms": {"Agents"}, "evals": {"Evals"}, "cost": {"Cost"},
                  "tuning": {"Fine-tuning"}, "safety": {"Guardrails"}, "llm": {"LLMs"}, "recs": {"Personalisation"}}
 MAX_APPROACHES = 12
 SHOWN_APPROACHES = 6  # the rest sit behind "More"
@@ -313,17 +388,17 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
         sections = [f'<section class="cs-sec"><div class="cs-sec-head"><h2>Newest</h2></div>'
                     f'<ul class="cs-grid">{"".join(card(p) for p in posts[:NEWEST])}{making_of.card()}</ul></section>']
         # Topics with the freshest write-ups come first
-        latest = {k: max((p.get("published") or "" for p in posts if p["problem"] == k), default="") for k in TOPICS}
-        for k in sorted(TOPICS, key=lambda t: latest[t], reverse=True):
+        latest = {k: max((p.get("published") or "" for p in posts if p["problem"] == k), default="") for k in topic_keys()}
+        for k in sorted(topic_keys(), key=lambda t: latest[t], reverse=True):
             these = [p for p in posts if p["problem"] == k]
             if not these:
                 continue
-            see = (f'<a class="cs-see" href="{SLUGS[k]}.html">See all {len(these)}{EXT_ARROW}</a>'
-                   if len(these) > PER_SECTION else f'<a class="cs-see" href="{SLUGS[k]}.html">Open topic{EXT_ARROW}</a>')
+            see = (f'<a class="cs-see" href="{page_slug(k)}.html">See all {len(these)}{EXT_ARROW}</a>'
+                   if len(these) > PER_SECTION else f'<a class="cs-see" href="{page_slug(k)}.html">Open topic{EXT_ARROW}</a>')
             sections.append(
-                f'<section class="cs-sec" id="{SLUGS[k]}" style="--c:var(--l-{k})"><div class="cs-sec-head">'
-                f'<div><h2><i aria-hidden="true"></i><a href="{SLUGS[k]}.html">{esc(SHORT[k])}</a></h2>'
-                f'<p>{esc(TOPIC_INFO[k][1])}</p></div>{see}</div>'
+                f'<section class="cs-sec" id="{page_slug(k)}" style="--c:{color(k)}"><div class="cs-sec-head">'
+                f'<div><h2><i aria-hidden="true"></i><a href="{page_slug(k)}.html">{esc(problem_name(k))}</a></h2>'
+                f'<p>{esc(topic_about(k))}</p></div>{see}</div>'
                 f'<ul class="cs-grid cs-plain">{"".join(card(p) for p in these[:PER_SECTION])}</ul></section>')
         inner = f"""{filters(posts, posts)}
 <div data-cs-sections>{"".join(sections)}</div>
@@ -340,17 +415,17 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
     paths += making_of.build(write, site_dir, site_url, posts, theme_script, head_extra)
 
     # One page per topic with write-ups
-    for k in TOPICS:
+    for k in topic_keys():
         these = [p for p in posts if p["problem"] == k]
         if not these:
             continue
-        name, about = TOPIC_INFO[k]
+        name, about = problem_name(k), topic_about(k)
         body = (f'<p class="cs-crumb"><a href="index.html">Case studies</a> / {esc(name)}</p>'
                 f'<section class="cs-top cs-topic-top"><h1>{esc(name)}</h1><p>{esc(about)}</p></section>'
                 f'{filters(posts, these, k)}{approaches(these, k)}{status(len(these))}{feed(these)}')
-        write(os.path.join(site_dir, DIR, f"{SLUGS[k]}.html"),
-              page(f"{name}: case studies", wrap(body, f' style="--c:var(--l-{k})"'), root=ROOT, active="cases",
-                   path=f"{DIR}/{SLUGS[k]}.html",
+        write(os.path.join(site_dir, DIR, f"{page_slug(k)}.html"),
+              page(f"{name}: case studies", wrap(body, f' style="--c:{color(k)}"'), root=ROOT, active="cases",
+                   path=f"{DIR}/{page_slug(k)}.html",
                    description=f"How companies handle {name.lower()} in production, from their own engineering blogs."))
-        paths.append(f"{DIR}/{SLUGS[k]}.html")
+        paths.append(f"{DIR}/{page_slug(k)}.html")
     return paths

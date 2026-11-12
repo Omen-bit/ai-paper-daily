@@ -10,6 +10,7 @@ A feed that moves or goes down is skipped and logged; the posts already saved st
 The site's focus is LLMs in production (RAG, agents, evaluation, cost), so those topics come
 first; recommendations, ads, forecasting and vision keep their own topics.
 """
+import re
 
 # (name, RSS or Atom feed, blog home, Simple Icons slug or "", brand colour without #)
 SOURCES = [
@@ -168,7 +169,12 @@ CUSTOMER_BLOGS = {"AWS", "Google Cloud"}
 # key -> (name, what it covers). The order is the order of the topic chips.
 TOPICS = {
     "rag": ("RAG and search", "Retrieval, vector search, chunking and re-ranking, for search boxes and for LLM answers."),
-    "agents": ("Agents", "LLMs that use tools and work through multi-step tasks."),
+    "agents": ("Agents", "LLMs that use tools and work through multi-step tasks, when no narrower agent topic fits."),
+    "coding": ("Coding agents", "Agents that write, review, migrate and test code, or build whole apps."),
+    "data": ("Data agents", "Agents that answer business questions over a company's data, metrics and dashboards."),
+    "ops": ("Ops agents", "Agents that watch production: alerts, incidents, failure diagnosis and security work."),
+    "support": ("Customer support", "Assistants and agents that answer customers and the teams that help them."),
+    "platforms": ("Agent platforms", "Running agents at scale: harnesses, sandboxes, memory, MCP, observability and training."),
     "evals": ("Evaluation", "Offline evals, LLM judges, A/B tests: knowing a change is better before it ships."),
     "cost": ("Cost and speed", "Caching, smaller or distilled models, batching and GPU serving to cut cost and latency."),
     "tuning": ("Fine-tuning", "LoRA, distillation and training models on a company's own data."),
@@ -179,7 +185,9 @@ TOPICS = {
     "predict": ("Forecasting", "Predicting demand, prices, arrival times and fraud."),
     "vision": ("Vision", "Understanding and editing images and video."),
 }
-FOCUS = ["rag", "agents", "evals", "cost", "tuning", "safety", "llm"]
+FOCUS = ["rag", "agents", "coding", "data", "ops", "support", "platforms", "evals", "cost", "tuning", "safety", "llm"]
+# The narrower topics a post about agents can move to; "agents" stays for the ones none of them fit
+AGENT_TOPICS = ("coding", "data", "ops", "support", "platforms")
 
 # Topic from keywords when Groq is not available: (topic, pattern), first match wins.
 # Titles are checked first, then the opening text.
@@ -266,3 +274,120 @@ def topic_of(post: dict) -> str | None:
     if key == "search":
         return "rag"
     return key if key in TOPICS else None
+
+
+# A post about agents moves to a narrower topic when its title (first) or its text matches one of
+# these, checked in this order. Picked from the 148 posts that were all "Agents" before the split.
+AGENT_RULES = [
+    ("support", r"customer (support|service|questions|context)|support (tickets?|team|agents?|work)|helpdesk|"
+                r"contact cent|\bfin\b|speed.to.lead|engineering support|customers? (ask|wait)"),
+    ("ops", r"\bsre\b|incidents?|on.?call|alerts?|paging|failure diagnosis|root cause|production issues|"
+            r"factory operations|security (work|investigation|fix)|investigat|outages?|monitoring agent"),
+    ("data", r"analytic|\bdata (apps?|sources|analys|questions)|metrics|dashboards?|\bgenie\b|\bsql\b|spreadsheet|"
+             r"business (data|context|question)|stripe data|ml exploration|machine learning model|data graph|analysts?"),
+    ("coding", r"\bcod(e|es|ing)\b|codebase|software|developers?|\bapps?\b|vibe|\bgit\b|pull requests?|\bmerge\b|"
+               r"migrat|rewrite|translat|cuda|\budfs?\b|ros 2|full.stack|web ?sites?|storefront|\bcli\b|\bsdk\b|"
+               r"agentic (development|engineering)|programm|e2e test|prototyp"),
+    ("platforms", r"platform|sandbox|harness|kubernetes|\bmcp\b|infrastructure|memory|protocol|identity|govern|"
+                  r"secur|durable|runtime|substrate|gateway|observab|telemetry|fleet|orchestrat|router|framework|"
+                  r"open.?sourc|on.device|reinforcement|\brl\b|post.train|training data|benchmark"),
+]
+
+
+def split_agents(post: dict) -> str:
+    """The narrower agent topic for a post about agents, or "agents" when none fits. Keywords only, no network."""
+    title = (post.get("title") or "").lower()
+    text = " ".join(str(post.get(k) or "") for k in ("title", "issue", "summary", "text")).lower()[:1500]
+    for scope in (title, text):
+        for topic, pattern in AGENT_RULES:
+            if re.search(pattern, scope):
+                return topic
+    return "agents"
+
+
+# ---------- categories the classifier proposes
+# Groq may name a new category when none of TOPICS fits. Names are compared in a normal form
+# (lower case, singular words, no filler words) so "Voice Agents", "voice agent" and "Voice-agents"
+# are one category, and a name that only restates a topic ("AI agents", "Search") joins that topic.
+CATEGORY_SYNONYMS = {
+    "agent": "agents", "ai agent": "agents", "llm agent": "agents", "agentic": "agents", "autonomous agent": "agents",
+    "search": "rag", "retrieval": "rag", "semantic search": "rag", "vector search": "rag", "enterprise search": "rag",
+    "evaluation": "evals", "eval": "evals", "testing": "evals", "llm evaluation": "evals", "benchmarking": "evals",
+    "cost": "cost", "latency": "cost", "inference": "cost", "serving": "cost", "model serving": "cost", "efficiency": "cost",
+    "fine tuning": "tuning", "finetuning": "tuning", "training": "tuning", "model training": "tuning", "post training": "tuning",
+    "safety": "safety", "moderation": "safety", "content moderation": "safety", "trust safety": "safety", "guardrail": "safety",
+    "llm": "llm", "llm product": "llm", "generative": "llm", "assistant": "llm", "copilot": "llm", "chatbot": "llm",
+    "recommendation": "recs", "recommender": "recs", "personalization": "recs", "personalisation": "recs",
+    "ranking": "recs", "feed ranking": "recs",
+    "ad": "ads", "advertising": "ads", "ad ranking": "ads",
+    "forecasting": "predict", "prediction": "predict", "fraud detection": "predict", "fraud": "predict",
+    "demand forecasting": "predict",
+    "computer vision": "vision", "image": "vision", "video": "vision", "image generation": "vision",
+    "coding": "coding", "code generation": "coding", "coding assistant": "coding", "developer tool": "coding",
+    "developer productivity": "coding", "software engineering": "coding", "code review": "coding",
+    "data analysis": "data", "analytics": "data", "data analytics": "data", "text to sql": "data",
+    "business intelligence": "data",
+    "sre": "ops", "incident response": "ops", "devop": "ops", "observability": "ops", "aiop": "ops",
+    "customer service": "support", "support": "support", "support agent": "support", "customer support agent": "support",
+    "agent infrastructure": "platforms", "agent platform": "platforms", "agent framework": "platforms",
+    "agent tooling": "platforms",
+    "other": "", "misc": "", "miscellaneous": "", "general": "", "none": "", "n/a": "",
+}
+_FILLER = {"and", "for", "the", "of", "with", "in", "a", "an", "&", "ai", "ml", "system"}
+
+
+def _singular(word: str) -> str:
+    if len(word) > 4 and word.endswith("ies"):
+        return word[:-3] + "y"
+    if len(word) > 3 and word.endswith("s") and not word.endswith(("ss", "us", "is")):
+        return word[:-1]
+    return word
+
+
+def category_norm(name: str) -> str:
+    """A category name in its normal form, for comparing: "Voice-Agents" -> "voice agent"."""
+    words = [_singular(w) for w in re.sub(r"[^a-z0-9&/]+", " ", (name or "").lower()).split()]
+    kept = [w for w in words if w not in _FILLER]
+    return " ".join(kept or words)
+
+
+_TOPIC_BY_NORM = {category_norm(k): v for k, v in CATEGORY_SYNONYMS.items()}
+_TOPIC_BY_NORM.update({category_norm(name): key for key, (name, _) in TOPICS.items()})
+_TOPIC_BY_NORM.update({category_norm(key): key for key in TOPICS})
+
+
+def clean_category(name: str) -> str:
+    """A proposed name tidied for the chip row: 1-3 words in sentence case like "Coding agents",
+    acronyms kept ("LLM", "SQL"). "" when it is too long or too short to be a category."""
+    words = re.sub(r"[^\w&+/ -]+", " ", str(name or "")).replace("_", " ").split()
+    if not words or len(words) > 3 or len("".join(words)) < 3:
+        return ""
+    out = []
+    for i, w in enumerate(words):
+        if 1 < len(w) <= 4 and w.isupper():  # LLM, SQL, RAG, GPU
+            out.append(w)
+        else:
+            out.append(w.capitalize() if i == 0 else w.lower())
+    return " ".join(out)
+
+
+def match_category(name: str, known: dict[str, str] | None = None) -> tuple[str | None, str]:
+    """Where a proposed category name belongs:
+    (topic key, "") when it is one of TOPICS or a synonym of one;
+    ("", display name) for a new category, using the name already in known (normal form -> display
+    name) when it is the same category spelled differently;
+    (None, "") when the name is unusable or just "Other"."""
+    shown = clean_category(name)
+    norm = category_norm(shown)
+    if not shown or not norm:
+        return None, ""
+    if norm in _TOPIC_BY_NORM:
+        key = _TOPIC_BY_NORM[norm]
+        return (key, "") if key else (None, "")
+    if known and norm in known:
+        return "", known[norm]
+    return "", shown
+
+
+def category_slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", (name or "").lower()).strip("-")

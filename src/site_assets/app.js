@@ -1942,6 +1942,44 @@
     }
   }
 
+  // ---- Case studies: the topic chips scroll sideways; fade the edge with more chips, arrows to scroll ----
+  document.querySelectorAll("[data-cs-chipbar]").forEach(function (bar) {
+    var row = bar.querySelector("[data-cs-chips]");
+    var prev = bar.querySelector("[data-cs-chip-prev]");
+    var next = bar.querySelector("[data-cs-chip-next]");
+    if (!row) return;
+    var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var how = still ? "auto" : "smooth";
+    bar.setAttribute("data-js", "");
+    var paint = function () {
+      var max = row.scrollWidth - row.clientWidth;
+      var x = Math.abs(row.scrollLeft);
+      var left = max > 1 && x > 1, right = max > 1 && x < max - 1;
+      bar.toggleAttribute("data-left", left);
+      bar.toggleAttribute("data-right", right);
+      if (prev) prev.hidden = !left;
+      if (next) next.hidden = !right;
+    };
+    var step = function (dir) {
+      row.scrollBy({ left: dir * Math.max(160, row.clientWidth * 0.7), behavior: how });
+    };
+    if (prev) prev.addEventListener("click", function () { step(-1); });
+    if (next) next.addEventListener("click", function () { step(1); });
+    row.addEventListener("scroll", paint, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(paint).observe(row); else window.addEventListener("resize", paint);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint);  // chip widths change once the font loads
+    // A chip reached with Tab scrolls fully into view, clear of the faded edge (scroll-padding in style.css)
+    row.addEventListener("focusin", function (e) {
+      if (e.target && e.target.scrollIntoView) e.target.scrollIntoView({ block: "nearest", inline: "nearest", behavior: how });
+    });
+    // On a topic page, its own chip starts in view
+    var here = row.querySelector("[aria-current]");
+    if (here && here.offsetLeft + here.offsetWidth > row.clientWidth) {
+      row.scrollLeft = here.offsetLeft - (row.clientWidth - here.offsetWidth) / 2;
+    }
+    paint();
+  });
+
   // ---- Case studies: search, company and tag filters, showing more, and Save ----
   (function () {
     var saveBtns = Array.prototype.slice.call(document.querySelectorAll("[data-cs-save]"));
