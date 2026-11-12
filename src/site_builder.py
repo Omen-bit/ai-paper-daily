@@ -1813,6 +1813,11 @@ def build_paper(rec: dict, related: list[dict] = (), prev: dict = None, nxt: dic
   </article>
   {related_html}
   {subscribe_box("../")}
+</div>
+<div class="np-mbar">
+  <a class="btn btn-primary" href="{esc(rec.get('pdf_url'))}" rel="noopener" data-out="pdf">Read the PDF {icon("external", 14)}</a>
+  {'<button class="btn btn-outline" type="button" data-ask-open aria-controls="ask">Ask</button>' if abstract else ""}
+  <button class="btn btn-outline btn-icon" type="button" data-save aria-pressed="false" aria-label="Save this paper">{icon("bookmark", 16)}<span class="sr-only">Save</span></button>
 </div>"""
     desc = notes.get("tldr") or summary or abstract[:160]
     return page(rec["title"], body, root="../", description=desc, path=f"paper/{rec['id']}.html", body_class="rd-page",

@@ -2285,7 +2285,7 @@ body.rd-page .header-actions .cmdk { display: none; }
   .rd-big, .rd-big.rd-len-l, .rd-big.rd-len-xl { font-size: clamp(34px, 9.6vw, 48px) !important; line-height: 1.02; }
   .rd-big.rd-len-xl { font-size: clamp(30px, 8.2vw, 42px) !important; }
   .rd-cols { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
-  .rd-stick { position: static; margin-top: 0; padding-top: 20px; }
+  .rd-stick { position: static; margin-top: 0; padding-top: 20px; max-height: none; overflow: visible; overscroll-behavior: auto; } /* one column: the details scroll with the page */
   .rd-small, .rd-toc, .rd-notes { display: none; }
   .rd-md > div { grid-template-columns: 112px minmax(0, 1fr); }
   .rd-main { font-size: calc(18px * var(--reader-scale, 1)); }

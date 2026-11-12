@@ -464,5 +464,5 @@ def test_paper_page_without_links_leaves_those_parts_out(tmp_path):
     build_site(data_dir, site_dir)
     page = open(os.path.join(site_dir, "paper", "2610.1.html"), encoding="utf-8").read()
     assert "Where it fits" not in page and "Try it" not in page
-    assert "data-breakdown" in page and "np-mbar" not in page  # no floating bar over the phone menu
+    assert "data-breakdown" in page and "np-mbar" in page  # Read the PDF, Ask and Save above the phone menu
     assert "data-explain" in page and "Built by" in page and "oss-btn" in page
