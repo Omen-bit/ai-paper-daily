@@ -15,8 +15,6 @@ the pages from the posts already saved. A second run in the same week (a rerun, 
 does nothing, because cases.json remembers the day of the last read ("last_fetch").
 Posts left over when the week's Groq calls run out are saved in "queue" and sorted first next week.
 To read the blogs again now anyway:  python src/case_studies.py --now
-To move the saved posts onto today's categories (keywords only, no Groq calls):
-  python src/case_studies.py --recategorize
 A feed that is down is skipped; the posts already saved stay.
 """
 import html
@@ -32,13 +30,12 @@ ROOT_DIR = os.path.dirname(SRC_DIR)
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from case_sources import (CUSTOMER_BLOGS, FOCUS_WORDS, SOURCES, TAG_NAMES, TAGS, TOPIC_RULES, TOPICS,
-                          category_norm, match_category, split_agents, topic_of)
+from case_sources import CUSTOMER_BLOGS, FOCUS_WORDS, SOURCES, TAG_NAMES, TAGS, TOPIC_RULES, TOPICS, topic_of
 
 CASES_FILE = os.path.join(ROOT_DIR, "data", "cases.json")
 MAX_POSTS = 800          # oldest posts drop off past this
 MAX_AGE_DAYS = 400       # posts older than this are not added
-MAX_GROQ_CALLS = int(os.environ.get("CASES_MAX_GROQ", "150"))  # per weekly run, to stay inside the free tier
+MAX_GROQ_CALLS = int(os.environ.get("CASES_MAX_GROQ", "").strip() or 150)  # per weekly run, to stay inside the free tier
 GROQ_PAUSE = 8           # seconds to wait after a failed call, so a rate limit can clear
 MAX_PER_BLOG = 6         # Groq calls per blog per run, so every blog gets a turn
 MAX_REJECTED = 6000      # posts Groq said are not about AI in production, remembered so they are not asked again
@@ -167,7 +164,7 @@ Topics:
 {topics}
 
 Reply with JSON only:
-{{"kind": "<kind>", "topic": "<key>", "new_topic": "<short name or empty>", "issue": "<one sentence>", "summary": "<one or two sentences>", "result": "<short phrase or empty>", "tags": ["<tag>", ...], "customer": "<company name or empty>"}}
+{{"kind": "<kind>", "topic": "<key>", "issue": "<one sentence>", "summary": "<one or two sentences>", "result": "<short phrase or empty>", "tags": ["<tag>", ...], "customer": "<company name or empty>"}}
 
 kind is one of:
 - build: the company explains how it built, trained, served, tested or improved an AI or machine
@@ -180,14 +177,9 @@ On a cloud provider's blog (AWS, Google Cloud), a post in which a named customer
 explains how it built its own AI system on that cloud is build too, and customer is that
 company's name (for example "Booking.com"). Otherwise customer is empty.
 Only build posts are kept, so when unsure between build and another kind, pick the other kind.
-topic is the one key the post is mainly about. Prefer the specific LLM topics (rag, evals, cost,
-tuning, safety, and the agent topics) over llm when one fits: a post about making an LLM cheaper or
-faster is cost, a post about testing answer quality is evals. For a post about agents, pick the
-narrower agent topic (coding, data, ops, support, platforms) when one fits; use agents only when
-none of them does.
-new_topic is empty in most replies. Only when none of the topics fits the post well, give a new
-category name of 2 or 3 words in sentence case, like the topic names above (for example "Voice
-agents" or "Document processing"); topic is then still the closest key.
+topic is the one key the post is mainly about. Prefer the specific LLM topics (rag, agents,
+evals, cost, tuning, safety) over llm when one fits: a post about making an LLM cheaper or
+faster is cost, a post about testing answer quality is evals.
 Write issue and summary for someone new to AI: simple everyday words, short sentences, no
 jargon (or explain it in a few words), in your own words (never copy the post's sentences),
 and never start with the company name.
@@ -207,7 +199,6 @@ NOT_A_BUILD = re.compile(
     r"everything we talked|key takeaways|\brecap\b|\bwebinar\b|join us|we.re hiring|meet the team|"
     r"\bchangelog\b|\bnewsletter\b", re.I)
 VERSION = 3  # posts sorted under an older prompt are sorted again, so they get a result and a kind
-CAT_VERSION = 2  # sorted with the agent topics and new categories; older "agents" posts are split by keywords
 
 
 def _topics_text() -> str:
@@ -247,18 +238,9 @@ def parse_reply(raw: str) -> dict | None:
     customer = " ".join(str(data.get("customer") or "").split())[:60]
     if customer.lower() in ("none", "n/a", "empty", "unknown"):
         customer = ""
-    new_topic = str(data.get("new_topic") or "").strip()
-    category = ""
-    if new_topic:
-        key, name = match_category(new_topic)
-        if key:  # the "new" name is one of the topics (or a synonym of one): use that topic
-            topic = key
-        category = name
     out = {"keep": True, "topic": topic, "issue": issue, "summary": summary, "result": result, "tags": tags[:MAX_TAGS]}
     if customer:
         out["customer"] = customer
-    if category:
-        out["category"] = category
     return out
 
 
@@ -331,44 +313,12 @@ def interleave(fetched: list[dict]) -> list[dict]:
     return [p for p in out if is_focus(p)] + [p for p in out if not is_focus(p)]  # LLM posts first
 
 
-def recategorize(post: dict, known: dict[str, str] | None = None) -> dict:
-    """A saved post moved onto today's categories, by keywords only (no Groq, no network):
-    a post filed under the old catch-all "agents" goes to the narrower agent topic its words point
-    to, and a proposed category name is merged with the same name spelled another way (known maps
-    normal form -> display name, and is filled in as names are seen)."""
-    post = dict(post)
-    if post.get("problem") == "agents" and post.get("cat") != CAT_VERSION:
-        post["problem"] = split_agents(post)
-        post["cat"] = CAT_VERSION
-    if post.get("category"):
-        key, name = match_category(post["category"], known)
-        if key:
-            post["problem"] = key
-        if name and known is not None:
-            known.setdefault(category_norm(name), name)
-        if name:
-            post["category"] = name
-        else:
-            post.pop("category", None)
-    return post
-
-
-def known_categories(posts: list[dict]) -> dict[str, str]:
-    """The proposed category names already saved: normal form -> the name saved first."""
-    known: dict[str, str] = {}
-    for p in sorted(posts, key=lambda p: (p.get("added") or p.get("published") or "", p.get("url", ""))):
-        if p.get("category"):
-            known.setdefault(category_norm(p["category"]), p["category"])
-    return known
-
-
-def migrate(post: dict, known: dict[str, str] | None = None) -> dict:
+def migrate(post: dict) -> dict:
     """A saved post in today's shape: today's topics, no step, and tags."""
     post = dict(post)
     topic = topic_of(post)
     if topic:
         post["problem"] = topic
-    post = recategorize(post, known)
     post.pop("step", None)
     if post.get("v") != VERSION or not post.get("issue"):
         post["resort"] = True  # sorted under an older prompt, or no problem yet: Groq sorts it again when it has room
@@ -389,8 +339,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
     seen_skips = rejected if rejected is not None else set()
     blog_calls: dict[str, int] = {}
     cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=MAX_AGE_DAYS)).strftime("%Y-%m-%d")
-    known_cats = known_categories(existing)
-    posts = [migrate(p, known_cats) for p in existing]
+    posts = [migrate(p) for p in existing]
     counts = {"new": 0, "skipped": 0, "groq": 0, "rules": 0, "waiting": 0, "resorted": 0, "left": []}
     calls = 0
 
@@ -416,11 +365,8 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
         else:
             posts[i] = {**old, "problem": result["topic"], "summary": result["summary"] or old.get("summary", ""),
                         "result": result.get("result", ""), "issue": result.get("issue", ""), "tags": result.get("tags") or old.get("tags", []),
-                        "sorted_by": "groq", "v": VERSION, "cat": CAT_VERSION}
+                        "sorted_by": "groq", "v": VERSION}
             posts[i].pop("resort", None)
-            posts[i].pop("category", None)
-            if result.get("category"):
-                posts[i] = recategorize({**posts[i], "category": result["category"]}, known_cats)
         counts["resorted"] += 1
     posts = [p for p in posts if p]
     for post in interleave(fetched):
@@ -459,12 +405,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 continue
             problem, summary, how = result["topic"], result["summary"], "groq"
             tags = result.get("tags") or rule_tags(post)
-            extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION, "cat": CAT_VERSION}
-            if result.get("category"):
-                named = recategorize({"problem": problem, "category": result["category"]}, known_cats)
-                problem = named["problem"]
-                if named.get("category"):
-                    extra["category"] = named["category"]
+            extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION}
             if post["company"] in CUSTOMER_BLOGS and result.get("customer"):
                 # A customer story on a cloud blog: the card is about the customer, written up by the cloud
                 extra["via"] = post["company"]
@@ -474,8 +415,6 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
             if not problem:
                 counts["skipped"] += 1
                 continue
-            if problem == "agents":
-                problem = split_agents(post)
             summary, how = "", "rules"
             tags = rule_tags(post)
             extra = {}
@@ -551,26 +490,7 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
     return counts["new"]
 
 
-def recategorize_saved(path: str = CASES_FILE) -> dict[str, int]:
-    """Move the saved posts onto today's categories by keywords, offline and free (no Groq calls),
-    and save them. Returns how many posts each topic has afterwards, most first."""
-    saved = load_all(path)
-    posts = saved.get("posts", [])
-    known = known_categories(posts)
-    posts = [recategorize(p, known) for p in posts]
-    save(posts, path, saved.get("rejected", []), saved.get("waiting", 0), saved.get("last_fetch", ""),
-         saved.get("queue", []))
-    counts: dict[str, int] = {}
-    for p in posts:
-        counts[p.get("problem", "")] = counts.get(p.get("problem", ""), 0) + 1
-    return dict(sorted(counts.items(), key=lambda kv: -kv[1]))
-
-
 if __name__ == "__main__":
-    if "--recategorize" in sys.argv:  # keywords only, no API calls
-        for key, n in recategorize_saved().items():
-            print(f"  [cases] {TOPICS.get(key, (key,))[0]}: {n}")
-        sys.exit(0)
     try:
         from dotenv import load_dotenv
         load_dotenv()
