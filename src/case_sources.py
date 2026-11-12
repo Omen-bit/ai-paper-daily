@@ -3,6 +3,10 @@ case_sources.py
 The company engineering blogs behind the Case studies page, the topics posts are sorted into,
 and the technique tags shown on each card.
 
+Sources run from the largest tech companies to small startups, plus the AWS and Google Cloud AI
+blogs, whose posts are mostly write-ups of how other companies (of every size) built on them.
+A feed that moves or goes down is skipped and logged; the posts already saved stay.
+
 The site's focus is LLMs in production (RAG, agents, evaluation, cost), so those topics come
 first; recommendations, ads, forecasting and vision keep their own topics.
 """
@@ -81,9 +85,85 @@ SOURCES = [
     ("Vercel", "https://vercel.com/atom", "https://vercel.com/blog", "vercel", "000000"),
     ("Weaviate", "https://weaviate.io/blog/rss.xml", "https://weaviate.io/blog", "weaviate", "00B061"),
     ("Honeycomb", "https://www.honeycomb.io/feed", "https://www.honeycomb.io/blog", "", "F5A623"),
+    # Cloud AI blogs: customer write-ups from companies of every size
+    ("AWS", "https://aws.amazon.com/blogs/machine-learning/feed/", "https://aws.amazon.com/blogs/machine-learning/", "", "FF9900"),
+    ("Google Cloud", "https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/", "https://cloud.google.com/blog/products/ai-machine-learning", "", "4285F4"),
+    # Large software and internet companies
+    ("Atlassian", "https://www.atlassian.com/engineering/feed", "https://www.atlassian.com/engineering", "", "0052CC"),
+    ("Reddit", "https://www.reddit.com/r/RedditEng/.rss", "https://www.reddit.com/r/RedditEng/", "", "FF4500"),
+    ("Twilio", "https://www.twilio.com/blog/feed", "https://www.twilio.com/blog", "", "F22F46"),
+    ("Block", "https://developer.squareup.com/blog/rss.xml", "https://developer.squareup.com/blog/", "", "000000"),
+    ("Indeed", "https://engineering.indeedblog.com/feed/", "https://engineering.indeedblog.com/", "", "003A9B"),
+    ("GitLab", "https://about.gitlab.com/atom.xml", "https://about.gitlab.com/blog/", "", "FC6D26"),
+    ("JetBrains", "https://blog.jetbrains.com/ai/feed/", "https://blog.jetbrains.com/ai/", "", "000000"),
+    ("MongoDB", "https://www.mongodb.com/blog/rss", "https://www.mongodb.com/blog", "", "47A248"),
+    ("Elastic", "https://www.elastic.co/search-labs/rss/feed", "https://www.elastic.co/search-labs", "", "005571"),
+    ("Snowflake", "https://medium.com/feed/snowflake", "https://medium.com/snowflake", "", "29B5E8"),
+    ("Datadog", "https://www.datadoghq.com/blog/index.xml", "https://www.datadoghq.com/blog/", "", "632CA6"),
+    ("HubSpot", "https://product.hubspot.com/blog/rss.xml", "https://product.hubspot.com/blog", "", "FF7A59"),
+    ("Zendesk", "https://zendesk.engineering/feed", "https://zendesk.engineering/", "", "03363D"),
+    ("Asana", "https://blog.asana.com/category/eng/feed/", "https://blog.asana.com/category/eng/", "", "F06A6A"),
+    ("Grammarly", "https://www.grammarly.com/blog/engineering/feed/", "https://www.grammarly.com/blog/engineering/", "", "15C39A"),
+    ("Box", "https://medium.com/feed/box-tech-blog", "https://medium.com/box-tech-blog", "", "0061D5"),
+    ("Wix", "https://www.wix.engineering/blog-feed.xml", "https://www.wix.engineering/", "", "000000"),
+    ("monday.com", "https://engineering.monday.com/feed/", "https://engineering.monday.com/", "", "FF3D57"),
+    ("Miro", "https://medium.com/feed/miro-engineering", "https://medium.com/miro-engineering", "", "FFD02F"),
+    ("Postman", "https://blog.postman.com/feed/", "https://blog.postman.com/", "", "FF6C37"),
+    ("Medium", "https://medium.engineering/feed", "https://medium.engineering/", "", "000000"),
+    ("Nextdoor", "https://engblog.nextdoor.com/feed", "https://engblog.nextdoor.com/", "", "8ED500"),
+    # Retail and marketplaces
+    ("Target", "https://tech.target.com/feed.xml", "https://tech.target.com/", "", "CC0000"),
+    ("The Home Depot", "https://medium.com/feed/thd-engineering", "https://medium.com/thd-engineering", "", "F96302"),
+    ("Mercari", "https://engineering.mercari.com/en/blog/feed.xml", "https://engineering.mercari.com/en/blog/", "", "FF0211"),
+    ("Allegro", "https://blog.allegro.tech/feed.xml", "https://blog.allegro.tech/", "", "FF5A00"),
+    ("Adevinta", "https://medium.com/feed/adevinta-tech-blog", "https://medium.com/adevinta-tech-blog", "", "1B1B1B"),
+    ("Thumbtack", "https://medium.com/feed/thumbtack-engineering", "https://medium.com/thumbtack-engineering", "", "009FD9"),
+    ("Tokopedia", "https://medium.com/feed/tokopedia-engineering", "https://medium.com/tokopedia-engineering", "", "42B549"),
+    ("Klaviyo", "https://klaviyo.tech/feed", "https://klaviyo.tech/", "", "232426"),
+    ("Criteo", "https://medium.com/feed/criteo-engineering", "https://medium.com/criteo-engineering", "", "FE5000"),
+    # Food, travel and transport
+    ("Deliveroo", "https://deliveroo.engineering/feed.xml", "https://deliveroo.engineering/", "", "00CCBC"),
+    ("HelloFresh", "https://engineering.hellofresh.com/feed", "https://engineering.hellofresh.com/", "", "91C11E"),
+    ("Picnic", "https://blog.picnic.nl/feed", "https://blog.picnic.nl/", "", "E1171E"),
+    ("iFood", "https://medium.com/feed/ifood-engineering", "https://medium.com/ifood-engineering", "", "EA1D2C"),
+    ("trivago", "https://tech.trivago.com/index.xml", "https://tech.trivago.com/", "", "007FAD"),
+    ("Traveloka", "https://medium.com/feed/traveloka-engineering", "https://medium.com/traveloka-engineering", "", "0194F3"),
+    ("BlaBlaCar", "https://medium.com/feed/blablacar", "https://medium.com/blablacar", "", "00AFF5"),
+    ("Gojek", "https://medium.com/feed/gojekengineering", "https://medium.com/gojekengineering", "", "00AA13"),
+    # Money
+    ("Brex", "https://medium.com/feed/brexeng", "https://medium.com/brexeng", "", "212121"),
+    ("Ramp", "https://engineering.ramp.com/rss.xml", "https://engineering.ramp.com/", "", "E4F222"),
+    ("Gusto", "https://engineering.gusto.com/rss/", "https://engineering.gusto.com/", "", "F45D48"),
+    ("CRED", "https://engineering.cred.club/feed", "https://engineering.cred.club/", "", "1B1B1B"),
+    ("Groww", "https://tech.groww.in/feed", "https://tech.groww.in/", "", "00D09C"),
+    ("Zerodha", "https://zerodha.tech/index.xml", "https://zerodha.tech/", "", "387ED1"),
+    # Media, learning, health and games
+    ("Dream11", "https://blog.dream11engineering.com/feed", "https://blog.dream11engineering.com/", "", "D32F2F"),
+    ("ShareChat", "https://medium.com/feed/sharechat-techbyte", "https://medium.com/sharechat-techbyte", "", "FF6D00"),
+    ("Urban Company", "https://medium.com/feed/urbancompany-engineering", "https://medium.com/urbancompany-engineering", "", "000000"),
+    ("Deezer", "https://deezer.io/feed", "https://deezer.io/", "", "A238FF"),
+    ("Scribd", "https://tech.scribd.com/feed.xml", "https://tech.scribd.com/", "", "1E7B85"),
+    ("Udemy", "https://medium.com/feed/udemy-engineering", "https://medium.com/udemy-engineering", "", "A435F0"),
+    ("Coursera", "https://medium.com/feed/coursera-engineering", "https://medium.com/coursera-engineering", "", "0056D2"),
+    ("Khan Academy", "https://blog.khanacademy.org/feed/", "https://blog.khanacademy.org/", "", "14BF96"),
+    ("Doctolib", "https://medium.com/feed/doctolib", "https://medium.com/doctolib", "", "107ACA"),
+    # Small teams and startups that build AI products and write about it
+    ("Sourcegraph", "https://sourcegraph.com/blog/rss.xml", "https://sourcegraph.com/blog", "", "A112FF"),
+    ("PostHog", "https://posthog.com/rss.xml", "https://posthog.com/blog", "", "F54E00"),
+    ("Supabase", "https://supabase.com/rss.xml", "https://supabase.com/blog", "", "3FCF8E"),
+    ("Neon", "https://neon.tech/blog/rss.xml", "https://neon.tech/blog", "", "00E599"),
+    ("Fly.io", "https://fly.io/blog/feed.xml", "https://fly.io/blog/", "", "7B3BE2"),
+    ("Sentry", "https://blog.sentry.io/feed.xml", "https://blog.sentry.io/", "", "362D59"),
+    ("Grafana Labs", "https://grafana.com/blog/index.xml", "https://grafana.com/blog/", "", "F46800"),
+    ("Qdrant", "https://qdrant.tech/blog/index.xml", "https://qdrant.tech/blog/", "", "DC244C"),
+    ("Vespa", "https://blog.vespa.ai/feed.xml", "https://blog.vespa.ai/", "", "61D790"),
+    ("LlamaIndex", "https://www.llamaindex.ai/blog/feed", "https://www.llamaindex.ai/blog", "", "000000"),
+    ("Mozilla.ai", "https://blog.mozilla.ai/rss/", "https://blog.mozilla.ai/", "", "000000"),
 ]
 
 BY_NAME = {s[0]: s for s in SOURCES}
+# Blogs where most posts tell how a customer built something: the card shows the customer's name
+CUSTOMER_BLOGS = {"AWS", "Google Cloud"}
 
 # key -> (name, what it covers). The order is the order of the topic chips.
 TOPICS = {

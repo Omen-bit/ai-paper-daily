@@ -9,9 +9,12 @@ writes a sentence or two in our own words on what was built and how, plus the re
 Without Groq, a keyword fallback sorts posts and the summary is left empty: the site never
 shows the blog's own text as ours.
 
-Writes data/cases.json. The daily workflow runs it before the site build; it reads the blogs on
-RUN_DAYS only (Monday and Thursday by default), and on any day while posts are still waiting
-for Groq from a run that ran out of calls. To run it now:  python src/case_studies.py --now
+Writes data/cases.json. It reads the blogs once a week: the Case studies workflow
+(.github/workflows/case-studies.yml) runs it early on Monday, and the daily edition only builds
+the pages from the posts already saved. A second run in the same week (a rerun, a manual run)
+does nothing, because cases.json remembers the day of the last read ("last_fetch").
+Posts left over when the week's Groq calls run out are saved in "queue" and sorted first next week.
+To read the blogs again now anyway:  python src/case_studies.py --now
 A feed that is down is skipped; the posts already saved stay.
 """
 import html
@@ -27,18 +30,17 @@ ROOT_DIR = os.path.dirname(SRC_DIR)
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from case_sources import FOCUS_WORDS, SOURCES, TAG_NAMES, TAGS, TOPIC_RULES, TOPICS, topic_of
+from case_sources import CUSTOMER_BLOGS, FOCUS_WORDS, SOURCES, TAG_NAMES, TAGS, TOPIC_RULES, TOPICS, topic_of
 
 CASES_FILE = os.path.join(ROOT_DIR, "data", "cases.json")
 MAX_POSTS = 800          # oldest posts drop off past this
 MAX_AGE_DAYS = 400       # posts older than this are not added
-MAX_GROQ_CALLS = int(os.environ.get("CASES_MAX_GROQ", "60"))  # per run, to stay inside the free tier
+MAX_GROQ_CALLS = int(os.environ.get("CASES_MAX_GROQ", "150"))  # per weekly run, to stay inside the free tier
 GROQ_PAUSE = 8           # seconds to wait after a failed call, so a rate limit can clear
 MAX_PER_BLOG = 6         # Groq calls per blog per run, so every blog gets a turn
-MAX_REJECTED = 4000      # posts Groq said are not about AI in production, remembered so they are not asked again
-# Company blogs post about once a week, so the blogs are read on these days only.
-# CASES_RUN_DAYS="mon" reads them weekly, "daily" every day. "--now" runs today regardless.
-RUN_DAYS = os.environ.get("CASES_RUN_DAYS", "").strip().lower() or "mon,thu"
+MAX_REJECTED = 6000      # posts Groq said are not about AI in production, remembered so they are not asked again
+MAX_QUEUE = 400          # posts waiting for next week's Groq calls, newest kept
+IST = timezone(timedelta(hours=5, minutes=30))
 USER_AGENT = "AIPapersDaily/1.0 (+https://omen-bit.github.io/ai-paper-daily/)"
 
 # A post has to mention one of these to be worth asking Groq about
@@ -162,7 +164,7 @@ Topics:
 {topics}
 
 Reply with JSON only:
-{{"kind": "<kind>", "topic": "<key>", "issue": "<one sentence>", "summary": "<one or two sentences>", "result": "<short phrase or empty>", "tags": ["<tag>", ...]}}
+{{"kind": "<kind>", "topic": "<key>", "issue": "<one sentence>", "summary": "<one or two sentences>", "result": "<short phrase or empty>", "tags": ["<tag>", ...], "customer": "<company name or empty>"}}
 
 kind is one of:
 - build: the company explains how it built, trained, served, tested or improved an AI or machine
@@ -171,6 +173,9 @@ kind is one of:
 - research: a research result, paper or model that the post does not say is running in a product.
 - event: a talk, conference, meetup or webinar recap.
 - other: culture, hiring, opinion, advice, an operating model or a security notice, with no concrete system.
+On a cloud provider's blog (AWS, Google Cloud), a post in which a named customer company
+explains how it built its own AI system on that cloud is build too, and customer is that
+company's name (for example "Booking.com"). Otherwise customer is empty.
 Only build posts are kept, so when unsure between build and another kind, pick the other kind.
 topic is the one key the post is mainly about. Prefer the specific LLM topics (rag, agents,
 evals, cost, tuning, safety) over llm when one fits: a post about making an LLM cheaper or
@@ -230,7 +235,13 @@ def parse_reply(raw: str) -> dict | None:
     issue = " ".join(str(data.get("issue") or "").split())
     if not issue or len(issue.split()) > 30:
         return None  # every card shows the problem, so a reply without one is asked again on the next run
-    return {"keep": True, "topic": topic, "issue": issue, "summary": summary, "result": result, "tags": tags[:MAX_TAGS]}
+    customer = " ".join(str(data.get("customer") or "").split())[:60]
+    if customer.lower() in ("none", "n/a", "empty", "unknown"):
+        customer = ""
+    out = {"keep": True, "topic": topic, "issue": issue, "summary": summary, "result": result, "tags": tags[:MAX_TAGS]}
+    if customer:
+        out["customer"] = customer
+    return out
 
 
 def groq_sort(post: dict) -> dict | None:
@@ -275,11 +286,15 @@ def load(path: str = CASES_FILE) -> list[dict]:
     return load_all(path).get("posts", [])
 
 
-def save(posts: list[dict], path: str = CASES_FILE, rejected=(), waiting: int = 0) -> None:
+def save(posts: list[dict], path: str = CASES_FILE, rejected=(), waiting: int = 0,
+         last_fetch: str = "", queue=()) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     posts = sorted(posts, key=lambda p: (p.get("published") or "", p["url"]), reverse=True)[:MAX_POSTS]
+    queue = sorted(queue, key=lambda p: p.get("published") or "", reverse=True)[:MAX_QUEUE]
+    queue = [{k: p.get(k, "") for k in ("url", "company", "title", "published", "text")} for p in queue]
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({"posts": posts, "waiting": waiting, "rejected": sorted(rejected)[-MAX_REJECTED:]},
+        json.dump({"last_fetch": last_fetch, "posts": posts, "waiting": waiting, "queue": queue,
+                   "rejected": sorted(rejected)[-MAX_REJECTED:]},
                   f, ensure_ascii=False, indent=1)
         f.write("\n")
 
@@ -318,13 +333,14 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
     """Add the new AI posts in fetched to existing. Returns (posts, counts); counts["waiting"] is
     how many posts were left for the next run because the Groq calls ran out.
     reader(url) -> text opens a new post's page so Groq reads more than the feed's excerpt.
-    rejected is the set of urls Groq already turned down; new rejections are added to it."""
+    rejected is the set of urls Groq already turned down; new rejections are added to it.
+    counts["left"] lists the new posts that were left waiting, to save in the queue."""
     known = {p["url"] for p in existing} | {u for p in existing for u in p.get("aliases", [])}
     seen_skips = rejected if rejected is not None else set()
     blog_calls: dict[str, int] = {}
     cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=MAX_AGE_DAYS)).strftime("%Y-%m-%d")
     posts = [migrate(p) for p in existing]
-    counts = {"new": 0, "skipped": 0, "groq": 0, "rules": 0, "waiting": 0, "resorted": 0}
+    counts = {"new": 0, "skipped": 0, "groq": 0, "rules": 0, "waiting": 0, "resorted": 0, "left": []}
     calls = 0
 
     # Posts saved under the old problems, or with no problem line, are sorted again, with up to half of this run's calls
@@ -364,6 +380,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
         result = None
         if use_groq and (calls >= max_calls or blog_calls.get(post["company"], 0) >= per_blog):
             counts["waiting"] += 1
+            counts["left"].append(post)
             continue  # leave it for the next run, when Groq has room again
         if use_groq:
             calls += 1
@@ -377,6 +394,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 use_groq = False  # Groq is down or not set up: sort the rest by keywords
             elif result is None:
                 counts["waiting"] += 1  # a passing failure such as a rate limit: try it on the next run
+                counts["left"].append(post)
                 time.sleep(GROQ_PAUSE)
                 continue
         if result is not None:
@@ -388,6 +406,10 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
             problem, summary, how = result["topic"], result["summary"], "groq"
             tags = result.get("tags") or rule_tags(post)
             extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION}
+            if post["company"] in CUSTOMER_BLOGS and result.get("customer"):
+                # A customer story on a cloud blog: the card is about the customer, written up by the cloud
+                extra["via"] = post["company"]
+                post = {**post, "company": result["customer"]}
         else:
             problem = rule_sort(post)
             if not problem:
@@ -405,21 +427,38 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
     return posts, counts
 
 
-def is_run_day(now: datetime, days: str = RUN_DAYS) -> bool:
+def is_run_day(now: datetime, days: str = "mon") -> bool:
+    """Kept for older tests and scripts; the weekly read now uses read_this_week()."""
     if days in ("daily", "all", "every day"):
         return True
     wanted = {d.strip()[:3] for d in days.split(",") if d.strip()}
     return now.strftime("%a").lower() in wanted
 
 
+def read_this_week(last_fetch: str, now: datetime) -> bool:
+    """True when the blogs were already read in the same Monday-to-Sunday week as now."""
+    try:
+        last = datetime.strptime(last_fetch, "%Y-%m-%d")
+    except (TypeError, ValueError):
+        return False
+    return last.isocalendar()[:2] == now.isocalendar()[:2]
+
+
+def merge_queue(queue: list[dict], fetched: list[dict]) -> list[dict]:
+    """Last week's waiting posts plus this week's feeds, one entry per url (the feed's copy wins)."""
+    urls = {p["url"] for p in fetched}
+    return fetched + [p for p in queue if p.get("url") and p["url"] not in urls]
+
+
 def run(path: str = CASES_FILE, force: bool = False) -> int:
-    now = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+    now = datetime.now(IST)
     today = now.strftime("%Y-%m-%d")
     saved = load_all(path)
     existing = saved.get("posts", [])
-    behind = saved.get("waiting", 1) > 0  # the last run ran out of Groq calls (or is from before this was counted)
-    if existing and not behind and not force and not is_run_day(now):
-        print(f"  [cases] Blogs are read on {RUN_DAYS} only; nothing to do today. Use --now to run anyway.")
+    last_fetch = saved.get("last_fetch", "")
+    if existing and not force and read_this_week(last_fetch, now):
+        print(f"  [cases] The blogs were already read this week (on {last_fetch}); keeping the saved posts. "
+              "Use --now to read them again.")
         return 0
     fetched, down = [], []
     for name, feed, *_ in SOURCES:
@@ -432,9 +471,12 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
             print(f"  [cases] {name}: feed failed ({str(exc)[:80]})")
     use_groq = bool(os.environ.get("GROQ_API_KEY", "").strip())
     rejected = set(saved.get("rejected", []))
-    posts, counts = update(existing, fetched, today, use_groq=use_groq,
+    queue = saved.get("queue", [])
+    posts, counts = update(existing, merge_queue(queue, fetched), today, use_groq=use_groq,
                            reader=read_article if use_groq else None, rejected=rejected)
-    save(posts, path, rejected, counts["waiting"])
+    # Every feed down usually means no network: leave last_fetch alone so the next run tries again
+    read_ok = len(down) < len(SOURCES)
+    save(posts, path, rejected, counts["waiting"], today if read_ok else last_fetch, counts["left"])
     try:  # icons for the companies with no drawn logo, from their own websites
         import case_logos
         with open(os.path.join(SRC_DIR, "case_brands.json"), encoding="utf-8") as f:
@@ -443,8 +485,8 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
     except Exception as exc:
         print(f"  [cases] Logos skipped ({str(exc)[:80]})")
     print(f"  [cases] {counts['new']} new posts ({counts['groq']} sorted by Groq, {counts['rules']} by keywords), "
-          f"{counts['resorted']} older posts sorted again, {counts['skipped']} not about AI in production, {counts['waiting']} waiting for the next run, "
-          f"{len(down)} feeds down. {len(posts)} saved.")
+          f"{counts['resorted']} older posts sorted again, {counts['skipped']} not about AI in production, {counts['waiting']} waiting for next week, "
+          f"{len(down)} of {len(SOURCES)} feeds down. {len(posts)} saved.")
     return counts["new"]
 
 

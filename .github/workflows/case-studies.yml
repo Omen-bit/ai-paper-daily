@@ -1,0 +1,72 @@
+name: Weekly case studies
+
+# Once a week: read the company engineering blogs, keep the posts about AI in real products and
+# save them to data/cases.json. The daily edition only builds the Case studies pages from the
+# saved posts; it never reads the blogs.
+#
+# Runs at 20:30 UTC on Sunday (02:00 IST on Monday), so the 07:00 IST edition that morning shows
+# the new posts. The Monday 12:00 IST run is a backup in case GitHub skips the first one.
+# A second run in the same week (the backup, a rerun, a manual run) does nothing, because
+# cases.json remembers the day the blogs were last read. Tick "Read the blogs again" on a manual
+# run to read them anyway.
+on:
+  schedule:
+    - cron: "30 20 * * 0" # Monday 02:00 IST
+    - cron: "30 6 * * 1" # backup, Monday 12:00 IST
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Read the blogs again even if they were read this week"
+        type: boolean
+        default: false
+
+concurrency:
+  group: case-studies
+  cancel-in-progress: false
+
+jobs:
+  cases:
+    name: Read the blogs
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: "Asia/Kolkata"
+    permissions:
+      contents: write # commit data/cases.json
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Find new case studies on company engineering blogs
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODELS: ${{ vars.GROQ_MODELS }}
+          CASES_MAX_GROQ: ${{ vars.CASES_MAX_GROQ }} # optional: Groq calls per week, 150 when empty
+        run: python src/case_studies.py ${{ inputs.force == true && '--now' || '' }}
+
+      - name: Commit the case studies
+        run: |
+          git config user.name "Omen-bit"
+          git config user.email "darshanchougule821@gmail.com"
+          git add data/cases.json data/case_logos
+          if git diff --staged --quiet; then
+            echo "Nothing new this time."
+            exit 0
+          fi
+          git commit -m "data: case studies for the week of $(date +'%Y-%m-%d')"
+          for attempt in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push origin main && exit 0
+            echo "Push failed, retrying ($attempt/3)..."
+            sleep 5
+          done
+          exit 1

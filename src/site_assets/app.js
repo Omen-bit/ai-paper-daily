@@ -932,9 +932,30 @@
   // Only the paper ID and the kind of event are sent. Each browser counts a
   // paper once, and only after 15 seconds on its page.
   var trackMeta = document.querySelector('meta[name="apd-track"]');
+  // Bots stay out of every count. A browser run by a script says so
+  // (navigator.webdriver) or names itself in its user agent; crawlers on
+  // cloud servers that look like plain Chrome never scroll, tap or press a
+  // key, so visits are only counted once a person does one of those.
+  var AUTOMATED = navigator.webdriver === true ||
+    /HeadlessChrome|Lighthouse|PhantomJS|Puppeteer|Playwright|bot\b|crawl|spider|slurp|preview/i.test(navigator.userAgent || "") ||
+    !navigator.languages || navigator.languages.length === 0;
+  function whenHuman(fn) {
+    if (AUTOMATED) return;
+    var kinds = ["pointerdown", "pointermove", "keydown", "scroll", "wheel", "touchstart"];
+    var done = false;
+    function go(e) {
+      // Chrome sends one still pointermove as the page loads under the mouse
+      if (done || e.type === "pointermove" && !e.movementX && !e.movementY) return;
+      done = true;
+      kinds.forEach(function (k) { window.removeEventListener(k, go, true); });
+      fn();
+    }
+    kinds.forEach(function (k) { window.addEventListener(k, go, { capture: true, passive: true }); });
+  }
   // Site-wide actions that also show up as events in Umami
   var GOALS = /^(scout_(click|save|dismiss|more)|breakdown_load|out_(pdf|arxiv|hf|code)|subscribe_(rss|email|confirmed)|click_(pick|trending|runner_up|most_read))$/;
   function track(id, event) {
+    if (AUTOMATED) return;
     if (id === "site" && GOALS.test(event)) goal(event);
     if (!trackMeta || !window.fetch || /localhost|127\.0\.0\.1/.test(location.hostname) && !window.APD_TRACK_LOCAL) return;
     fetch(trackMeta.content, {
@@ -985,7 +1006,7 @@
   // back within a week, or back after longer), the first click on each
   // featured card, and the answer to "Seen this paper before today?".
   function slotKey(el) { return (el.getAttribute("data-slot") || "").replace(/-/g, "_"); }
-  (function countVisit() {
+  whenHuman(function countVisit() {
     var today = new Date().toISOString().slice(0, 10);
     var last = load("apd.lastVisit", "");
     if (last === today) return;
@@ -993,7 +1014,7 @@
     var gap = last ? (Date.parse(today) - Date.parse(last)) / 86400000 : -1;
     track("site", gap < 0 || isNaN(gap) ? "visit_new" : gap <= 7 ? "visit_return_7d" : "visit_return_old");
     track("site", "src_" + visitSource());
-  })();
+  });
 
   // ---- Umami: visitors, pages, sources and key actions (no cookies) ----
   // The page view is sent from here rather than by Umami on its own, with the
@@ -1004,15 +1025,17 @@
   function withCounter(fn) {
     // Not id="umami": an element with that id would take over window.umami
     var script = document.getElementById("umami-script");
-    if (!script) return;
+    if (!script || AUTOMATED) return;
     if (window.umami && window.umami.track) { fn(window.umami); return; }
     script.addEventListener("load", function () { if (window.umami && window.umami.track) fn(window.umami); });
   }
   function goal(name) {
     withCounter(function (u) { u.track(name); });
   }
-  withCounter(function (u) {
-    u.track(function (props) { props.url = arrivedAt; props.referrer = document.referrer; return props; });
+  whenHuman(function () {
+    withCounter(function (u) {
+      u.track(function (props) { props.url = arrivedAt; props.referrer = document.referrer; return props; });
+    });
   });
 
   // Where today's first visit came from: a ?ref= tag on our own links (rss,
