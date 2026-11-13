@@ -20,6 +20,7 @@ import zlib
 
 import case_logos
 import making_of
+from case_suggestions import clean_credit
 from case_sources import (BY_NAME, BUILD_DETAILS, INDUSTRIES, TECHNIQUES, TOPICS as TOPIC_INFO, category_norm,
                           category_slug, clean_category, topic_of)
 
@@ -208,13 +209,24 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
     tag_html = ("<ul class=\"cs-tags\" aria-label=\"Techniques\">" +
                 "".join(f'<li><button type="button" data-cs-tag="{esc(t)}">{esc(t)}</button></li>' for t in tags) +
                 "</ul>") if tags else ""
-    rel = research_block(paper)
+    rel = research_block(paper) + credit_row(post)
     date = nice_date(post.get("published", ""))
     when = f'<time datetime="{esc(post.get("published", ""))}">{date}</time>' if date else ""
     return f"""<li class="cs-card" style="--c:{color(problem)};--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
 <div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-pills"><span class="cs-topic">{esc(problem_name(problem))}</span>{detail_pill(post)}</span></div>
 <div class="cs-body"><h3><a class="cs-link" href="{esc(post['url'])}" rel="noopener" target="_blank">{esc(post['title'])}</a></h3>{summary}{tag_html}{rel}
 <div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span><button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
+
+
+def credit_row(post: dict) -> str:
+    """ "Suggested by <name>" above the footer, for a write-up a reader suggested and asked to be
+    credited for. The name is plain text (case_suggestions.clean_credit), never a link."""
+    credit = clean_credit(post.get("suggested_by"))
+    if not credit:
+        return ""
+    initial = (credit.lstrip("@")[:1] or credit[:1]).upper()
+    return (f'<p class="cs-by"><span class="cs-av" aria-hidden="true">{esc(initial)}</span>'
+            f'<span>Suggested by <b>{esc(credit)}</b></span></p>')
 
 
 # ---------- research behind a case (case_research.py matches them at build time, no LLM)
@@ -371,8 +383,40 @@ NONE = ('<div class="cs-none" data-cs-none hidden><p>No write-ups match these fi
 
 SUBLINE = ("Browse real engineering write-ups by category, or describe what you\u2019re building to find the "
            "closest ones. Every card opens the original post.")
-HERO = ('<section class="cs-top cf-hero"><p class="cf-eyebrow">Case studies</p><h1>How companies build AI</h1>'
-        f'<p>{SUBLINE}</p>')
+HERO = ('<section class="cs-top cf-hero"><div class="cf-hero-row"><p class="cf-eyebrow">Case studies</p>'
+        '<button class="cf-suggest" type="button" data-sg-open aria-haspopup="dialog">+ Suggest a write-up</button></div>'
+        f'<h1>How companies build AI</h1><p>{SUBLINE}</p>')
+# Readers' suggestions go to supabase/functions/suggest; the owner reviews them on review.html
+FUNCTIONS_URL = "https://nmelkepelhwyhlfdznpf.supabase.co/functions/v1/"
+SUGGEST_URL = FUNCTIONS_URL + "suggest"
+SUGGEST_ADMIN_URL = FUNCTIONS_URL + "suggest-admin"
+SUGGEST_DIALOG = f"""<dialog class="sg" data-sg aria-labelledby="sg-title">
+<form class="sg-form" data-sg-form novalidate data-endpoint="{SUGGEST_URL}">
+<div data-sg-body>
+<h2 id="sg-title">Suggest a write-up</h2>
+<p class="sg-intro">Know a good post about how a company built something with AI? Send it in. We check every link, and if it goes live your name goes on the card.</p>
+<div class="sg-field"><label for="sg-url">Link to the post</label>
+<input id="sg-url" name="url" type="url" inputmode="url" required autocomplete="off" spellcheck="false" placeholder="https://" aria-describedby="sg-url-msg" data-sg-url>
+<p class="sg-msg" id="sg-url-msg" data-sg-url-msg aria-live="polite"></p></div>
+<div class="sg-field"><label for="sg-note">Why is it worth reading? <span>Optional</span></label>
+<textarea id="sg-note" name="note" rows="3" maxlength="280" aria-describedby="sg-note-count" data-sg-note></textarea>
+<p class="sg-hint" id="sg-note-count" data-sg-count>0 / 280</p></div>
+<div class="sg-field"><label for="sg-credit">Credit me as <span>Optional</span></label>
+<input id="sg-credit" name="credit" maxlength="40" autocomplete="nickname" aria-describedby="sg-credit-hint" data-sg-credit>
+<p class="sg-hint" id="sg-credit-hint">Your name, LinkedIn or X handle. Leave it blank to stay anonymous.</p></div>
+<div class="sg-hp" aria-hidden="true"><label for="sg-website">Website</label><input id="sg-website" name="website" tabindex="-1" autocomplete="off" data-sg-hp></div>
+<p class="sg-error" role="alert" data-sg-error hidden></p>
+<div class="sg-actions"><button class="sg-cancel" type="button" data-sg-close>Cancel</button><button class="sg-send" type="submit" data-sg-send>Send suggestion</button></div>
+<p class="sg-foot">We review suggestions within a few days. Only links to public posts, please.</p>
+</div>
+<div class="sg-thanks" data-sg-thanks hidden tabindex="-1">
+<p class="sg-tick" aria-hidden="true">\u2713</p>
+<h2>Thanks, it\u2019s on our list</h2>
+<p>We\u2019ll check the link in the next few days. If it goes live, your name goes on the card.</p>
+<div class="sg-actions"><button class="sg-cancel" type="button" data-sg-again>Suggest another</button><button class="sg-send" type="button" data-sg-close>Done</button></div>
+</div>
+</form>
+</dialog>"""
 PLACEHOLDER = "Describe your problem, e.g. HR policy chatbot with role-based access"
 TRY = ["Policy Q&A bot", "Support chatbot with handoff", "Evaluate a RAG bot", "Cut LLM costs", "Coding agent in CI"]
 # One plain-English line per topic for its section heading; proposed categories use their own description
@@ -480,6 +524,8 @@ def search_index(posts: list[dict]) -> dict:
                "n": _industry(p), "b": build_score(p)}
         if p.get("related_papers"):
             row["rp"] = [p["related_papers"][0]["id"], p["related_papers"][0]["title"]]
+        if clean_credit(p.get("suggested_by")):
+            row["sb"] = clean_credit(p.get("suggested_by"))
         covered = [k for k in BUILD_DETAILS if (p.get("build_details") or {}).get(k)]
         if covered:
             row["bd"] = covered
@@ -496,6 +542,41 @@ def index_json(posts: list[dict]) -> str:
     """search_index as JSON that is safe inside a <script> tag."""
     text = json.dumps(search_index(posts), ensure_ascii=False, separators=(",", ":"))
     return text.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
+def review_body(asset_v: str = "") -> str:
+    """The owner's review page for suggested write-ups. It holds no data and no secret: the rows come
+    from supabase/functions/suggest-admin, which needs the ADMIN_TOKEN the owner pastes once."""
+    labels = {"topics": {k: n for k, (n, _) in TOPIC_INFO.items()}, "x": TECH_LABELS, "n": INDUSTRY_LABELS,
+              "brands": {name: "#" + src[4] for name, src in BY_NAME.items()}}
+    labels_json = json.dumps(labels, ensure_ascii=False).replace("<", "\\u003c")
+    return f"""<section class="cs-top rv-top"><p class="cf-eyebrow">Case studies \u00b7 Review</p><h1>Suggested write-ups</h1>
+<p class="rv-private">{LOCK} Only you can see this page. It isn\u2019t linked anywhere, and it asks for your admin token.</p></section>
+<div class="rv" data-rv data-endpoint="{SUGGEST_ADMIN_URL}">
+<form class="rv-login" data-rv-login hidden>
+<label for="rv-token">Admin token</label>
+<div class="rv-login-row"><input id="rv-token" type="password" autocomplete="off" spellcheck="false" data-rv-token>
+<button class="sg-send" type="submit">Open the review</button></div>
+<p class="sg-hint">The ADMIN_TOKEN secret of the suggest-admin function. It stays in this browser only.</p>
+</form>
+<div data-rv-main hidden>
+<div class="rv-tabs" role="tablist" aria-label="Suggestions">
+<button role="tab" type="button" data-rv-tab="waiting" aria-selected="true">Waiting <span data-rv-count="waiting">0</span></button>
+<button role="tab" type="button" data-rv-tab="approved" aria-selected="false">Approved <span data-rv-count="approved">0</span></button>
+<button role="tab" type="button" data-rv-tab="rejected" aria-selected="false">Rejected <span data-rv-count="rejected">0</span></button>
+</div>
+<ul class="rv-list" role="tabpanel" data-rv-list></ul>
+<p class="rv-empty" data-rv-empty hidden>Nothing here right now.</p>
+<button class="rv-forget" type="button" data-rv-forget>Forget the token on this browser</button>
+</div>
+<p class="sg-error" role="alert" data-rv-error hidden></p>
+</div>
+<script type="application/json" id="rv-labels">{labels_json}</script>
+<script src="../assets/case-review.js{"?v=" + asset_v if asset_v else ""}" defer></script>"""
+
+
+LOCK = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+        'stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>')
 
 
 def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_dir: str = "",
@@ -553,7 +634,7 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
                         '<h2>How these write-ups are found and sorted.</h2></div></div>'
                         f'<ul class="cs-grid cs-plain">{making_of.card()}</ul></section>')
         body = (f'{HERO}{finder_tools(posts)}</section>{category_chips(posts, counts)}'
-                f'<div data-cf-sections>{"".join(sections)}</div>{FINDER_RESULTS}'
+                f'<div data-cf-sections>{"".join(sections)}</div>{FINDER_RESULTS}{SUGGEST_DIALOG}'
                 f'<script type="application/json" id="cf-index">{index_json(posts)}</script>'
                 f'<script src="../assets/case-finder.js{"?v=" + asset_v if asset_v else ""}" defer></script>')
     else:
@@ -563,6 +644,9 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
           page("Case studies", wrap(body), root=ROOT, active="cases", path=f"{DIR}/index.html", description=desc))
     paths = [f"{DIR}/index.html"]
     paths += making_of.build(write, site_dir, site_url, posts, theme_script, head_extra)
+    write(os.path.join(site_dir, DIR, "review.html"),  # private: not in paths, so not in the sitemap
+          page("Review suggestions", wrap(review_body(asset_v)), root=ROOT, active="cases", path=None,
+               description="Private review page."))
 
     # One page per topic with write-ups
     for k in topic_keys():

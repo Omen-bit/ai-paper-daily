@@ -236,7 +236,7 @@ LOGO_DEV_CREDIT = False
 def _asset_version() -> str:
     """Changes whenever style.css, app.js or case-finder.js changes, so browsers never keep an old copy."""
     h = hashlib.sha1()
-    for name in ("style.css", "app.js", "case-finder.js", "labs.svg"):
+    for name in ("style.css", "app.js", "case-finder.js", "case-review.js", "labs.svg"):
         with open(os.path.join(ASSETS_DIR, name), "rb") as f:
             h.update(f.read())
     return h.hexdigest()[:10]

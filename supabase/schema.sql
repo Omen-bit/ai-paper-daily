@@ -404,3 +404,43 @@ language sql stable set search_path = '' as $$
   limit least(match_count, 30);
 $$;
 grant execute on function public.match_cases(extensions.vector, int) to anon, authenticated;
+
+-- Write-ups readers suggest for the Case studies page (supabase/functions/suggest writes them,
+-- src/case_suggestions.py checks and publishes them, supabase/functions/suggest-admin lists and
+-- reviews them for the owner). Nobody else can read or write: RLS is on with no policies, and only
+-- the service role (the functions and the pipeline) is granted access.
+create table if not exists public.case_suggestions (
+  id            bigint generated always as identity primary key,
+  url           text not null,
+  canonical_url text not null,
+  note          text not null default '',
+  credit        text not null default '',
+  status        text not null default 'new',
+  checks        jsonb not null default '{}'::jsonb,   -- link_works, about_ai, not_on_site, has_build_details, announcement, ...
+  topic         text,
+  techniques    text[],
+  industry      text,
+  build_details jsonb,
+  build_score   smallint,
+  title         text,
+  company       text,
+  problem       text,
+  solution      text,
+  card          jsonb,                                -- the record the pipeline publishes to data/cases.json
+  created_at    timestamptz not null default now(),
+  reviewed_at   timestamptz,
+  ip_hash       text not null default ''
+);
+alter table public.case_suggestions drop constraint if exists case_suggestions_status_check;
+alter table public.case_suggestions add constraint case_suggestions_status_check
+  check (status in ('new', 'checked', 'approved', 'rejected', 'duplicate'));
+alter table public.case_suggestions drop constraint if exists case_suggestions_text_check;
+alter table public.case_suggestions add constraint case_suggestions_text_check
+  check (char_length(url) <= 2000 and char_length(note) <= 280 and char_length(credit) <= 40);
+-- One open suggestion per post; a rejected one can be suggested again
+create unique index if not exists case_suggestions_open_url on public.case_suggestions (canonical_url)
+  where status in ('new', 'checked', 'approved', 'duplicate');
+create index if not exists case_suggestions_status_idx on public.case_suggestions (status, created_at);
+alter table public.case_suggestions enable row level security;
+revoke all on public.case_suggestions from anon, authenticated;
+grant all on public.case_suggestions to service_role;

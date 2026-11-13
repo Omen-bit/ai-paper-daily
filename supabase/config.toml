@@ -25,3 +25,9 @@ verify_jwt = false
 
 [functions.scout-spike]
 verify_jwt = false
+
+[functions.suggest]
+verify_jwt = false
+
+[functions.suggest-admin]
+verify_jwt = false

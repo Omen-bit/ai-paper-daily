@@ -153,7 +153,7 @@ def test_case_studies_are_split_by_topic(tmp_path):
     build_site(data_dir, site_dir)
     folder = os.path.join(site_dir, "case-studies")
     assert sorted(os.listdir(folder)) == ["ads.html", "guardrails.html", "how-i-built-ai-papers-daily.html",
-                                          "how-i-built-ai-papers-daily.md", "index.html", "recommendations.html"]
+                                          "how-i-built-ai-papers-daily.md", "index.html", "recommendations.html", "review.html"]
     page = open(os.path.join(folder, "index.html"), encoding="utf-8").read()
     assert "Two-tower retrieval &lt;in&gt; the home feed ranking" in page
     assert 'href="https://netflixtechblog.com/a"' in page and 'rel="noopener"' in page
@@ -173,6 +173,10 @@ def test_case_studies_are_split_by_topic(tmp_path):
     assert 'href="case-studies/index.html"' in home
     sitemap = open(os.path.join(site_dir, "sitemap.xml"), encoding="utf-8").read()
     assert "case-studies/index.html" in sitemap and "case-studies/guardrails.html" in sitemap
+    # The owner's review page is built, but never indexed, linked or listed
+    review = open(os.path.join(folder, "review.html"), encoding="utf-8").read()
+    assert '<meta name="robots" content="noindex">' in review and "Only you can see this page" in review
+    assert "case-studies/review.html" not in sitemap and "review.html" not in page
 
 
 def test_case_study_page_without_posts(tmp_path):

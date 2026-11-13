@@ -181,6 +181,8 @@
       match + body + (tags ? '<ul class="cs-tags" aria-label="Techniques">' + tags + "</ul>" : "") +
       (p.rp ? '<a class="cs-rel" href="../paper/' + esc(p.rp[0]) + '.html">' + PAPER + "<div><span>Research behind this, on AI Papers Daily</span><b>" +
               esc(p.rp[1]) + "</b></div></a>" : "") +
+      (p.sb ? '<p class="cs-by"><span class="cs-av" aria-hidden="true">' + esc(p.sb.replace(/^@/, "").charAt(0).toUpperCase()) +
+              "</span><span>Suggested by <b>" + esc(p.sb) + "</b></span></p>" : "") +
       '<div class="cs-foot"><span class="cs-src">Read on ' + esc(host(p.u)) + EXT + "</span>" +
       '<button class="cs-save" type="button" data-cs-save="cs:' + esc(p.u) + '" data-title="' + esc(p.t) + '" data-url="' + esc(p.u) +
       '" data-co="' + esc(p.c) + '" aria-pressed="false">' + BOOKMARK + "<span>Save</span></button></div></div></li>";
@@ -265,6 +267,131 @@
   });
   if (first) first.addEventListener("change", function () { if (active()) run(false); });
   more.addEventListener("click", function () { shown += PAGE; draw(); });
+
+  // ---------- "Suggest a write-up": the dialog, its instant checks, and sending it
+  (function () {
+    var dialog = document.querySelector("[data-sg]");
+    var opener = document.querySelector("[data-sg-open]");
+    if (!dialog || !opener || typeof dialog.showModal !== "function") { if (opener) opener.hidden = true; return; }
+    var sgForm = dialog.querySelector("[data-sg-form]");
+    var url = dialog.querySelector("[data-sg-url]");
+    var msg = dialog.querySelector("[data-sg-url-msg]");
+    var note = dialog.querySelector("[data-sg-note]");
+    var count = dialog.querySelector("[data-sg-count]");
+    var credit = dialog.querySelector("[data-sg-credit]");
+    var hp = dialog.querySelector("[data-sg-hp]");
+    var error = dialog.querySelector("[data-sg-error]");
+    var send = dialog.querySelector("[data-sg-send]");
+    var bodyEl = dialog.querySelector("[data-sg-body]");
+    var thanks = dialog.querySelector("[data-sg-thanks]");
+    var sending = false;
+
+    // The same address rules as normalise_url() in case_studies.py and canonicalUrl() in the function
+    function canonical(u) {
+      u = String(u || "").trim().replace(/[?#].*$/, "").replace(/^http:\/\//i, "https://");
+      u = u.replace(/^https:\/\/[^/]+/i, function (m) { return m.toLowerCase(); });
+      return u.replace(/\/+$/, "");
+    }
+    var onSite = {};
+    index.posts.forEach(function (p) { onSite[canonical(p.u)] = p; });
+
+    // What the link field says: {state: "ok" | "dup" | "bad", text, post}
+    function judge(raw) {
+      var text = raw.trim();
+      if (!text) return { state: "bad", text: "Add the link to the post so we can check it." };
+      var u;
+      try { u = new URL(text); } catch (e) { return { state: "bad", text: "We need the full link to the post, starting with https://" }; }
+      if (u.protocol !== "https:") return { state: "bad", text: "We can only take https:// links." };
+      var h = u.hostname.toLowerCase();
+      if (u.username || u.password || h === "localhost" || h.indexOf(".") < 0 || /^[\d.]+$/.test(h) || h.indexOf(":") >= 0 ||
+          /\.(local|internal|localhost)$/.test(h)) {
+        return { state: "bad", text: "We can only take links to public websites." };
+      }
+      if (u.pathname.replace(/\/+$/, "") === "") return { state: "bad", text: "That\u2019s the blog\u2019s front page. Paste the link to the post itself." };
+      var known = onSite[canonical(text)];
+      if (known) return { state: "dup", text: "This one is already on the site", post: known };
+      return { state: "ok", text: "\u2713 Looks like a blog post. Not in our list yet." };
+    }
+    function show(result, asError) {
+      msg.className = "sg-msg" + (result ? " sg-" + result.state : "");
+      url.setAttribute("aria-invalid", asError ? "true" : "false");
+      if (!result) { msg.textContent = ""; return; }
+      msg.textContent = result.text;
+      if (result.state === "dup") {
+        var a = document.createElement("a");
+        a.href = "index.html?q=" + encodeURIComponent(result.post.t);
+        a.textContent = "See it on the site";
+        msg.appendChild(document.createTextNode(". "));
+        msg.appendChild(a);
+      }
+    }
+    url.addEventListener("input", function () {  // errors clear as soon as the link changes
+      error.hidden = true;
+      var r = judge(url.value);
+      show(r.state === "bad" ? null : r, false);
+    });
+    url.addEventListener("blur", function () {
+      if (!url.value.trim()) { show(null, false); return; }
+      var r = judge(url.value);
+      show(r, r.state === "bad");
+    });
+    note.addEventListener("input", function () { count.textContent = note.value.length + " / 280"; });
+
+    function reset() {
+      sgForm.reset();
+      show(null, false);
+      count.textContent = "0 / 280";
+      error.hidden = true;
+      bodyEl.hidden = false;
+      thanks.hidden = true;
+      send.disabled = false;
+      send.textContent = "Send suggestion";
+    }
+    opener.addEventListener("click", function () {
+      reset();
+      dialog.showModal();
+      url.focus();
+    });
+    dialog.addEventListener("close", function () { opener.focus(); });  // focus goes back to the button
+    dialog.addEventListener("click", function (e) {
+      if (e.target === dialog) { dialog.close(); return; }  // a click on the backdrop
+      var t = e.target.closest && e.target.closest("[data-sg-close], [data-sg-again]");
+      if (!t) return;
+      if (t.hasAttribute("data-sg-again")) { reset(); url.focus(); } else dialog.close();
+    });
+    sgForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (sending) return;
+      var r = judge(url.value);
+      if (r.state !== "ok") { show(r, r.state === "bad"); url.focus(); return; }
+      sending = true;
+      send.disabled = true;
+      send.textContent = "Sending\u2026";
+      error.hidden = true;
+      fetch(sgForm.getAttribute("data-endpoint"), {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ url: url.value.trim(), note: note.value, credit: credit.value, website: hp.value })
+      }).then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (body) { return { status: res.status, body: body }; });
+      }).then(function (r2) {
+        if (r2.status === 200 && r2.body.ok) {
+          bodyEl.hidden = true;
+          thanks.hidden = false;
+          thanks.focus();
+          return;
+        }
+        error.textContent = r2.body.error || "We couldn\u2019t send it just now. Please try again in a minute.";
+        error.hidden = false;
+      }).catch(function () {
+        error.textContent = "We couldn\u2019t reach our server just now. Please try again in a minute.";
+        error.hidden = false;
+      }).then(function () {
+        sending = false;
+        send.disabled = false;
+        send.textContent = "Send suggestion";
+      });
+    });
+  })();
 
   // A shared link (?q=...&topic=...) opens with that search
   try {

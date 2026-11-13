@@ -97,6 +97,16 @@ jobs:
         run: python src/supabase_sync.py
 
       - if: steps.check.outputs.skip != 'true'
+        name: Check suggested write-ups
+        continue-on-error: true # the site still builds if Supabase or Groq is down
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODELS: ${{ vars.GROQ_MODELS }}
+        run: python src/case_suggestions.py
+
+      - if: steps.check.outputs.skip != 'true'
         name: Build the website
         env:
           # Optional repository variables (Settings > Secrets and variables > Actions > Variables)
