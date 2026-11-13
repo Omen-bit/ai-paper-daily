@@ -2434,7 +2434,7 @@ a, button, summary, label { -webkit-tap-highlight-color: transparent; touch-acti
 
 /* ---------- Case studies finder (case_pages.finder_tools, assets/case-finder.js) ---------- */
 .cf-hero { padding-top: 56px; }
-.cf-hero > .cf-eyebrow { margin: 0 0 14px; font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cs-top .cf-eyebrow { margin: 0 0 14px; font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .cf-hero > p:not(.cf-eyebrow) { margin: 18px 0 0; max-width: 60ch; font-size: 18px; line-height: 1.55; color: var(--muted); }
 .cf-form { display: flex; gap: 10px; margin-top: 32px; max-width: 860px; }
 .cf-box { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent); }
@@ -2545,7 +2545,7 @@ a, button, summary, label { -webkit-tap-highlight-color: transparent; touch-acti
   .cf-suggest { min-height: 40px; padding: 0 12px; font-size: 13.5px; }
 }
 /* "Suggested by" on a card a reader suggested */
-.cs-by { display: flex; align-items: center; gap: 8px; margin: 14px 0 0 !important; font-size: 13.5px !important; color: var(--muted) !important; -webkit-line-clamp: unset !important; }
+.cs-body > p.cs-by, .cs-by { display: flex; align-items: center; gap: 8px; margin: 14px 0 0 !important; font-size: 13.5px !important; color: var(--muted) !important; -webkit-line-clamp: unset !important; }
 .cs-by b { color: var(--ink); font-weight: 600; }
 .cs-av { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 16%, var(--surface)); color: var(--accent-ink); font: 600 12px var(--sans); }
 
@@ -2599,4 +2599,25 @@ a, button, summary, label { -webkit-tap-highlight-color: transparent; touch-acti
   .rv-item { padding: 16px; }
   .rv-login-row { flex-direction: column; }
   .rv-actions { flex-direction: column-reverse; } .rv-actions button { width: 100%; min-height: 44px; }
+}
+
+/* ---------- New this week, the "New" pill, topic follows (case_pages.new_strip, follow_button) ---------- */
+.cs-new { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 999px; background: var(--accent); color: var(--on-accent, #fff); font: 600 12px var(--mono); letter-spacing: .02em; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.cf-new .cs-sec-head { border-bottom-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.cf-sec-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.cf-follow { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: 500 14px var(--sans); cursor: pointer; }
+.cf-follow svg { width: 14px; height: 14px; flex: none; color: color-mix(in srgb, var(--ink) 30%, var(--surface)); }
+.cf-follow:hover { border-color: color-mix(in srgb, var(--ink) 35%, var(--line)); }
+.cf-follow[aria-pressed="true"] { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.cf-follow[aria-pressed="true"] svg { color: var(--accent); }
+.cf-follow:focus-visible, .cf-mine:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cf-topic-follow { margin-top: 18px; }
+.cf-chips .cf-mine { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.cf-mine svg { width: 14px; height: 14px; flex: none; color: var(--accent); }
+.cf-chips .cf-mine[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.cf-chips .cf-badge { padding: 1px 7px; border-radius: 999px; background: var(--accent); color: var(--on-accent, #fff); font: 600 11.5px var(--sans); }
+.cf-chips .cf-badge[hidden], .cf-mine[hidden] { display: none; }
+@media (max-width: 640px) {
+  .cf-sec-actions { width: 100%; justify-content: space-between; }
+  .cf-follow { min-height: 44px; }
 }

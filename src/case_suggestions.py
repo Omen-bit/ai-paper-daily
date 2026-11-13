@@ -187,6 +187,7 @@ def publish(rows: list[dict], posts: list[dict], today: str) -> list[dict]:
             continue
         record = {k: v for k, v in card.items() if k != "suggested_by"}
         record["added"] = today
+        record["added_at"] = today  # a reader's pick is new to the site, however old the post
         record["published"] = record.get("published") or today
         record["suggested"] = True
         credit = clean_credit(row.get("credit"))

@@ -143,7 +143,38 @@
   var first = document.querySelector("[data-cf-first]");
   var chips = Array.prototype.slice.call(document.querySelectorAll("[data-cf-topic]"));
   var PAGE = 24;
-  var state = { q: "", topic: "", tech: "", ind: "", co: "" };
+  var EMPTY = function () { return { q: "", topic: "", tech: "", ind: "", co: "", fresh: false, mine: false }; };
+  var state = EMPTY();
+  var mineChip = document.querySelector("[data-cf-mine]");
+
+  // Followed topics (app.js keeps them in localStorage) and the day of the reader's previous visit,
+  // for the "Your topics" chip and the "N new" badges on followed topics
+  function follows() {
+    try { var f = JSON.parse(localStorage.getItem("apd.follows") || "[]"); return Array.isArray(f) ? f : []; } catch (e) { return []; }
+  }
+  var lastVisit = (function () {
+    var today = new Date().toISOString().slice(0, 10), seen = {};
+    try { seen = JSON.parse(localStorage.getItem("apd.casesVisit") || "{}") || {}; } catch (e) { /* a private window */ }
+    if (seen.current !== today) { seen.last = seen.current || ""; seen.current = today; }
+    try { localStorage.setItem("apd.casesVisit", JSON.stringify(seen)); } catch (e) { /* not kept */ }
+    return seen.last || "";
+  })();
+  function paintFollows() {
+    var mine = follows().filter(function (k) { return index.topics[k]; });
+    if (mineChip) {
+      mineChip.hidden = mine.length === 0;
+      mineChip.querySelector("[data-cf-mine-n]").textContent = index.posts.filter(function (p) { return mine.indexOf(p.p) >= 0; }).length;
+      if (!mine.length && state.mine) { state.mine = false; run(false); }
+    }
+    document.querySelectorAll("[data-cf-badge]").forEach(function (b) {
+      var k = b.getAttribute("data-cf-badge");
+      var n = lastVisit && mine.indexOf(k) >= 0
+        ? index.posts.filter(function (p) { return p.p === k && (p.a || "") > lastVisit; }).length : 0;
+      b.hidden = !n;
+      b.textContent = n ? "+" + n + " new" : "";
+    });
+  }
+  document.addEventListener("cs:follows", paintFollows);
   var found = [], shown = PAGE;
 
   function esc(s) {
@@ -176,7 +207,7 @@
     var when = niceDate(p.d) ? '<time datetime="' + esc(p.d) + '">' + niceDate(p.d) + "</time>" : "";
     return '<li class="cs-card" style="--c:' + esc(topic[1]) + ";--b:" + esc(brand[2]) + '">' +
       '<div class="cs-cover">' + brand[0] + '<span class="cs-co">' + brand[1] + esc(p.c) + "</span>" + when +
-      '<span class="cs-pills"><span class="cs-topic">' + esc(topic[0]) + "</span>" + pill + "</span></div>" +
+      '<span class="cs-pills">' + (p.nw ? '<span class="cs-new">New</span>' : "") + '<span class="cs-topic">' + esc(topic[0]) + "</span>" + pill + "</span></div>" +
       '<div class="cs-body"><h3><a class="cs-link" href="' + esc(p.u) + '" rel="noopener" target="_blank">' + esc(p.t) + "</a></h3>" +
       match + body + (tags ? '<ul class="cs-tags" aria-label="Techniques">' + tags + "</ul>" : "") +
       (p.rp ? '<a class="cs-rel" href="../paper/' + esc(p.rp[0]) + '.html">' + PAPER + "<div><span>Research behind this, on AI Papers Daily</span><b>" +
@@ -195,7 +226,7 @@
     document.dispatchEvent(new CustomEvent("cs:cards"));  // app.js marks the saved ones
   }
 
-  function active() { return !!(state.q || state.topic || state.tech || state.ind || state.co); }
+  function active() { return !!(state.q || state.topic || state.tech || state.ind || state.co || state.fresh || state.mine); }
 
   function remember() {
     try {
@@ -209,6 +240,8 @@
 
   function run(scroll) {
     chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-cf-topic") === state.topic ? "true" : "false"); });
+    if (mineChip) mineChip.setAttribute("aria-pressed", state.mine ? "true" : "false");
+    var mine = follows();
     remember();
     var on = active();
     sections.hidden = on;
@@ -218,12 +251,15 @@
     found = search(index, state.q, { detailFirst: detailFirst }).filter(function (hit) {
       var p = hit.post;
       return (!state.topic || p.p === state.topic) && (!state.tech || (p.x || []).indexOf(state.tech) >= 0) &&
-             (!state.ind || p.n === state.ind) && (!state.co || p.c === state.co);
+             (!state.ind || p.n === state.ind) && (!state.co || p.c === state.co) &&
+             (!state.fresh || p.nw) && (!state.mine || mine.indexOf(p.p) >= 0);
     });
     shown = PAGE;
     var n = found.length, what = n + (n === 1 ? " write-up" : " write-ups");
     var text = state.q ? what + " match “" + state.q + "”"
-             : state.topic ? what + " in " + (index.topics[state.topic] || [state.topic])[0] : what + " match these filters";
+             : state.topic ? what + " in " + (index.topics[state.topic] || [state.topic])[0]
+             : state.fresh ? n + " new " + (n === 1 ? "write-up" : "write-ups") + " this week"
+             : state.mine ? what + " in your topics" : what + " match these filters";
     if (state.q && state.topic) text += " in " + (index.topics[state.topic] || [state.topic])[0];
     status.textContent = n ? text + (detailFirst ? " · posts with the most build details first" : "") : text;
     draw();
@@ -250,12 +286,14 @@
       run(!!state.topic);
       return;
     }
+    if (t.closest("[data-cf-fresh]")) { e.preventDefault(); state.fresh = true; run(true); return; }
+    if (t.closest("[data-cf-mine]")) { state.mine = !state.mine; run(state.mine); return; }
     var see = t.closest("[data-cf-see]");
     if (see) { e.preventDefault(); state.topic = see.getAttribute("data-cf-see"); run(true); return; }
     var tag = t.closest("[data-cs-tag]");
     if (tag) { q.value = tag.getAttribute("data-cs-tag"); state.q = q.value; run(true); return; }
     if (t.closest("[data-cf-clear]")) {
-      q.value = ""; state = { q: "", topic: "", tech: "", ind: "", co: "" };
+      q.value = ""; state = EMPTY();
       Object.keys(menus).forEach(function (m) { if (menus[m]) menus[m].value = ""; });
       run(false);
       form.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -402,6 +440,8 @@
       });
     });
   })();
+
+  paintFollows();
 
   // A shared link (?q=...&topic=...) opens with that search
   try {

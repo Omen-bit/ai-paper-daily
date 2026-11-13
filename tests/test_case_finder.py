@@ -99,7 +99,7 @@ def test_the_index_carries_what_the_cards_and_search_need(tmp_path):
     row = index["posts"][0]
     assert row == {"u": "https://eng.example.com/1", "c": "Netflix", "t": "Post 1", "p": "rag", "d": "2026-11-01",
                    "i": "What hurt.", "s": "What they built.", "r": "2x faster", "g": ["Reranking"], "x": ["rag"],
-                   "n": "", "b": 4, "bd": ["architecture", "stack", "evaluation", "failure_modes"]}
+                   "n": "", "b": 4, "a": "2026-11-01", "bd": ["architecture", "stack", "evaluation", "failure_modes"]}
     assert index["topics"]["rag"] == ["RAG and search", "var(--l-rag)"]
     assert index["labels"]["x"]["classical-ml"] == "Classical ML"
     assert index["brands"]["Netflix"][0].startswith("<svg") and index["brands"]["Netflix"][2].startswith("#")

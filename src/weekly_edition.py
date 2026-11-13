@@ -49,6 +49,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT_DIR, "src"))
 
 import send_newsletter as sn  # noqa: E402  (shares the Buttondown call, helpers and markers)
+from case_studies import added_on  # noqa: E402  (when a case study counts as new on the site)
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 DAILY_DIR = os.path.join(DATA_DIR, "daily")
@@ -190,20 +191,37 @@ def collect(sunday: date, daily_dir: str = DAILY_DIR, cases_path: str = CASES_PA
     }
 
 
-def week_cases(start: str, end: str, cases_path: str = CASES_PATH) -> tuple[list[dict], int]:
-    """Case studies published this week (not merely found this week: a new blog source brings in
-    its back catalogue): the ones with a measured result first, then the newest."""
+def week_cases(start: str, end: str, cases_path: str = CASES_PATH,
+               prefer_topics=()) -> tuple[list[dict], int]:
+    """Case studies added to the site this week (case_studies.added_on, so a blog's back catalogue
+    or a backfill never counts as new), for "How companies built it this week". Returns
+    (the MAX_CASES to show, how many were new). See pick_week_cases."""
     try:
         with open(cases_path, encoding="utf-8") as f:
             posts = json.load(f).get("posts", [])
     except (OSError, ValueError):
         return [], 0
+    return pick_week_cases(posts, start, end, prefer_topics)
+
+
+def pick_week_cases(posts: list[dict], start: str, end: str, prefer_topics=(),
+                    n: int = MAX_CASES) -> tuple[list[dict], int]:
+    """The week's new case studies with the most build details first, then the newest. Cases in
+    prefer_topics (a reader's followed topics) come before the rest. No AI: the problem line is
+    the card's own Problem text."""
+    prefer = set(prefer_topics or ())
     fresh = [p for p in posts
-             if start <= str(p.get("published") or "")[:10] <= end
-             and str(p.get("url", "")).startswith("https://") and p.get("title")]
-    fresh.sort(key=lambda p: (bool(p.get("result")), p.get("published") or ""), reverse=True)
-    keep = [{k: p.get(k) for k in ("company", "title", "url", "summary", "result", "published")}
-            for p in fresh[:MAX_CASES]]
+             if start <= added_on(p) <= end and str(p.get("url", "")).startswith("https://") and p.get("title")]
+
+    def score(p):
+        n_ = p.get("build_score")
+        return n_ if isinstance(n_, int) and not isinstance(n_, bool) else 0
+    fresh.sort(key=lambda p: (p.get("problem") in prefer, score(p), added_on(p), p.get("published") or "", p["url"]),
+               reverse=True)
+    keep = [{"company": p.get("company"), "title": p.get("title"), "url": p.get("url"), "problem": p.get("problem"),
+             "issue": p.get("issue") or "", "build_score": score(p), "published": p.get("published"),
+             "result": p.get("result") or ""}
+            for p in fresh[:n]]
     return keep, len(fresh)
 
 
@@ -560,22 +578,28 @@ def story_row(story: dict, week: str) -> str:
 
 
 def cases_row(cases: list[dict], total: int) -> str:
+    """ "How companies built it this week": the company, the title linked to its own post, the
+    problem in one line and how many build details the post describes. Nothing when none are new."""
     if not cases:
         return ""
     items = ""
     for p in cases:
-        result = (f'<p style="margin:3px 0 0 0;font-family:{SANS};font-size:13px;font-weight:700;color:{INK};">'
-                  f'— {esc(p["result"])}</p>') if p.get("result") else ""
-        items += (f'<tr><td style="padding:0 0 12px 0;">'
+        problem = (f'<p style="margin:4px 0 0 0;font-family:{SERIF};font-size:15px;line-height:22px;color:{BODY_INK};">'
+                   f'{esc(sn.clip(p["issue"], 150))}</p>') if p.get("issue") else ""
+        score = p.get("build_score") or 0
+        detail = (f'<p style="margin:4px 0 0 0;font-family:{SANS};font-size:12px;font-weight:700;letter-spacing:.04em;'
+                  f'color:{MUTED};">Build details {score}/5</p>') if score else ""
+        items += (f'<tr><td style="padding:0 0 14px 0;">'
                   f'<p style="margin:0 0 2px 0;font-family:{SANS};font-size:11px;font-weight:700;letter-spacing:.08em;'
                   f'text-transform:uppercase;color:{MUTED};">{esc(p.get("company"))}</p>'
                   f'<p style="margin:0;font-family:{SERIF};font-size:17px;line-height:23px;font-weight:700;">'
                   f'<a href="{esc(p["url"])}" style="color:{INK};text-decoration:none;">{esc(sn.clip(p.get("title"), 120))}</a></p>'
-                  f'{result}</td></tr>')
+                  f'{problem}{detail}</td></tr>')
+    note = f"{total} new on the site" if total > len(cases) else "new on the site"
     more = (f'<p style="margin:2px 0 0 0;"><a href="{SITE_URL}case-studies/index.html?ref=email" style="font-family:{SANS};'
-            f'font-size:14px;font-weight:700;color:{INK};text-decoration:underline;">All {total} case studies →</a></p>')
+            f'font-size:14px;font-weight:700;color:{INK};text-decoration:underline;">More case studies →</a></p>')
     return (f'<tr><td style="padding:22px 28px 0 28px;"><div style="border-top:2px solid {INK};padding-top:12px;">'
-            f'{_section("Business", "what companies shipped this week")}'
+            f'{_section("How companies built it this week", note)}'
             f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">{items}</table>'
             f'{more}</div></td></tr>')
 

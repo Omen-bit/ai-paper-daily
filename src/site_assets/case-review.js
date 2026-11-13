@@ -91,7 +91,7 @@
     if (r.industry) out.push(((labels.n || {})[r.industry]) || r.industry);
     if (!out.length && r.build_score == null) return "";
     var bd = r.build_score != null ? '<li class="rv-bd ' + (r.build_score >= 4 ? "rv-bd-hi" : r.build_score >= 2 ? "rv-bd-mid" : "rv-bd-lo") +
-      '">✓ Build details ' + esc(r.build_score) + "/5</li>" : "";
+      '">' + (r.build_score >= 2 ? "✓ " : "") + "Build details " + esc(r.build_score) + "/5</li>" : "";
     return '<p class="rv-label">Filled in automatically</p><ul class="rv-chips">' +
       out.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + bd + "</ul>" +
       (r.problem ? '<p class="rv-ps"><b>Problem</b> ' + esc(r.problem) + "</p>" : "") +

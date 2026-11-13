@@ -31,9 +31,10 @@ def setup_week(tmp_path):
     write_day(daily, "2026-11-01", [paper("z", 500, "2026-11-01")])
     cases = tmp_path / "cases.json"
     cases.write_text(json.dumps({"posts": [
-        {"company": "X", "title": "No result", "url": "https://x/1", "added": "2026-11-05", "published": "2026-11-05"},
+        {"company": "X", "title": "No result", "url": "https://x/1", "added": "2026-11-05", "published": "2026-11-05",
+         "build_score": 2, "issue": "Search was slow."},
         {"company": "Y", "title": "With result", "url": "https://y/1", "added": "2026-11-03", "published": "2026-11-03",
-         "result": "2x faster"},
+         "result": "2x faster", "build_score": 4, "issue": "Agents kept guessing API parameters."},
         {"company": "Z", "title": "Last week", "url": "https://z/1", "added": "2026-11-01", "published": "2026-11-01"},
         # found this week, but published long ago (a new blog's back catalogue)
         {"company": "Q", "title": "Old post", "url": "https://q/1", "added": "2026-11-04", "published": "2025-06-01"},
@@ -54,7 +55,7 @@ def test_collect_keeps_this_weeks_papers_with_their_best_upvotes(tmp_path):
     assert week["papers"]["a"]["hf_upvotes"] == 80
     assert week["numbers"] == {"scanned": 300, "new_papers": 4, "picks": 1, "cases": 2}
     assert week["topics"][0] == ("llms", 3)
-    assert [c["company"] for c in week["cases"]] == ["Y", "X"]  # measured result first
+    assert [c["company"] for c in week["cases"]] == ["Y", "X"]  # the most build details first; Q's old post is not new
 
 
 def test_ranking_uses_upvotes_then_score(tmp_path):
@@ -151,7 +152,8 @@ def test_render_email(tmp_path):
     assert email["subject"].startswith("The Weekly Express: ")
     assert "\n" not in body  # Buttondown reads the body as Markdown
     assert "assets/weekly-masthead.png" in body and "weekly/2026-W45/fig-a.jpg" in body
-    assert "Paper of the week" in body and "All 2 case studies" in body and "2x faster" in body
+    assert "Paper of the week" in body and "How companies built it this week" in body and "More case studies" in body
+    assert "Agents kept guessing API parameters." in body and "Build details 4/5" in body
     assert "4 new papers this week. You read none of them." in body
     assert "data:image" not in body  # images are hosted, never inlined
     assert len(body.encode()) < 60_000  # far below Gmail's 102 KB clipping

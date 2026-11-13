@@ -14,6 +14,7 @@ site_builder.build_site calls build_all with the posts from data/cases.json.
 import html
 import json
 import os
+from datetime import datetime
 import shutil
 
 import zlib
@@ -21,6 +22,7 @@ import zlib
 import case_logos
 import making_of
 from case_suggestions import clean_credit
+from case_studies import IST, added_on
 from case_sources import (BY_NAME, BUILD_DETAILS, INDUSTRIES, TECHNIQUES, TOPICS as TOPIC_INFO, category_norm,
                           category_slug, clean_category, topic_of)
 
@@ -173,6 +175,29 @@ def nice_date(day: str) -> str:
         return ""
 
 
+NEW_PILL = '<span class="cs-new">New</span>'
+NEW_DAYS = 7  # "New this week": added to the site in the last 7 days (case_studies.added_on)
+
+
+def mark_new(posts: list[dict], today: str) -> list[dict]:
+    """Flag the posts added to the site in the last NEW_DAYS days (is_new) and give each its added_at."""
+    import datetime
+    try:
+        since = (datetime.date.fromisoformat(today) - datetime.timedelta(days=NEW_DAYS - 1)).isoformat()
+    except ValueError:
+        since = today
+    for p in posts:
+        p["added_at"] = added_on(p)
+        p["is_new"] = bool(p["added_at"]) and since <= p["added_at"] <= today
+    return posts
+
+
+def new_this_week(posts: list[dict]) -> list[dict]:
+    """The new posts, the ones with the most build details first, then the newest."""
+    return sorted((p for p in posts if p.get("is_new")),
+                  key=lambda p: (build_score(p), p.get("added_at") or "", p.get("published") or "", p["url"]), reverse=True)
+
+
 def build_score(post: dict) -> int:
     """How many of the five build details the post describes; 0 when it is not tagged yet."""
     n = post.get("build_score")
@@ -213,7 +238,7 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
     date = nice_date(post.get("published", ""))
     when = f'<time datetime="{esc(post.get("published", ""))}">{date}</time>' if date else ""
     return f"""<li class="cs-card" style="--c:{color(problem)};--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
-<div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-pills"><span class="cs-topic">{esc(problem_name(problem))}</span>{detail_pill(post)}</span></div>
+<div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-pills">{NEW_PILL if post.get("is_new") else ""}<span class="cs-topic">{esc(problem_name(problem))}</span>{detail_pill(post)}</span></div>
 <div class="cs-body"><h3><a class="cs-link" href="{esc(post['url'])}" rel="noopener" target="_blank">{esc(post['title'])}</a></h3>{summary}{tag_html}{rel}
 <div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span><button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
 
@@ -495,11 +520,37 @@ def finder_tools(posts: list[dict]) -> str:
 <label class="cf-toggle"><input type="checkbox" data-cf-first checked><span>Build details first</span></label></div>"""
 
 
+STAR = ('<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.8 2.8 5.9 6.4.8-4.7 4.4 1.2 '
+        '6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>')
+
+
+def follow_button(key: str) -> str:
+    """The Follow toggle for a topic. Follows live in the reader's browser (localStorage), see app.js."""
+    return (f'<button class="cf-follow" type="button" data-follow="{esc(key)}" aria-pressed="false" '
+            f'aria-label="Follow {esc(problem_name(key))}">{STAR}<span data-follow-label>Follow</span></button>')
+
+
+def new_strip(posts: list[dict], card) -> str:
+    """ "New this week" under the category chips: up to 6 of the posts added in the last 7 days,
+    the most detailed first, and a link that lists all of them. Nothing when there are none."""
+    fresh = new_this_week(posts)
+    if not fresh:
+        return ""
+    return (f'<section class="cs-sec cf-sec cf-new" aria-labelledby="cf-new-h" style="--c:var(--accent)">'
+            f'<div class="cs-sec-head"><div><p class="cf-kicker"><i aria-hidden="true"></i>New this week</p>'
+            f'<h2 id="cf-new-h">Added to the site in the last 7 days.</h2><p>The ones with the most build details first.</p></div>'
+            f'<a class="cs-see" href="#" data-cf-fresh>See all {len(fresh)} new{EXT_ARROW}</a></div>'
+            f'<ul class="cs-grid cs-plain">{"".join(card(p) for p in fresh[:6])}</ul></section>')
+
+
 def category_chips(posts: list[dict], counts: dict[str, int]) -> str:
     """One chip per topic with write-ups, biggest first; a chip filters the page to its topic."""
-    chips = "".join(f'<button type="button" style="--c:{color(k)}" data-cf-topic="{esc(k)}" aria-pressed="false">'
-                    f'<i aria-hidden="true"></i>{esc(problem_name(k))} <span>{n}</span></button>'
-                    for k, n in sorted(counts.items(), key=lambda kv: (-kv[1], problem_name(kv[0]))) if n)
+    mine = ('<button class="cf-mine" type="button" data-cf-mine aria-pressed="false" hidden>'
+            f'{STAR}Your topics <span data-cf-mine-n>0</span></button>')
+    chips = mine + "".join(f'<button type="button" style="--c:{color(k)}" data-cf-topic="{esc(k)}" aria-pressed="false">'
+                           f'<i aria-hidden="true"></i>{esc(problem_name(k))} <span>{n}</span>'
+                           f'<b class="cf-badge" data-cf-badge="{esc(k)}" hidden></b></button>'
+                           for k, n in sorted(counts.items(), key=lambda kv: (-kv[1], problem_name(kv[0]))) if n)
     return (f'<section class="cf-browse" aria-labelledby="cf-browse-h"><h2 id="cf-browse-h">Browse by category</h2>'
             f'<div class="cf-chips" role="group" aria-label="Categories">{chips}</div></section>')
 
@@ -521,7 +572,9 @@ def search_index(posts: list[dict]) -> dict:
         row = {"u": p["url"], "c": p["company"], "t": p["title"], "p": p["problem"], "d": p.get("published") or "",
                "i": p.get("issue") or "", "s": p.get("summary") or "", "r": p.get("result") or "",
                "g": [t for t in p.get("tags") or [] if isinstance(t, str)][:3], "x": _techniques(p),
-               "n": _industry(p), "b": build_score(p)}
+               "n": _industry(p), "b": build_score(p), "a": p.get("added_at") or added_on(p)}
+        if p.get("is_new"):
+            row["nw"] = 1
         if p.get("related_papers"):
             row["rp"] = [p["related_papers"][0]["id"], p["related_papers"][0]["title"]]
         if clean_credit(p.get("suggested_by")):
@@ -580,11 +633,12 @@ LOCK = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 
 
 def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_dir: str = "",
-              site_url: str = "", theme_script: str = "", head_extra: str = "", asset_v: str = "") -> list[str]:
+              site_url: str = "", theme_script: str = "", head_extra: str = "", asset_v: str = "",
+              today: str | None = None) -> list[str]:
     """Write the Case studies pages: the main page with a section per topic, and one page per topic.
     page is site_builder.page; logo_dir holds the icons case_logos.py saved. It also writes "How I built
     AI Papers Daily" (making_of.py), whose card leads the main page. Returns the paths for the sitemap."""
-    posts = recent(_clean(posts))
+    posts = mark_new(recent(_clean(posts)), today or datetime.now(IST).strftime("%Y-%m-%d"))
     companies = {p["company"] for p in posts}
     LOGO_FILES.clear()
     for company in companies:
@@ -627,13 +681,14 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
                 f'<section class="cs-sec cf-sec" id="{page_slug(k)}" style="--c:{color(k)}"><div class="cs-sec-head"><div>'
                 f'<p class="cf-kicker"><i aria-hidden="true"></i>{esc(problem_name(k))}</p>'
                 f'<h2>{esc(blurb(k))}</h2><p>Posts with real build details first.</p></div>'
-                f'<a class="cs-see" href="{page_slug(k)}.html" data-cf-see="{esc(k)}">See all {len(these)}{EXT_ARROW}</a></div>'
+                f'<div class="cf-sec-actions">{follow_button(k)}'
+                f'<a class="cs-see" href="{page_slug(k)}.html" data-cf-see="{esc(k)}">See all {len(these)}{EXT_ARROW}</a></div></div>'
                 f'<ul class="cs-grid cs-plain">{"".join(card(p) for p in these[:PER_SECTION])}</ul></section>')
         # Our own write-up about building this site closes the page
         sections.append('<section class="cs-sec cf-sec"><div class="cs-sec-head"><div><p class="cf-kicker">Behind this site</p>'
                         '<h2>How these write-ups are found and sorted.</h2></div></div>'
                         f'<ul class="cs-grid cs-plain">{making_of.card()}</ul></section>')
-        body = (f'{HERO}{finder_tools(posts)}</section>{category_chips(posts, counts)}'
+        body = (f'{HERO}{finder_tools(posts)}</section>{category_chips(posts, counts)}{new_strip(posts, card)}'
                 f'<div data-cf-sections>{"".join(sections)}</div>{FINDER_RESULTS}{SUGGEST_DIALOG}'
                 f'<script type="application/json" id="cf-index">{index_json(posts)}</script>'
                 f'<script src="../assets/case-finder.js{"?v=" + asset_v if asset_v else ""}" defer></script>')
@@ -655,7 +710,8 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
             continue
         name, about = problem_name(k), topic_about(k)
         body = (f'<p class="cs-crumb"><a href="index.html">Case studies</a> / {esc(name)}</p>'
-                f'<section class="cs-top cs-topic-top"><h1>{esc(name)}</h1><p>{esc(about)}</p></section>'
+                f'<section class="cs-top cs-topic-top"><h1>{esc(name)}</h1><p>{esc(about)}</p>'
+                f'<div class="cf-topic-follow">{follow_button(k)}</div></section>'
                 f'{filters(posts, these, k)}{approaches(these, k)}{status(len(these))}{feed(these)}')
         write(os.path.join(site_dir, DIR, f"{page_slug(k)}.html"),
               page(f"{name}: case studies", wrap(body, f' style="--c:{color(k)}"'), root=ROOT, active="cases",

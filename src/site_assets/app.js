@@ -1976,6 +1976,32 @@
     paint();
   });
 
+  // ---- Case studies: Follow a topic. Kept in this browser only (no account); the Case studies page
+  // uses the list for its "Your topics" chip and the "N new" badges (case-finder.js) ----
+  (function () {
+    var KEY = "apd.follows";
+    function read() { try { var f = JSON.parse(localStorage.getItem(KEY) || "[]"); return Array.isArray(f) ? f : []; } catch (e) { return []; } }
+    function paint() {
+      var f = read();
+      document.querySelectorAll("[data-follow]").forEach(function (b) {
+        var on = f.indexOf(b.getAttribute("data-follow")) >= 0;
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+        var label = b.querySelector("[data-follow-label]");
+        if (label) label.textContent = on ? "Following" : "Follow";
+      });
+    }
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-follow]");
+      if (!b) return;
+      var k = b.getAttribute("data-follow"), f = read(), i = f.indexOf(k);
+      if (i >= 0) f.splice(i, 1); else f.push(k);
+      try { localStorage.setItem(KEY, JSON.stringify(f)); } catch (err) { /* private window: this page only */ }
+      paint();
+      document.dispatchEvent(new CustomEvent("cs:follows"));
+    });
+    paint();
+  })();
+
   // ---- Case studies: search, company and tag filters, showing more, and Save ----
   (function () {
     // One listener for every Save button, so the cards case-finder.js draws later work too

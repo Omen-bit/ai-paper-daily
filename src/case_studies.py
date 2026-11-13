@@ -581,7 +581,33 @@ def migrate(post: dict, known: dict[str, str] | None = None) -> dict:
         post["resort"] = True  # sorted under an older prompt, or no problem yet: Groq sorts it again when it has room
     tags = [t for t in post.get("tags") or [] if t in TAG_NAMES]  # tags from older lists are redone
     post["tags"] = tags or rule_tags(post)
+    post.setdefault("added_at", added_on(post))
     return post
+
+
+NEW_FOR_DAYS = 14  # a post published longer ago than this before it reached the site is old news, not new
+
+
+def added_at_for(published: str, day: str) -> str:
+    """When a post counts as new on the site: the day it was added, unless it was published more than
+    NEW_FOR_DAYS before that (a blog's back catalogue, the first import, a backfill), when it counts
+    from its own publish date instead, so "New this week" and the weekly email never fill up with
+    old posts that merely reached the site late."""
+    published, day = str(published or "")[:10], str(day or "")[:10]
+    if not day:
+        return published
+    if not published:
+        return day
+    try:
+        late = (datetime.strptime(day, "%Y-%m-%d") - datetime.strptime(published, "%Y-%m-%d")).days > NEW_FOR_DAYS
+    except ValueError:
+        return day
+    return published if late else max(day, published)
+
+
+def added_on(post: dict) -> str:
+    """A saved post's added_at, worked out from "added" and "published" for posts saved before it existed."""
+    return str(post.get("added_at") or "")[:10] or added_at_for(post.get("published"), post.get("added") or post.get("published"))
 
 
 def groq_record(post: dict, result: dict, today: str, known_cats: dict[str, str]) -> dict:
@@ -600,7 +626,8 @@ def groq_record(post: dict, result: dict, today: str, known_cats: dict[str, str]
         extra["via"] = post["company"]
         post = {**post, "company": result["customer"]}
     return {"url": post["url"], "company": post["company"], "title": post["title"],
-            "published": post["published"] or today, "added": today, "problem": problem,
+            "published": post["published"] or today, "added": today,
+            "added_at": added_at_for(post["published"], today), "problem": problem,
             "summary": summary, "tags": tags, "sorted_by": "groq", **extra}
 
 
@@ -699,7 +726,8 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 problem = split_agents(post)
             counts["rules"] += 1
             posts.append({"url": post["url"], "company": post["company"], "title": post["title"],
-                          "published": post["published"] or today, "added": today, "problem": problem,
+                          "published": post["published"] or today, "added": today,
+            "added_at": added_at_for(post["published"], today), "problem": problem,
                           "summary": "", "tags": rule_tags(post), "sorted_by": "rules"})
         known.add(post["url"])
         known_titles.add(title_key(post["title"], post["company"]))
