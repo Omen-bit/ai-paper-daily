@@ -272,6 +272,11 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Broad Institute": {
+  "checked": "2026-11-13",
+  "qid": "Q4971893",
+  "v": 6
+ },
  "Brown University": {
   "checked": "2026-11-07",
   "file": "brown-university.png",
@@ -964,6 +969,11 @@
   "v": 6
  },
  "Indian Institute of Technology Kharagpur": {},
+ "Indian Institute of Technology Madras": {
+  "checked": "2026-11-13",
+  "qid": "Q858662",
+  "v": 6
+ },
  "Indian Institute of Technology, Kanpur": {
   "checked": "2026-11-05",
   "file": "indian-institute-of-technology-kanpur.png",
@@ -993,6 +1003,13 @@
   "file": "institute-of-automation.png",
   "qid": "",
   "source": "website http://www.et.tu-dresden.de/ifa/",
+  "v": 6
+ },
+ "Institute of Computing Technology": {
+  "checked": "2026-11-13",
+  "file": "institute-of-computing-technology.png",
+  "qid": "Q2118986",
+  "source": "Hugging Face",
   "v": 6
  },
  "Institute of Information Science, Academia Sinica": {
@@ -1054,7 +1071,13 @@
   "source": "Hugging Face",
   "v": 4
  },
- "Johns Hopkins University": {},
+ "Johns Hopkins University": {
+  "checked": "2026-11-13",
+  "file": "johns-hopkins-university.png",
+  "qid": "Q193727",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "KAIST": {
   "checked": "2026-11-07",
   "file": "kaist.png",
@@ -1459,6 +1482,13 @@
   "source": "website https://www.neu.edu.cn",
   "v": 6
  },
+ "Northwestern University": {
+  "checked": "2026-11-13",
+  "file": "northwestern-university.png",
+  "qid": "Q309350",
+  "source": "website https://www.northwestern.edu/",
+  "v": 6
+ },
  "Norwegian University of Science and Technology": {
   "checked": "2026-11-12",
   "file": "norwegian-university-of-science-and-technology.png",
@@ -1653,6 +1683,11 @@
   "source": "website https://www.uni-saarland.de/",
   "v": 6
  },
+ "Salesforce": {
+  "checked": "2026-11-13",
+  "qid": "Q941127",
+  "v": 6
+ },
  "Samsung": {
   "checked": "2026-11-10",
   "file": "samsung.png",
@@ -1792,6 +1827,7 @@
   "source": "Lobe Icons",
   "v": 5
  },
+ "Sogang University": {},
  "Sony": {
   "checked": "2026-11-12",
   "qid": "",
@@ -2104,6 +2140,13 @@
   "source": "website https://www.tju.edu.cn/",
   "v": 6
  },
+ "Tohoku University": {
+  "checked": "2026-11-13",
+  "file": "tohoku-university.png",
+  "qid": "Q1062129",
+  "source": "website http://www.tohoku.ac.jp/en/",
+  "v": 6
+ },
  "TokenRhythm": {
   "checked": "2026-11-11",
   "file": "tokenrhythm.png",
@@ -2236,6 +2279,11 @@
   "file": "university-of-arkansas-at-fayetteville.png",
   "qid": "Q1070333",
   "source": "website https://www.uark.edu/",
+  "v": 6
+ },
+ "University of Auckland": {
+  "checked": "2026-11-13",
+  "qid": "Q492467",
   "v": 6
  },
  "University of Bologna": {
@@ -2414,6 +2462,13 @@
   "source": "website https://umd.edu",
   "v": 6
  },
+ "University of Massachusetts Amherst": {
+  "checked": "2026-11-13",
+  "file": "university-of-massachusetts-amherst.png",
+  "qid": "Q15142",
+  "source": "website https://www.umass.edu",
+  "v": 6
+ },
  "University of Michigan": {
   "checked": "2026-11-11",
   "file": "university-of-michigan.png",
@@ -2506,6 +2561,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "University of Thessaly": {
+  "checked": "2026-11-13",
+  "file": "university-of-thessaly.png",
+  "qid": "Q1471684",
+  "source": "website https://www.uth.gr",
+  "v": 6
+ },
  "University of Toronto": {
   "checked": "2026-11-07",
   "file": "university-of-toronto.png",
@@ -2539,6 +2601,11 @@
   "file": "university-of-windsor.png",
   "qid": "Q2065769",
   "source": "website https://www.uwindsor.ca",
+  "v": 6
+ },
+ "University of Wisconsin–Madison": {
+  "checked": "2026-11-13",
+  "qid": "Q838330",
   "v": 6
  },
  "University of Würzburg": {
