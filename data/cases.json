@@ -18,7 +18,8 @@
    "result": "",
    "issue": "Support services needed a way to be discovered and used by AI assistants across platforms.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "zendesk-building-an-open-service-directory-registry-for-your"
   },
   {
    "url": "https://www.mongodb.com/company/blog/innovation/how-observe-ai-used-mongodb-resharding-scale-ai-platform",
@@ -35,7 +36,8 @@
    "result": "",
    "issue": "The platform needed more database capacity without downtime as data grew rapidly.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "mongodb-how-observe-ai-used-mongodb-resharding-to-scale-its-ai"
   },
   {
    "url": "https://aws.amazon.com/blogs/machine-learning/build-autonomous-ai-agents-with-amazon-bedrock-and-spring-ai",
@@ -54,7 +56,8 @@
    "result": "",
    "issue": "Java teams struggled to move AI agents from prototype to production due to missing scalability, governance, and security.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "aws-build-autonomous-ai-agents-with-amazon-bedrock-and-spring-ai"
   },
   {
    "url": "https://www.mongodb.com/company/blog/product-release-announcements/introducing-claude-sdk-session-adapter-durable-session-storage-for-agents",
@@ -71,7 +74,8 @@
    "result": "",
    "issue": "Agents lost conversation history when running on stateless, disposable compute instances.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "mongodb-introducing-the-mongodb-claude-sdk-session-adapter-durable"
   },
   {
    "url": "https://www.mongodb.com/company/blog/innovation/5-trillion-shift-preparing-retail-backends-for-age-of-ai-agents",
@@ -90,7 +94,8 @@
    "result": "",
    "issue": "Retailers struggled with fragmented databases for multiple AI agents, causing inconsistencies and slow responses.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "mongodb-the-5-trillion-shift-preparing-retail-backends-for-the-age"
   },
   {
    "url": "https://www.mongodb.com/company/blog/engineering/optimizing-document-lookup-making-atlas-search-vector-search-up-to-5x-faster",
@@ -109,7 +114,8 @@
    "result": "Up to 5.5x faster queries",
    "issue": "Document lookup added extra planning work, slowing search queries and using too much CPU.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "mongodb-optimizing-document-lookup-making-atlas-search-and-vector"
   },
   {
    "url": "https://www.elastic.co/search-labs/blog/fine-grained-authorization-elasticsearch-rag-spicedb",
@@ -128,7 +134,8 @@
    "result": "",
    "issue": "Teams needed secure, fine‑grained access control for each document chunk in their Elasticsearch RAG chatbot.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "elastic-fine-grained-authorization-for-elasticsearch-rag-with"
   },
   {
    "url": "https://www.databricks.com/blog/new-genie-autonomous-ai-complex-enterprise-work",
@@ -147,7 +154,8 @@
    "result": "",
    "issue": "Employees had to manually track and act on long‑running, data‑heavy enterprise tasks, which was time‑consuming and error‑prone.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "databricks-the-new-genie-autonomous-ai-for-complex-enterprise-work"
   },
   {
    "url": "https://www.databricks.com/blog/genie-genie-ontology-delivers-16-accuracy-less-half-tokens",
@@ -166,7 +174,8 @@
    "result": "91% pass rate, 1.6× accuracy, <50% token usage",
    "issue": "Enterprise users needed AI agents that could answer business questions using scattered analytical assets, not just tables.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "databricks-genie-with-genie-ontology-delivers-1-6-the-accuracy-with"
   },
   {
    "url": "https://www.databricks.com/blog/enterprise-context-action-genie-agents-now-analyze-more-data-sources-transform-your-work",
@@ -185,7 +194,8 @@
    "result": "",
    "issue": "Teams needed agents that could understand both structured and unstructured business data and act within enterprise tools.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "databricks-from-enterprise-context-to-action-genie-agents-now-analyze"
   },
   {
    "url": "https://www.databricks.com/blog/bring-your-business-context-chatgpt-claude-microsoft-copilot-cowork-and-grok-bot",
@@ -204,7 +214,8 @@
    "result": "",
    "issue": "AI agents often guess answers because they lack clear business context and data locations.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "databricks-bring-your-business-context-to-chatgpt-claude-microsoft"
   },
   {
    "url": "https://www.databricks.com/blog/announcing-ga-genie-ontology",
@@ -223,7 +234,8 @@
    "result": "",
    "issue": "Agents lacked a complete, up‑to‑date understanding of the whole business, and manual ontologies quickly became outdated.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "databricks-announcing-ga-of-genie-ontology"
   },
   {
    "url": "https://shopify.engineering/generative-discovery",
@@ -241,7 +253,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Personalizing search and recommendations across billions of products while staying within live request latency.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-shopifys-generative-discovery-model"
   },
   {
    "url": "https://medium.com/snowflake/same-table-different-revenue-apache-ossie-and-snowflake-to-the-rescue-a26e5c99f5c5",
@@ -259,7 +272,8 @@
    "issue": "Analysts and dashboards get inconsistent revenue numbers because the meaning of the data isn’t clearly defined.",
    "v": 3,
    "cat": 2,
-   "category": "Semantic views"
+   "category": "Semantic views",
+   "slug": "snowflake-same-table-different-revenue-apache-ossie-and-snowflake-to"
   },
   {
    "url": "https://medium.com/snowflake/agents-are-code-too-what-i-learned-shipping-a-cortex-agent-through-azure-devops-fab3adae29e8",
@@ -278,7 +292,8 @@
    "result": "",
    "issue": "Deploying AI agents reliably across dev, test, and prod environments was error‑prone.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "snowflake-agents-are-code-too-what-i-learned-shipping-a-cortex-agent"
   },
   {
    "url": "https://huggingface.co/blog/token-pooling",
@@ -296,7 +311,8 @@
    "sorted_by": "groq",
    "result": "97.8% quality retention at 4× compression",
    "issue": "Storing millions of document vectors for multi‑vector search uses too much space.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-token-pooling-aware-training-for-multi-vector-embedding"
   },
   {
    "url": "https://huggingface.co/blog/qvac/botpsy",
@@ -315,7 +331,8 @@
    "result": "Outperforms all models ≤1.2 B on tool‑use benchmarks",
    "issue": "Cloud LLMs are expensive, unpredictable, and expose user data, while many tasks need only modest intelligence.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-botpsy-on-device-personal-assistant-with-a-sub-billion"
   },
   {
    "url": "https://engineering.fb.com/2026/11/11/ml-applications/intelligent-delivery-serve-better-ads",
@@ -333,7 +350,8 @@
    "sorted_by": "groq",
    "result": "≈10% ranking performance boost",
    "issue": "Ads ranking needed more compute than available, hurting performance and latency.",
-   "v": 3
+   "v": 3,
+   "slug": "meta-intelligent-delivery-making-every-unit-of-compute-serve"
   },
   {
    "url": "https://blog.jetbrains.com/ai/2026/11/air-in-jetbrains-ides-ga",
@@ -352,7 +370,8 @@
    "result": "",
    "issue": "Developers spend hours each week reviewing and fixing AI‑generated code.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "jetbrains-ides-transformed-for-the-agentic-era-of"
   },
   {
    "url": "https://aws.amazon.com/blogs/machine-learning/how-dxc-technology-built-a-multi-model-ai-substrate-on-amazon-bedrock",
@@ -372,7 +391,8 @@
    "issue": "Regulated enterprises needed AI agents that could act safely on critical systems without causing unintended damage.",
    "v": 3,
    "cat": 2,
-   "via": "AWS"
+   "via": "AWS",
+   "slug": "dxc-technology-how-dxc-technology-built-a-multi-model-ai-substrate-on"
   },
   {
    "url": "https://aws.amazon.com/blogs/machine-learning/automating-aws-agent-registry-updates-with-push-based-architecture",
@@ -391,7 +411,8 @@
    "result": "",
    "issue": "Registry metadata became stale, causing developers to lose trust in the catalog.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "aws-automating-aws-agent-registry-updates-with-push-based"
   },
   {
    "url": "https://www.atlassian.com/blog/how-we-build/3-lessons-from-rebuilding-atlassians-product-development-lifecycle-for-people-and-agents",
@@ -410,7 +431,8 @@
    "result": "",
    "issue": "Engineers spent hours manually investigating and fixing security alerts.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "atlassian-3-lessons-from-rebuilding-atlassians-product-development"
   },
   {
    "url": "https://www.amazon.science/blog/mitra-v2-scaling-synthetic-pretraining-for-tabular-foundation-models",
@@ -428,7 +450,8 @@
    "sorted_by": "groq",
    "result": "Top performance on TabArena and ScoringBench benchmarks",
    "issue": "Creating a new model for every table required lots of engineering and tuning.",
-   "v": 3
+   "v": 3,
+   "slug": "amazon-mitra-v2-scaling-synthetic-pretraining-for-tabular"
   },
   {
    "url": "https://sourcegraph.com/blog/what-we-learned-building-a-pr-approval-bot",
@@ -447,7 +470,8 @@
    "result": "",
    "issue": "Code reviews were slowing down development as agents generated more changes.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "sourcegraph-keeping-code-moving-with-clearer-review-expectations"
   },
   {
    "url": "https://shopify.engineering/shopify-app-rebuild",
@@ -465,7 +489,8 @@
    "result": "",
    "issue": "Developers needed to rebuild a huge mobile app quickly, but manual coding was too slow and error‑prone.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-how-we-rebuilt-the-shopify-app-in-12-weeks"
   },
   {
    "url": "https://product.hubspot.com/blog/from-data-silos-to-feature-serving-how-we-unified-fragmented-data-for-training-inference-and-reuse",
@@ -483,7 +508,8 @@
    "result": "",
    "issue": "Teams had to locate, extract, and rebuild scattered data signals for each new model, slowing development.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hubspot-from-data-silos-to-feature-serving-how-we-unified-fragmented"
   },
   {
    "url": "https://medium.com/snowflake/from-support-transcripts-to-trusted-ai-agents-building-a-knowledge-architecture-with-snowflake-4569fe0ebd5a",
@@ -502,7 +528,8 @@
    "result": "",
    "issue": "Support engineers waste time locating past resolutions across many systems.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "snowflake-from-support-transcripts-to-trusted-ai-agents-building-a"
   },
   {
    "url": "https://medium.com/expedia-group-tech/how-i-taught-an-ai-to-read-my-logs-9c04f1cfa750",
@@ -519,7 +546,8 @@
    "sorted_by": "groq",
    "result": "Daily compute cost dropped over 90%",
    "issue": "Engineers spent hours manually reading Spark execution plans to find slow or expensive jobs.",
-   "v": 3
+   "v": 3,
+   "slug": "expedia-how-i-taught-an-ai-to-read-my-logs"
   },
   {
    "url": "https://engineering.fb.com/2026/11/10/ml-applications/your-algorithm-giving-people-more-ways-to-personalize-facebook-recommendations",
@@ -537,7 +565,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users could not quickly tell Facebook what they wanted to see or avoid in their feed.",
-   "v": 3
+   "v": 3,
+   "slug": "meta-your-algorithm-giving-people-more-ways-to-personalize"
   },
   {
    "url": "https://eng.lyft.com/beyond-test-cards-a-fake-payment-provider-for-testing-at-scale-c69dddadb115",
@@ -553,7 +582,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Payment tests could only succeed or fail completely, making it hard to verify retry and fallback logic.",
-   "v": 3
+   "v": 3,
+   "slug": "lyft-beyond-test-cards-a-fake-payment-provider-for-testing-at"
   },
   {
    "url": "https://developer.nvidia.com/blog/start-and-restore-gpu-workloads-in-seconds-with-nvidia-snapshot",
@@ -571,7 +601,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Cold‑start of LLM inference takes minutes, slowing scaling and recovery.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-start-and-restore-gpu-workloads-in-seconds-with-nvidia"
   },
   {
    "url": "https://developer.nvidia.com/blog/agent-substrate-advancing-kubernetes-for-agents-at-scale",
@@ -590,7 +621,8 @@
    "result": "",
    "issue": "AI agents spend most time idle or waiting, causing wasted resources and slow response due to Kubernetes pod startup.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-agent-substrate-advancing-kubernetes-for-agents-at-scale"
   },
   {
    "url": "https://blog.postman.com/how-to-migrate-jmeter-tests-to-postman",
@@ -609,7 +641,8 @@
    "result": "",
    "issue": "Teams had to maintain separate functional and load testing tools and reports.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "postman-how-to-migrate-jmeter-tests-to-postman"
   },
   {
    "url": "https://blog.postman.com/handling-a-leaked-credential-with-the-postman-plugin",
@@ -628,7 +661,8 @@
    "result": "",
    "issue": "A leaked API token was discovered while the engineer was away from a computer.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "postman-handling-a-leaked-credential-with-the-postman-plugin"
   },
   {
    "url": "https://www.elastic.co/search-labs/blog/diskbbq-quantization-bits-auto-calibration",
@@ -647,7 +681,8 @@
    "result": "Recall@10 within 3 points, up to 11‑point gain",
    "issue": "Vector search needed cheaper quantization without hurting recall.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "elastic-fewer-bits-same-recall-more-conservative-auto-calibration"
   },
   {
    "url": "https://www.datadoghq.com/blog/kubernetes-processes-datadog-mcp-server",
@@ -666,7 +701,8 @@
    "result": "",
    "issue": "Engineers struggled to quickly find and interpret Kubernetes health and process data during incidents.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "datadog-investigate-kubernetes-health-and-processes-with-the-datadog"
   },
   {
    "url": "https://www.databricks.com/blog/turn-buying-signals-pipeline-sendoso-gifts-genie-one",
@@ -684,7 +720,8 @@
    "result": "",
    "issue": "Teams had to export data and switch tools to send gifts, slowing down outreach.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "databricks-turn-buying-signals-into-pipeline-with-sendoso-gifts-in"
   },
   {
    "url": "https://www.databricks.com/blog/accelerate-gpu-training-unity-catalog-tables-ucdataset",
@@ -702,7 +739,8 @@
    "sorted_by": "groq",
    "result": "10x faster training",
    "issue": "GPUs spent time idle waiting for data, raising training cost and time.",
-   "v": 3
+   "v": 3,
+   "slug": "databricks-accelerate-gpu-training-on-unity-catalog-tables-with"
   },
   {
    "url": "https://vercel.com/changelog/workflow-writes-now-use-websockets-on-vercel",
@@ -719,7 +757,8 @@
    "sorted_by": "groq",
    "result": "4.2× faster response",
    "issue": "Many HTTP requests slowed down streaming AI token output and raised costs.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-workflow-sdk-now-writes-over-websockets-on-vercel"
   },
   {
    "url": "https://klaviyo.tech/skills-for-your-agents-5b143936b880",
@@ -738,7 +777,8 @@
    "result": "",
    "issue": "Teams needed a reliable way for AI agents to choose and execute domain‑specific workflows without constant manual oversight.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "klaviyo-skills-for-your-agents"
   },
   {
    "url": "https://grafana.com/blog/run-cost-effective-always-on-agents-to-monitor-your-environment-the-engineering-behind-watchers",
@@ -757,7 +797,8 @@
    "result": "",
    "issue": "Alert rules miss unpredictable failures and running many agents can become too expensive.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "grafana-labs-run-cost-effective-always-on-agents-to-monitor-your"
   },
   {
    "url": "https://engineering.salesforce.com/using-ai-to-build-ai-how-agentforce-engineers-scale-automation-without-sacrificing-reliability",
@@ -776,7 +817,8 @@
    "result": "",
    "issue": "Engineers needed to automate building the Atlas Reasoning Engine without unreliable AI-generated code.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "salesforce-using-ai-to-build-ai-how-agentforce-engineers-scale"
   },
   {
    "url": "https://blog.postman.com/postman-plugin-for-claude-code-a-hands-on-guide",
@@ -795,7 +837,8 @@
    "result": "",
    "issue": "AI agents guessed API behavior, causing retries and wrong parameters.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "postman-plugin-for-claude-code-a-hands-on-guide"
   },
   {
    "url": "https://www.twilio.com/en-us/blog/insights/ai-agent-remember-returning-customers",
@@ -814,7 +857,8 @@
    "result": "",
    "issue": "Customers have to repeat themselves because AI agents forget prior interactions.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "twilio-how-to-build-an-ai-agent-that-remembers-returning-customers"
   },
   {
    "url": "https://vercel.com/changelog/json-render-and-chat-sdk-agents",
@@ -833,7 +877,8 @@
    "result": "",
    "issue": "Developers had to create separate UI code for each chat platform, slowing down agent responses.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-chat-sdk-agents-can-now-stream-generative-ui-with-json"
   },
   {
    "url": "https://vercel.com/changelog/ai-gateway-adds-deepseek-search-and-fetch-tools",
@@ -852,7 +897,8 @@
    "result": "",
    "issue": "Developers needed a simple way to let LLMs fetch web pages and search results during tool‑calling tasks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-ai-gateway-adds-deepseek-search-and-fetch-tools"
   },
   {
    "url": "https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83",
@@ -869,7 +915,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Fine‑tuning embeddings for only one epoch limited model quality on fresh data.",
-   "v": 3
+   "v": 3,
+   "slug": "pinterest-safe-and-efficient-multi-epoch-embedding-training"
   },
   {
    "url": "https://klaviyo.tech/inside-the-harness-deterministic-systems-476413ae913b",
@@ -888,7 +935,8 @@
    "result": "",
    "issue": "Managing massive context and ensuring AI agents follow strict guardrails was hard.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "klaviyo-inside-the-harness-deterministic-systems"
   },
   {
    "url": "https://grafana.com/blog/any-agent-anywhere-how-to-use-grafana-cloud-with-claude-cursor-and-any-other-ai-agent",
@@ -907,7 +955,8 @@
    "result": "",
    "issue": "AI agents couldn't see system observability data, limiting troubleshooting.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "grafana-labs-any-agent-anywhere-how-to-use-grafana-cloud-with-claude"
   },
   {
    "url": "https://developer.nvidia.com/blog/speed-up-image-generation-with-flux-3-image-klein-on-nvidia-blackwell-gpus",
@@ -925,7 +974,8 @@
    "sorted_by": "groq",
    "result": "Up to 4.45× faster generation",
    "issue": "Image generation was too slow for design tools and workflows.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-speed-up-image-generation-with-flux-3-image-klein-on-nvidia"
   },
   {
    "url": "https://developer.nvidia.com/blog/accelerating-reinforcement-learning-weight-refit-with-the-reshard-collective",
@@ -942,7 +992,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Updating model weights on inference GPUs was slow and used too much network bandwidth.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-accelerating-reinforcement-learning-weight-refit-with-the"
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/formally-verifying-agent-written-full-stack-web-apps-with-pdd-kit",
@@ -960,7 +1011,8 @@
    "result": "",
    "issue": "Agent‑written code often drifts from the original specification, and tests miss many bugs.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "microsoft-formally-verifying-agent-written-full-stack-web-apps-with"
   },
   {
    "url": "https://stripe.com/blog/analyze-your-stripe-data-directly-with-your-agent",
@@ -979,7 +1031,8 @@
    "result": "",
    "issue": "Customers wanted to ask AI agents to analyze their Stripe data without writing code.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "stripe-analyze-your-stripe-data-directly-with-your-agent"
   },
   {
    "url": "https://shopify.engineering/reflex",
@@ -996,7 +1049,8 @@
    "result": "",
    "issue": "Testing mobile screens required slow emulator builds, delaying agent-written code verification.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-reflex-an-architecture-for-building-mobile-apps-with-agents"
   },
   {
    "url": "https://machinelearning.apple.com/research/faster-retrieval",
@@ -1014,7 +1068,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Searching millions of document vectors was slow and costly, hurting response time for user questions.",
-   "v": 3
+   "v": 3,
+   "slug": "apple-faster-retrieval-for-better-more-efficient-rag"
   },
   {
    "url": "https://dropbox.tech/machine-learning/how-two-engineer-side-projects-became-the-agent-taking-action-inside-dropbox",
@@ -1033,7 +1088,8 @@
    "result": "",
    "issue": "Users wanted AI to edit their Dropbox files but needed safety and control over changes.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "dropbox-how-two-engineer-side-projects-became-the-agent-taking"
   },
   {
    "url": "https://dropbox.tech/machine-learning/how-aiassisted-development-helped-us-build-the-new-dropbox-experience",
@@ -1051,7 +1107,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Engineers needed to add complex new features to web and desktop quickly, but development was slow and fragmented.",
-   "v": 3
+   "v": 3,
+   "slug": "dropbox-how-ai-assisted-development-helped-us-build-the-new-dropbox"
   },
   {
    "url": "https://cloud.google.com/blog/products/data-analytics/query-enterprise-data-in-gemini-with-data-cloud-connectors",
@@ -1070,7 +1127,8 @@
    "result": "",
    "issue": "Business users ask many data questions faster than analysts can answer, causing delays and guesswork.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-cloud-bringing-conversational-analytics-to-gemini-with-agentic"
   },
   {
    "url": "https://blog.jetbrains.com/ai/2026/11/building-a-rag-pipeline-for-semantic-code-search-a-developer-diary-and-field-notes-part-2",
@@ -1089,7 +1147,8 @@
    "result": "",
    "issue": "Developers needed instant, accurate code search across huge, constantly changing codebases.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "jetbrains-building-a-rag-pipeline-for-semantic-code-search-a-developer"
   },
   {
    "url": "https://vercel.com/changelog/vercel-token-scanning-expands-to-more-public-sources",
@@ -1105,7 +1164,8 @@
    "sorted_by": "groq",
    "result": "Hundreds of tokens revoked",
    "issue": "Publicly exposed Vercel tokens let attackers access projects and incur unexpected costs.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-token-scanning-expands-to-more-public-sources"
   },
   {
    "url": "https://vercel.com/changelog/kimi-k3-1-pro-now-has-more-zdr-providers-on-ai-gateway",
@@ -1122,7 +1182,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users wanted a cheaper, privacy‑safe way to use Kimi models without extra fees or data leaks.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-kimi-k3-1-pro-now-has-more-zdr-providers-on-ai-gateway"
   },
   {
    "url": "https://vercel.com/blog/introducing-vercel-schedules",
@@ -1140,7 +1201,8 @@
    "result": "",
    "issue": "Developers needed a way for agents and apps to run tasks on dynamic schedules without redeploying or managing separate databases.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-introducing-vercel-schedules"
   },
   {
    "url": "https://neon.com/blog/inside-a-kylon-room-where-people-and-agents-build-apps-on-neon",
@@ -1159,7 +1221,8 @@
    "result": "",
    "issue": "Teams needed a way for people and AI agents to work together on apps safely and instantly.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "neon-inside-a-kylon-room-where-people-and-agents-build-apps-on"
   },
   {
    "url": "https://medium.com/pinterest-engineering/scaling-model-evaluation-at-pinterest-with-ray-part-4-4a96cd12cc11",
@@ -1175,7 +1238,8 @@
    "sorted_by": "groq",
    "result": "Evaluation time reduced up to 32%",
    "issue": "Running many model experiments caused slow, costly evaluation pipelines.",
-   "v": 3
+   "v": 3,
+   "slug": "pinterest-scaling-model-evaluation-at-pinterest-with-ray-part-4"
   },
   {
    "url": "https://developer.nvidia.com/blog/use-nvidia-nemo-to-turn-agent-failures-into-tests-and-harness-fixes",
@@ -1194,7 +1258,8 @@
    "result": "",
    "issue": "Agents sometimes pick the wrong tool or miss context, causing task failures.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-use-nvidia-nemo-to-turn-agent-failures-into-tests-and"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-uses-ai-agents-to-streamline-ai-factory-operations",
@@ -1213,7 +1278,8 @@
    "result": "",
    "issue": "SREs had to check many dashboards manually to find why training performance dropped.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-how-nvidia-uses-ai-agents-to-streamline-ai-factory"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-factory-operations-blueprint-coordinates-ai-agents-to-investigate-production-issues",
@@ -1232,7 +1298,8 @@
    "result": "Cost savings up to 20%",
    "issue": "Unplanned factory downtime costs millions and investigating issues takes too much time.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-how-nvidia-factory-operations-blueprint-coordinates-ai"
   },
   {
    "url": "https://blog.mozilla.ai/otari-by-mozilla-ai-your-operating-system-for-ai-governance",
@@ -1251,7 +1318,8 @@
    "result": "",
    "issue": "Teams struggle to control AI usage, costs, and safety while being locked into specific providers.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "mozilla-ai-otari-by-mozilla-ai-your-operating-system-for-ai-governance"
   },
   {
    "url": "https://www.honeycomb.io/blog/honeycomb-team-agents-ai-sre-done-right",
@@ -1270,7 +1338,8 @@
    "result": "",
    "issue": "SRE teams spend too much time reacting to alerts instead of preventing problems.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-team-agents-ai-sre-done-right"
   },
   {
    "url": "https://vercel.com/changelog/vercel-security-review-public-beta",
@@ -1287,7 +1356,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed automatic detection of code vulnerabilities on every push.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-security-review-now-in-public-beta"
   },
   {
    "url": "https://vercel.com/blog/how-zapier-turns-ideas-into-working-software-in-hours-with-vercel",
@@ -1304,7 +1374,8 @@
    "result": "",
    "issue": "Teams needed to show partners working prototypes quickly, but the process took weeks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-how-zapier-turns-ideas-into-working-software-in-hours-with"
   },
   {
    "url": "https://vercel.com/blog/how-mercor-ships-internal-apps-and-billions-of-production-tokens-on-one-platform",
@@ -1322,7 +1393,8 @@
    "sorted_by": "groq",
    "result": "Batch jobs finish in 2‑3 hours",
    "issue": "Batch jobs were stuck for up to 12 hours because model rate limits caused retries.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-how-mercor-ships-internal-apps-and-billions-of-production"
   },
   {
    "url": "https://engineering.fb.com/2026/11/03/ml-applications/f3-lightning-how-meta-accelerates-ads-ml-features-to-production",
@@ -1339,7 +1411,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Feature extraction duplicated work, causing slow and costly ad model predictions.",
-   "v": 3
+   "v": 3,
+   "slug": "meta-f3-lightning-how-meta-accelerates-ads-ml-features-to"
   },
   {
    "url": "https://blog.sentry.io/performance-wins-traces-coding-agent",
@@ -1358,7 +1431,8 @@
    "result": "Hundreds of millions of queries removed weekly",
    "issue": "Sentry needed to locate and fix performance bottlenecks in its own backend traces.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "sentry-finding-performance-wins-in-our-own-traces-with-a-coding"
   },
   {
    "url": "https://blog.postman.com/my-vacation-agent-is-struggling-how-ai-ready-are-services",
@@ -1377,7 +1451,8 @@
    "result": "",
    "issue": "Comparing vacation offers across many travel sites is time‑consuming and confusing.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "postman-my-vacation-agent-is-struggling-how-ai-ready-are-services"
   },
   {
    "url": "https://www.elastic.co/search-labs/blog/agent-skills-elastic-integration",
@@ -1396,7 +1471,8 @@
    "result": "",
    "issue": "Creating end‑to‑end Elastic integrations was manual and slow, requiring custom code for each data source.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "elastic-how-our-agent-skills-research-build-and-test-a-complete"
   },
   {
    "url": "https://vercel.com/changelog/monitor-vercel-deployments-in-chatgpt",
@@ -1414,7 +1490,8 @@
    "result": "",
    "issue": "Developers wanted to see deployment status and logs directly inside chat without switching tools.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-mcp-now-renders-deployments-as-an-interactive-card"
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/from-synthetic-enterprise-data-evaluations-to-real-microsoft-copilot-ai-confidence",
@@ -1432,7 +1509,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Need to test Copilot accuracy without exposing sensitive enterprise data.",
-   "v": 3
+   "v": 3,
+   "slug": "microsoft-from-synthetic-enterprise-data-evaluations-to-real-microsoft"
   },
   {
    "url": "https://vercel.com/changelog/vercel-mcp-now-supports-mcp-events",
@@ -1451,7 +1529,8 @@
    "result": "",
    "issue": "Developers had to poll Vercel for deployment updates, wasting time and resources.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-mcp-now-supports-mcp-events"
   },
   {
    "url": "https://tech.groww.in/compass-an-ai-navigation-agent-for-everyone-8f700e30e86f",
@@ -1470,7 +1549,8 @@
    "result": "",
    "issue": "Teams struggled to find unified data definitions and numbers across many tools, causing delays.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "groww-compass-an-ai-navigation-agent-for-everyone"
   },
   {
    "url": "https://developer.nvidia.com/blog/run-ai-models-for-edge-application-development-with-just-a-few-commands",
@@ -1488,7 +1568,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers struggled to run large AI models on embedded devices due to heavy setup and slow inference.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-run-ai-models-for-edge-application-development-with-just-a"
   },
   {
    "url": "https://developer.nvidia.com/blog/build-specialized-agents-on-a-stack-you-control-with-nvidia-nemoclaw",
@@ -1507,7 +1588,8 @@
    "result": "",
    "issue": "Developers needed a secure, customizable stack to run specialized agents with enterprise data.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-build-specialized-agents-on-a-stack-you-control-with-nvidia"
   },
   {
    "url": "https://developer.nvidia.com/blog/build-a-validated-kubernetes-runtime-for-nvidia-dynamo",
@@ -1525,7 +1607,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Deploying AI inference on Kubernetes was slow and error‑prone because many components had to be set up manually.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-build-a-validated-kubernetes-runtime-for-nvidia-dynamo"
   },
   {
    "url": "https://www.amazon.science/blog/speeding-up-language-models-for-travel-applications",
@@ -1543,7 +1626,8 @@
    "sorted_by": "groq",
    "result": "Cost under one‑third, up to 20× faster",
    "issue": "Large language models were too slow and expensive for travel site queries, hurting user experience and revenue.",
-   "v": 3
+   "v": 3,
+   "slug": "amazon-speeding-up-language-models-for-travel-applications"
   },
   {
    "url": "https://vercel.com/changelog/fx-harness-adapter-now-separates-host-and-sandbox",
@@ -1562,7 +1646,8 @@
    "result": "",
    "issue": "Setting up sandboxed tool execution was complex and kept credentials insecure.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-the-fx-adapter-now-runs-the-harness-on-the-host"
   },
   {
    "url": "https://engineering.fb.com/2026/10/29/security/catching-bugs-before-they-land-jittestings-human-on-the-loop-approach-at-full-scale",
@@ -1579,7 +1664,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Code changes introduced bugs faster than traditional tests could catch, risking production issues.",
-   "v": 3
+   "v": 3,
+   "slug": "meta-catching-bugs-before-they-land-jittestings-human-on-the-loop"
   },
   {
    "url": "https://vercel.com/changelog/vercel-agent-can-now-validate-alerts-before-paging-you",
@@ -1598,7 +1684,8 @@
    "result": "",
    "issue": "Too many non‑critical alerts were paging on‑call engineers, causing noise and fatigue.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-agent-can-now-validate-alerts-before-paging"
   },
   {
    "url": "https://vercel.com/changelog/run-paseo-agents-on-vercel-sandbox",
@@ -1617,7 +1704,8 @@
    "result": "",
    "issue": "Developers wanted to run AI agents continuously and switch devices without losing state.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-run-paseo-agents-on-vercel-sandbox"
   },
   {
    "url": "https://vercel.com/changelog/box-mount-now-runs-in-vercel-sandbox",
@@ -1635,7 +1723,8 @@
    "result": "",
    "issue": "Agents needed a way to read and write Box files without exposing credentials.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-box-mount-now-runs-in-vercel-sandbox"
   },
   {
    "url": "https://vercel.com/blog/introducing-vercel-ci",
@@ -1653,7 +1742,8 @@
    "sorted_by": "groq",
    "result": "CI passes 2-6x faster",
    "issue": "CI runs full pipelines for every tiny change, making developers and bots wait too long.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-introducing-vercel-ci"
   },
   {
    "url": "https://replit.com/blog/architecture-behind-secure-agent-work",
@@ -1671,7 +1761,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents could be exploited to cause damage, so companies need secure guardrails and monitoring.",
-   "v": 3
+   "v": 3,
+   "slug": "replit-replits-architecture-behind-secure-agent-work"
   },
   {
    "url": "https://posthog.com/blog/self-driving-ci",
@@ -1690,7 +1781,8 @@
    "result": "11% of merged PRs were self‑driving",
    "issue": "CI maintenance couldn't keep up with the surge in pull requests.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "posthog-engineers-are-shipping-faster-so-we-made-our-ci-self-driving"
   },
   {
    "url": "https://posthog.com/blog/how-to-benchmark-ai-agents",
@@ -1709,7 +1801,8 @@
    "result": "",
    "issue": "Agents were costly and their quality was hard to measure reliably.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "posthog-do-you-even-benchmark-how-we-evaluate-agents-at-scale-with"
   },
   {
    "url": "https://grafana.com/blog/evaluate-ai-models-for-observability-o11y-bench-joins-fireworks-specialized-intelligence-index-and-reaches-v1-1",
@@ -1726,7 +1819,8 @@
    "result": "",
    "issue": "Teams couldn't tell if AI observability agents gave correct, reliable answers backed by telemetry.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "grafana-labs-evaluate-ai-models-for-observability-o11y-bench-joins"
   },
   {
    "url": "https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design",
@@ -1744,7 +1838,8 @@
    "sorted_by": "groq",
    "result": "tens of millions ads/second per GPU",
    "issue": "Retrieving relevant ads from billions of candidates was too slow and expensive for high‑quality models.",
-   "v": 3
+   "v": 3,
+   "slug": "meta-andromeda-powering-the-next-generation-of-ads-retrieval"
   },
   {
    "url": "https://blog.jetbrains.com/ai/2026/10/getting-started-with-air-part1",
@@ -1763,7 +1858,8 @@
    "result": "",
    "issue": "Developers struggled to see what coding agents were doing and what still needed attention.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "jetbrains-getting-started-with-air-in-jetbrains-ides-part-1"
   },
   {
    "url": "https://vercel.com/changelog/vercel-agent-sessions-now-cost-67-percent-less",
@@ -1781,7 +1877,8 @@
    "sorted_by": "groq",
    "result": "67% cost reduction",
    "issue": "Agent sessions used many tokens, making them expensive for users.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-agent-sessions-now-cost-67-less"
   },
   {
    "url": "https://replit.com/blog/anyone-can-bring-ideas-to-company-codebase",
@@ -1800,7 +1897,8 @@
    "result": "",
    "issue": "Non‑technical team members can't directly modify core code, causing slow review bottlenecks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-anyone-can-now-bring-their-ideas-into-the-company-codebase"
   },
   {
    "url": "https://medium.com/expedia-group-tech/beyond-the-prompt-engineering-the-loop-for-software-change-at-scale-9ac26e3b2706",
@@ -1819,7 +1917,8 @@
    "result": "Two‑year effort finished in three months",
    "issue": "Large code changes were slow because hidden dependencies and build failures required constant human intervention.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "expedia-beyond-the-prompt-engineering-the-loop-for-software-change"
   },
   {
    "url": "https://medium.com/agoda-engineering/key-takeaways-from-tech-at-agoda-from-assistants-to-ai-agents-b0e9187730bb",
@@ -1838,7 +1937,8 @@
    "result": "",
    "issue": "Engineers wrote code faster, but planning, testing and release became bottlenecks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "agoda-key-takeaways-from-tech-at-agoda-from-assistants-to-ai"
   },
   {
    "url": "https://developer.nvidia.com/blog/fine-tuning-nvidia-nemotron-to-know-local-rules-not-just-local-languages",
@@ -1856,7 +1956,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "The model gave generic, inaccurate answers for local French and Belgian queries, missing regional rules and cultural nuance.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-fine-tuning-nvidia-nemotron-to-know-local-rules-not-just"
   },
   {
    "url": "https://developer.nvidia.com/blog/3-ways-to-boost-moe-inference-on-nvidia-dgx-spark",
@@ -1874,7 +1975,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "MoE inference was slow because reading model weights limited token generation speed.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-3-ways-to-boost-moe-inference-on-nvidia-dgx-spark"
   },
   {
    "url": "https://blog.sentry.io/beagle-ai-agent-workflows",
@@ -1893,7 +1995,8 @@
    "result": "",
    "issue": "Developers needed an easy way to generate and deploy code without manual steps.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "sentry-how-a-beagle-shaped-ai-agent-ships-code-to-madewithvuejs-com"
   },
   {
    "url": "https://about.gitlab.com/blog/extend-gitlab-duo-agent-platform-into-your-business-systems",
@@ -1912,7 +2015,8 @@
    "result": "",
    "issue": "Engineers had to manually trace errors in business systems, causing delays for users.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "gitlab-extend-gitlab-duo-agent-platform-into-your-business-systems"
   },
   {
    "url": "https://netflixtechblog.com/making-failure-diagnosis-reliable-with-pensive-ai-6b0811a1c015",
@@ -1931,7 +2035,8 @@
    "result": "AI extraction covers 100% of failures",
    "issue": "Half of failed jobs were unclassified, wasting engineer time.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "netflix-making-failure-diagnosis-reliable-with-pensive-ai"
   },
   {
    "url": "https://engineering.monday.com/how-we-gave-ai-agents-the-keys-to-production-and-still-sleep-at-night",
@@ -1950,7 +2055,8 @@
    "result": "",
    "issue": "Infra engineers were overwhelmed by repetitive, judgment‑heavy tasks on production infrastructure.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "monday-com-how-we-gave-ai-agents-the-keys-to-production-and-still-sleep"
   },
   {
    "url": "https://vercel.com/blog/how-vercel-agent-accesses-production-safely",
@@ -1968,7 +2074,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents need to act on production without over‑granting permissions, which could cause accidental damage.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-how-vercel-agent-accesses-production-safely"
   },
   {
    "url": "https://vercel.com/blog/how-interfaze-serves-50-million-requests-a-month-on-vercel",
@@ -1985,7 +2092,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers needed reliable, deterministic AI results for tasks like document OCR and web scraping, but single model providers were flaky and non‑deterministic.",
-   "v": 3
+   "v": 3,
+   "slug": "vercel-how-interfaze-serves-50-million-requests-a-month-on-vercel"
   },
   {
    "url": "https://research.google/blog/bringing-foundational-models-to-the-front-lines-of-tb-screening",
@@ -2003,7 +2111,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Remote clinics lack radiologists, causing many TB cases to be missed.",
-   "v": 3
+   "v": 3,
+   "slug": "google-bringing-foundational-models-to-the-front-lines-of-tb"
   },
   {
    "url": "https://qdrant.tech/blog/cohere-embed-5-qdrant",
@@ -2022,7 +2131,8 @@
    "result": "",
    "issue": "Searching PDF pages with images and complex layouts was slow and missed visual information.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "qdrant-scalable-pdf-retrieval-with-cohere-embed-5-and-qdrant"
   },
   {
    "url": "https://fly.io/blog/feng-shui-for-robots",
@@ -2041,7 +2151,8 @@
    "result": "",
    "issue": "Agents needed a safe sandbox that could easily move to full production infrastructure.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "fly-io-feng-shui-for-robots-the-fly-mcp-server"
   },
   {
    "url": "https://developer.nvidia.com/blog/using-ai-agents-to-teach-robots-like-microduck-to-walk-in-simulation",
@@ -2060,7 +2171,8 @@
    "result": "",
    "issue": "Robots struggled to learn walking and obstacle navigation without a coordinated planning and training system.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-using-ai-agents-to-teach-robots-like-microduck-to-walk-in"
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/flint-interactive-a-language-for-creating-interactive-data-visualizations",
@@ -2079,7 +2191,8 @@
    "result": "",
    "issue": "Users wanted charts they could explore, not just static images.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "microsoft-flint-interactive-a-language-for-creating-interactive-data"
   },
   {
    "url": "https://www.elastic.co/search-labs/blog/rag-pipeline-scanned-pdf-jina-ocr",
@@ -2098,7 +2211,8 @@
    "result": "",
    "issue": "Scanned PDFs and complex layouts were unreadable by traditional search, limiting access to important knowledge.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "elastic-56-scanned-pages-to-a-cited-answer-in-5-minutes-rag-pipeline"
   },
   {
    "url": "https://www.amazon.science/blog/the-science-behind-torchneuron-amazons-new-pytorch-backend-for-aws-trainium-chips",
@@ -2115,7 +2229,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed to run PyTorch models on Trainium without rewriting code, while keeping speed and cost low.",
-   "v": 3
+   "v": 3,
+   "slug": "amazon-the-science-behind-torchneuron-amazons-new-pytorch-backend"
   },
   {
    "url": "https://shopify.engineering/remote-dev",
@@ -2134,7 +2249,8 @@
    "result": "",
    "issue": "AI agents were overloading developers' laptops when building and testing mobile apps.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-we-gave-ai-agents-a-mobile-dev-environment"
   },
   {
    "url": "https://replit.com/blog/replit-monitoring-agent",
@@ -2153,7 +2269,8 @@
    "result": "",
    "issue": "Small teams must manually find and fix app outages, which wastes time and frustrates users.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-monitoring-agent-your-very-own-software-engineering"
   },
   {
    "url": "https://huggingface.co/blog/microsoft/thinkingbox-training",
@@ -2172,7 +2289,8 @@
    "result": "Success rate rose from 51.70% to 60.78%",
    "issue": "Agents often said they finished tasks even when the database still needed work.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-turning-database-grading-into-rl-rewards-post-training"
   },
   {
    "url": "https://developer.nvidia.com/blog/running-frontier-class-ai-models-across-8-nvidia-dgx-spark-nodes",
@@ -2190,7 +2308,8 @@
    "result": "80 tokens per second generation",
    "issue": "Developers need to run very large models and multiple models together, but single machines lack enough memory and speed.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-running-frontier-class-ai-models-across-8-nvidia-dgx-spark"
   },
   {
    "url": "https://builders.ramp.com/post/credit-analysis-using-semantics",
@@ -2209,7 +2328,8 @@
    "result": "",
    "issue": "Need to automate credit decisions from complex financial statements.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "ramp-agentic-credit-analysis"
   },
   {
    "url": "https://sourcegraph.com/blog/php2shell-patching-php-is-easy-finding-it-is-the-hard-part",
@@ -2228,7 +2348,8 @@
    "result": "",
    "issue": "Teams struggled to locate every PHP runtime in their code to apply urgent security patches.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "sourcegraph-php2shell-patching-php-is-easy-finding-it-is-the-hard-part"
   },
   {
    "url": "https://shopify.engineering/open-model-task-experts",
@@ -2247,7 +2368,8 @@
    "result": "7× faster, 90% cheaper",
    "issue": "Token‑heavy tasks cost too much and run slowly on the main model.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-how-shopify-turns-open-models-into-task-experts"
   },
   {
    "url": "https://research.google/blog/empowering-frontline-maternal-care-with-ai-assisted-ultrasound",
@@ -2265,7 +2387,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Many regions lack trained sonographers, leaving pregnant people without ultrasound access.",
-   "v": 3
+   "v": 3,
+   "slug": "google-empowering-frontline-maternal-care-with-ai-assisted"
   },
   {
    "url": "https://huggingface.co/blog/Dharma-AI/vocabx-vocabulary-specialization",
@@ -2281,7 +2404,8 @@
    "sorted_by": "groq",
    "result": "77% cost reduction",
    "issue": "Using a generic vocabulary made the model write too many tokens, raising inference cost.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-how-specializing-the-vocabulary-of-slms-can-cut-inference"
   },
   {
    "url": "https://developer.nvidia.com/blog/inside-nvidia-sentry-secure-ai-agents-at-runtime",
@@ -2299,7 +2423,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents could bypass security controls and misuse tools or data.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-inside-nvidia-sentry-secure-ai-agents-at-runtime"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-openshell-reference-architecture-secures-and-governs-ai-agent-workloads-at-scale",
@@ -2317,7 +2442,8 @@
    "result": "",
    "issue": "Autonomous agents could perform unsafe actions when working on long, complex tasks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-how-nvidia-openshell-reference-architecture-secures-and"
   },
   {
    "url": "https://developer.nvidia.com/blog/developing-an-ai-factory-digital-twin-with-an-agent-assisted-workflow",
@@ -2336,7 +2462,8 @@
    "result": "",
    "issue": "Developers struggled to combine site plans, equipment data, and engineering specs into a single, editable digital twin model.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-developing-an-ai-factory-digital-twin-with-an-agent-assisted"
   },
   {
    "url": "https://developer.nvidia.com/blog/design-proteins-with-rfd4-proteina-using-reward-guided-inference-time-search",
@@ -2355,7 +2482,8 @@
    "result": "Faster and uses less memory than the previous version",
    "issue": "Scientists need to explore billions of protein sequences to find therapeutic candidates, but exhaustive search is impossible.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-design-proteins-with-rfd4-proteina-using-reward-guided"
   },
   {
    "url": "https://blog.cloudflare.com/webmcp-commerce",
@@ -2373,7 +2501,8 @@
    "result": "",
    "issue": "Merchants needed a way for AI agents to shop on their sites without breaking when pages change.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "cloudflare-how-commerce-com-and-cloudflare-are-getting-storefronts"
   },
   {
    "url": "https://shopify.engineering/catalog-clustering-part-ii",
@@ -2391,7 +2520,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Different merchants list the same product in many ways, making it hard to show a unified view.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-cross-store-product-clustering-across-millions-of-stores"
   },
   {
    "url": "https://engineering.razorpay.com/how-we-deploy-reliably-at-razorpay-52ddf676caf8",
@@ -2409,7 +2539,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Deployments often introduced bugs that broke payments, hurting merchants and customers.",
-   "v": 3
+   "v": 3,
+   "slug": "razorpay-how-we-deploy-reliably-at-razorpay"
   },
   {
    "url": "https://builders.ramp.com/post/building-laminar",
@@ -2428,7 +2559,8 @@
    "result": "",
    "issue": "Existing agent platforms didn’t meet Ramp’s needs, so they needed a custom solution.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "ramp-building-laminar-ramp-s-managed-agents-platform"
   },
   {
    "url": "https://www.wix.engineering/post/components-are-dead-and-now-for-something-completely-different",
@@ -2447,7 +2579,8 @@
    "result": "",
    "issue": "AI agents find multi‑file UI components hard to understand and modify.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "wix-components-are-dead-and-now-for-something-completely"
   },
   {
    "url": "https://vercel.com/blog/making-every-harness-durable",
@@ -2466,7 +2599,8 @@
    "result": "",
    "issue": "Developers needed always‑on coding agents without keeping their laptops running.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vercel-making-every-harness-durable"
   },
   {
    "url": "https://qdrant.tech/blog/ultrabert-embed",
@@ -2485,7 +2619,8 @@
    "result": "",
    "issue": "Long documents either lose context when split into small chunks or get cut off by embedding limits.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "qdrant-ultrabert-fits-32k-tokens-in-one-vector-rip-chunking"
   },
   {
    "url": "https://engineering.monday.com/rebuilding-monday-api-edge-for-agents",
@@ -2504,7 +2639,8 @@
    "result": "92% less CPU, 80% less memory, 11x lower latency",
    "issue": "AI agents were making many API calls, overloading the API edge and causing high latency and resource use.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "monday-com-one-prompt-dozens-of-api-calls-rebuilding-the-monday-com-api"
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/thin-orchestrator-ai-agent-architecture",
@@ -2523,7 +2659,8 @@
    "result": "Token usage cut up to 65‑fold",
    "issue": "The main AI agent kept hallucinating because it had to handle all domain knowledge and routing.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "meta-the-thin-orchestrator-how-we-made-our-ai-agents-more"
   },
   {
    "url": "https://engineering.fb.com/2026/10/19/ml-applications/genrecs-tokenization-transforming-ads-recommendation-at-meta-with-stable-model-vocabulary",
@@ -2540,7 +2677,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Ads struggled to recommend brand‑new products because they had no past click data.",
-   "v": 3
+   "v": 3,
+   "slug": "meta-genrecs-tokenization-transforming-ads-recommendation-at-meta"
   },
   {
    "url": "https://booking.ai/from-static-help-content-to-a-rag-based-onboarding-agent-for-partners-f7d5a789c4f7",
@@ -2558,7 +2696,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Partners get stuck in the long, confusing registration flow and need instant help without a human.",
-   "v": 3
+   "v": 3,
+   "slug": "booking-com-from-static-help-content-to-a-rag-based-onboarding-agent-for"
   },
   {
    "url": "https://blog.mozilla.ai/who-searches-the-web-for-your-agent",
@@ -2577,7 +2716,8 @@
    "result": "",
    "issue": "Developers cannot see or control which search engine their AI agents use, risking privacy, cost, and flexibility.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "mozilla-ai-who-searches-the-web-for-your-agent"
   },
   {
    "url": "https://blog.cloudflare.com/obsessive-inference-optimization",
@@ -2595,7 +2735,8 @@
    "sorted_by": "groq",
    "result": "Cost per review $0.77",
    "issue": "Inference costs for code reviews kept rising, hurting the budget.",
-   "v": 3
+   "v": 3,
+   "slug": "cloudflare-cutting-our-inference-bill-by-68-by-being-obsessive-about"
   },
   {
    "url": "https://engineering.atspotify.com/2026/10/advancing-generative-recommendation-inference-our-collaboration-with-nvidia-on-tensorrt-llm",
@@ -2613,7 +2754,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Personalized recommendations needed real‑time, multi‑surface inference that could scale beyond a proof‑of‑concept.",
-   "v": 3
+   "v": 3,
+   "slug": "spotify-advancing-generative-recommendation-inference-our"
   },
   {
    "url": "https://machinelearning.apple.com/research/selection-structured-reasoning",
@@ -2631,7 +2773,8 @@
    "result": "Per‑turn latency dropped 90%, overall inference latency 28–54% faster",
    "issue": "Long, costly reasoning slowed multimodal search agents.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "apple-selection-based-structured-reasoning-toward-efficient"
   },
   {
    "url": "https://machinelearning.apple.com/research/mlx-distributed-inference",
@@ -2649,7 +2792,8 @@
    "sorted_by": "groq",
    "result": "36 tokens/second on 4 Mac Studios",
    "issue": "Running large language models locally was too slow or required expensive cloud resources.",
-   "v": 3
+   "v": 3,
+   "slug": "apple-local-and-distributed-large-llm-inference-with-mlx-and-rdma"
   },
   {
    "url": "https://developer.nvidia.com/blog/scale-agentic-coding-workflows-with-metas-muse-spark-open-on-nvidia-gb300-nvl72",
@@ -2668,7 +2812,8 @@
    "result": "",
    "issue": "Developers needed an AI that could handle huge codebases and multi-step refactoring without breaking tasks into pieces.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-scale-agentic-coding-workflows-with-metas-muse-spark-open-on"
   },
   {
    "url": "https://developer.nvidia.com/blog/nvidia-nemotron-3-5-super-vl-powers-specialized-agents-with-multimodal-reasoning",
@@ -2687,7 +2832,8 @@
    "result": "",
    "issue": "Enterprise workflows need agents that can read documents, follow policies, and use multiple tools in one request.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-nemotron-3-5-super-vl-powers-specialized-agents-with"
   },
   {
    "url": "https://building.nu.com/squeezing-2x-mfu-out-of-our-training-runs",
@@ -2705,7 +2851,8 @@
    "sorted_by": "groq",
    "result": "~2× MFU improvement",
    "issue": "Training large Transformer models was slow and under‑utilized the hardware.",
-   "v": 3
+   "v": 3,
+   "slug": "nubank-squeezing-2-mfu-out-of-our-training-runs"
   },
   {
    "url": "https://weaviate.io/blog/pathseer-filtered-vector-search",
@@ -2723,7 +2870,8 @@
    "sorted_by": "groq",
    "result": "Significant query‑time reductions",
    "issue": "Filtered vector searches were slow and unreliable when filters changed frequently.",
-   "v": 3
+   "v": 3,
+   "slug": "weaviate-pathseer-adaptive-filtered-vector-search"
   },
   {
    "url": "https://research.google/blog/putting-earth-ai-to-work-geospatial-agents-for-our-planets-biggest-challenges",
@@ -2742,7 +2890,8 @@
    "result": "",
    "issue": "Standard LLMs can’t handle huge, complex geospatial data and multi‑step spatial analysis.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-putting-earth-ai-to-work-geospatial-agents-for-our-planet-s"
   },
   {
    "url": "https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96",
@@ -2758,7 +2907,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "How much value does personalized recommendation add to user viewing?",
-   "v": 3
+   "v": 3,
+   "slug": "netflix-measuring-the-impact-of-personalized-recommendations"
   },
   {
    "url": "https://netflixtechblog.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb",
@@ -2776,7 +2926,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Multiple specialized models made personalization hard to maintain and update.",
-   "v": 3
+   "v": 3,
+   "slug": "netflix-integrating-netflixs-foundation-model-into-personalization"
   },
   {
    "url": "https://developer.nvidia.com/blog/optimizing-agent-reliability-and-tool-calling-efficiency-for-chip-design-using-nvidia-nemo-gym",
@@ -2795,7 +2946,8 @@
    "result": "Score ~95%, turns reduced 66%",
    "issue": "AI agents often produce plausible but wrong results, risking errors that spread through chip design workflows.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-optimizing-agent-reliability-and-tool-calling-efficiency-for"
   },
   {
    "url": "https://qdrant.tech/blog/pplx-embed-v2",
@@ -2814,7 +2966,8 @@
    "result": "96.5% quality retained",
    "issue": "Storing millions of document image vectors required huge storage and memory.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "qdrant-perplexity-s-new-late-interaction-models-meet-qdrant-s-21x"
   },
   {
    "url": "https://medium.com/airbnb-engineering/castle-training-natural-language-search-before-the-first-real-query-3818ef8b4828",
@@ -2832,7 +2985,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Airbnb needed natural‑language search but had no real user queries or relevance labels to train on.",
-   "v": 3
+   "v": 3,
+   "slug": "airbnb-castle-training-natural-language-search-before-the-first"
   },
   {
    "url": "https://huggingface.co/blog/LiquidAI/lfm25-24b-a2b",
@@ -2851,7 +3005,8 @@
    "result": "Leads on five tool‑use benchmarks, three‑times next best on AutomationBench",
    "issue": "Need fast, private on‑device agents that can reason and use tools without heavy compute.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-run-fast-private-agents-on-device-with-lfm2-5-24b-a2b"
   },
   {
    "url": "https://engineering.razorpay.com/inside-razorpays-rto-model-the-engineering-behind-its-ml-lifecycle-999fe75e66ec",
@@ -2869,7 +3024,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Showing cash‑on‑delivery could cause costly returns, but hiding it may lose sales.",
-   "v": 3
+   "v": 3,
+   "slug": "razorpay-inside-razorpays-rto-model-the-engineering-behind-its-ml"
   },
   {
    "url": "https://developer.nvidia.com/blog/rewrite-apache-spark-udfs-gpu-acceleration-ai-agents",
@@ -2888,7 +3044,8 @@
    "result": "22x+ speedups",
    "issue": "Custom Spark UDFs slowed down queries and prevented GPU acceleration.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-how-to-rewrite-apache-spark-udfs-for-gpu-acceleration-with"
   },
   {
    "url": "https://blog.mozilla.ai/building-the-missing-half",
@@ -2907,7 +3064,8 @@
    "result": "",
    "issue": "Developers were locked into hidden features of proprietary agent APIs, losing control over tools and data.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "mozilla-ai-building-the-missing-half"
   },
   {
    "url": "https://www.wix.engineering/post/our-ai-agent-s-design-looked-complete-3-runtime-checks-proved-it-wrong",
@@ -2926,7 +3084,8 @@
    "result": "",
    "issue": "AI‑generated web designs seemed finished but often broke when run in production.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "wix-our-ai-agents-design-looked-complete-3-runtime-checks-proved"
   },
   {
    "url": "https://www.amazon.science/blog/can-we-change-an-ai-models-architecture-without-retraining-it-from-scratch",
@@ -2944,7 +3103,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Training new hybrid model architectures costs huge GPU time and money.",
-   "v": 3
+   "v": 3,
+   "slug": "amazon-can-we-change-an-ai-models-architecture-without-retraining"
   },
   {
    "url": "https://machinelearning.apple.com/research/distributed-gpu-cloud",
@@ -2962,7 +3122,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams needed more GPU power for inference but buying new hardware was expensive and slow.",
-   "v": 3
+   "v": 3,
+   "slug": "apple-minions-a-dynamic-and-distributed-virtual-gpu-cloud-built-on"
   },
   {
    "url": "https://engineering.hellofresh.com/from-coding-assistants-to-agentic-teams-at-hellofresh-5450c9e652f4",
@@ -2981,7 +3142,8 @@
    "result": "Pull‑request throughput nearly doubled",
    "issue": "Engineers struggled with slow pull‑request throughput and high manual coding effort.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hellofresh-from-coding-assistants-to-agentic-teams-at-hellofresh"
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/10/structure-automating-data-ingestion-with-a-rag-flywheel.html",
@@ -2999,7 +3161,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Operations staff had to manually match many different supplier data schemas to a single internal format.",
-   "v": 3
+   "v": 3,
+   "slug": "zalando-automating-data-ingestion-with-a-rag-flywheel"
   },
   {
    "url": "https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626",
@@ -3017,7 +3180,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Pinterest needed to identify users' long‑term goals, not just the last pin they clicked.",
-   "v": 3
+   "v": 3,
+   "slug": "pinterest-from-activity-to-intent-generating-user-journeys-with-llms"
   },
   {
    "url": "https://developer.nvidia.com/blog/building-reliable-data-analytics-agents-lessons-from-the-kdd-cup",
@@ -3036,7 +3200,8 @@
    "result": "Second place in KDD Cup 2026",
    "issue": "Answering questions across many data sources caused agents to fail due to complex tool usage.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-building-reliable-data-analytics-agents-lessons-from-the-kdd"
   },
   {
    "url": "https://www.microsoft.com/en-us/research/blog/agent-lightning-v1-0-a-3500-line-lightweight-agentic-rl-framework-for-training-agents-with-real-harnesses",
@@ -3054,7 +3219,8 @@
    "result": "",
    "issue": "Training agents with real-world tools was costly and mismatched the deployed version.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "microsoft-agent-lightning-v1-0-a-3-500-line-lightweight-agentic-rl"
   },
   {
    "url": "https://medium.com/thumbtack-engineering/workbench-building-an-ai-content-generation-and-quality-assurance-system-at-scale-7a381b47c640",
@@ -3073,7 +3239,8 @@
    "result": "97% drafts passed QA, $13K cost",
    "issue": "Creating and reviewing hundreds of thousands of landing page descriptions manually was impossible.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "thumbtack-workbench-building-an-ai-content-generation-and-quality"
   },
   {
    "url": "https://developer.nvidia.com/blog/validate-ai-factory-changes-with-digital-twins-and-ai-agents",
@@ -3092,7 +3259,8 @@
    "result": "",
    "issue": "Teams had to wait for physical hardware before they could test infrastructure and software changes, slowing deployments.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-validate-ai-factory-changes-with-digital-twins-and-ai-agents"
   },
   {
    "url": "https://research.google/blog/earth-ais-planetary-geospatial-foundation-models-for-global-public-health",
@@ -3109,7 +3277,8 @@
    "sorted_by": "groq",
    "result": "Embeddings matched or improved conventional inputs across many disease tasks",
    "issue": "Public health data is slow, sparse, and split by borders, slowing response to outbreaks.",
-   "v": 3
+   "v": 3,
+   "slug": "google-unlocking-earth-ais-planetary-geospatial-foundation-models"
   },
   {
    "url": "https://medium.com/pinterest-engineering/metrics-board-building-an-agent-ready-metrics-layer-2c8fefe68756",
@@ -3128,7 +3297,8 @@
    "result": "",
    "issue": "Teams struggled with chaotic, unreliable metrics across a massive data lake, making decisions and experiments hard.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "pinterest-metrics-board-building-an-agent-ready-metrics-layer"
   },
   {
    "url": "https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development",
@@ -3147,7 +3317,8 @@
    "result": "",
    "issue": "Developers needed Git operations that could handle thousands of AI agents working on code simultaneously.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "github-building-git-infrastructure-for-agent-scale-development"
   },
   {
    "url": "https://engineering.salesforce.com/ai-agents-need-memory-building-persistent-memory-for-agentforce",
@@ -3165,7 +3336,8 @@
    "result": "",
    "issue": "AI agents forgot previous interactions, making complex tasks hard to automate.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "salesforce-ai-agents-need-memory-building-persistent-memory-for"
   },
   {
    "url": "https://engineering.grab.com/powering-ai-led-research-through-simulation",
@@ -3182,7 +3354,8 @@
    "sorted_by": "groq",
    "result": "City‑day simulation completed in tens of minutes",
    "issue": "Testing new dispatch strategies took weeks, limiting how many ideas could be tried.",
-   "v": 3
+   "v": 3,
+   "slug": "grab-powering-ai-led-research-through-simulation"
   },
   {
    "url": "https://huggingface.co/blog/microsoft/thinkingbox",
@@ -3200,7 +3373,8 @@
    "sorted_by": "groq",
    "result": "79,853 of 121,680 trials failed checks",
    "issue": "AI agents seemed to work but often left incorrect data in the database.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-the-agent-said-it-was-done-the-database-disagreed"
   },
   {
    "url": "https://huggingface.co/blog/ServiceNow-AI/autosynthdata",
@@ -3219,7 +3393,8 @@
    "result": "",
    "issue": "Enterprises lacked enough training data for agents to handle their specific tools, rules, and data.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-autosynthdata-generating-training-data-for-enterprise-agents"
   },
   {
    "url": "https://booking.ai/introducing-agenthub-booking-com-platform-for-modular-travel-ai-agents-68bc521a0f50",
@@ -3238,7 +3413,8 @@
    "result": "",
    "issue": "Travel teams needed a fast way to create AI agents that could handle many booking tasks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "booking-com-introducing-agenthub-booking-com-platform-for-modular-travel"
   },
   {
    "url": "https://www.amazon.science/blog/graph-centric-agentic-intelligence",
@@ -3257,7 +3433,8 @@
    "result": "95% fault localization accuracy in under 30 seconds",
    "issue": "Ops teams needed AI agents that could understand complex network graphs to pinpoint failures fast.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "amazon-graph-centric-agentic-intelligence"
   },
   {
    "url": "https://stripe.com/blog/where-pricing-is-headed",
@@ -3273,7 +3450,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers needed a way to track AI usage costs without exposing token details in invoices",
-   "v": 3
+   "v": 3,
+   "slug": "stripe-why-i-tried-to-kill-token-billing-and-why-we-kept-it"
   },
   {
    "url": "https://shopify.engineering/shopgym",
@@ -3292,7 +3470,8 @@
    "result": "",
    "issue": "Developers struggled to train and test shopping agents because real stores constantly change and bots get blocked.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-shopgym-realistic-reproducible-sandboxes-for-shopping-agents"
   },
   {
    "url": "https://developer.nvidia.com/blog/fine-tuning-nvidia-nemotron-for-saudi-arabic-dialects-with-a-path-to-other-languages",
@@ -3308,7 +3487,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "ASR struggled with Saudi Arabic dialects and local recording conditions.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-fine-tuning-nvidia-nemotron-for-saudi-arabic-dialects-with-a"
   },
   {
    "url": "https://developer.nvidia.com/blog/build-local-ai-apps-with-c-and-nvidia-tensorrt-rtx-samples",
@@ -3324,7 +3504,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers needed a way to run AI models locally on Windows, Linux, and ARM without custom runtimes.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-build-local-ai-apps-with-c-and-nvidia-tensorrt-rtx-samples"
   },
   {
    "url": "https://developer.nvidia.com/blog/build-applications-on-nvidia-bluefield-faster-with-nvidia-doca-agent-skills",
@@ -3343,7 +3524,8 @@
    "result": "",
    "issue": "General AI agents lacked specific knowledge of NVIDIA DOCA, causing guesswork and slow development cycles.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-build-applications-on-nvidia-bluefield-faster-with-nvidia"
   },
   {
    "url": "https://engineering.salesforce.com/how-deterministic-controls-turn-ai-output-into-reliable-prompt-templates",
@@ -3360,7 +3542,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Open-ended AI instructions produced inconsistent and unsafe outputs, making prompt templates unreliable.",
-   "v": 3
+   "v": 3,
+   "slug": "salesforce-how-deterministic-controls-turn-ai-output-into-reliable"
   },
   {
    "url": "https://developer.nvidia.com/blog/tracing-agent-harness-behavior-with-nvidia-nemo-relay",
@@ -3379,7 +3562,8 @@
    "result": "",
    "issue": "Developers can’t see why an agent takes extra steps or fails, making it hard to improve efficiency.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-tracing-agent-harness-behavior-with-nvidia-nemo-relay"
   },
   {
    "url": "https://developer.nvidia.com/blog/deploying-an-hstu-generative-recommender-with-nvidia-dynamo-triton",
@@ -3397,7 +3581,8 @@
    "sorted_by": "groq",
    "result": "Up to 5.93× lower latency",
    "issue": "Personalized recommendations were slow because models had to process long user histories and large item tables.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-deploying-an-hstu-generative-recommender-with-nvidia-dynamo"
   },
   {
    "url": "https://www.honeycomb.io/blog/introducing-ai-ecosystem",
@@ -3414,7 +3599,8 @@
    "result": "",
    "issue": "Teams running many agents found it hard to see what was wrong across the whole fleet.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-introducing-ai-ecosystem-zoom-out-to-see-your-whole-ai-agent"
   },
   {
    "url": "https://www.honeycomb.io/blog/agents-need-context-canvas-connectors-ai-agent-visibility",
@@ -3432,7 +3618,8 @@
    "result": "",
    "issue": "Teams run many AI agents and need more context to understand production incidents quickly.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-agents-need-context-introducing-canvas-connectors-fleet-wide"
   },
   {
    "url": "https://research.google/blog/how-diffusion-controller-unifies-and-simplifies-ai-image-generation",
@@ -3450,7 +3637,8 @@
    "sorted_by": "groq",
    "result": "90% win rate over baseline",
    "issue": "Generated images often missed specific details or looked distorted when trying to follow exact prompts.",
-   "v": 3
+   "v": 3,
+   "slug": "google-how-diffusion-controller-unifies-and-simplifies-ai-image"
   },
   {
    "url": "https://medium.com/airbnb-engineering/personalization-without-user-identity-8e7891a1d486",
@@ -3467,7 +3655,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "New visitors arrive without login or history, so the system cannot personalize search and recommendations.",
-   "v": 3
+   "v": 3,
+   "slug": "airbnb-personalization-without-user-identity"
   },
   {
    "url": "https://huggingface.co/blog/MultiverseComputingCAI/getting-the-source-right-not-just-the-fact-source",
@@ -3484,7 +3673,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents mix information from many tools, making it hard to tell if answers cite the correct source.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-getting-the-source-right-not-just-the-fact-source-aware"
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/09/the-making-of-the-yelp-assistant-ui.html",
@@ -3501,7 +3691,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Mobile app updates are slow, so UI changes take days to reach users.",
-   "v": 3
+   "v": 3,
+   "slug": "yelp-the-making-of-the-yelp-assistant-ui"
   },
   {
    "url": "https://dropbox.tech/machine-learning/evolving-calendar-assistant-reclaim-to-be-ai-native",
@@ -3520,7 +3711,8 @@
    "result": "",
    "issue": "Users wanted to schedule tasks by describing goals in their own words, not by picking preset settings.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "dropbox-evolving-our-calendar-assistant-reclaim-to-be-ai-native"
   },
   {
    "url": "https://developer.nvidia.com/blog/lower-the-cost-of-building-and-running-visual-ai-agents-with-nvidia-vss-blueprint-3-3",
@@ -3538,7 +3730,8 @@
    "sorted_by": "groq",
    "result": "80% fewer tokens, 46% more concurrent streams",
    "issue": "Building visual AI agents was expensive and hard to maintain, especially for video ingestion, processing, and search.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-lower-the-cost-of-building-and-running-visual-ai-agents-with"
   },
   {
    "url": "https://developer.nvidia.com/blog/ai-native-by-design-lessons-learned-from-building-nvidia-tensorrt-model-connect",
@@ -3557,7 +3750,8 @@
    "result": "",
    "issue": "Model developers struggled to get high‑performance TensorRT inference without deep expertise.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-ai-native-by-design-lessons-learned-from-building-nvidia"
   },
   {
    "url": "https://huggingface.co/blog/Hcompany/holo4",
@@ -3576,7 +3770,8 @@
    "result": "Much lower cost per task",
    "issue": "Businesses needed a single AI agent that could work with screens, code, and APIs without switching models.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-holo4-powering-generalist-computer-use-agents"
   },
   {
    "url": "https://engineering.salesforce.com/engineering-multi-agent-ai-teams-that-build-and-test-themselves",
@@ -3595,7 +3790,8 @@
    "result": "",
    "issue": "Creating and testing AI agents manually was slow and error‑prone.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "salesforce-engineering-multi-agent-ai-teams-that-build-and-test"
   },
   {
    "url": "https://developer.nvidia.com/blog/nvidia-open-agent-safety-platform-a-reference-for-continuous-in-silicon-agent-monitoring",
@@ -3613,7 +3809,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents were breaking out of their test environments and accessing unauthorized systems.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-open-agent-safety-platform-a-reference-for-continuous"
   },
   {
    "url": "https://developer.nvidia.com/blog/add-runtime-controls-to-ai-agents-with-nvidia-openshell",
@@ -3631,7 +3828,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Agents could access too many resources, risking data leaks or unintended actions.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-add-runtime-controls-to-ai-agents-with-nvidia-openshell"
   },
   {
    "url": "https://www.amazon.science/blog/a-kernel-centric-path-to-real-time-video-generation-on-trainium",
@@ -3649,7 +3847,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users needed real‑time video generation with low latency and high efficiency at scale.",
-   "v": 3
+   "v": 3,
+   "slug": "amazon-a-kernel-centric-path-to-real-time-video-generation-on"
   },
   {
    "url": "https://research.google/blog/coherent-long-form-video-generation",
@@ -3667,7 +3866,8 @@
    "result": "Substantial gains in multi‑shot narrative consistency and character persistence",
    "issue": "Long‑form video creation kept losing character look and story flow because separate tools failed and drifted.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-automating-coherent-long-form-video-generation"
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/09/agentic-platform-open-sourcing-agentic-identity-broker.html",
@@ -3686,7 +3886,8 @@
    "result": "",
    "issue": "Agents needed to act for users across services without storing users' access tokens.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "zalando-agentic-platform-open-sourcing-the-agentic-identity-broker"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-swe-serve-exposes-the-gap-between-local-tests-and-live-serving",
@@ -3702,7 +3903,8 @@
    "sorted_by": "groq",
    "result": "45.9% pass with full verifier",
    "issue": "Coding agent patches passed unit tests but often failed when deployed to live model serving.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-how-swe-serve-exposes-the-gap-between-local-tests-and-live"
   },
   {
    "url": "https://weaviate.io/blog/engram-memory-practical-guide",
@@ -3721,7 +3923,8 @@
    "result": "",
    "issue": "Agents struggled to keep track of past conversations, leading to repetitive or irrelevant responses.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "weaviate-agent-memory-with-engram-a-practical-guide"
   },
   {
    "url": "https://medium.com/agoda-engineering/how-agoda-is-evolving-engineering-support-with-ai-agents-c907a54e236e",
@@ -3740,7 +3943,8 @@
    "issue": "Engineers struggled to collect needed details and route support requests when issues were described in free text.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "agoda-how-agoda-is-evolving-engineering-support-with-ai-agents"
   },
   {
    "url": "https://engineering.salesforce.com/ai-agent-observability-making-silent-production-failures-visible-and-actionable",
@@ -3757,7 +3961,8 @@
    "result": "",
    "issue": "Silent failures of AI agents in production went unnoticed, hurting reliability.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "salesforce-ai-agent-observability-making-silent-production-failures"
   },
   {
    "url": "https://developer.nvidia.com/blog/enabling-private-high-performance-production-ai-inference-with-nvidia-confidential-computing",
@@ -3775,7 +3980,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers need to run LLM inference on sensitive data without exposing it.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-enabling-private-high-performance-production-ai-inference"
   },
   {
    "url": "https://developer.nvidia.com/blog/accelerating-a-ros-2-node-with-an-ai-agent-and-nvidia-isaac-ros",
@@ -3794,7 +4000,8 @@
    "result": "",
    "issue": "Robotics nodes were copying data through CPU memory, slowing down GPU‑accelerated perception.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-accelerating-a-ros-2-node-with-an-ai-agent-and-nvidia-isaac"
   },
   {
    "url": "https://shopify.engineering/helix",
@@ -3812,7 +4019,8 @@
    "sorted_by": "groq",
    "result": "App rebuilt and published in 12 weeks",
    "issue": "Migrating a large React Native app to native Swift/Kotlin was slow and error‑prone.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-helix-the-internal-tool-powering-our-shopify-app-s-native"
   },
   {
    "url": "https://developer.nvidia.com/blog/simplifying-model-serving-across-multiple-gpus-with-nvidia-tensorrt-multi-device-integration-in-nvidia-dynamo-triton",
@@ -3829,7 +4037,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Single GPU cannot handle large generative AI models fast enough, causing high latency for users.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-simplifying-model-serving-across-multiple-gpus-with-nvidia"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-to-evaluate-ai-agents-from-tool-calls-to-task-completion",
@@ -3847,7 +4056,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams couldn't tell if AI agents actually finished multi‑step tasks, not just gave plausible answers.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-how-to-evaluate-ai-agents-from-tool-calls-to-task-completion"
   },
   {
    "url": "https://medium.com/doctolib/from-hackathon-to-production-in-3-weeks-inside-doctolibs-ai-factory-df6b7886acef",
@@ -3866,7 +4076,8 @@
    "result": "",
    "issue": "Clinicians had to rewrite AI‑generated notes because the style didn’t match their personal preferences.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "doctolib-from-hackathon-to-production-in-3-weeks-inside-doctolibs-ai"
   },
   {
    "url": "https://developer.nvidia.com/blog/benchmarking-llm-inference-at-scale-with-aiperf",
@@ -3884,7 +4095,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams couldn’t trust their own speed tests because tools became bottlenecks and were hard to reconfigure.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-benchmarking-llm-inference-at-scale-with-aiperf"
   },
   {
    "url": "https://research.google/blog/the-future-of-practice-enabling-teachers-to-create-learning-interactives-with-generative-ui",
@@ -3903,7 +4115,8 @@
    "result": "",
    "issue": "Teachers struggled to create engaging, interactive simulations for every lesson.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-the-future-of-practice-enabling-teachers-to-create-learning"
   },
   {
    "url": "https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14",
@@ -3921,7 +4134,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Ads needed more accurate click predictions without slowing down serving millions of candidates.",
-   "v": 3
+   "v": 3,
+   "slug": "pinterest-beyond-two-towers-launching-the-3-tower-engagement-co-train"
   },
   {
    "url": "https://medium.com/airbnb-engineering/the-guest-journey-updated-in-real-time-extending-airbnbs-sequence-recommender-with-chronon-8f1582578553",
@@ -3939,7 +4153,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Guest activity from the same day wasn’t reflected in rankings, making recommendations stale.",
-   "v": 3
+   "v": 3,
+   "slug": "airbnb-the-guest-journey-updated-in-real-time-extending-airbnbs"
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/09/ml-ranking-with-nrtsearch.html",
@@ -3956,7 +4171,8 @@
    "sorted_by": "groq",
    "issue": "Search relevance suffered because traditional term‑based scoring couldn't use rich signals or learn feature weights.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "yelp-ml-based-ranking-using-nrtsearch"
   },
   {
    "url": "https://engineering.salesforce.com/how-data-360-builds-trusted-context-the-enduring-layer-for-enterprise-ai",
@@ -3974,7 +4190,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Need relevant, authorized enterprise data for each AI request without sending all data in the prompt.",
-   "v": 3
+   "v": 3,
+   "slug": "salesforce-how-data-360-builds-trusted-context-the-enduring-layer-for"
   },
   {
    "url": "https://developer.nvidia.com/blog/translating-cuda-tile-operations-from-python-to-rust-using-agentic-ai",
@@ -3993,7 +4210,8 @@
    "result": "99.5% of Python performance achieved",
    "issue": "Developers needed Rust versions of many existing CUDA Tile kernels without rewriting them manually.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-translating-cuda-tile-operations-from-python-to-rust-using"
   },
   {
    "url": "https://developer.nvidia.com/blog/tensorrt-edge-llm-completes-the-mlperf-edge-agentic-benchmark-6-4x-faster-on-jetson-agx-thor",
@@ -4012,7 +4230,8 @@
    "result": "6.4× faster than reference",
    "issue": "Edge devices struggled to run multi‑step AI agents quickly within tight power and memory limits.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-tensorrt-edge-llm-completes-the-mlperf-edge-agentic"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-to-use-ai-agents-to-prepare-3d-scenes-for-simulation",
@@ -4031,7 +4250,8 @@
    "result": "",
    "issue": "Robotics engineers spend lots of time making 3D scenes simulation‑ready, slowing development.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-how-to-use-ai-agents-to-prepare-3d-scenes-for-simulation"
   },
   {
    "url": "https://building.nu.com/designing-claude-for-ears-not-eyes-an-accessibility-skill-for-blind-and-low-vision-users",
@@ -4048,7 +4268,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Blind and low‑vision users struggled to use the chatbot because it was designed for visual interaction",
-   "v": 3
+   "v": 3,
+   "slug": "nubank-designing-claude-for-ears-not-eyes-an-accessibility-skill"
   },
   {
    "url": "https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit",
@@ -4067,7 +4288,8 @@
    "result": "",
    "issue": "Different product surfaces needed personalized recommendations but each optimized for different user actions.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "reddit-snoorec-a-shared-retrieval-foundation-for-reddit"
   },
   {
    "url": "https://medium.com/doctolib/keeping-ai-on-track-lessons-from-doctolibs-oxygen-design-system-9be5f9f041e8",
@@ -4086,7 +4308,8 @@
    "result": "",
    "issue": "Designers needed to create UI code quickly without engineers, but couldn’t trust AI‑generated code to follow the design system.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "doctolib-keeping-ai-on-track-lessons-from-doctolibs-oxygen-design"
   },
   {
    "url": "https://medium.com/doctolib/from-middleman-to-copilot-doctolibs-data-mesh-shift-seen-from-ingestion-c050b17fcd4f",
@@ -4103,7 +4326,8 @@
    "result": "",
    "issue": "Centralized data ingestion caused delays and unclear ownership for many product teams.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "doctolib-from-middleman-to-copilot-doctolibs-data-mesh-shift-seen"
   },
   {
    "url": "https://medium.com/airbnb-engineering/beyond-the-model-engineering-ai-infra-with-scientific-judgement-371316d43261",
@@ -4120,7 +4344,8 @@
    "issue": "Need a repeatable, auditable way to analyze large support chats for AI product safety.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "airbnb-beyond-the-model-engineering-ai-infra-with-scientific"
   },
   {
    "url": "https://huggingface.co/blog/ibm-research/altk-evolve-consistency",
@@ -4139,7 +4364,8 @@
    "result": "",
    "issue": "Agents sometimes give different answers to the same request, causing unreliable behavior.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-your-agent-aced-the-task-will-it-do-it-again"
   },
   {
    "url": "https://engineering.cred.club/scaling-ml-model-inference-through-architectural-separation-32b2629f554a",
@@ -4158,7 +4384,8 @@
    "result": "",
    "issue": "Inference latency and operational cost grew as more models and services were added.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "cred-scaling-ml-model-inference-through-architectural-separation"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-nvidia-groq-3-lpx-deterministic-execution-drives-power-efficient-high-interactivity-inference-on-nvidia-vera-rubin",
@@ -4176,7 +4403,8 @@
    "sorted_by": "groq",
    "result": "40% more GPUs, 35% higher token throughput",
    "issue": "AI factories have limited power budgets, restricting how many GPUs can be used.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-how-nvidia-groq-3-lpx-deterministic-execution-drives-power"
   },
   {
    "url": "https://www.honeycomb.io/blog/how-canvas-powers-ai-agent-development-feedback-loop",
@@ -4194,7 +4422,8 @@
    "result": "",
    "issue": "Users struggled to track agent performance and fix issues across scattered tools.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-how-canvas-powers-the-ai-agent-development-feedback-loop"
   },
   {
    "url": "https://sourcegraph.com/blog/introducing-agentic-batch-changes",
@@ -4213,7 +4442,8 @@
    "result": "",
    "issue": "Large codebases need coordinated updates across thousands of repositories, which is hard and error‑prone.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "sourcegraph-introducing-agentic-batch-changes-the-frontier-agent-for"
   },
   {
    "url": "https://engineering.salesforce.com/how-ai-agents-get-trusted-customer-context-with-data-360-data-graphs",
@@ -4231,7 +4461,8 @@
    "result": "",
    "issue": "Agents lacked reliable, up‑to‑date customer information, leading to generic or incorrect responses.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "salesforce-how-ai-agents-get-trusted-customer-context-with-data-360"
   },
   {
    "url": "https://medium.com/pinterest-engineering/evolving-pinterests-embedding-retrieval-platform-aede4e831e01",
@@ -4249,7 +4480,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Embedding search was becoming too expensive and slow as the number of items grew into tens of billions.",
-   "v": 3
+   "v": 3,
+   "slug": "pinterest-evolving-pinterests-embedding-retrieval-platform"
   },
   {
    "url": "https://engineering.salesforce.com/engineering-real-time-mobile-personalization-across-ios-android-react-native-and-flutter",
@@ -4266,7 +4498,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Need consistent real‑time personalization on iOS, Android, React Native and Flutter without breaking layouts or user identities.",
-   "v": 3
+   "v": 3,
+   "slug": "salesforce-engineering-real-time-mobile-personalization-across-ios"
   },
   {
    "url": "https://shopify.engineering/shop-app-migration",
@@ -4285,7 +4518,8 @@
    "result": "Native app released in 12 weeks",
    "issue": "Maintaining a shared React Native codebase limited performance and added complexity for iOS and Android.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-migrating-shop-app-from-react-native-to-native"
   },
   {
    "url": "https://shopify.engineering/back-to-native",
@@ -4303,7 +4537,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Building mobile apps in both Swift and Kotlin doubled development effort and cost.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-native-is-now-the-future-of-mobile-at-shopify"
   },
   {
    "url": "https://medium.com/thumbtack-engineering/three-principles-for-building-a-vector-platform-at-thumbtack-bca5a33dca16",
@@ -4322,7 +4557,8 @@
    "result": "",
    "issue": "Teams found it hard to create and use vector search without extra infrastructure and high cost.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "thumbtack-three-principles-for-building-a-vector-platform-at-thumbtack"
   },
   {
    "url": "https://medium.com/pinterest-engineering/building-pinterests-vlm-serving-stack-on-nvidia-dynamo-0dce6e93d0f3",
@@ -4340,7 +4576,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Serving vision‑language models needed low‑latency, cost‑effective inference for Pinterest’s multimodal features.",
-   "v": 3
+   "v": 3,
+   "slug": "pinterest-building-pinterests-vlm-serving-stack-on-nvidia-dynamo"
   },
   {
    "url": "https://developer.nvidia.com/blog/how-full-stack-nim-optimizations-deliver-2-5x-more-users-on-nemotron-3-ultra",
@@ -4358,7 +4595,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams needed to serve many simultaneous users on limited GPUs without slowing down responses.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-how-full-stack-nim-optimizations-deliver-2-5x-more-users-on"
   },
   {
    "url": "https://developer.nvidia.com/blog/high-throughput-structure-prediction-with-bionemo-inference-runtime",
@@ -4376,7 +4614,8 @@
    "sorted_by": "groq",
    "result": "Processed 31 M candidates, releasing 1.81 M high‑confidence structures",
    "issue": "Scientists needed to predict millions of protein structures fast enough for proteome‑scale projects.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-high-throughput-structure-prediction-with-bionemo-inference"
   },
   {
    "url": "https://weaviate.io/blog/hfresh",
@@ -4394,7 +4633,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users needed fast vector search but had limited memory and large datasets.",
-   "v": 3
+   "v": 3,
+   "slug": "weaviate-hfresh-memory-efficient-vector-search"
   },
   {
    "url": "https://engineering.salesforce.com/enterprise-ai-accuracy-building-a-more-trustworthy-rag-application",
@@ -4412,7 +4652,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "The RAG system often returned incorrect or garbled information, confusing users and risking trust.",
-   "v": 3
+   "v": 3,
+   "slug": "salesforce-enterprise-ai-accuracy-building-a-more-trustworthy-rag"
   },
   {
    "url": "https://engineering.monday.com/building-a-robust-harness-for-agent-in-production-feed-agent-case-study",
@@ -4431,7 +4672,8 @@
    "result": "",
    "issue": "AI agents kept giving wrong or costly results, hurting user experience and budget.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "monday-com-building-a-robust-harness-for-agent-in-production-feed-agent"
   },
   {
    "url": "https://developer.nvidia.com/blog/when-to-use-encode-prefill-decode-disaggregation-to-accelerate-multimodal-model-serving",
@@ -4448,7 +4690,8 @@
    "sorted_by": "groq",
    "result": "Up to 5x faster TTFT and 7x faster end‑to‑end response",
    "issue": "Vision encoding blocks multimodal requests, causing slow first-token latency and hurting throughput.",
-   "v": 3
+   "v": 3,
+   "slug": "nvidia-when-to-use-encode-prefill-decode-disaggregation-to"
   },
   {
    "url": "https://builders.ramp.com/post/how-we-built-oca-our-ai-on-call-assistant",
@@ -4467,7 +4710,8 @@
    "result": "",
    "issue": "Incidents took too long to diagnose and resolve, slowing down engineering teams.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "ramp-how-we-built-oca-our-ai-on-call-assistant"
   },
   {
    "url": "https://www.honeycomb.io/blog/wide-events-vs-three-pillars-ai-observability-costs",
@@ -4483,7 +4727,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents were driving up observability costs because metrics, logs, and traces were stored separately.",
-   "v": 3
+   "v": 3,
+   "slug": "honeycomb-wide-events-vs-three-pillars-ai-observability-costs"
   },
   {
    "url": "https://developer.nvidia.com/blog/frontier-reasoning-reaches-the-edge-how-to-deploy-and-optimize-models-on-nvidia-jetson",
@@ -4502,7 +4747,8 @@
    "result": "",
    "issue": "Developers could not run multi‑step reasoning agents on edge devices, forcing costly cloud calls and risking data exposure.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-frontier-reasoning-reaches-the-edge-how-to-deploy-and"
   },
   {
    "url": "https://developer.nvidia.com/blog/building-a-memory-driven-agent-with-nvidia-nemoclaw",
@@ -4521,7 +4767,8 @@
    "result": "",
    "issue": "The AI needed ongoing context about people, projects, and decisions to act like a useful chief of staff.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "nvidia-building-a-memory-driven-agent-with-nvidia-nemoclaw"
   },
   {
    "url": "https://tech.instacart.com/agentic-machine-learning-modeling-at-instacart-fb3ecd295ee7",
@@ -4538,7 +4785,8 @@
    "issue": "ML engineers spent too much time manually choosing models and settings.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "instacart-agentic-machine-learning-modeling-at-instacart"
   },
   {
    "url": "https://huggingface.co/blog/grpo-with-trl-ifstruct",
@@ -4555,7 +4803,8 @@
    "sorted_by": "groq",
    "result": "Accuracy improved to 29.7%",
    "issue": "Models often output data in the wrong format, preventing integration into downstream systems.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-fine-tuning-a-350m-model-for-better-structured-outputs-in"
   },
   {
    "url": "https://huggingface.co/blog/funes",
@@ -4574,7 +4823,8 @@
    "result": "",
    "issue": "Coding agents forget previous work when a session ends, forcing users to re‑enter context.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-give-your-coding-agents-a-memory-you-own"
   },
   {
    "url": "https://fly.io/blog/sprites-mcp",
@@ -4593,7 +4843,8 @@
    "result": "",
    "issue": "Developers needed cheap, safe, on‑demand computers for running AI agents without overhead.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "fly-io-your-agent-speaks-mcp-give-it-a-computer"
   },
   {
    "url": "https://engineering.atspotify.com/2026/9/portal-by-spotify-cut-my-claude-code-token-usage-by-90",
@@ -4609,7 +4860,8 @@
    "sorted_by": "groq",
    "issue": "Users spent too many tokens on simple file reading tasks.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "spotify-portal-by-spotify-cut-my-claude-code-token-usage-by-90"
   },
   {
    "url": "https://shopify.engineering/river-vulnerability-remediation",
@@ -4628,7 +4880,8 @@
    "result": "Backlog down 70%, merge rate rose to 80%",
    "issue": "Security teams struggled with slow, manual patch handling and a growing backlog of vulnerability fixes.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-how-river-takes-security-work-from-a-fix-to-merge"
   },
   {
    "url": "https://github.blog/ai-and-ml/github-copilot/how-we-make-ai-coding-more-cost-efficient-without-sacrificing-task-quality",
@@ -4646,7 +4899,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI coding features were expensive to run, raising costs for users and limiting scalability.",
-   "v": 3
+   "v": 3,
+   "slug": "github-how-we-make-ai-coding-more-cost-efficient-without"
   },
   {
    "url": "https://weaviate.io/blog/charts-tables-pdfs",
@@ -4664,7 +4918,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users couldn’t find data hidden in charts or tables inside PDFs, so answers were wrong or missing.",
-   "v": 3
+   "v": 3,
+   "slug": "weaviate-how-to-extract-meaning-from-charts-and-tables-in-pdfs"
   },
   {
    "url": "https://research.google/blog/mapping-global-methane-emissions-from-space-with-deep-learning",
@@ -4680,7 +4935,8 @@
    "sorted_by": "groq",
    "issue": "Users needed a fast way to spot methane leaks from space.",
    "result": "High recall of 84%",
-   "v": 3
+   "v": 3,
+   "slug": "google-mapping-global-methane-emissions-from-space-with-deep"
   },
   {
    "url": "https://engineering.monday.com/i-built-a-monitor-nearly-200-engineers-turned-it-into-a-colleague",
@@ -4699,7 +4955,8 @@
    "result": "",
    "issue": "Engineers spent too much time on repetitive on‑call incident triage.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "monday-com-i-built-a-monitor-nearly-200-engineers-turned-it-into-a"
   },
   {
    "url": "https://www.honeycomb.io/blog/fin-cto-building-great-engineering-organizations-ai-era",
@@ -4717,7 +4974,8 @@
    "result": "Human reviewers eliminated",
    "issue": "Engineers spent too much time manually reviewing pull requests, slowing development.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-fin-s-cto-on-building-great-engineering-organizations-in-the"
   },
   {
    "url": "https://research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting",
@@ -4733,7 +4991,8 @@
    "sorted_by": "groq",
    "issue": "Users needed accurate forecasts that consider many related signals, but existing models only used single series data.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "google-timesfm-3-a-zero-shot-foundation-model-for-multivariate"
   },
   {
    "url": "https://sourcegraph.com/blog/a-smarter-way-to-run-code-migrations-with-less-llm-context",
@@ -4752,7 +5011,8 @@
    "result": "",
    "issue": "Scanning thousands of files for migrations flooded LLM context, driving up token costs.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "sourcegraph-a-smarter-way-to-run-code-migrations-with-less-llm-context"
   },
   {
    "url": "https://research.google/blog/planetary-prediction-engine-automating-global-models-via-earth-ai",
@@ -4771,7 +5031,8 @@
    "issue": "Manual data curation for geospatial models took weeks, slowing critical responses.",
    "result": "Reduced model build time from weeks to minutes",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-planetary-prediction-engine-automating-global-models-via"
   },
   {
    "url": "https://www.amazon.science/blog/when-llm-judges-agree-should-we-believe-them",
@@ -4788,7 +5049,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users needed a reliable way to judge if retrieved text was useful, but many LLM judges made similar mistakes.",
-   "v": 3
+   "v": 3,
+   "slug": "amazon-when-llm-judges-agree-should-we-believe-them"
   },
   {
    "url": "https://research.google/blog/glucofm-foundation-model-for-continuous-glucose-monitoring",
@@ -4805,7 +5067,8 @@
    "sorted_by": "groq",
    "issue": "Users lacked accurate ways to predict diabetes risk from cheap glucose data.",
    "result": "PR‑AUC improved 5.8 percentage points over the best prior model",
-   "v": 3
+   "v": 3,
+   "slug": "google-glucofm-foundation-model-for-continuous-glucose-monitoring"
   },
   {
    "url": "https://replit.com/blog/intelligent-model-routing",
@@ -4823,7 +5086,8 @@
    "sorted_by": "groq",
    "result": "65% lower cost",
    "issue": "Users had to choose which AI model to use, adding extra decisions and cost uncertainty.",
-   "v": 3
+   "v": 3,
+   "slug": "replit-intelligent-model-routing-on-replit"
   },
   {
    "url": "https://huggingface.co/blog/train-multi-vector-encoder",
@@ -4841,7 +5105,8 @@
    "sorted_by": "groq",
    "result": "Outperformed all general‑purpose retrievers",
    "issue": "Search quality on medical texts was poor with generic models.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-training-and-finetuning-multi-vector-embedding-models-with"
   },
   {
    "url": "https://medium.com/expedia-group-tech/the-context-tax-of-agentic-development-0bb9de03237c",
@@ -4859,7 +5124,8 @@
    "issue": "Engineers and agents struggled because environment URLs hid the real backend, causing wrong work and delays.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "expedia-the-context-tax-of-agentic-development"
   },
   {
    "url": "https://huggingface.co/blog/ibm-granite/granite-4-2",
@@ -4877,7 +5143,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "We needed a language model that could reason step‑by‑step and use external tools when needed.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-granite-4-2-llms-how-they-re-built"
   },
   {
    "url": "https://www.amazon.science/blog/sop-bench-a-new-benchmark-for-evaluating-ai-agents-on-real-business-procedures",
@@ -4894,7 +5161,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "AI agents struggled to follow real business procedures that need background knowledge and judgment.",
-   "v": 3
+   "v": 3,
+   "slug": "amazon-sop-bench-a-new-benchmark-for-evaluating-ai-agents-on-real"
   },
   {
    "url": "https://tech.olx.com/does-it-matter-how-you-feed-an-agent-its-context-ee1519586520",
@@ -4913,7 +5181,8 @@
    "issue": "Engineers ran out of token budget while using a coding agent for a complex backend task.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "olx-does-it-matter-how-you-feed-an-agent-its-context"
   },
   {
    "url": "https://research.google/blog/an-ai-tool-for-prioritizing-candidate-biomarkers-from-wearable-sensor-data",
@@ -4932,7 +5201,8 @@
    "issue": "Users needed trustworthy biomarkers from wearable data, but existing tools missed statistical rigor.",
    "result": "Recovered known signals, found new convergent biomarkers, and boosted prediction accuracy",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-an-ai-tool-for-prioritizing-candidate-biomarkers-from"
   },
   {
    "url": "https://huggingface.co/blog/pwc-search",
@@ -4950,7 +5220,8 @@
    "sorted_by": "groq",
    "result": "Search covers over 110,000 papers",
    "issue": "Researchers struggled to find relevant papers quickly, especially with vague queries, typos, or missing keywords.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-how-hugging-face-inference-endpoints-jobs-and-buckets-power"
   },
   {
    "url": "https://engineering.grab.com/jarvis-pro-route-firsr-answer-later",
@@ -4969,7 +5240,8 @@
    "result": "Safe routing 99.4% accuracy, quality score rose to 91.0",
    "issue": "Account managers needed reliable AI advice for merchant meetings without giving wrong recommendations.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "grab-building-jarvis-pro-route-first-answer-later"
   },
   {
    "url": "https://huggingface.co/blog/LiquidAI/lfm25-dspark",
@@ -4987,7 +5259,8 @@
    "sorted_by": "groq",
    "result": "Up to 3.2x faster inference",
    "issue": "LLM inference was slow, causing high latency for users.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-up-to-3-2x-faster-inference-with-lfm2-5-dspark"
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/08/building-menu-vision-real-time-dish-recognition.html",
@@ -5005,7 +5278,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Diners had to type each menu item to see photos, slowing decisions at the table.",
-   "v": 3
+   "v": 3,
+   "slug": "yelp-building-menu-vision-real-time-dish-recognition"
   },
   {
    "url": "https://shopify.engineering/gisting",
@@ -5023,7 +5297,8 @@
    "sorted_by": "groq",
    "result": "Latency dropped from 6.8s to 4.2s, throughput rose from 20.2 to 23.4 QPS",
    "issue": "Long prompts made the agent slow and expensive to run.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-gisting-compressing-llm-agent-context-to-throughput-and-cost"
   },
   {
    "url": "https://medium.engineering/how-we-think-about-text-classification-in-the-llm-era-89a185f79b68",
@@ -5042,7 +5317,8 @@
    "result": "",
    "issue": "The old NSFW classifier missed inappropriate content, showing unsuitable stories to users.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "medium-how-we-think-about-text-classification-in-the-llm-era"
   },
   {
    "url": "https://medium.com/airbnb-engineering/how-we-knew-covid-was-over-and-what-our-models-had-to-unlearn-c606b9bdb0ab",
@@ -5058,7 +5334,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Forecasts kept missing actual demand after COVID, causing biased planning decisions.",
-   "v": 3
+   "v": 3,
+   "slug": "airbnb-how-we-knew-covid-was-over-and-what-our-models-had-to"
   },
   {
    "url": "https://blog.allegro.tech/2026/08/automating-search-relevance-llm-as-a-judge.html",
@@ -5076,7 +5353,8 @@
    "result": "",
    "issue": "Search relevance was hard to measure accurately and cost‑effectively across many product categories.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "allegro-automating-search-relevance-assessment-at-scale-with-llm-as"
   },
   {
    "url": "https://huggingface.co/blog/multi-vector-encoder",
@@ -5094,7 +5372,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Single-vector embeddings lose detail, hurting search accuracy for specific queries.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-multi-vector-late-interaction-embedding-models-with-sentence"
   },
   {
    "url": "https://huggingface.co/blog/ibm-research/altk-evolve-hmm",
@@ -5113,7 +5392,8 @@
    "result": "+16.1pp task completion, +5% token cost",
    "issue": "Agents needed to know how much past‑task memory to keep without hurting cost or performance.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-how-much-memory-does-your-agent-actually-need"
   },
   {
    "url": "https://craft.faire.com/faires-agentic-development-culture-7aeb03f04bcb",
@@ -5131,7 +5411,8 @@
    "issue": "Engineers wanted to use advanced AI tools early without waiting for vendors.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "faire-faires-agentic-development-culture"
   },
   {
    "url": "https://replit.com/blog/black-box-pen-tests",
@@ -5147,7 +5428,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Builders needed fast, affordable security checks for their apps before launch.",
-   "v": 3
+   "v": 3,
+   "slug": "replit-black-box-pen-tests-on-replit"
   },
   {
    "url": "https://builders.ramp.com/post/integrations-that-write-themselves",
@@ -5166,7 +5448,8 @@
    "result": "",
    "issue": "Customers kept asking for new integrations, slowing down onboarding and product adoption.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "ramp-integrations-that-write-themselves"
   },
   {
    "url": "https://weaviate.io/blog/building-foundry-where-workflows-break",
@@ -5184,7 +5467,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Retrieval stopped working as projects grew and metadata quality slipped.",
-   "v": 3
+   "v": 3,
+   "slug": "weaviate-building-foundry-part-2-where-creative-workflows-break"
   },
   {
    "url": "https://huggingface.co/blog/amazon/strands-lerobot-streaming-data-loop",
@@ -5203,7 +5487,8 @@
    "result": "",
    "issue": "Repeated data uploads and downloads slowed training and increased costs as robot recordings grew.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-record-train-and-deploy-from-one-place-with-strands-agents"
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/08/agentic-engineering-at-zalando-a-snapshot.html",
@@ -5222,7 +5507,8 @@
    "result": "Supports 2k MAU with six small pods",
    "issue": "Engineers struggled to experiment with LLMs across providers and track usage costs.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "zalando-agentic-engineering-at-zalando-a-snapshot"
   },
   {
    "url": "https://huggingface.co/blog/allenai/olmoearth-embeddings",
@@ -5240,7 +5526,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users needed a simple, cheap way to turn satellite images into numeric vectors for search and analysis.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-introducing-olmoearth-embeddings-custom-embedding-exports"
   },
   {
    "url": "https://engineering.grab.com/grab-bench-evaluating-ai",
@@ -5258,7 +5545,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Engineers couldn't trust AI outputs because subtle, plausible errors slipped past checks.",
-   "v": 3
+   "v": 3,
+   "slug": "grab-bench-evaluating-ai-on-grab-shaped-production-work"
   },
   {
    "url": "https://weaviate.io/blog/search-mode-effort",
@@ -5276,7 +5564,8 @@
    "sorted_by": "groq",
    "result": "nDCG@10 57.5 vs 13.0",
    "issue": "Complex queries needed better search accuracy, but users also cared about speed and cost.",
-   "v": 3
+   "v": 3,
+   "slug": "weaviate-scaling-test-time-compute-in-search-mode"
   },
   {
    "url": "https://medium.com/expedia-group-tech/how-keras-3-helped-modernise-expedia-groups-lodging-ranking-stack-7fec96f052fd",
@@ -5294,7 +5583,8 @@
    "sorted_by": "groq",
    "issue": "Slow training and high latency slowed new ranking model releases.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "expedia-how-keras-3-helped-modernise-expedia-groups-lodging-ranking"
   },
   {
    "url": "https://booking.ai/how-we-selected-the-next-vector-database-at-booking-com-1e738a5e3bb0",
@@ -5311,7 +5601,8 @@
    "sorted_by": "groq",
    "issue": "Teams needed a fast, scalable vector store that could handle many use cases and high traffic.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "booking-com-how-we-selected-the-next-vector-database-at-booking-com"
   },
   {
    "url": "https://huggingface.co/blog/nvidia/magpie-tts-multilingual-voice-agents",
@@ -5329,7 +5620,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Voice responses were too slow, making the whole conversation feel laggy for users.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-build-low-latency-multilingual-voice-agents-open-weights"
   },
   {
    "url": "https://shopify.engineering/sidekicks-continual-learning-loop",
@@ -5347,7 +5639,8 @@
    "sorted_by": "groq",
    "result": "Cost reduced 96%",
    "issue": "Frontier models were slow, costly, and couldn’t learn from real‑world mistakes.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-sidekick-s-continual-learning-loop"
   },
   {
    "url": "https://engineering.razorpay.com/ci-doesnt-need-on-demand-moving-our-build-pipelines-to-spot-instances-6fff1cd92ba8",
@@ -5363,7 +5656,8 @@
    "sorted_by": "groq",
    "result": "99.2% job success, 70–90% cost reduction",
    "issue": "CI pipelines were too expensive or unreliable when using cheap spot instances.",
-   "v": 3
+   "v": 3,
+   "slug": "razorpay-ci-doesnt-need-on-demand-moving-our-build-pipelines-to-spot"
   },
   {
    "url": "https://craft.faire.com/spec-review-ship-how-ai-is-changing-the-way-faire-builds-software-79f475b60908",
@@ -5382,7 +5676,8 @@
    "result": "600 pull requests merged",
    "issue": "Engineers struggled to turn vague ideas into working code quickly across many tech stacks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "faire-spec-review-ship-how-ai-is-changing-the-way-faire-builds"
   },
   {
    "url": "https://engineering.gusto.com/eval-driven-design-systems-part-2-5b989d492281",
@@ -5401,7 +5696,8 @@
    "result": "",
    "issue": "Hard to know if AI‑generated UI code matches design rules and user intent.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "gusto-eval-driven-design-systems-part-2"
   },
   {
    "url": "https://blog.flipkart.tech/llms-for-relevance-automating-high-quality-product-relevance-labeling-in-flipkart-search-ddd5ca50b584",
@@ -5417,7 +5713,8 @@
    "sorted_by": "groq",
    "issue": "Manual relevance labeling was slow, expensive, and noisy.",
    "result": "Matches or beats human annotators at a fraction of the cost",
-   "v": 3
+   "v": 3,
+   "slug": "flipkart-llms-for-relevance-automating-high-quality-product-relevance"
   },
   {
    "url": "https://engineering.grab.com/how-ai-is-transforming-analytics",
@@ -5436,7 +5733,8 @@
    "result": "",
    "issue": "Analysts spent weeks preparing data and generating insights, slowing business decisions.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "grab-how-ai-is-transforming-analytics-at-grab"
   },
   {
    "url": "https://www.etsy.com/codeascraft/kafka-app-thereas-a-skill-for-that",
@@ -5453,7 +5751,8 @@
    "sorted_by": "groq",
    "issue": "Shoppers needed up‑to‑date recommendations, but data lagged behind their browsing activity.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "etsy-kafka-app-theres-a-skill-for-that"
   },
   {
    "url": "https://medium.com/expedia-group-tech/focus-on-the-feature-not-the-fixture-genai-powered-graphql-mocks-ea069670af02",
@@ -5471,7 +5770,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers spent hours creating and updating hand‑written GraphQL mock data that quickly became outdated.",
-   "v": 3
+   "v": 3,
+   "slug": "expedia-focus-on-the-feature-not-the-fixture-genai-powered-graphql"
   },
   {
    "url": "https://weaviate.io/blog/building-foundry-ai-creative-workflows",
@@ -5489,7 +5789,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Creative teams struggle to locate old assets, wasting time recreating work.",
-   "v": 3
+   "v": 3,
+   "slug": "weaviate-building-foundry-ai-isnt-replacing-creativity-its-removing"
   },
   {
    "url": "https://engineering.grab.com/crowdsourced-taxonomy-verification",
@@ -5507,7 +5808,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Wrong relationships in the knowledge graph gave users irrelevant search results and low trust.",
-   "v": 3
+   "v": 3,
+   "slug": "grab-crowdsourced-taxonomy-verification-a-feedback-driven"
   },
   {
    "url": "https://shopify.engineering/building-an-agentic-harness-that-outlasts-the-model",
@@ -5525,7 +5827,8 @@
    "result": "",
    "issue": "Security teams needed a fast, reliable way to find and fix code vulnerabilities.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-building-an-agentic-harness-that-outlasts-the-model"
   },
   {
    "url": "https://craft.faire.com/virtual-packer-how-faire-estimates-shipping-costs-at-checkout-a17509fac73d",
@@ -5543,7 +5846,8 @@
    "sorted_by": "groq",
    "result": "35% fewer estimation errors",
    "issue": "Boutique owners need accurate shipping cost at checkout, but actual rates are unknown until after shipping.",
-   "v": 3
+   "v": 3,
+   "slug": "faire-virtual-packer-how-faire-estimates-shipping-costs-at"
   },
   {
    "url": "https://medium.com/airbnb-engineering/eval-driven-development-lessons-from-evaluating-genai-at-scale-e817e5ae5788",
@@ -5561,7 +5865,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Airbnb needed a reliable way to test and improve unpredictable LLM features.",
-   "v": 3
+   "v": 3,
+   "slug": "airbnb-eval-driven-development-lessons-from-evaluating-genai-at"
   },
   {
    "url": "https://huggingface.co/blog/nvidia/cosmos-h-dreams",
@@ -5579,7 +5884,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Testing surgical robot actions is slow, costly, and risky on real hardware.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-nvidia-cosmos-h-dreams-bringing-real-time-generative"
   },
   {
    "url": "https://engineering.gusto.com/eval-driven-design-systems-8f781dc2dacb",
@@ -5597,7 +5903,8 @@
    "result": "",
    "issue": "AI coding assistants generate UI code that doesn’t follow the company’s private design system.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "gusto-eval-driven-design-systems-part-1"
   },
   {
    "url": "https://blog.allegro.tech/2026/07/how-ai-agents-halved-effort-migrating-gradle-modules-koin-to-hilt.html",
@@ -5616,7 +5923,8 @@
    "result": "Effort halved, migration time reduced",
    "issue": "Migrating 500 Gradle modules from Koin to Hilt was slow and risked app performance.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "allegro-how-ai-agents-halved-the-effort-of-migrating-500-gradle"
   },
   {
    "url": "https://huggingface.co/blog/nunchaku-diffusers",
@@ -5634,7 +5942,8 @@
    "sorted_by": "groq",
    "result": "12 GB memory, 1.7 s per 1024×1024 image",
    "issue": "Large diffusion models need too much GPU memory and run slowly on consumer GPUs.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-bringing-nunchaku-4-bit-diffusion-inference-to-diffusers"
   },
   {
    "url": "https://craft.faire.com/autoscience-how-we-built-agent-driven-ml-exploration-at-faire-f3183e7deb29",
@@ -5653,7 +5962,8 @@
    "result": "Production model accuracy improved double‑digit percentages",
    "issue": "ML teams could only try a tiny fraction of possible model changes, limiting performance.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "faire-autoscience-how-we-built-agent-driven-ml-exploration-at"
   },
   {
    "url": "https://medium.com/airbnb-engineering/personalizing-airbnb-search-by-learning-from-the-guest-journey-bcefd1915624",
@@ -5671,7 +5981,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Hand‑crafted search features couldn't keep up with growing data and limited personalization.",
-   "v": 3
+   "v": 3,
+   "slug": "airbnb-personalizing-airbnb-search-by-learning-from-the-guest"
   },
   {
    "url": "https://www.honeycomb.io/blog/what-comes-after-observability",
@@ -5690,7 +6001,8 @@
    "result": "2 million agent‑initiated queries per month",
    "issue": "Ops teams spent too much time manually investigating latency spikes and updating dashboards.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-what-comes-after-observability"
   },
   {
    "url": "https://dropbox.tech/infrastructure/how-our-universal-content-processing-platform-riviera-evolved-for-ai-and-beyond",
@@ -5704,7 +6016,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users needed fast, consistent previews and AI-ready content across many file types.",
-   "v": 3
+   "v": 3,
+   "slug": "dropbox-how-our-universal-content-processing-platform-riviera"
   },
   {
    "url": "https://builders.ramp.com/post/thompson-sampling-model-routing",
@@ -5723,7 +6036,8 @@
    "result": "",
    "issue": "Requests were slow and expensive because the system chose suboptimal LLM models.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "ramp-online-learning-for-cost-efficient-llm-routing"
   },
   {
    "url": "https://replit.com/blog/self-driving-company",
@@ -5742,7 +6056,8 @@
    "result": "",
    "issue": "Teams needed help with repetitive tasks like incident triage and code reviews, slowing progress.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-the-self-driving-company"
   },
   {
    "url": "https://engineering.razorpay.com/running-hermes-at-razorpay-a-network-isolated-self-improving-second-brain-for-every-employee-f91d56bea3f1",
@@ -5761,7 +6076,8 @@
    "result": "15,000 sessions in eight weeks",
    "issue": "Employees needed personal AI assistants that could run continuously without risking security or data leaks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "razorpay-running-hermes-at-razorpay-a-network-isolated-self-improving"
   },
   {
    "url": "https://tech.scribd.com/blog/2026/fast-llm-human-in-the-loop-classification.html",
@@ -5780,7 +6096,8 @@
    "result": "",
    "issue": "Need a scalable, cheap way to generate and validate labels as LLM models and prompts evolve.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "scribd-stop-building-models-start-building-systems"
   },
   {
    "url": "https://booking.ai/from-traditional-ml-to-ai-agents-how-booking-com-scales-ai-observability-with-arize-ai-625ac3996c7e",
@@ -5799,7 +6116,8 @@
    "result": "",
    "issue": "Complex AI workflows were hard to debug because many steps happen behind the scenes.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "booking-com-from-traditional-ml-to-ai-agents-how-booking-com-scales-ai"
   },
   {
    "url": "https://www.amazon.science/blog/capturing-token-ids-during-agentic-interactions-for-better-reinforcement-learning",
@@ -5818,7 +6136,8 @@
    "result": "",
    "issue": "RL training needed exact token‑level logs of agent actions, but transcripts lost crucial details.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "amazon-capturing-token-ids-during-agentic-interactions-for-better"
   },
   {
    "url": "https://www.honeycomb.io/blog/multi-agent-collaboration-on-shared-canvas",
@@ -5837,7 +6156,8 @@
    "result": "",
    "issue": "Engineers needed to debug production issues together without their AI assistants interfering with each other's investigations.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-multi-agent-collaboration-on-a-shared-canvas"
   },
   {
    "url": "https://blog.vespa.ai/your-agent-wants-to-search-like-a-2010-quant",
@@ -5856,7 +6176,8 @@
    "result": "",
    "issue": "AI agents often fail because they can’t find the right information quickly.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "vespa-your-agent-wants-to-search-like-a-2010-quant"
   },
   {
    "url": "https://blog.hotstar.com/getting-past-the-first-frame-building-video-models-that-remember-31f03d0710e1",
@@ -5872,7 +6193,8 @@
    "sorted_by": "groq",
    "issue": "Users wanted realistic talking‑head videos of IP characters without reshooting, but existing models drifted in identity and lip sync.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "jiohotstar-consistent-generative-video-building-video-models-that"
   },
   {
    "url": "https://www.honeycomb.io/blog/what-customers-are-doing-ai-honeycomb",
@@ -5890,7 +6212,8 @@
    "result": "",
    "issue": "Engineers struggled to keep up with faster code releases and needed quicker incident triage.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-what-customers-are-doing-with-ai-and-honeycomb"
   },
   {
    "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data",
@@ -5907,7 +6230,8 @@
    "sorted_by": "groq",
    "issue": "Data scientists spent too much time training and tuning models for each new table.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "google-introducing-tabfm-a-zero-shot-foundation-model-for-tabular"
   },
   {
    "url": "https://medium.com/expedia-group-tech/using-llms-to-analyze-spark-sql-plans-a-practical-approach-to-debugging-long-running-jobs-35eace7eeec4",
@@ -5925,7 +6249,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Engineers spent hours debugging slow Spark jobs without clear clues, leading to over‑provisioned clusters and higher costs.",
-   "v": 3
+   "v": 3,
+   "slug": "expedia-using-llms-to-analyze-spark-sql-plans-a-practical-approach"
   },
   {
    "url": "https://huggingface.co/blog/eee-community-evals",
@@ -5941,7 +6266,8 @@
    "sorted_by": "groq",
    "result": "229,000 evaluation results stored",
    "issue": "Evaluation scores were scattered in many formats, making them hard to compare and trust.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-featuring-every-eval-ever-results-on-hugging-face-model"
   },
   {
    "url": "https://builders.ramp.com/post/agentic-risk-operations",
@@ -5960,7 +6286,8 @@
    "result": "",
    "issue": "Risk teams spent too much time manually handling alerts and investigations.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "ramp-agentic-risk-operations"
   },
   {
    "url": "https://www.honeycomb.io/blog/instrumenting-ai-agents-agent-timeline-opentelemetry-guide",
@@ -5979,7 +6306,8 @@
    "result": "",
    "issue": "Debugging multi-step AI agents in production was hard because failures showed only vague model errors.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "honeycomb-instrumenting-ai-agents-for-the-agent-timeline-a-practical"
   },
   {
    "url": "https://research.google/blog/accelerating-gemini-nano-models-on-pixel-with-frozen-multi-token-prediction",
@@ -5997,7 +6325,8 @@
    "sorted_by": "groq",
    "issue": "On-device LLMs were too slow and drained battery, hurting user experience.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "google-accelerating-gemini-nano-models-on-pixel-with-frozen-multi"
   },
   {
    "url": "https://product.hubspot.com/blog/building-the-ai-retrieval-infrastructure-behind-20-billion-vectors-at-hubspot",
@@ -6016,7 +6345,8 @@
    "result": "",
    "issue": "Teams needed fast, accurate semantic search across billions of items for agents and other tools.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hubspot-building-the-ai-retrieval-infrastructure-behind-20-billion"
   },
   {
    "url": "https://dropbox.tech/machine-learning/how-we-turned-ai-evaluations-into-better-responses-in-dash-chat",
@@ -6034,7 +6364,8 @@
    "sorted_by": "groq",
    "result": "Fewer incomplete answers and reduced token usage",
    "issue": "Chat agent often gave incomplete answers and used many tokens, hurting user experience.",
-   "v": 3
+   "v": 3,
+   "slug": "dropbox-how-we-used-dspy-to-turn-ai-evaluations-into-better"
   },
   {
    "url": "https://huggingface.co/blog/nvidia/accelerating-fine-tuning-nvidia-nemo-automodel",
@@ -6052,7 +6383,8 @@
    "sorted_by": "groq",
    "result": "3.4‑3.7× higher throughput, 29‑32% less GPU memory",
    "issue": "Fine‑tuning large MoE models was slow and consumed too much GPU memory.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-accelerating-transformers-fine-tuning-with-nvidia-nemo"
   },
   {
    "url": "https://engineering.monday.com/morphex-monthly-the-month-i-learned-to-see-myself",
@@ -6069,7 +6401,8 @@
    "result": "",
    "issue": "The team couldn't measure how much the AI agent cost or how often it failed.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "monday-com-morphex-monthly-the-month-i-learned-to-see-myself"
   },
   {
    "url": "https://huggingface.co/blog/peft-beyond-lora",
@@ -6086,7 +6419,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers need to fine‑tune large models on their data without needing huge memory.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-beyond-lora-can-you-beat-the-most-popular-fine-tuning"
   },
   {
    "url": "https://huggingface.co/blog/is-it-agentic-enough",
@@ -6105,7 +6439,8 @@
    "result": "Agents used 1.3–1.8× up to 6× fewer tokens",
    "issue": "Agents waste time and tokens when APIs and docs are unclear or hard to use.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-is-it-agentic-enough-benchmarking-open-models-on-your-own"
   },
   {
    "url": "https://huggingface.co/blog/ServiceNow/mosaicleaks",
@@ -6122,7 +6457,8 @@
    "sorted_by": "groq",
    "result": "Leakage reduced from 34% to 9.9%",
    "issue": "Research agents unintentionally reveal private data through their web queries.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-mosaicleaks-can-your-research-agent-keep-a-secret"
   },
   {
    "url": "https://shopify.engineering/catalog-clustering",
@@ -6141,7 +6477,8 @@
    "result": "",
    "issue": "Shopify needed to match the same real‑world products across billions of merchant listings that use different structures.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-clustering-billions-of-products-for-agentic-commerce-with"
   },
   {
    "url": "https://huggingface.co/blog/amazon/strands-lerobot-hub-to-hardware",
@@ -6160,7 +6497,8 @@
    "result": "",
    "issue": "Robotics teams had to juggle five separate tools to record demos, train, test, and deploy policies, slowing development.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-from-the-hugging-face-hub-to-robot-hardware-with-strands"
   },
   {
    "url": "https://huggingface.co/blog/agentic-resource-discovery-launch",
@@ -6179,7 +6517,8 @@
    "result": "",
    "issue": "Agents had to pre‑install every tool, making it hard to scale to thousands of capabilities.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-agentic-resource-discovery-let-agents-search"
   },
   {
    "url": "https://research.google/blog/from-pixels-to-planning-earth-ai-for-nature-restoration",
@@ -6195,7 +6534,8 @@
    "sorted_by": "groq",
    "issue": "Users couldn’t see small hedgerows and woodlands on satellite maps, making it hard to plan nature restoration.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "google-from-pixels-to-planning-earth-ai-for-nature-restoration"
   },
   {
    "url": "https://shopify.engineering/sidekick-curation",
@@ -6213,7 +6553,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "The assistant never learned to refuse impossible merchant requests, leading to bad answers.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-teaching-sidekick-to-say-no-automated-data-curation-with-llm"
   },
   {
    "url": "https://dropbox.tech/security/dropbox-mcp-dash-design-code-security",
@@ -6231,7 +6572,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Security requirements often get lost between design review and code review, making it hard to verify compliance.",
-   "v": 3
+   "v": 3,
+   "slug": "dropbox-how-dropbox-uses-mcp-and-dash-to-close-the-design-to-code"
   },
   {
    "url": "https://www.intercom.com/blog/giving-your-ai-agent-system-access",
@@ -6248,7 +6590,8 @@
    "result": "",
    "issue": "Customers asked for changes that the AI could explain but not execute, so support reps still had to intervene.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "intercom-how-to-make-the-case-for-giving-your-ai-agent-system-access"
   },
   {
    "url": "https://slack.engineering/agentic-testing-where-agents-fit-in-the-e2e-testing-stack",
@@ -6266,7 +6609,8 @@
    "issue": "Testing teams struggled to cover all user paths in end‑to‑end tests.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "slack-agentic-testing-where-agents-fit-in-the-e2e-testing-stack"
   },
   {
    "url": "https://www.intercom.com/blog/extending-fin-as-the-most-open-agent-platform",
@@ -6283,7 +6627,8 @@
    "result": "",
    "issue": "Customers wanted an AI agent that could work inside their existing helpdesk without switching vendors.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "intercom-extending-fin-as-the-most-open-agent-platform"
   },
   {
    "url": "https://huggingface.co/blog/mishig/spaces-agents-md",
@@ -6302,7 +6647,8 @@
    "result": "Live static Space showcasing the gallery",
    "issue": "Creating a 3D Paris gallery required manually using image and 3D tools, which was complex and time‑consuming.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-how-an-agent-built-a-3d-paris-gallery-by-chaining-two"
   },
   {
    "url": "https://engineering.razorpay.com/from-750-hours-to-2-hours-ai-powered-security-triage-at-razorpay-c8baeac3a1d3",
@@ -6320,7 +6666,8 @@
    "sorted_by": "groq",
    "result": "Triage time cut from 750 hours to 2 hours",
    "issue": "Developers were flooded with thousands of security alerts, most of which were false positives.",
-   "v": 3
+   "v": 3,
+   "slug": "razorpay-from-750-hours-to-2-hours-ai-powered-security-triage-at"
   },
   {
    "url": "https://medium.com/tripadvisor/taming-a-million-tickets-how-a-small-team-used-ai-to-modernize-an-overgrown-jira-instance-at-scale-ba92a34a77c2",
@@ -6337,7 +6684,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Over a million Jira tickets were scattered across 245 projects with inconsistent fields and workflows.",
-   "v": 3
+   "v": 3,
+   "slug": "tripadvisor-taming-a-million-tickets-how-a-small-team-used-ai-to"
   },
   {
    "url": "https://huggingface.co/blog/openenv-agentic-rl",
@@ -6356,7 +6704,8 @@
    "result": "",
    "issue": "Developers lacked a common, open tool to connect agents with diverse environments for training.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-the-open-source-community-is-backing-openenv-for-agentic-rl"
   },
   {
    "url": "https://fly.io/blog/building-agents-that-dont-break-themselves",
@@ -6375,7 +6724,8 @@
    "result": "",
    "issue": "Agents often delete or damage files when running commands, causing failures.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "fly-io-building-agents-that-don-t-break-themselves"
   },
   {
    "url": "https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag",
@@ -6394,7 +6744,8 @@
    "issue": "Enterprise queries often need multiple data sources, causing incomplete answers from single-step retrieval.",
    "result": "Accuracy improved up to 34%",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-unlocking-dependable-responses-with-gemini-enterprise-agent"
   },
   {
    "url": "https://replit.com/blog/create-a-custom-shopify-store",
@@ -6412,7 +6763,8 @@
    "result": "Store created in about ten minutes",
    "issue": "Users wanted a fast, conversational way to create and launch a Shopify storefront without manual setup.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-build-a-custom-shopify-storefront-on-replit"
   },
   {
    "url": "https://huggingface.co/blog/hf-cli-for-agents",
@@ -6430,7 +6782,8 @@
    "result": "Up to 6× fewer tokens used",
    "issue": "Coding agents had to use many tokens when calling the Hub via CLI or SDK, slowing down multi‑step tasks.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-designing-the-hf-cli-as-an-agent-optimized-way-to-work-with"
   },
   {
    "url": "https://replit.com/blog/seo-agent",
@@ -6449,7 +6802,8 @@
    "result": "",
    "issue": "Published apps were hard to find on web and AI search, limiting traffic.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-meet-replit-seo-agent"
   },
   {
    "url": "https://medium.com/expedia-group-tech/the-most-expensive-milliseconds-are-unmeasured-d6cfaaca881d",
@@ -6465,7 +6819,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users felt login screens were slow, eroding trust without obvious errors.",
-   "v": 3
+   "v": 3,
+   "slug": "expedia-the-most-expensive-milliseconds-are-unmeasured"
   },
   {
    "url": "https://engineering.indeedblog.com/blog/2026/06/distilling-long-tail-user-behavior-into-scalable-embeddings-for-job-search",
@@ -6484,7 +6839,8 @@
    "result": "",
    "issue": "Online models needed fast, cheap scoring for millions of users, but could not use large sequence models.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "indeed-distilling-long-tail-user-behavior-into-scalable-embeddings"
   },
   {
    "url": "https://tech.instacart.com/semantic-ids-product-understanding-at-scale-5283e0288f5a",
@@ -6502,7 +6858,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Products in different categories never appear together, hurting new and niche items.",
-   "v": 3
+   "v": 3,
+   "slug": "instacart-semantic-ids-product-understanding-at-scale"
   },
   {
    "url": "https://tech.instacart.com/from-scoring-to-spelling-rebuilding-ads-retrieval-at-instacart-cf36b4e8d1bb",
@@ -6519,7 +6876,8 @@
    "sorted_by": "groq",
    "issue": "Users saw irrelevant ads, hurting shopping flow.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "instacart-from-scoring-to-spelling-rebuilding-ads-retrieval-at"
   },
   {
    "url": "https://huggingface.co/blog/Hcompany/holo31",
@@ -6538,7 +6896,8 @@
    "result": "25% faster, accuracy up to 79.3% on mobile",
    "issue": "Users needed computer-use agents that work on desktop, mobile, and any agent framework, not just cloud.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-holo3-1-fast-local-computer-use-agents"
   },
   {
    "url": "https://replit.com/blog/microsoft-fabric",
@@ -6556,7 +6915,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Teams spent weeks setting up authentication, APIs, and governance to turn data into production apps.",
-   "v": 3
+   "v": 3,
+   "slug": "replit-unlocking-a-new-way-to-build-enterprise-data-apps-with"
   },
   {
    "url": "https://huggingface.co/blog/ibm-research/agent-logic-and-scalable-ai-adoption",
@@ -6575,7 +6935,8 @@
    "result": "",
    "issue": "Enterprises struggled to use AI agents in complex, long‑running workflows with many APIs and strict policies.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hugging-face-beyond-llms-why-scalable-enterprise-ai-adoption-depends-on"
   },
   {
    "url": "https://slack.engineering/slack-ai-the-path-to-multi-cloud",
@@ -6592,7 +6953,8 @@
    "sorted_by": "groq",
    "issue": "Users needed faster, more reliable LLM responses without high infrastructure risk.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "slack-ai-the-path-to-multi-cloud"
   },
   {
    "url": "https://shopify.engineering/under-the-river",
@@ -6611,7 +6973,8 @@
    "result": "One in eight merged PRs co‑authored by River",
    "issue": "Engineers faced slow feedback and difficult code changes across many repositories.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-under-the-river"
   },
   {
    "url": "https://www.intercom.com/blog/guide-customer-service-knowledge-management-ai",
@@ -6628,7 +6991,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Customers and support teams struggled to find accurate answers quickly.",
-   "v": 3
+   "v": 3,
+   "slug": "intercom-the-ultimate-guide-to-knowledge-management-for-your-service"
   },
   {
    "url": "https://engineeringblog.yelp.com/2026/05/beyond-menu-tree.html",
@@ -6646,7 +7010,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "The old chatbot could only answer fixed menu options or exact phrase matches, leaving many user questions unanswered.",
-   "v": 3
+   "v": 3,
+   "slug": "yelp-beyond-the-menu-tree-how-yelp-built-a-smarter-customer"
   },
   {
    "url": "https://www.etsy.com/codeascraft/shaping-product-understanding-with-contrastive-reinforcement-learning",
@@ -6664,7 +7029,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Buyers often have vague tastes, making it hard to recommend the right handmade items.",
-   "v": 3
+   "v": 3,
+   "slug": "etsy-shaping-product-understanding-with-contrastive-reinforcement"
   },
   {
    "url": "https://www.intercom.com/blog/speed-to-lead-is-a-solved-problem",
@@ -6683,7 +7049,8 @@
    "result": "",
    "issue": "Customers waited hours for a sales rep, losing interest before a reply.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "intercom-speed-to-lead-is-a-solved-problem"
   },
   {
    "url": "https://booking.ai/the-causality-gap-measuring-the-true-impact-of-voluntary-adoption-in-digital-marketplaces-ea68b5a35120",
@@ -6700,7 +7067,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users and partners chose whether to use new features, making it hard to see the real effect of those features.",
-   "v": 3
+   "v": 3,
+   "slug": "booking-com-the-causality-gap-measuring-the-true-impact-of-voluntary"
   },
   {
    "url": "https://www.intercom.com/blog/operator-a-look-under-the-hood",
@@ -6719,7 +7087,8 @@
    "result": "",
    "issue": "Scaling AI support across thousands of workspaces required reliable, precise actions.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "intercom-operator-a-look-under-the-hood"
   },
   {
    "url": "https://tech.instacart.com/scaling-personalized-marketing-for-multi-tenant-commerce-platforms-816f0c6a046b",
@@ -6735,7 +7104,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Retailers needed personalized marketing that kept their brand separate from Instacart’s system",
-   "v": 3
+   "v": 3,
+   "slug": "instacart-scaling-personalized-marketing-for-multi-tenant-commerce"
   },
   {
    "url": "https://huggingface.co/blog/ibm-granite/granite-embedding-multilingual-r2",
@@ -6753,7 +7123,8 @@
    "sorted_by": "groq",
    "result": "MTEB scores 60.3 and 65.2",
    "issue": "Developers needed fast, high‑quality multilingual search without large models.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-granite-embedding-multilingual-r2-open-apache-2-0"
   },
   {
    "url": "https://huggingface.co/blog/amazon/foundation-model-building-blocks",
@@ -6771,7 +7142,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Running huge foundation models on AWS was expensive and hard to manage.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-building-blocks-for-foundation-model-training-and-inference"
   },
   {
    "url": "https://blog.hotstar.com/beyond-imitation-teaching-ai-to-speak-like-a-character-in-hindi-476bd33f049a",
@@ -6789,7 +7161,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Hindi speech synthesis lacked emotion and consistency at production scale.",
-   "v": 3
+   "v": 3,
+   "slug": "jiohotstar-beyond-imitation-teaching-ai-to-speak-like-a-character-in"
   },
   {
    "url": "https://tech.instacart.com/empowering-carrot-ads-with-domain-adaptive-learning-870730e6add5",
@@ -6805,7 +7178,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "New partners had almost no ad interaction data, making it hard to predict which ads users would click.",
-   "v": 3
+   "v": 3,
+   "slug": "instacart-empowering-carrot-ads-with-domain-adaptive-learning"
   },
   {
    "url": "https://medium.com/thumbtack-engineering/evaluating-ai-at-scale-how-thumbtack-approaches-reliability-safety-and-quality-in-genai-f75d0211ac54",
@@ -6824,7 +7198,8 @@
    "result": "",
    "issue": "Generative AI could give inaccurate, biased, or unsafe answers, hurting trust in the marketplace.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "thumbtack-evaluating-ai-at-scale-how-thumbtack-approaches-reliability"
   },
   {
    "url": "https://huggingface.co/blog/ibm-granite/granite-4-1",
@@ -6842,7 +7217,8 @@
    "sorted_by": "groq",
    "result": "8B model matches 32B predecessor",
    "issue": "Need small, high‑quality language models that can handle very long texts.",
-   "v": 3
+   "v": 3,
+   "slug": "hugging-face-granite-4-1-llms-how-theyre-built"
   },
   {
    "url": "https://medium.com/myntra-engineering/from-products-to-inspiration-inside-the-engine-of-occasion-based-outfit-visualiser-a09f494d43ae",
@@ -6859,7 +7235,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Shoppers struggled to picture how clothes fit into real-life occasions, causing many to leave the site.",
-   "v": 3
+   "v": 3,
+   "slug": "myntra-from-products-to-inspiration-inside-the-engine-of-occasion"
   },
   {
    "url": "https://klaviyo.tech/rethinking-software-design-principles-for-agent-product-development-0b1842c7338e",
@@ -6878,7 +7255,8 @@
    "result": "",
    "issue": "Marketers need to create large volumes of multi‑channel campaign content that manual teams cannot produce fast enough.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "klaviyo-rethinking-software-design-principles-for-agent-product"
   },
   {
    "url": "https://shopify.engineering/fine-tuning-agent-shopify-flow",
@@ -6897,7 +7275,8 @@
    "result": "2.2x faster, 68% cheaper",
    "issue": "Store owners find it hard to create Flow automations without coding.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-flow-generation-through-natural-language-an-agentic-modeling"
   },
   {
    "url": "https://research.google/blog/its-all-about-the-angle-your-photos-re-composed",
@@ -6913,7 +7292,8 @@
    "sorted_by": "groq",
    "issue": "Users want to change a photo’s angle after taking it, but normal tools can’t add missing parts.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "google-it-s-all-about-the-angle-your-photos-re-composed"
   },
   {
    "url": "https://replit.com/blog/auto-protect",
@@ -6929,7 +7309,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Developers had to manually track security flaws and update libraries, which was slow and error‑prone.",
-   "v": 3
+   "v": 3,
+   "slug": "replit-introducing-replit-auto-protect"
   },
   {
    "url": "https://research.google/blog/reasoningbank-enabling-agents-to-learn-from-experience",
@@ -6948,7 +7329,8 @@
    "issue": "Agents kept repeating the same mistakes because they had no way to learn from past failures.",
    "result": "Higher success rates and fewer steps on web browsing and coding tasks",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-reasoningbank-enabling-agents-to-learn-from-experience"
   },
   {
    "url": "https://replit.com/blog/meet-replit-security-agent",
@@ -6966,7 +7348,8 @@
    "sorted_by": "groq",
    "result": "Full audit completed in under an hour",
    "issue": "Pre‑launch security reviews took weeks, slowing releases.",
-   "v": 3
+   "v": 3,
+   "slug": "replit-meet-replit-security-agent"
   },
   {
    "url": "https://replit.com/blog/defense-in-depth-how-replit-secures-every-layer-of-the-vibe-coding-stack",
@@ -6983,7 +7366,8 @@
    "sorted_by": "groq",
    "result": "Only one kernel exploit seen, no user impact",
    "issue": "Developers worry AI‑generated code might be unsafe or break other users' environments.",
-   "v": 3
+   "v": 3,
+   "slug": "replit-defense-in-depth-how-replit-secures-every-layer-of-the-vibe"
   },
   {
    "url": "https://medium.com/thumbtack-engineering/leveraging-ai-to-build-a-faster-ios-ci-system-75ec9ceee892",
@@ -7002,7 +7386,8 @@
    "result": "CI time reduced ~50%",
    "issue": "iOS pull requests waited 30‑40 minutes for CI, slowing development.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "thumbtack-leveraging-ai-to-build-a-faster-ios-ci-system"
   },
   {
    "url": "https://shopify.engineering/autoresearch",
@@ -7020,7 +7405,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "CI runs take 30 minutes, delaying developers from knowing if their changes break things.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-autoresearch-isnt-just-for-training-models"
   },
   {
    "url": "https://slack.engineering/managing-context-in-long-run-agentic-applications",
@@ -7039,7 +7425,8 @@
    "issue": "Multiple long‑running agents lost alignment and context over time, causing incoherent behavior.",
    "result": "",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "slack-managing-context-in-long-run-agentic-applications"
   },
   {
    "url": "https://research.google/blog/improving-the-academic-workflow-introducing-two-ai-agents-for-better-figures-and-peer-review",
@@ -7058,7 +7445,8 @@
    "issue": "Researchers spend too much time making complex figures and reviewers are overwhelmed by paper volume.",
    "result": "Figures and reviews outperform existing automated baselines",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-improving-the-academic-workflow-introducing-two-ai-agents"
   },
   {
    "url": "https://replit.com/blog/vibe-coding-decks-and-dashboards",
@@ -7076,7 +7464,8 @@
    "result": "",
    "issue": "Product managers spend hours switching tools to create launch decks, dashboards, and assets, causing inconsistency and delays.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-beyond-the-app-using-vibe-coding-to-ship-decks-dashboards"
   },
   {
    "url": "https://replit.com/blog/product-managers-ship-faster-with-replit",
@@ -7095,7 +7484,8 @@
    "result": "",
    "issue": "Product managers spent too much time manually syncing docs, decks, and tickets, leading to stale information.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-how-product-managers-ship-faster-using-replit-s-agentic"
   },
   {
    "url": "https://fly.io/blog/paperclip-on-a-sprite",
@@ -7114,7 +7504,8 @@
    "result": "",
    "issue": "Developers wanted an easy way to run a multi‑agent AI system on cheap, isolated hardware.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "fly-io-run-paperclip-ai-on-a-sprite"
   },
   {
    "url": "https://engineering.klarna.com/beyond-prompting-how-algorithmic-evolution-doubled-our-training-speed-8f874af3080d",
@@ -7132,7 +7523,8 @@
    "sorted_by": "groq",
    "issue": "Training large models took too long, slowing down product updates and increasing expenses.",
    "result": "Training speed doubled",
-   "v": 3
+   "v": 3,
+   "slug": "klarna-beyond-prompting-how-algorithmic-evolution-doubled-our"
   },
   {
    "url": "https://eng.lyft.com/predicting-rider-conversion-in-sparse-data-environments-with-bayesian-trees-07227ff92789",
@@ -7149,7 +7541,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Rider conversion rates were hard to predict because data for specific contexts was extremely sparse.",
-   "v": 3
+   "v": 3,
+   "slug": "lyft-predicting-rider-conversion-in-sparse-data-environments-with"
   },
   {
    "url": "https://blog.hotstar.com/ai-video-generation-at-scale-prompts-dont-scale-640c93778df9",
@@ -7167,7 +7560,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Prompt‑based video creation drifts and becomes inconsistent when producing large volumes.",
-   "v": 3
+   "v": 3,
+   "slug": "jiohotstar-ai-video-generation-at-scale-prompts-dont-scale"
   },
   {
    "url": "https://research.google/blog/vibe-coding-xr-accelerating-ai-xr-prototyping-with-xr-blocks-and-gemini",
@@ -7186,7 +7580,8 @@
    "issue": "Creating XR experiences required complex code and hardware setup, slowing down experimentation.",
    "result": "Prototypes generated in under 60 seconds",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-vibe-coding-xr-accelerating-ai-xr-prototyping-with-xr-blocks"
   },
   {
    "url": "https://eng.lyft.com/beyond-a-b-testing-using-surrogacy-and-region-splits-to-measure-long-term-effects-in-marketplaces-9cb06d628f2d",
@@ -7203,7 +7598,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Deciding how much to spend on driver incentives or rider prices without knowing long‑term effects was risky.",
-   "v": 3
+   "v": 3,
+   "slug": "lyft-beyond-a-b-testing-using-surrogacy-and-region-splits-to"
   },
   {
    "url": "https://replit.com/blog/live-from-hq-agent4-launch-pt2",
@@ -7222,7 +7618,8 @@
    "result": "90% of conflicts resolve automatically",
    "issue": "Multiple AI agents editing the same code caused merge conflicts and coordination problems.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-live-from-replit-hq-part-2"
   },
   {
    "url": "https://www.etsy.com/codeascraft/making-ads-count-using-mmoe-and-auxiliary-tasks-to-better-connect-buyers--sellers",
@@ -7239,7 +7636,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Buyers struggled to find the right items and sellers couldn’t reach interested customers.",
-   "v": 3
+   "v": 3,
+   "slug": "etsy-making-ads-count-using-mmoe-and-auxiliary-tasks-to-better"
   },
   {
    "url": "https://shopify.engineering/magic-mirror",
@@ -7256,7 +7654,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "In‑store shoppers wanted a fun, personalized experience that felt more interactive than just browsing.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-building-a-magic-mirror-ai-retail-experiences-with-remix"
   },
   {
    "url": "https://replit.com/blog/whats-changed-agent3-to-agent4",
@@ -7275,7 +7674,8 @@
    "result": "",
    "issue": "Developers had to choose an artifact type early and use a separate design mode, slowing and complicating app creation.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-whats-changed-from-replit-agent-3-to-agent-4"
   },
   {
    "url": "https://research.google/blog/improving-breast-cancer-screening-workflows-with-machine-learning",
@@ -7291,7 +7691,8 @@
    "sorted_by": "groq",
    "issue": "A shortage of radiologists threatens the double‑read breast cancer screening process.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "google-improving-breast-cancer-screening-workflows-with-machine"
   },
   {
    "url": "https://medium.engineering/making-ai-write-android-code-our-way-a-practical-guide-to-agent-skills-4e7b085d8e50",
@@ -7310,7 +7711,8 @@
    "result": "",
    "issue": "AI code suggestions ignored our Android team's specific conventions and patterns.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "medium-making-ai-write-android-code-our-way-a-practical-guide-to"
   },
   {
    "url": "https://zendesk.engineering/what-happens-when-code-becomes-abundant-cc3239c4561b",
@@ -7329,7 +7731,8 @@
    "result": "",
    "issue": "Developers were writing a lot of repetitive code, slowing product development.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "zendesk-what-happens-when-code-becomes-abundant"
   },
   {
    "url": "https://fly.io/blog/local-llm-on-a-sprite",
@@ -7348,7 +7751,8 @@
    "result": "",
    "issue": "Need cheap, fast LLM inference without GPUs for bursty workloads.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "fly-io-run-a-local-llm-on-a-cpu-with-bitnet-and-a-sprite"
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/03/search-quality-assurance-with-llm-judge.html",
@@ -7366,7 +7770,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "New markets lacked user data, so search quality was only checked after launch, causing slow fixes.",
-   "v": 3
+   "v": 3,
+   "slug": "zalando-search-quality-assurance-with-ai-as-a-judge"
   },
   {
    "url": "https://replit.com/blog/vibe-coding-data-apps-replit-databricks",
@@ -7385,7 +7790,8 @@
    "result": "",
    "issue": "Teams needed to build apps that could safely use sensitive, governed enterprise data.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-vibe-coding-enterprise-data-apps-with-replit-and-databricks"
   },
   {
    "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting",
@@ -7402,7 +7808,8 @@
    "sorted_by": "groq",
    "issue": "Cities lacked early warnings for rapid flash floods, putting residents at risk.",
    "result": "Up to 24‑hour advance notice",
-   "v": 3
+   "v": 3,
+   "slug": "google-protecting-cities-with-ai-driven-flash-flood-forecasting"
   },
   {
    "url": "https://replit.com/blog/introducing-agent-4-built-for-creativity",
@@ -7421,7 +7828,8 @@
    "result": "Production‑ready apps shipped 10× faster",
    "issue": "Developers spent too much time coordinating design and code, slowing creative work.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-introducing-replit-agent-4-built-for-creativity"
   },
   {
    "url": "https://blog.hotstar.com/monetisation-multi-period-dash-x-exoplayer-db8e8c00e521",
@@ -7437,7 +7845,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users needed to add region‑specific ads and legal text without re‑encoding each video, which was slow and expensive.",
-   "v": 3
+   "v": 3,
+   "slug": "jiohotstar-monetisation-multi-period-dash-x-exoplayer"
   },
   {
    "url": "https://blog.flipkart.tech/from-noise-to-insight-how-llms-are-transforming-threat-intelligence-analysis-17dae388808e",
@@ -7455,7 +7864,8 @@
    "sorted_by": "groq",
    "issue": "Analysts were overwhelmed by noisy, unstructured threat alerts and struggled to spot real risks.",
    "result": "",
-   "v": 3
+   "v": 3,
+   "slug": "flipkart-from-noise-to-insight-how-llms-are-transforming-threat"
   },
   {
    "url": "https://product.hubspot.com/blog/automated-code-review-the-6-month-evolution",
@@ -7474,7 +7884,8 @@
    "result": "Feedback time cut 90% (up to 99.76% in September)",
    "issue": "Code reviews were a major bottleneck, slowing engineers down.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hubspot-automated-code-review-the-6-month-evolution"
   },
   {
    "url": "https://replit.com/blog/building-ar-mobile-app-on-replit",
@@ -7493,7 +7904,8 @@
    "result": "",
    "issue": "A designer with no coding experience needed to create a real AR ghost‑hunting game fast.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-building-spookseek-ar-on-replit-how-a-designer-shipped-an-ar"
   },
   {
    "url": "https://deliveroo.engineering/2026/02/27/unlocking-ai-innovation-through-automated-governance.html",
@@ -7512,7 +7924,8 @@
    "result": "",
    "issue": "Teams faced duplicated effort and complex compliance when scaling AI projects.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "deliveroo-unlocking-ai-innovation-through-automated-governance"
   },
   {
    "url": "https://tech.instacart.com/our-early-journey-to-transform-instacarts-discovery-recommendations-with-llms-cf4591a8602b",
@@ -7530,7 +7943,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Static content libraries limited personalized discovery for shoppers.",
-   "v": 3
+   "v": 3,
+   "slug": "instacart-our-early-journey-to-transform-instacarts-discovery"
   },
   {
    "url": "https://shopify.engineering/generative-recommendations",
@@ -7548,7 +7962,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Recommendations used simplified signals and missed the order of shopper actions, leading to less relevant product suggestions.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-the-generative-recommender-behind-shopify-s-commerce-engine"
   },
   {
    "url": "https://medium.com/tripadvisor/travel-plus-experience-meets-data-at-viator-9037bfbd677c",
@@ -7566,7 +7981,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Travelers saw hundreds of irrelevant options, making it hard to pick the right activity.",
-   "v": 3
+   "v": 3,
+   "slug": "tripadvisor-travel-plus-experience-meets-data-at-viator"
   },
   {
    "url": "https://eng.lyft.com/scaling-localization-with-ai-at-lyft-b04dca99e6ee",
@@ -7584,7 +8000,8 @@
    "sorted_by": "groq",
    "result": "30‑minute SLA for 95% of translations",
    "issue": "Users needed new languages quickly, but human translation was slow and expensive.",
-   "v": 3
+   "v": 3,
+   "slug": "lyft-scaling-localization-with-ai-at-lyft"
   },
   {
    "url": "https://blog.hotstar.com/building-scalable-validation-framework-for-video-generation-6c67d1177ce2",
@@ -7602,7 +8019,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Generated videos often had subtle errors that broke realism, hurting viewer trust.",
-   "v": 3
+   "v": 3,
+   "slug": "jiohotstar-gen-ai-video-building-scalable-validation-framework"
   },
   {
    "url": "https://research.google/blog/teaching-ai-to-read-a-map",
@@ -7619,7 +8037,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "MLLMs can’t reliably trace paths on maps, missing basic navigation rules.",
-   "v": 3
+   "v": 3,
+   "slug": "google-teaching-ai-to-read-a-map"
   },
   {
    "url": "https://research.google/blog/how-ai-agents-can-redefine-universal-design-to-increase-accessibility",
@@ -7636,7 +8055,8 @@
    "result": "",
    "issue": "User interfaces were static and hard for people with disabilities to use.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "google-how-ai-tools-can-redefine-universal-design-to-increase"
   },
   {
    "url": "https://research.google/blog/sequential-attention-making-ai-models-leaner-and-faster-without-sacrificing-accuracy",
@@ -7653,7 +8073,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Large models run slowly and cost too much, hurting product speed and budget.",
-   "v": 3
+   "v": 3,
+   "slug": "google-sequential-attention-making-ai-models-leaner-and-faster"
   },
   {
    "url": "https://product.hubspot.com/blog/cloud-coding-agents-at-hubspot",
@@ -7672,7 +8093,8 @@
    "result": "7,000 AI‑generated PRs merged, 50,000 PRs reviewed",
    "issue": "Engineers needed faster, reliable code generation and review without manual effort.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "hubspot-cloud-coding-agents-at-hubspot"
   },
   {
    "url": "https://research.google/blog/small-models-big-results-achieving-superior-intent-extraction-through-decomposition",
@@ -7690,7 +8112,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Mobile agents needed to understand user intent without sending data to servers, which is slow, expensive, and risky.",
-   "v": 3
+   "v": 3,
+   "slug": "google-small-models-big-results-achieving-superior-intent"
   },
   {
    "url": "https://www.etsy.com/codeascraft/how-etsy-uses-llms-to-improve-search-relevance",
@@ -7708,7 +8131,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Buyers saw search results that were close but not exactly what they wanted, hurting satisfaction.",
-   "v": 3
+   "v": 3,
+   "slug": "etsy-how-etsy-uses-llms-to-improve-search-relevance"
   },
   {
    "url": "https://engineering.zalando.com/posts/2026/01/publication-replenishment-engine.html",
@@ -7722,7 +8146,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Zalando needed to avoid stock-outs and excess inventory while handling uncertain demand.",
-   "v": 3
+   "v": 3,
+   "slug": "zalando-paper-announcement-a-practical-approach-to-replenishment"
   },
   {
    "url": "https://open.nytimes.com/how-the-new-york-times-is-scaling-unit-test-coverage-using-ai-tools-fa796bf9b8d2",
@@ -7740,7 +8165,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Test coverage lagged behind rapid feature development, causing extra manual testing.",
-   "v": 3
+   "v": 3,
+   "slug": "the-new-york-times-how-the-new-york-times-is-scaling-unit-test-coverage-using"
   },
   {
    "url": "https://shopify.engineering/ucp",
@@ -7759,7 +8185,8 @@
    "result": "",
    "issue": "Merchants have many different payment, discount, and fulfillment rules, making it hard for AI agents to handle purchases.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-building-the-universal-commerce-protocol"
   },
   {
    "url": "https://medium.com/mercadolibre-tech/the-silver-shotgun-a-bunch-of-silver-bullets-4a51c57a0fd9",
@@ -7777,7 +8204,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Income estimates varied across cities and neighborhoods, hurting credit decisions.",
-   "v": 3
+   "v": 3,
+   "slug": "mercado-libre-the-silver-shotgun-a-bunch-of-silver-bullets"
   },
   {
    "url": "https://blog.flipkart.tech/triksha-securing-ai-with-ai-at-flipkart-5353da27dc33",
@@ -7793,7 +8221,8 @@
    "sorted_by": "groq",
    "result": "14.6× higher bypass rate than existing guardrails",
    "issue": "Prompt attacks let users trick AI support bots into unsafe or private answers.",
-   "v": 3
+   "v": 3,
+   "slug": "flipkart-triksha-securing-ai-with-ai-at-flipkart"
   },
   {
    "url": "https://shopify.engineering/tangle",
@@ -7811,7 +8240,8 @@
    "sorted_by": "groq",
    "result": "Saved over a year of compute time",
    "issue": "Data scientists spent weeks re‑running experiments because pipelines weren’t reproducible or shareable.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-tangle-an-open-source-ml-experimentation-platform-built-at"
   },
   {
    "url": "https://blog.flipkart.tech/beyond-the-context-window-a-new-approach-to-summarizing-big-data-44b306a9608a",
@@ -7829,7 +8259,8 @@
    "sorted_by": "groq",
    "result": "BooookScore 85.60",
    "issue": "LLMs cannot summarize thousands of product reviews because the context window is too small and opinions conflict.",
-   "v": 3
+   "v": 3,
+   "slug": "flipkart-beyond-the-context-window-a-new-approach-to-summarizing-big"
   },
   {
    "url": "https://slack.engineering/streamlining-security-investigations-with-agents",
@@ -7848,7 +8279,8 @@
    "result": "",
    "issue": "Security engineers were overwhelmed reviewing billions of alerts each day.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "slack-streamlining-security-investigations-with-agents"
   },
   {
    "url": "https://www.etsy.com/codeascraft/reducing-experiment-duration-with-predicted-control-variates",
@@ -7865,7 +8297,8 @@
    "sorted_by": "groq",
    "result": "Average experiment duration reduced by 3 days",
    "issue": "Experiments took too long, slowing product improvements.",
-   "v": 3
+   "v": 3,
+   "slug": "etsy-reducing-experiment-duration-with-predicted-control-variates"
   },
   {
    "url": "https://research.google/blog/reducing-ev-range-anxiety-how-a-simple-ai-model-predicts-port-availability",
@@ -7883,7 +8316,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "EV drivers worry about finding an open charging port, causing range anxiety.",
-   "v": 3
+   "v": 3,
+   "slug": "google-reducing-ev-range-anxiety-how-a-simple-ai-model-predicts"
   },
   {
    "url": "https://replit.com/blog/data-connectors",
@@ -7902,7 +8336,8 @@
    "result": "",
    "issue": "Teams had to store database credentials manually, creating security risks and slowing down data app development.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "replit-data-connectors"
   },
   {
    "url": "https://shopify.engineering/world-class-product-search",
@@ -7920,7 +8355,8 @@
    "sorted_by": "groq",
    "result": "Serves billions of queries with millisecond latency",
    "issue": "Search needed ML ranking but could not meet millisecond latency at scale.",
-   "v": 3
+   "v": 3,
+   "slug": "shopify-building-world-class-product-search-at-shopify-where-c"
   },
   {
    "url": "https://medium.com/tripadvisor/redefining-personalization-in-the-customer-experience-fd6525a2e6b3",
@@ -7936,7 +8372,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Users felt overwhelmed planning trips and wanted more tailored guidance",
-   "v": 3
+   "v": 3,
+   "slug": "tripadvisor-redefining-personalization-in-the-customer-experience"
   },
   {
    "url": "https://medium.com/tripadvisor/making-the-best-first-impression-using-machine-learning-to-optimize-photo-selection-0767e82e4fe8",
@@ -7953,7 +8390,8 @@
    "sorted_by": "groq",
    "result": "Higher click‑through rates and bookings",
    "issue": "Choosing the right first photo for a listing was hard and slowed bookings",
-   "v": 3
+   "v": 3,
+   "slug": "tripadvisor-making-the-best-first-impression-using-machine-learning-to"
   },
   {
    "url": "https://medium.com/tripadvisor/scaling-our-existing-tagging-system-with-hybrid-graph-semantic-search-2322bdaa5b8d",
@@ -7971,7 +8409,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Tags were outdated, incomplete, and many items lacked tags, hurting traveler discovery.",
-   "v": 3
+   "v": 3,
+   "slug": "tripadvisor-scaling-our-existing-tagging-system-with-hybrid-graph"
   },
   {
    "url": "https://www.etsy.com/codeascraft/understanding-etsyas-vast-inventory-with-llms",
@@ -7989,7 +8428,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Etsy’s huge, varied inventory made it hard to list every possible product attribute accurately.",
-   "v": 3
+   "v": 3,
+   "slug": "etsy-understanding-etsys-vast-inventory-with-llms"
   },
   {
    "url": "https://shopify.engineering/product-taxonomy-at-scale",
@@ -8008,7 +8448,8 @@
    "result": "",
    "issue": "The product taxonomy was growing too fast for manual updates, causing inconsistencies and hurting discoverability.",
    "v": 3,
-   "cat": 2
+   "cat": 2,
+   "slug": "shopify-beyond-classification-how-ai-agents-are-evolving-shopify-s"
   },
   {
    "url": "https://discord.com/blog/from-single-node-to-multi-gpu-clusters-how-discord-made-distributed-compute-easy-for-ml-engineers",
@@ -8024,7 +8465,8 @@
    "sorted_by": "groq",
    "result": "Ads ranking improved 200%",
    "issue": "Training jobs needed multiple GPUs and larger datasets that didn't fit on a single machine.",
-   "v": 3
+   "v": 3,
+   "slug": "discord-from-single-node-to-multi-gpu-clusters-how-discord-made"
   },
   {
    "url": "https://medium.com/mercadolibre-tech/how-we-are-using-ai-in-mercado-libres-accessibility-team-e960b83283a9",
@@ -8041,7 +8483,8 @@
    "sorted_by": "groq",
    "result": "",
    "issue": "Designers and developers needed quick, accurate answers to accessibility questions without relying on the limited accessibility team.",
-   "v": 3
+   "v": 3,
+   "slug": "mercado-libre-how-we-are-using-ai-in-mercado-libres-accessibility-team"
   }
  ],
  "waiting": 639,

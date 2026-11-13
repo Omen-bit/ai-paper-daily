@@ -258,13 +258,13 @@ def trends_ready(rows: list[dict]) -> bool:
 
 def page(title: str, body: str, root: str = "", description: str = TAGLINE, active: str = "",
          edition: str = "", body_class: str = "", path: str | None = None, image: str = "og/site.png",
-         og_type: str = "website") -> str:
+         og_type: str = "website", full_title: str = "", noindex: bool = False) -> str:
     """Wrap body in the shared layout. root is the relative path to the site root.
     path is this page's address from the site root ("" for the home page); pages
     without one (the reading list) are kept out of search engines."""
     edition = edition or EDITION
-    full_title = f"{title} · {SITE_NAME}" if title != SITE_NAME else f"{SITE_NAME}: research papers worth building on"
-    if path is None:
+    full_title = full_title or (f"{title} · {SITE_NAME}" if title != SITE_NAME else f"{SITE_NAME}: research papers worth building on")
+    if path is None or noindex:
         seo = '<meta name="robots" content="noindex">'
     else:
         url = discovery.absolute(SITE_URL, path)
@@ -2143,7 +2143,8 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     pages = [("", newest), ("papers.html", newest), ("methodology.html", newest), ("scout.html", ""), ("archive.html", newest), ("labs.html", newest)]
     if SHOW_TRENDS:
         pages.append(("trends.html", newest))
-    pages += [(p, newest) for p in case_paths]
+    # Case pages carry their own last change (case_pages.build_all returns (path, date) for them)
+    pages += [p if isinstance(p, tuple) else (p, newest) for p in case_paths]
     pages += [(f"day/{d['date']}.html", d["date"]) for d in days]
     pages += [(f"paper/{r['id']}.html", r.get("featured_on") or r.get("first_seen") or "")
               for r in sorted(papers.values(), key=lambda r: r.get("first_seen") or "", reverse=True)]

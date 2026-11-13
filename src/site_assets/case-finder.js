@@ -215,6 +215,7 @@
       (p.sb ? '<p class="cs-by"><span class="cs-av" aria-hidden="true">' + esc(p.sb.replace(/^@/, "").charAt(0).toUpperCase()) +
               "</span><span>Suggested by <b>" + esc(p.sb) + "</b></span></p>" : "") +
       '<div class="cs-foot"><span class="cs-src">Read on ' + esc(host(p.u)) + EXT + "</span>" +
+      (p.sl ? '<a class="cs-details" href="' + esc(p.sl) + '.html" aria-label="Details: ' + esc(p.t) + '">Details</a>' : "") +
       '<button class="cs-save" type="button" data-cs-save="cs:' + esc(p.u) + '" data-title="' + esc(p.t) + '" data-url="' + esc(p.u) +
       '" data-co="' + esc(p.c) + '" aria-pressed="false">' + BOOKMARK + "<span>Save</span></button></div></div></li>";
   }
@@ -233,6 +234,8 @@
       var params = new URLSearchParams();
       if (state.q) params.set("q", state.q);
       if (state.topic) params.set("topic", state.topic);
+      if (state.tech) params.set("tech", state.tech);
+      if (state.ind) params.set("ind", state.ind);
       var qs = params.toString();
       history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
     } catch (e) { /* an old browser keeps the address as it is */ }
@@ -448,7 +451,13 @@
     var params = new URLSearchParams(location.search);
     state.q = (params.get("q") || "").slice(0, 200);
     state.topic = index.topics[params.get("topic")] ? params.get("topic") : "";
+    // Links from a case page's chips: ?tech=rag, ?ind=fintech; ?suggest=1 opens the suggestion form
+    var tech = params.get("tech") || "", ind = params.get("ind") || "";
+    if ((index.labels.x || {})[tech]) { state.tech = tech; if (menus.tech) menus.tech.value = tech; }
+    if ((index.labels.n || {})[ind]) { state.ind = ind; if (menus.ind) menus.ind.value = ind; }
     q.value = state.q;
     if (active()) run(false);
+    var opener = document.querySelector("[data-sg-open]");
+    if (params.get("suggest") && opener && !opener.hidden) opener.click();
   } catch (e) { /* no URLSearchParams: start on the sections */ }
 })(typeof window !== "undefined" ? window : this);

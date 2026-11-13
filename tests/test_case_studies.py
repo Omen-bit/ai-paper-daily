@@ -152,8 +152,13 @@ def test_case_studies_are_split_by_topic(tmp_path):
         json.dump({"posts": posts}, f)
     build_site(data_dir, site_dir)
     folder = os.path.join(site_dir, "case-studies")
-    assert sorted(os.listdir(folder)) == ["ads.html", "guardrails.html", "how-i-built-ai-papers-daily.html",
-                                          "how-i-built-ai-papers-daily.md", "index.html", "recommendations.html", "review.html"]
+    fixed = ["ads.html", "guardrails.html", "how-i-built-ai-papers-daily.html", "how-i-built-ai-papers-daily.md",
+             "index.html", "recommendations.html", "review.html"]
+    case_pages_written = sorted(set(os.listdir(folder)) - set(fixed))
+    assert set(fixed) <= set(os.listdir(folder))
+    # one page per case shown, and nothing else
+    assert case_pages_written == ["booking-com-post-c.html", "meta-post-b.html",
+                                  "netflix-two-tower-retrieval-in-the-home-feed-ranking.html"]
     page = open(os.path.join(folder, "index.html"), encoding="utf-8").read()
     assert "Two-tower retrieval &lt;in&gt; the home feed ranking" in page
     assert 'href="https://netflixtechblog.com/a"' in page and 'rel="noopener"' in page

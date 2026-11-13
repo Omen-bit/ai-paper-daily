@@ -21,11 +21,14 @@ The same Groq call also tags each post for the case study finder (techniques, in
 build_details, build_score; see FINDER_FIELDS; the category is the post's "problem" topic). Saved posts without those fields are tagged with
 the week's spare calls. To tag every saved post that has none yet (one Groq call each, resumable):
   python src/case_studies.py --retag            (add --all to tag every post again)
+To store a page address (slug) on every saved post that has none (no network, no Groq):
+  python src/case_studies.py --slugs
 To grow the Case studies page to a number of write-ups (one Groq call per candidate, resumable;
 see backfill()):  python src/case_studies.py --backfill [--dry-run] [--target 520] [--max-calls 200]
 A feed that is down is skipped; the posts already saved stay.
 """
 import html
+import unicodedata
 import json
 import math
 import os
@@ -733,6 +736,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
         known_titles.add(title_key(post["title"], post["company"]))
         counts["new"] += 1
     counts["calls"] = calls
+    assign_slugs(posts)
     return posts, counts
 
 
@@ -974,6 +978,7 @@ def backfill(path: str = CASES_FILE, target: int = BACKFILL_TARGET, max_calls: i
             posts.append(groq_record(post, result, today, known_cats))
             done.add(post["url"])
             report["kept"] += 1
+            assign_slugs(posts)
             shown = shown_count(posts)
         if report["calls"] % 10 == 0:
             keep()
@@ -982,6 +987,59 @@ def backfill(path: str = CASES_FILE, target: int = BACKFILL_TARGET, max_calls: i
     keep()
     report["shown_after"] = shown
     return report
+
+
+# ---------- a page per case study: case-studies/<slug>.html (case_detail.py)
+
+SLUG_TITLE_MAX = 60
+RESERVED_SLUGS = {"index", "review", "logos", "how-i-built-ai-papers-daily"}
+
+
+def slugify(text: str, limit: int = 0) -> str:
+    """Lowercase ASCII words joined by hyphens; cut at a word boundary when longer than limit."""
+    text = unicodedata.normalize("NFKD", html.unescape(str(text or ""))).encode("ascii", "ignore").decode()
+    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    if limit and len(slug) > limit:
+        cut = slug[:limit + 1].rsplit("-", 1)[0]
+        slug = (cut or slug[:limit]).strip("-")
+    return slug
+
+
+def base_slug(post: dict) -> str:
+    """<company>-<short title>, for a case page's address."""
+    company = slugify(post.get("company", ""), 30) or "case"
+    title = slugify(post.get("title", ""), SLUG_TITLE_MAX)
+    if title.startswith(company + "-"):  # "Netflix: ..." titles would say the company twice
+        title = title[len(company) + 1:]
+    return f"{company}-{title}".strip("-") if title else company
+
+
+def assign_slugs(posts: list[dict], reserved=()) -> int:
+    """Give every post without one a slug, unique among the posts and the reserved page names.
+    A slug is never changed once given, even when the title changes later; collisions get -2,
+    -3 ... in the order posts reached the site, so the same data always gives the same slugs.
+    Returns how many posts got a new slug."""
+    taken = set(RESERVED_SLUGS) | set(reserved) | {p["slug"] for p in posts if p.get("slug")}
+    fresh = sorted((p for p in posts if not p.get("slug")),
+                   key=lambda p: (str(p.get("added") or p.get("published") or ""), p.get("url", "")))
+    for post in fresh:
+        base = base_slug(post)
+        slug, n = base, 2
+        while slug in taken:
+            slug, n = f"{base}-{n}", n + 1
+        post["slug"] = slug
+        taken.add(slug)
+    return len(fresh)
+
+
+def slug_saved(path: str = CASES_FILE) -> int:
+    """One-off: store a slug on every saved post that has none. No network, no Groq."""
+    saved = load_all(path)
+    posts = saved.get("posts", [])
+    n = assign_slugs(posts)
+    save(posts, path, saved.get("rejected", []), saved.get("waiting", 0), saved.get("last_fetch", ""),
+         saved.get("queue", []))
+    return n
 
 
 def retag_saved(path: str = CASES_FILE, everything: bool = False, tagger=None, reader=read_article,
@@ -1034,6 +1092,9 @@ if __name__ == "__main__":
               f"(if {BACKFILL_KEEP_RATE:.0%} are kept). This run: {result['calls']} calls, {result['kept']} kept, "
               f"{result['turned_down']} turned down, {result['failed']} unusable; shown now {result['shown_after']} "
               f"({result['stopped']}).")
+        sys.exit(0)
+    if "--slugs" in sys.argv:  # no network, no Groq
+        print(f"  [cases] {slug_saved()} posts got a slug.")
         sys.exit(0)
     if "--retag" in sys.argv:
         if not os.environ.get("GROQ_API_KEY", "").strip():

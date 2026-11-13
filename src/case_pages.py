@@ -240,7 +240,16 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
     return f"""<li class="cs-card" style="--c:{color(problem)};--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
 <div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-pills">{NEW_PILL if post.get("is_new") else ""}<span class="cs-topic">{esc(problem_name(problem))}</span>{detail_pill(post)}</span></div>
 <div class="cs-body"><h3><a class="cs-link" href="{esc(post['url'])}" rel="noopener" target="_blank">{esc(post['title'])}</a></h3>{summary}{tag_html}{rel}
-<div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span><button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
+<div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span>{details_link(post)}<button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
+
+
+def details_link(post: dict) -> str:
+    """A small link to the case's own page on this site (case_detail.py). The title and "Read on"
+    still open the original post."""
+    if not post.get("slug"):
+        return ""
+    return (f'<a class="cs-details" href="{esc(post["slug"])}.html" aria-label="Details: {esc(post["title"])}">'
+            f'Details</a>')
 
 
 def credit_row(post: dict) -> str:
@@ -573,6 +582,8 @@ def search_index(posts: list[dict]) -> dict:
                "i": p.get("issue") or "", "s": p.get("summary") or "", "r": p.get("result") or "",
                "g": [t for t in p.get("tags") or [] if isinstance(t, str)][:3], "x": _techniques(p),
                "n": _industry(p), "b": build_score(p), "a": p.get("added_at") or added_on(p)}
+        if p.get("slug"):
+            row["sl"] = p["slug"]
         if p.get("is_new"):
             row["nw"] = 1
         if p.get("related_papers"):
@@ -652,6 +663,10 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
     found = case_research.related(posts, papers, k=1, labels=TECH_LABELS) if papers else {}
     for p in posts:
         p["related_papers"] = [{k: m[k] for k in ("id", "title", "url", "score")} for m in found.get(p["url"], [])]
+    # Each case's own page address: kept in cases.json once given; missing ones are given here the
+    # same way case_studies.assign_slugs would, so the cards can link to the pages
+    import case_studies
+    case_studies.assign_slugs(posts, reserved=set(SLUGS.values()) | {page_slug(k) for k in topic_keys()} | {making_of.SLUG})
     desc = "How companies like Netflix, Meta and Spotify build AI into their products, from their own engineering blogs."
     sprite_all = sprite(companies)
 
@@ -718,4 +733,8 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
                    path=f"{DIR}/{page_slug(k)}.html",
                    description=f"How companies handle {name.lower()} in production, from their own engineering blogs."))
         paths.append(f"{DIR}/{page_slug(k)}.html")
+    # A page per case study (case_detail.py); the indexable ones go in the sitemap with their own date
+    import case_detail
+    paths += case_detail.build_case_pages(posts, page, write, site_dir, site_url,
+                                          lambda body, sprite_html: f'{sprite_html}<div class="cs-wrap">{body}</div>')
     return paths

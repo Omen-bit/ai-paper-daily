@@ -193,6 +193,7 @@ def publish(rows: list[dict], posts: list[dict], today: str) -> list[dict]:
         credit = clean_credit(row.get("credit"))
         if credit:
             record["suggested_by"] = credit
+        cs.assign_slugs(posts + added + [record])
         added.append(record)
         urls.add(card["url"])
         titles.add(key)
