@@ -1,0 +1,153 @@
+{
+ "2610.40754": {
+  "claims": [],
+  "date": "2026-11-13",
+  "proposed": 0
+ },
+ "2611.03142": {
+  "claims": [
+   {
+    "benchmark": "MMLU-Pro",
+    "metric": "absolute improvement",
+    "quote": "on the 16B MoE model, DepthGraft achieves a 7.0% absolute improvement on MMLU-Pro, along with gains of 6.6% on CMMLU and 6.4% on C3.",
+    "result": "7.0%",
+    "task": "downstream improvement"
+   },
+   {
+    "benchmark": "CMMLU",
+    "metric": "gain",
+    "quote": "on the 16B MoE model, DepthGraft achieves a 7.0% absolute improvement on MMLU-Pro, along with gains of 6.6% on CMMLU and 6.4% on C3.",
+    "result": "6.6%",
+    "task": "downstream improvement"
+   },
+   {
+    "benchmark": "C3",
+    "metric": "gain",
+    "quote": "on the 16B MoE model, DepthGraft achieves a 7.0% absolute improvement on MMLU-Pro, along with gains of 6.6% on CMMLU and 6.4% on C3.",
+    "result": "6.4%",
+    "task": "downstream improvement"
+   }
+  ],
+  "date": "2026-11-13",
+  "proposed": 3
+ },
+ "2611.10649": {
+  "claims": [
+   {
+    "benchmark": "Qwen3-32B in vLLM",
+    "metric": "end-to-end overhead",
+    "quote": "MACaQ adds only 2.3% end-to-end overhead over pure MXFP4 on Qwen3-32B in vLLM.",
+    "result": "2.3%",
+    "task": "inference"
+   },
+   {
+    "benchmark": "122B parameter model",
+    "metric": "quantization time",
+    "quote": "quantization of a 122B parameter model in 64 minutes, using only 32.5GB GPU RAM.",
+    "result": "64 minutes",
+    "task": "quantization"
+   },
+   {
+    "benchmark": "122B parameter model",
+    "metric": "GPU RAM usage",
+    "quote": "quantization of a 122B parameter model in 64 minutes, using only 32.5GB GPU RAM.",
+    "result": "32.5GB",
+    "task": "quantization"
+   }
+  ],
+  "date": "2026-11-13",
+  "proposed": 3
+ },
+ "2611.10866": {
+  "claims": [
+   {
+    "benchmark": "prior-task accuracy",
+    "metric": "loss compared to full fine-tuning",
+    "quote": "Under reinforcement learning, its prior-task accuracy stays near the base level while FFT, LoRA, and random sparse fine-tuning lose up to 5.4 points.",
+    "result": "5.4 points",
+    "task": "Reinforcement learning"
+   }
+  ],
+  "date": "2026-11-13",
+  "proposed": 1
+ },
+ "2611.12177": {
+  "claims": [
+   {
+    "benchmark": "456 core tasks",
+    "metric": "success rate",
+    "quote": "On the 456 core tasks, the strongest of eight agents, GPT-6 Astra in Codex, achieves a success rate of 34% in the Standard Setting",
+    "result": "34%",
+    "task": "Standard Setting"
+   }
+  ],
+  "date": "2026-11-13",
+  "proposed": 1
+ },
+ "2611.12527": {
+  "claims": [
+   {
+    "benchmark": "Seed-en",
+    "metric": "WER",
+    "quote": "WaveGen achieves a WER of 1.47 and a SIM of 0.75 on the Seed-en benchmark.",
+    "result": "1.47",
+    "task": "text-to-waveform generation"
+   },
+   {
+    "benchmark": "Seed-en",
+    "metric": "SIM",
+    "quote": "WaveGen achieves a WER of 1.47 and a SIM of 0.75 on the Seed-en benchmark.",
+    "result": "0.75",
+    "task": "text-to-waveform generation"
+   }
+  ],
+  "date": "2026-11-13",
+  "proposed": 2
+ },
+ "2611.14210": {
+  "claims": [
+   {
+    "benchmark": "MATH-500",
+    "metric": "accuracy",
+    "quote": "Tree-Ising achieves 54.6% on MATH-500",
+    "result": "54.6%",
+    "task": "accuracy"
+   },
+   {
+    "benchmark": "MATH-500",
+    "metric": "accuracy",
+    "quote": "the agent's edit (51.7%)",
+    "result": "51.7%",
+    "task": "accuracy"
+   },
+   {
+    "benchmark": "MATH-500",
+    "metric": "accuracy",
+    "quote": "the base model scores 7.9% as reported",
+    "result": "7.9%",
+    "task": "accuracy"
+   },
+   {
+    "benchmark": "MATH-500",
+    "metric": "accuracy",
+    "quote": "The simulated bifurcation solver yields a statistically indistinguishable repair at 55.1%",
+    "result": "55.1%",
+    "task": "accuracy"
+   },
+   {
+    "benchmark": "GSM8K",
+    "metric": "accuracy",
+    "quote": "the same recipe increases greedy GSM8K accuracy from 21.6% to 69.4%",
+    "result": "69.4%",
+    "task": "accuracy"
+   }
+  ],
+  "date": "2026-11-13",
+  "proposed": 5
+ },
+ "2611.14320": {
+  "claims": [],
+  "date": "2026-11-13",
+  "proposed": 0
+ }
+}
