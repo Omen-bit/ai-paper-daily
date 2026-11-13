@@ -165,7 +165,8 @@ def test_case_studies_are_split_by_topic(tmp_path):
     assert 'id="b-netflix"' in page and 'id="b-bookingdotcom"' in page  # real logos for both
     assert 'data-cs-tag="Two-tower"' in page and 'data-cs-save="cs:https://netflixtechblog.com/a"' in page
     assert '<option value="Meta">Meta (1)</option>' in page
-    assert "../paper/2611.1.html" in page  # a related paper from our library
+    # A one-paper library cannot tell a rare word from a common one, so no "Research behind this" here;
+    # tests/test_case_research.py checks the matching
     ads = open(os.path.join(folder, "ads.html"), encoding="utf-8").read()
     assert ads.count("data-cs-item") == 1 and 'href="ads.html" style="--c:var(--l-ads)" aria-current="page"' in ads
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()

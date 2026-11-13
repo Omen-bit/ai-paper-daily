@@ -2487,3 +2487,12 @@ a, button, summary, label { -webkit-tap-highlight-color: transparent; touch-acti
   .cf-toggle { min-height: 44px; }
   .cf-chips button, .cf-try button { min-height: 40px; }
 }
+
+/* "Research behind this": the paper on this site behind a case, an inset above the card footer */
+.cs-rel { border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line)); background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.cs-rel:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.cs-rel svg { color: var(--accent); }
+.cs-rel div { min-width: 0; }
+.cs-rel span { margin-bottom: 2px; font: 500 11.5px var(--mono); letter-spacing: .01em; color: var(--muted); }
+.cs-rel b { font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+:root[data-theme="dark"] .cs-rel { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }

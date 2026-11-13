@@ -119,7 +119,8 @@
     return out;
   }
 
-  var api = { stem: stem, key: key, terms: terms, prepare: prepare, search: search };
+  // STOP and GROUPS are shared with case_research.py, which matches papers to cases at build time
+  var api = { stem: stem, key: key, terms: terms, prepare: prepare, search: search, STOP: Object.keys(STOP), GROUPS: GROUPS };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; return; }
   root.CaseFinder = api;
 
@@ -158,6 +159,7 @@
   }
   var EXT = '<svg class="cs-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
   var BOOKMARK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>';
+  var PAPER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>';
   var TREND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg>';
 
   // The same card case_pages.post_card draws, plus the words that matched
@@ -177,6 +179,8 @@
       '<span class="cs-pills"><span class="cs-topic">' + esc(topic[0]) + "</span>" + pill + "</span></div>" +
       '<div class="cs-body"><h3><a class="cs-link" href="' + esc(p.u) + '" rel="noopener" target="_blank">' + esc(p.t) + "</a></h3>" +
       match + body + (tags ? '<ul class="cs-tags" aria-label="Techniques">' + tags + "</ul>" : "") +
+      (p.rp ? '<a class="cs-rel" href="../paper/' + esc(p.rp[0]) + '.html">' + PAPER + "<div><span>Research behind this, on AI Papers Daily</span><b>" +
+              esc(p.rp[1]) + "</b></div></a>" : "") +
       '<div class="cs-foot"><span class="cs-src">Read on ' + esc(host(p.u)) + EXT + "</span>" +
       '<button class="cs-save" type="button" data-cs-save="cs:' + esc(p.u) + '" data-title="' + esc(p.t) + '" data-url="' + esc(p.u) +
       '" data-co="' + esc(p.c) + '" aria-pressed="false">' + BOOKMARK + "<span>Save</span></button></div></div></li>";

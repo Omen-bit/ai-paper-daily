@@ -13,7 +13,6 @@ site_builder.build_site calls build_all with the posts from data/cases.json.
 """
 import html
 import json
-import math
 import os
 import shutil
 
@@ -209,8 +208,7 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
     tag_html = ("<ul class=\"cs-tags\" aria-label=\"Techniques\">" +
                 "".join(f'<li><button type="button" data-cs-tag="{esc(t)}">{esc(t)}</button></li>' for t in tags) +
                 "</ul>") if tags else ""
-    rel = (f'<a class="cs-rel" href="../paper/{esc(paper[0])}.html">{PAPER_ICON}<div><span>Related paper on AI Papers Daily</span>'
-           f'<b>{esc(paper[1])}</b></div></a>' if paper else "")
+    rel = research_block(paper)
     date = nice_date(post.get("published", ""))
     when = f'<time datetime="{esc(post.get("published", ""))}">{date}</time>' if date else ""
     return f"""<li class="cs-card" style="--c:{color(problem)};--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
@@ -219,39 +217,17 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
 <div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span><button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
 
 
-# ---------- related papers
+# ---------- research behind a case (case_research.py matches them at build time, no LLM)
 
-STOP = set("""a an and are as at be by for from has have in into is it its of on or our that the their this to via we with
-which while using use used based new show shows can these than more over between both such also not only how what when
-where who model models method methods paper approach results part scale scaling system systems production building
-build engineering data learning machine""".split())
+RESEARCH_LABEL = "Research behind this, on AI Papers Daily"
 
 
-def _words(text: str) -> set[str]:
-    words = "".join(ch if ch.isalnum() or ch == "-" else " " for ch in (text or "").lower()).split()
-    return {w for w in words if len(w) > 3 and w not in STOP}
-
-
-def related_papers(posts: list[dict], papers: dict, k: int = 2, min_score: float = 2.2) -> dict[str, list[str]]:
-    """For each post, up to k papers from our library that share its rarer words."""
-    index: dict[str, list[str]] = {}
-    for pid, rec in papers.items():
-        for w in _words(f"{rec.get('title', '')} {rec.get('abstract', '')[:600]}"):
-            index.setdefault(w, []).append(pid)
-    limit = max(25, len(papers) // 25)
-    out = {}
-    for post in posts:
-        scores: dict[str, float] = {}
-        for w in _words(f"{post['title']} {post.get('summary', '')}"):
-            posting = index.get(w, [])
-            if not posting or len(posting) > limit:
-                continue
-            weight = 1.0 / math.log(len(posting) + 1.5)
-            for pid in posting:
-                scores[pid] = scores.get(pid, 0.0) + weight
-        best = sorted(scores.items(), key=lambda kv: (-kv[1], kv[0]))[:k]
-        out[post["url"]] = [pid for pid, sc in best if sc >= min_score]
-    return out
+def research_block(paper: tuple | None) -> str:
+    """The inset above the card's footer: the paper on this site behind the case, or nothing."""
+    if not paper:
+        return ""
+    return (f'<a class="cs-rel" href="../paper/{esc(paper[0])}.html">{PAPER_ICON}<div><span>{RESEARCH_LABEL}</span>'
+            f'<b>{esc(paper[1])}</b></div></a>')
 
 
 # ---------- the page
@@ -502,6 +478,8 @@ def search_index(posts: list[dict]) -> dict:
                "i": p.get("issue") or "", "s": p.get("summary") or "", "r": p.get("result") or "",
                "g": [t for t in p.get("tags") or [] if isinstance(t, str)][:3], "x": _techniques(p),
                "n": _industry(p), "b": build_score(p)}
+        if p.get("related_papers"):
+            row["rp"] = [p["related_papers"][0]["id"], p["related_papers"][0]["title"]]
         covered = [k for k in BUILD_DETAILS if (p.get("build_details") or {}).get(k)]
         if covered:
             row["bd"] = covered
@@ -534,13 +512,17 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
             os.makedirs(os.path.join(site_dir, DIR, "logos"), exist_ok=True)
             shutil.copyfile(os.path.join(logo_dir, name), os.path.join(site_dir, DIR, "logos", name))
             LOGO_FILES[company] = name
-    related = related_papers(posts, papers, k=1) if papers else {}
+    # The paper behind each case, matched once here so the browser does nothing extra
+    import case_research
+    found = case_research.related(posts, papers, k=1, labels=TECH_LABELS) if papers else {}
+    for p in posts:
+        p["related_papers"] = [{k: m[k] for k in ("id", "title", "url", "score")} for m in found.get(p["url"], [])]
     desc = "How companies like Netflix, Meta and Spotify build AI into their products, from their own engineering blogs."
     sprite_all = sprite(companies)
 
     def card(p: dict, hidden: bool = False) -> str:
-        pid = (related.get(p["url"]) or [None])[0]
-        html_ = post_card(p, (pid, papers[pid]["title"]) if pid else None)
+        rp = (p.get("related_papers") or [None])[0]
+        html_ = post_card(p, (rp["id"], rp["title"]) if rp else None)
         return html_.replace("<li ", "<li hidden ", 1) if hidden else html_
 
     def feed(these: list[dict], cls: str = "") -> str:
