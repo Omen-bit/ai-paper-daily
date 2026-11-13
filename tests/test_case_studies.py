@@ -159,8 +159,9 @@ def test_case_studies_are_split_by_topic(tmp_path):
     assert 'href="https://netflixtechblog.com/a"' in page and 'rel="noopener"' in page
     assert "ftp://bad" not in page and "https://x/e" not in page  # bad records are left out
     assert 'id="recommendations"' in page and 'href="guardrails.html"' in page and 'id="vision"' not in page
-    results = page.split("data-cs-results", 1)[1]
-    assert results.count("data-cs-item") == 3  # the search list holds every write-up once
+    index = json.loads(page.split('<script type="application/json" id="cf-index">', 1)[1].split("</script>", 1)[0])
+    assert len(index["posts"]) == 3  # the search index holds every write-up once
+    assert "<in>" not in page.split('id="cf-index">', 1)[1].split("</script>", 1)[0]  # escaped inside the script
     assert 'id="b-netflix"' in page and 'id="b-bookingdotcom"' in page  # real logos for both
     assert 'data-cs-tag="Two-tower"' in page and 'data-cs-save="cs:https://netflixtechblog.com/a"' in page
     assert '<option value="Meta">Meta (1)</option>' in page
@@ -333,3 +334,173 @@ def test_posts_missing_a_problem_are_filled_first(monkeypatch):
     posts, _ = cs.update(old, [], "2026-11-08", max_calls=2)
     assert asked[0] == "https://x/missing"
     assert all(p.get("issue") for p in posts)
+
+
+# ---- Case study finder tags (techniques, industry, build details) ----
+
+import groq_summarizer as gs
+from case_sources import BUILD_DETAILS, INDUSTRIES, TECHNIQUES
+
+VALID_TAGS = ('{"techniques": ["RAG", "embeddings", "Classical ML", "guardrails", "caching"],'
+              ' "industry": "Fintech", "build": {"architecture": true, "stack": true, "evaluation": false,'
+              ' "failure_modes": "yes", "numbers": true}}')
+
+
+class _FakeGroq:
+    """Stands in for the Groq client: hands out the given replies (or raises the given errors) in turn."""
+    def __init__(self, replies):
+        self.replies, self.asked = list(replies), []
+        self.chat = self
+        self.completions = self
+
+    def create(self, model, messages, **kwargs):
+        self.asked.append((model, messages))
+        reply = self.replies.pop(0)
+        if isinstance(reply, Exception):
+            raise reply
+
+        class Msg:
+            content = reply
+
+        class Choice:
+            message = Msg
+
+        class Response:
+            choices = [Choice]
+        return Response
+
+
+def _fake_groq(monkeypatch, replies, models=("m1", "m2")):
+    client = _FakeGroq(replies)
+    monkeypatch.setattr(gs, "_get_client", lambda: client)
+    monkeypatch.setattr(gs, "_active_models", list(models))
+    monkeypatch.setattr(cs, "_TIRED", set())
+    return client
+
+
+def test_finder_tags_from_a_valid_reply():
+    tags = cs.parse_finder(json.loads(VALID_TAGS))
+    assert tags == {"techniques": ["rag", "embeddings", "classical-ml", "guardrails"],
+                    "industry": "fintech",
+                    "build_details": {"architecture": True, "stack": True, "evaluation": False,
+                                      "failure_modes": True, "numbers": True},
+                    "build_score": 4}
+
+
+def test_finder_tags_from_a_partial_reply_fall_back_to_other():
+    tags = cs.parse_finder({"techniques": ["Made up", "other", "RAG"],
+                            "build": {"numbers": 1, "stack": "maybe", "evaluation": None}})
+    assert tags["techniques"] == ["rag"]  # unknown dropped, "other" only when nothing else is left
+    assert tags["industry"] == "other"
+    assert tags["build_details"] == {k: k == "numbers" for k in BUILD_DETAILS} and tags["build_score"] == 1
+    tags = cs.parse_finder({"use_case": "space travel", "techniques": "nonsense", "industry": 7, "build": "lots"})
+    assert (tags["techniques"], tags["industry"], tags["build_score"]) == (["other"], "other", 0)
+    assert "use_case" not in tags  # the category is the post's "problem" topic, not a Groq field
+    assert set(tags["build_details"]) == set(BUILD_DETAILS)
+
+
+def test_finder_tags_from_garbage_are_none():
+    for raw in ("", "no json", "{not json", "[1, 2]", '{"kind": "build"}', "null"):
+        assert cs.parse_finder(cs._reply_json(raw)) is None
+    assert cs.parse_finder(None) is None and cs.parse_finder(["techniques"]) is None
+
+
+def test_vocabularies_all_end_with_other():
+    for vocab in (TECHNIQUES, INDUSTRIES):
+        assert "other" in vocab
+    assert len(BUILD_DETAILS) == 5
+
+
+def test_the_sorting_call_also_returns_the_finder_tags():
+    reply = ('{"kind": "build", "topic": "rag", "issue": "Fraud checks were slow.", "summary": "A retriever.", '
+             + VALID_TAGS[1:])
+    out = cs.parse_reply(reply)
+    assert out["keep"] and out["finder"]["industry"] == "fintech" and out["finder"]["build_score"] == 4
+    assert "finder" not in cs.parse_reply('{"kind": "build", "topic": "rag", "issue": "y", "summary": "x"}')
+
+
+def test_new_posts_get_the_finder_tags_in_one_call(monkeypatch):
+    calls = []
+    finder = cs.parse_finder(json.loads(VALID_TAGS))
+    monkeypatch.setattr(cs, "groq_sort", lambda post: calls.append(post) or
+                        {"keep": True, "topic": "rag", "issue": "Slow.", "summary": "x", "tags": [], "finder": finder})
+
+    def no_second_call(*a, **k):
+        raise AssertionError("a second Groq call")
+    monkeypatch.setattr(cs, "groq_tag", no_second_call)
+    posts, counts = cs.update([], cs.parse_feed(FEED, "Netflix"), "2026-11-07")
+    assert len(calls) == 1 and counts["calls"] == 1
+    assert posts[0]["industry"] == "fintech" and posts[0]["build_score"] == 4 and posts[0]["problem"] == "rag"
+    assert not cs.needs_tags(posts[0])
+
+
+def test_groq_tag_reads_a_valid_reply_in_one_call(monkeypatch):
+    client = _fake_groq(monkeypatch, [VALID_TAGS])
+    tags = cs.groq_tag({"company": "Stripe", "title": "Fraud", "issue": "I", "summary": "S", "text": "Body"})
+    assert tags["industry"] == "fintech" and len(client.asked) == 1
+    assert "Problem: I" in client.asked[0][1][1]["content"]
+
+
+def test_groq_tag_garbage_is_none_and_never_crashes(monkeypatch):
+    _fake_groq(monkeypatch, ["I cannot tag this post, sorry."])
+    assert cs.groq_tag({"company": "A", "title": "T"}) is None
+
+
+def test_groq_tag_waits_on_a_rate_limit_and_moves_off_a_tired_model(monkeypatch):
+    waits = []
+    client = _fake_groq(monkeypatch, [Exception("Error code: 429 - Rate limit reached ... Please try again in 1m2.5s."),
+                                      Exception("Error code: 429 - Rate limit reached on tokens per day (TPD)"),
+                                      VALID_TAGS])
+    assert cs.groq_tag({"company": "A", "title": "T"}, sleep=waits.append)["industry"] == "fintech"
+    assert waits == [63.5]
+    assert [m for m, _ in client.asked] == ["m1", "m1", "m2"]
+
+
+def test_groq_tag_stops_when_every_model_is_out_of_calls(monkeypatch):
+    _fake_groq(monkeypatch, [Exception("429 tokens per day (TPD)")] * 2)
+    try:
+        cs.groq_tag({"company": "A", "title": "T"}, sleep=lambda s: None)
+        assert False, "should stop"
+    except cs.GroqOutOfCalls:
+        pass
+
+
+def test_only_untagged_posts_are_tagged_and_cards_are_left_alone():
+    finder = cs.parse_finder(json.loads(VALID_TAGS))
+    tagged = _post("https://ex.com/1", issue="Old problem", **finder)
+    plain = _post("https://ex.com/2", issue="Their problem", result="2x")
+    asked = []
+    counts = cs.tag_posts([tagged, plain], tagger=lambda p: asked.append(p["url"]) or finder, sleep=lambda s: None)
+    assert asked == ["https://ex.com/2"] and counts == {"tagged": 1, "failed": 0, "left": 0}
+    assert plain["issue"] == "Their problem" and plain["summary"] == "What the team did." and plain["result"] == "2x"
+    assert plain["industry"] == "fintech"
+    counts = cs.tag_posts([tagged, plain], tagger=lambda p: asked.append(p["url"]) or finder, everything=True,
+                          sleep=lambda s: None)
+    assert counts["tagged"] == 2
+
+
+def test_a_failed_tag_leaves_the_post_for_next_time_and_out_of_calls_stops():
+    a, b, c = _post("https://ex.com/1"), _post("https://ex.com/2"), _post("https://ex.com/3")
+    replies = iter([None, cs.GroqOutOfCalls("daily limit")])
+
+    def tagger(post):
+        r = next(replies)
+        if isinstance(r, Exception):
+            raise r
+        return r
+    counts = cs.tag_posts([a, b, c], tagger=tagger, sleep=lambda s: None)
+    assert counts == {"tagged": 0, "failed": 1, "left": 2}
+    assert all(cs.needs_tags(p) for p in (a, b, c))
+
+
+def test_retag_saves_the_tags_and_reports_the_spread(tmp_path):
+    path = str(tmp_path / "cases.json")
+    cs.save([_post("https://ex.com/1"), _post("https://ex.com/2")], path, rejected=["https://ex.com/no"],
+            last_fetch="2026-11-09")
+    finder = cs.parse_finder(json.loads(VALID_TAGS))
+    result = cs.retag_saved(path, tagger=lambda p: finder, reader=lambda url: "", sleep=lambda s: None)
+    assert result["tagged"] == 2 and result["untagged"] == 0
+    assert result["problem"] == {"recs": 2} and result["build_score"] == {4: 2}
+    saved = cs.load_all(path)
+    assert saved["last_fetch"] == "2026-11-09" and saved["rejected"] == ["https://ex.com/no"]
+    assert all(p["industry"] == "fintech" and p["summary"] == "What the team did." for p in saved["posts"])

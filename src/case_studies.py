@@ -17,6 +17,10 @@ Posts left over when the week's Groq calls run out are saved in "queue" and sort
 To read the blogs again now anyway:  python src/case_studies.py --now
 To move the saved posts onto today's categories (keywords only, no Groq calls):
   python src/case_studies.py --recategorize
+The same Groq call also tags each post for the case study finder (techniques, industry,
+build_details, build_score; see FINDER_FIELDS; the category is the post's "problem" topic). Saved posts without those fields are tagged with
+the week's spare calls. To tag every saved post that has none yet (one Groq call each, resumable):
+  python src/case_studies.py --retag            (add --all to tag every post again)
 A feed that is down is skipped; the posts already saved stay.
 """
 import html
@@ -32,7 +36,8 @@ ROOT_DIR = os.path.dirname(SRC_DIR)
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from case_sources import (CUSTOMER_BLOGS, FOCUS_WORDS, SOURCES, TAG_NAMES, TAGS, TOPIC_RULES, TOPICS,
+from case_sources import (BUILD_DETAILS, CUSTOMER_BLOGS, FOCUS_WORDS, INDUSTRIES, MAX_TECHNIQUES, SOURCES,
+                          TAG_NAMES, TAGS, TECHNIQUES, TOPIC_RULES, TOPICS,
                           category_norm, match_category, split_agents, topic_of)
 
 CASES_FILE = os.path.join(ROOT_DIR, "data", "cases.json")
@@ -167,7 +172,7 @@ Topics:
 {topics}
 
 Reply with JSON only:
-{{"kind": "<kind>", "topic": "<key>", "new_topic": "<short name or empty>", "issue": "<one sentence>", "summary": "<one or two sentences>", "result": "<short phrase or empty>", "tags": ["<tag>", ...], "customer": "<company name or empty>"}}
+{{"kind": "<kind>", "topic": "<key>", "new_topic": "<short name or empty>", "issue": "<one sentence>", "summary": "<one or two sentences>", "result": "<short phrase or empty>", "tags": ["<tag>", ...], "customer": "<company name or empty>", {finder_json}}}
 
 kind is one of:
 - build: the company explains how it built, trained, served, tested or improved an AI or machine
@@ -199,7 +204,25 @@ result is the outcome the post reports, in at most 10 words, with its number whe
 one (for example "Support tickets resolved 30% faster"). Leave it empty when the post reports none;
 never guess one.
 tags are 1 to 3 techniques the system uses, the most specific first, chosen only from this list:
-{tags}"""
+{tags}
+{finder_rules}"""
+
+# The case study finder's fields, asked for in the same call (GROQ_PROMPT) or alone (TAG_PROMPT)
+FINDER_FIELDS = ("techniques", "industry", "build_details", "build_score")
+FINDER_JSON = ('"techniques": ["<key>", ...], "industry": "<key>", '
+               '"build": {' + ", ".join(f'"{k}": true|false' for k in BUILD_DETAILS) + "}")
+FINDER_RULES = (f"techniques are 1 to {MAX_TECHNIQUES} keys from this list, the main one first:\n"
+                + "\n".join(f"- {k}: {about}" for k, about in TECHNIQUES.items())
+                + "\nindustry is the company's industry (for a customer story, the customer's), one of: "
+                + ", ".join(INDUSTRIES)
+                + "\nbuild says, for each item, whether the post itself describes it (true) or not (false);"
+                + " when unsure, false:\n"
+                + "\n".join(f"- {k}: {about}" for k, about in BUILD_DETAILS.items()))
+
+TAG_PROMPT = """You tag engineering blog posts about AI systems that companies run in their products.
+Reply with JSON only:
+{{{finder_json}}}
+{finder_rules}"""
 
 # Titles that are never a write-up about how something was built, turned down without asking Groq
 NOT_A_BUILD = re.compile(
@@ -214,14 +237,60 @@ def _topics_text() -> str:
     return "\n".join(f"- {k}: {name}. {about}" for k, (name, about) in TOPICS.items())
 
 
-def parse_reply(raw: str) -> dict | None:
-    """The classification from a Groq reply, or None when it is unusable."""
+_TRUE = {"true", "yes", "y", "1"}
+
+
+def _key_of(value, allowed) -> str:
+    """value as one of the allowed keys (case, spaces and "&" forgiven), or "" when it is none of them."""
+    text = re.sub(r"[\s_/&]+", "-", str(value or "").strip().lower()).strip("-")
+    text = re.sub(r"-+", "-", text.replace("-and-", "-"))
+    return text if text in allowed else ""
+
+
+def parse_finder(data) -> dict | None:
+    """The finder fields from a reply's JSON, checked against the fixed lists: unknown values are
+    dropped, "other" fills an empty technique list or industry, and build_score is the
+    number of build details the post describes (0-5). None when the reply has none of the fields,
+    so the post is tagged again later."""
+    if not isinstance(data, dict) or not any(k in data for k in ("techniques", "industry", "build")):
+        return None
+    raw = data.get("techniques")
+    raw = raw if isinstance(raw, list) else [raw] if isinstance(raw, str) else []
+    techniques = []
+    for t in raw:
+        key = _key_of(t, TECHNIQUES)
+        if key and key not in techniques:
+            techniques.append(key)
+    if len(techniques) > 1 and "other" in techniques:
+        techniques.remove("other")
+    techniques = techniques[:MAX_TECHNIQUES] or ["other"]
+    industry = _key_of(data.get("industry"), INDUSTRIES) or "other"
+    build = data.get("build") if isinstance(data.get("build"), dict) else {}
+    details = {}
+    for k in BUILD_DETAILS:
+        v = build.get(k)
+        details[k] = (v is True or (isinstance(v, (int, float)) and not isinstance(v, bool) and v == 1)
+                      or (isinstance(v, str) and v.strip().lower() in _TRUE))
+    score = max(0, min(len(BUILD_DETAILS), sum(details.values())))
+    return {"techniques": techniques, "industry": industry,
+            "build_details": details, "build_score": score}
+
+
+def _reply_json(raw: str):
     match = re.search(r"\{.*\}", raw or "", re.S)
     if not match:
         return None
     try:
         data = json.loads(match.group(0))
     except json.JSONDecodeError:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def parse_reply(raw: str) -> dict | None:
+    """The classification from a Groq reply, or None when it is unusable."""
+    data = _reply_json(raw)
+    if data is None:
         return None
     if str(data.get("kind", "")).strip().lower() != "build":
         return {"keep": False}
@@ -259,6 +328,9 @@ def parse_reply(raw: str) -> dict | None:
         out["customer"] = customer
     if category:
         out["category"] = category
+    finder = parse_finder(data)
+    if finder:
+        out["finder"] = finder
     return out
 
 
@@ -277,9 +349,11 @@ def groq_sort(post: dict) -> dict | None:
         try:
             response = client.chat.completions.create(
                 model=model, temperature=0.2,
-                messages=[{"role": "system", "content": GROQ_PROMPT.format(topics=_topics_text(), tags=", ".join(TAG_NAMES))},
+                messages=[{"role": "system", "content": GROQ_PROMPT.format(
+                              topics=_topics_text(), tags=", ".join(TAG_NAMES),
+                              finder_json=FINDER_JSON, finder_rules=FINDER_RULES)},
                           {"role": "user", "content": user}],
-                **gs.call_options(model, 400))
+                **gs.call_options(model, 600))
             result = parse_reply(response.choices[0].message.content)
             if result:
                 return result
@@ -288,6 +362,106 @@ def groq_sort(post: dict) -> dict | None:
                 time.sleep(4)
             print(f"  [cases] Groq error on {model}: {str(exc)[:100]}")
     return None
+
+
+TAG_PAUSE = float(os.environ.get("CASES_TAG_PAUSE", "").strip() or 6)  # seconds between tagging calls
+MAX_TAG_CALLS = int(os.environ.get("CASES_MAX_TAG", "").strip() or 40)  # weekly run: saved posts tagged per run
+
+
+class GroqOutOfCalls(Exception):
+    """Every model has hit its daily limit (or Groq is not set up): stop tagging and save."""
+
+
+def _retry_after(error: str) -> float:
+    """Seconds Groq asks us to wait in a 429 message ("try again in 1m7.5s"), 20 when it does not say."""
+    m = re.search(r"try again in (?:(\d+)h)?(?:(\d+)m)?(?:([\d.]+)s)?", error)
+    if not m or not any(m.groups()):
+        return 20.0
+    h, mins, secs = (float(g) if g else 0.0 for g in m.groups())
+    return h * 3600 + mins * 60 + secs
+
+
+def needs_tags(post: dict) -> bool:
+    return not all(k in post for k in FINDER_FIELDS)
+
+
+_TIRED: set = set()  # models out of calls for today, in this run
+
+
+def groq_tag(post: dict, sleep=time.sleep, tries: int = 4) -> dict | None:
+    """The finder fields for one saved post, in one Groq call (TAG_PROMPT), with waits on rate limits.
+    None when the reply is unusable. Raises GroqOutOfCalls when no model has calls left today."""
+    import groq_summarizer as gs
+    try:
+        client = gs._get_client()
+        models = gs._active_models or gs._resolve_active_models()
+        gs._active_models = models
+    except Exception as exc:
+        raise GroqOutOfCalls(str(exc)[:120])
+    system = TAG_PROMPT.format(finder_json=FINDER_JSON, finder_rules=FINDER_RULES)
+    user = (f"Company: {post['company']}\nTitle: {post['title']}\n"
+            f"Problem: {post.get('issue', '')}\nSolution: {post.get('summary', '')}\n"
+            f"Post: {post.get('text', '')[:3500]}")
+    for _ in range(tries):
+        live = [m for m in models[:2] if m not in _TIRED]
+        if not live:
+            raise GroqOutOfCalls("every model is at its daily limit")
+        model = live[0]
+        try:
+            response = client.chat.completions.create(
+                model=model, temperature=0.1,
+                messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+                **gs.call_options(model, 250))
+            return parse_finder(_reply_json(response.choices[0].message.content))
+        except Exception as exc:
+            error = str(exc)
+            if gs._is_auth_error(error):
+                raise GroqOutOfCalls(error[:120])
+            if "429" in error or "rate limit" in error.lower():
+                if re.search(r"per day|\(TPD\)|\(RPD\)", error, re.I):
+                    print(f"  [cases] {model} is at its daily limit")
+                    _TIRED.add(model)
+                    continue
+                wait = min(_retry_after(error) + 1, 120)
+                print(f"  [cases] Rate limited on {model}; waiting {wait:.0f}s")
+                sleep(wait)
+                continue
+            print(f"  [cases] Groq error on {model}: {error[:100]}")
+            sleep(GROQ_PAUSE)
+    return None
+
+
+def tag_posts(posts: list[dict], tagger=None, reader=None, max_calls: int | None = None,
+              everything: bool = False, sleep=time.sleep, on_progress=None) -> dict:
+    """Add the finder fields to saved posts that have none (every post when everything is True),
+    one Groq call each, newest first. Changes posts in place; the Problem/Solution text is never
+    touched. on_progress() is called every 10 tagged posts, so a long run can save as it goes.
+    Returns {"tagged", "failed", "left"}."""
+    tagger = tagger or (lambda p: groq_tag(p, sleep=sleep))
+    todo = [p for p in posts if everything or needs_tags(p)]
+    todo.sort(key=lambda p: p.get("published") or "", reverse=True)
+    counts = {"tagged": 0, "failed": 0, "left": 0}
+    for n, post in enumerate(todo):
+        if max_calls is not None and n >= max_calls:
+            counts["left"] = len(todo) - n
+            break
+        if n:
+            sleep(TAG_PAUSE)
+        text = (reader(post["url"]) if reader else "") or ""
+        try:
+            fields = tagger({**post, "text": text})
+        except GroqOutOfCalls as exc:
+            print(f"  [cases] Tagging stopped: {exc}")
+            counts["left"] = len(todo) - n
+            break
+        if fields:
+            post.update(fields)
+            counts["tagged"] += 1
+            if on_progress and counts["tagged"] % 10 == 0:
+                on_progress()
+        else:
+            counts["failed"] += 1
+    return counts
 
 
 def load_all(path: str = CASES_FILE) -> dict:
@@ -419,6 +593,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                         "sorted_by": "groq", "v": VERSION, "cat": CAT_VERSION}
             posts[i].pop("resort", None)
             posts[i].pop("category", None)
+            posts[i].update(result.get("finder") or {})
             if result.get("category"):
                 posts[i] = recategorize({**posts[i], "category": result["category"]}, known_cats)
         counts["resorted"] += 1
@@ -459,7 +634,8 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 continue
             problem, summary, how = result["topic"], result["summary"], "groq"
             tags = result.get("tags") or rule_tags(post)
-            extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION, "cat": CAT_VERSION}
+            extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION, "cat": CAT_VERSION,
+                     **(result.get("finder") or {})}
             if result.get("category"):
                 named = recategorize({"problem": problem, "category": result["category"]}, known_cats)
                 problem = named["problem"]
@@ -485,6 +661,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                       "summary": summary, "tags": tags, "sorted_by": how, **extra})
         known.add(post["url"])
         counts["new"] += 1
+    counts["calls"] = calls
     return posts, counts
 
 
@@ -535,6 +712,11 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
     queue = saved.get("queue", [])
     posts, counts = update(existing, merge_queue(queue, fetched), today, use_groq=use_groq,
                            reader=read_article if use_groq else None, rejected=rejected)
+    # Saved posts with no finder fields yet (older posts, or a reply without them) use the spare calls
+    tagged = {"tagged": 0}
+    spare = min(MAX_TAG_CALLS, MAX_GROQ_CALLS - counts.get("calls", 0))
+    if use_groq and spare > 0 and any(needs_tags(p) for p in posts):
+        tagged = tag_posts(posts, reader=read_article, max_calls=spare)
     # Every feed down usually means no network: leave last_fetch alone so the next run tries again
     read_ok = len(down) < len(SOURCES)
     save(posts, path, rejected, counts["waiting"], today if read_ok else last_fetch, counts["left"])
@@ -546,7 +728,7 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
     except Exception as exc:
         print(f"  [cases] Logos skipped ({str(exc)[:80]})")
     print(f"  [cases] {counts['new']} new posts ({counts['groq']} sorted by Groq, {counts['rules']} by keywords), "
-          f"{counts['resorted']} older posts sorted again, {counts['skipped']} not about AI in production, {counts['waiting']} waiting for next week, "
+          f"{counts['resorted']} older posts sorted again, {tagged['tagged']} tagged for the finder, {counts['skipped']} not about AI in production, {counts['waiting']} waiting for next week, "
           f"{len(down)} of {len(SOURCES)} feeds down. {len(posts)} saved.")
     return counts["new"]
 
@@ -566,6 +748,29 @@ def recategorize_saved(path: str = CASES_FILE) -> dict[str, int]:
     return dict(sorted(counts.items(), key=lambda kv: -kv[1]))
 
 
+def retag_saved(path: str = CASES_FILE, everything: bool = False, tagger=None, reader=read_article,
+                sleep=time.sleep) -> dict:
+    """One-off: tag the saved posts for the finder (only those with no tags yet, unless everything),
+    saving every 10 posts so a run stopped by Groq's daily limit keeps its work; run it again the
+    next day to go on. Returns the counts plus the spread of topics ("problem") and build_score over the tagged posts."""
+    saved = load_all(path)
+    posts = saved.get("posts", [])
+
+    def keep():
+        save(posts, path, saved.get("rejected", []), saved.get("waiting", 0), saved.get("last_fetch", ""),
+             saved.get("queue", []))
+
+    counts = tag_posts(posts, tagger=tagger, reader=reader, everything=everything, sleep=sleep, on_progress=keep)
+    keep()
+    counts["problem"], counts["build_score"] = {}, {}
+    for p in posts:
+        if not needs_tags(p):
+            counts["problem"][p.get("problem", "")] = counts["problem"].get(p.get("problem", ""), 0) + 1
+            counts["build_score"][p["build_score"]] = counts["build_score"].get(p["build_score"], 0) + 1
+    counts["untagged"] = sum(needs_tags(p) for p in posts)
+    return counts
+
+
 if __name__ == "__main__":
     if "--recategorize" in sys.argv:  # keywords only, no API calls
         for key, n in recategorize_saved().items():
@@ -576,4 +781,14 @@ if __name__ == "__main__":
         load_dotenv()
     except ImportError:
         pass
+    if "--retag" in sys.argv:
+        if not os.environ.get("GROQ_API_KEY", "").strip():
+            print("  [cases] GROQ_API_KEY is not set; nothing tagged.")
+            sys.exit(1)
+        result = retag_saved(everything="--all" in sys.argv)
+        print(f"  [cases] {result['tagged']} posts tagged, {result['failed']} unusable replies, "
+              f"{result['left']} left for another run, {result['untagged']} saved posts still untagged.")
+        print("  [cases] topics:", dict(sorted(result["problem"].items(), key=lambda kv: -kv[1])))
+        print("  [cases] build_score:", dict(sorted(result["build_score"].items())))
+        sys.exit(0)
     run(force="--now" in sys.argv)

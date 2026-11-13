@@ -256,7 +256,39 @@ def test_case_studies_are_uploaded_for_scout(monkeypatch, tmp_path):
     url, rows, headers = next(c for c in session.calls if "/rest/v1/cases" in c[0])
     assert url == "https://x.supabase.co/rest/v1/cases?on_conflict=url"
     assert rows == [{"url": "https://ex.com/a", "company": "Acme", "title": "RAG at Acme", "published": "2026-10-01",
-                     "problem": "rag", "summary": "S", "issue": "", "result": "", "tags": ["RAG"]}]
+                     "problem": "rag", "summary": "S", "issue": "", "result": "", "tags": ["RAG"],
+                     "techniques": None, "industry": None, "build_details": None,
+                     "build_score": None}]
+
+
+def test_case_finder_tags_are_uploaded():
+    rows = sync.case_rows([{"url": "https://ex.com/a", "company": "Acme", "title": "T",
+                            "techniques": ["rag", 4], "industry": "fintech", "build_score": 2,
+                            "build_details": {"architecture": True, "numbers": True}}])
+    assert rows[0]["techniques"] == ["rag"] and "use_case" not in rows[0]
+    assert rows[0]["industry"] == "fintech" and rows[0]["build_score"] == 2
+    assert rows[0]["build_details"] == {"architecture": True, "numbers": True}
+
+
+def test_cases_upload_without_the_finder_columns_until_the_schema_has_them(monkeypatch, tmp_path, capsys):
+    import case_studies
+    _env(monkeypatch)
+    data = str(tmp_path)
+    case_studies.save([{"url": "https://ex.com/a", "company": "Acme", "title": "T", "industry": "other"}],
+                      os.path.join(data, "cases.json"))
+
+    class OldTable(FakeSession):
+        def post(self, url, json=None, headers=None, timeout=None):
+            self.calls.append((url, json, headers))
+            if any("industry" in row for row in json):
+                r = FakeResponse(400)
+                r.text = "Could not find the 'build_details' column of 'cases' in the schema cache"
+                return r
+            return FakeResponse(201)
+
+    session = OldTable()
+    assert sync.upsert_cases(sync._config(), data, session) == 1
+    assert "industry" not in session.calls[-1][1][0] and "run supabase/schema.sql" in capsys.readouterr().out
 
 
 def test_a_missing_cases_table_never_fails_the_sync(monkeypatch, tmp_path, capsys):

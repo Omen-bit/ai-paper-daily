@@ -3,8 +3,10 @@ case_pages.py
 The Case studies pages: engineering write-ups from company blogs. Every card links out to the
 company's own blog.
 
-  case-studies/index.html     the newest write-ups, then a section per topic; search, company
-                              or a tag switches to one list of every match
+  case-studies/index.html     the finder: a search box and category chips, then a section per
+                              topic, the write-ups with the most build details first. Search runs
+                              in the browser (assets/case-finder.js) over an inline JSON index of
+                              every write-up (search_index): keywords only, no LLM, no network
   case-studies/<topic>.html   every write-up on one topic, with the same search and filters
 
 site_builder.build_site calls build_all with the posts from data/cases.json.
@@ -19,7 +21,8 @@ import zlib
 
 import case_logos
 import making_of
-from case_sources import BY_NAME, TOPICS as TOPIC_INFO, category_norm, category_slug, clean_category, topic_of
+from case_sources import (BY_NAME, BUILD_DETAILS, INDUSTRIES, TECHNIQUES, TOPICS as TOPIC_INFO, category_norm,
+                          category_slug, clean_category, topic_of)
 
 DIR = "case-studies"
 ROOT = "../"
@@ -170,6 +173,28 @@ def nice_date(day: str) -> str:
         return ""
 
 
+def build_score(post: dict) -> int:
+    """How many of the five build details the post describes; 0 when it is not tagged yet."""
+    n = post.get("build_score")
+    return max(0, min(len(BUILD_DETAILS), n)) if isinstance(n, int) and not isinstance(n, bool) else 0
+
+
+def by_detail(posts: list[dict]) -> list[dict]:
+    """The write-ups with the most build details first (untagged ones count as 0), then the newest."""
+    return sorted(posts, key=lambda p: (build_score(p), p.get("published") or "", p.get("url", "")), reverse=True)
+
+
+def detail_pill(post: dict) -> str:
+    """The card's "Build details N/5" pill: green for 4-5, amber for 2-3, none below that."""
+    n = build_score(post)
+    if n < 2:
+        return ""
+    level = "hi" if n >= 4 else "mid"
+    covered = ", ".join(k.replace("_", " ") for k in BUILD_DETAILS if (post.get("build_details") or {}).get(k))
+    title = f' title="Describes: {esc(covered)}"' if covered else ""
+    return f'<span class="cs-bd cs-bd-{level}"{title}>\u2713 Build details {n}/{len(BUILD_DETAILS)}</span>'
+
+
 def post_card(post: dict, paper: tuple | None = None) -> str:
     """One write-up: brand cover with the company and topic, then our summary, tags and a link out.
     paper is (id, title) of a related paper from our library, or None."""
@@ -189,7 +214,7 @@ def post_card(post: dict, paper: tuple | None = None) -> str:
     date = nice_date(post.get("published", ""))
     when = f'<time datetime="{esc(post.get("published", ""))}">{date}</time>' if date else ""
     return f"""<li class="cs-card" style="--c:{color(problem)};--b:{brand_hex(company)}" data-cs-item data-p="{problem}" data-co="{esc(company)}" data-tags="|{esc("|".join(tags))}|" data-t="{search_text(post['title'], company, problem_name(problem), *tags, post.get('summary', ''), post.get('issue', ''), post.get('result', ''))}">
-<div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-topic">{esc(problem_name(problem))}</span></div>
+<div class="cs-cover">{logo(company, "cs-big")}<span class="cs-co">{logo(company, "cs-badge")}{esc(company)}</span>{when}<span class="cs-pills"><span class="cs-topic">{esc(problem_name(problem))}</span>{detail_pill(post)}</span></div>
 <div class="cs-body"><h3><a class="cs-link" href="{esc(post['url'])}" rel="noopener" target="_blank">{esc(post['title'])}</a></h3>{summary}{tag_html}{rel}
 <div class="cs-foot"><span class="cs-src">Read on {esc(host(post['url']))}{EXT}</span><button class="cs-save" type="button" data-cs-save="cs:{esc(post['url'])}" data-title="{esc(post['title'])}" data-url="{esc(post['url'])}" data-co="{esc(company)}" aria-pressed="false">{BOOKMARK}<span>Save</span></button></div></div></li>"""
 
@@ -366,8 +391,137 @@ NONE = ('<div class="cs-none" data-cs-none hidden><p>No write-ups match these fi
         '<button class="cs-more" type="button" data-cs-reset>Clear all filters</button></div>')
 
 
+# ---------- the finder on the main page
+
+SUBLINE = ("Browse real engineering write-ups by category, or describe what you\u2019re building to find the "
+           "closest ones. Every card opens the original post.")
+HERO = ('<section class="cs-top cf-hero"><p class="cf-eyebrow">Case studies</p><h1>How companies build AI</h1>'
+        f'<p>{SUBLINE}</p>')
+PLACEHOLDER = "Describe your problem, e.g. HR policy chatbot with role-based access"
+TRY = ["Policy Q&A bot", "Support chatbot with handoff", "Evaluate a RAG bot", "Cut LLM costs", "Coding agent in CI"]
+# One plain-English line per topic for its section heading; proposed categories use their own description
+BLURBS = {
+    "rag": "Bots and search boxes that answer from a company\u2019s own documents.",
+    "agents": "AI that takes actions with tools, not just answers.",
+    "coding": "AI that writes, reviews and tests code.",
+    "data": "Ask a question in plain words, get an answer from the company\u2019s data.",
+    "ops": "AI that watches production and helps fix incidents.",
+    "support": "Bots and assistants that help customers and support teams.",
+    "platforms": "The plumbing for running many agents safely.",
+    "evals": "How teams test whether answers are right.",
+    "cost": "Making AI cheaper and faster to run.",
+    "tuning": "Teaching a model a company\u2019s own data and style.",
+    "safety": "Stopping leaks, prompt attacks and unsafe answers.",
+    "llm": "Products built on top of a large language model.",
+    "recs": "Picking what each person sees next.",
+    "ads": "Choosing and pricing the ads people see.",
+    "predict": "Predicting demand, prices, arrival times and fraud.",
+    "vision": "Understanding and editing images and video.",
+}
+TECH_LABELS = {"rag": "RAG", "fine-tuning": "Fine-tuning", "embeddings": "Embeddings", "agents": "Agents and tools",
+               "distillation": "Distillation", "classical-ml": "Classical ML", "prompt-engineering": "Prompt engineering",
+               "evaluation-harness": "Eval harness", "guardrails": "Guardrails", "llm-routing": "LLM routing",
+               "quantization": "Quantization", "caching": "Caching", "other": "Other"}
+INDUSTRY_LABELS = {"fintech": "Fintech", "e-commerce": "E-commerce", "travel": "Travel", "media": "Media",
+                   "healthcare": "Healthcare", "developer-tools": "Developer tools", "saas": "SaaS",
+                   "marketplace": "Marketplace", "social": "Social", "logistics": "Logistics", "other": "Other"}
+CHEVRON_DOWN = CHEVRON.format(d="m6 9 6 6 6-6")
+
+
+def blurb(key: str) -> str:
+    return BLURBS.get(key) or topic_about(key)
+
+
+def _techniques(post: dict) -> list[str]:
+    return [t for t in post.get("techniques") or [] if t in TECHNIQUES]
+
+
+def _industry(post: dict) -> str:
+    return post.get("industry") if post.get("industry") in INDUSTRIES else ""
+
+
+def _select(name: str, label: str, counts: dict[str, int], labels: dict[str, str]) -> str:
+    """A filter menu with the values these write-ups use, most used first; "" when none do."""
+    if not counts:
+        return ""
+    opts = "".join(f'<option value="{esc(v)}">{esc(labels.get(v, v))} ({n})</option>'
+                   for v, n in sorted(counts.items(), key=lambda kv: (kv[0] == "other", -kv[1], labels.get(kv[0], kv[0]).lower())))
+    return (f'<label class="cf-sel"><span class="sr-only">{esc(label)}</span><select data-cf-{name}>'
+            f'<option value="">{esc(label)}: any</option>{opts}</select></label>')
+
+
+def finder_tools(posts: list[dict]) -> str:
+    """The search box, the "Try" examples and the filter menus."""
+    tech: dict[str, int] = {}
+    ind: dict[str, int] = {}
+    cos: dict[str, int] = {}
+    for p in posts:
+        for t in _techniques(p):
+            tech[t] = tech.get(t, 0) + 1
+        if _industry(p):
+            ind[_industry(p)] = ind.get(_industry(p), 0) + 1
+        cos[p["company"]] = cos.get(p["company"], 0) + 1
+    co_menu = (f'<label class="cf-sel"><span class="sr-only">Company</span><select data-cf-co><option value="">Company: any</option>'
+               + "".join(f'<option value="{esc(c)}">{esc(c)} ({n})</option>' for c, n in sorted(cos.items(), key=lambda kv: kv[0].lower()))
+               + "</select></label>")
+    tries = "".join(f'<button type="button" data-cf-try="{esc(t)}">{esc(t)}</button>' for t in TRY)
+    return f"""<form class="cf-form" role="search" data-cf-form>
+<label class="sr-only" for="cf-q">Describe what you are building</label>
+<div class="cf-box">{SEARCH}<input id="cf-q" name="q" type="search" placeholder="{esc(PLACEHOLDER)}" autocomplete="off" enterkeyhint="search" data-cf-q></div>
+<button class="cf-go" type="submit">Find write-ups</button>
+</form>
+<div class="cf-try" role="group" aria-label="Example searches"><span>Try</span>{tries}</div>
+<div class="cf-filters">{_select("tech", "Technique", tech, TECH_LABELS)}{_select("ind", "Industry", ind, INDUSTRY_LABELS)}{co_menu}
+<label class="cf-toggle"><input type="checkbox" data-cf-first checked><span>Build details first</span></label></div>"""
+
+
+def category_chips(posts: list[dict], counts: dict[str, int]) -> str:
+    """One chip per topic with write-ups, biggest first; a chip filters the page to its topic."""
+    chips = "".join(f'<button type="button" style="--c:{color(k)}" data-cf-topic="{esc(k)}" aria-pressed="false">'
+                    f'<i aria-hidden="true"></i>{esc(problem_name(k))} <span>{n}</span></button>'
+                    for k, n in sorted(counts.items(), key=lambda kv: (-kv[1], problem_name(kv[0]))) if n)
+    return (f'<section class="cf-browse" aria-labelledby="cf-browse-h"><h2 id="cf-browse-h">Browse by category</h2>'
+            f'<div class="cf-chips" role="group" aria-label="Categories">{chips}</div></section>')
+
+
+FINDER_RESULTS = ('<section class="cf-results" data-cf-results hidden aria-label="Matching write-ups">'
+                  '<div class="cs-status"><p data-cf-status aria-live="polite"></p>'
+                  '<button class="cf-clear" type="button" data-cf-clear>Clear</button></div>'
+                  '<ul class="cs-grid cs-plain" data-cf-list></ul>'
+                  '<div class="cs-none" data-cf-none hidden><p>No write-ups match yet. Try fewer words or pick a category above.</p></div>'
+                  '<button class="cs-more" type="button" data-cf-more hidden>Show more write-ups</button></section>')
+
+
+def search_index(posts: list[dict]) -> dict:
+    """Everything case-finder.js needs to search and draw the cards: the write-ups (short keys,
+    most build details first), topic names and colours, labels, and each company's logo markup."""
+    ordered = by_detail(posts)
+    rows = []
+    for p in ordered:
+        row = {"u": p["url"], "c": p["company"], "t": p["title"], "p": p["problem"], "d": p.get("published") or "",
+               "i": p.get("issue") or "", "s": p.get("summary") or "", "r": p.get("result") or "",
+               "g": [t for t in p.get("tags") or [] if isinstance(t, str)][:3], "x": _techniques(p),
+               "n": _industry(p), "b": build_score(p)}
+        covered = [k for k in BUILD_DETAILS if (p.get("build_details") or {}).get(k)]
+        if covered:
+            row["bd"] = covered
+        rows.append(row)
+    companies = sorted({p["company"] for p in posts})
+    topics = sorted({p["problem"] for p in posts})
+    return {"posts": rows,
+            "topics": {k: [problem_name(k), color(k)] for k in topics},
+            "labels": {"x": TECH_LABELS, "n": INDUSTRY_LABELS},
+            "brands": {c: [logo(c, "cs-big"), logo(c, "cs-badge"), brand_hex(c)] for c in companies}}
+
+
+def index_json(posts: list[dict]) -> str:
+    """search_index as JSON that is safe inside a <script> tag."""
+    text = json.dumps(search_index(posts), ensure_ascii=False, separators=(",", ":"))
+    return text.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
 def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_dir: str = "",
-              site_url: str = "", theme_script: str = "", head_extra: str = "") -> list[str]:
+              site_url: str = "", theme_script: str = "", head_extra: str = "", asset_v: str = "") -> list[str]:
     """Write the Case studies pages: the main page with a section per topic, and one page per topic.
     page is site_builder.page; logo_dir holds the icons case_logos.py saved. It also writes "How I built
     AI Papers Daily" (making_of.py), whose card leads the main page. Returns the paths for the sitemap."""
@@ -399,38 +553,30 @@ def build_all(posts: list[dict], papers: dict, page, write, site_dir: str, logo_
     def wrap(inner: str, style: str = "") -> str:
         return f'{sprite_all}<div class="cs-wrap"{style}>{inner}</div>'
 
-    # The main page: the newest write-ups, then a section for each topic
+    # The main page: the finder (search box, category chips), then a section for each topic,
+    # biggest first, each with the write-ups that show the most build details
     if posts:
-        lead = (f"Write-ups from {len(companies)} company engineering blogs about AI running in real products, "
-                "grouped by topic. Each card opens the original post on the company’s own blog.")
-        # Our own write-up about building this site leads, beside the newest company post
-        # The newest write-ups lead, the latest one large; our own "how I built it" card follows them
-        sections = [f'<section class="cs-sec"><div class="cs-sec-head"><h2>Newest</h2></div>'
-                    f'<ul class="cs-grid">{"".join(card(p) for p in posts[:NEWEST])}{making_of.card()}</ul></section>']
-        # Topics with the freshest write-ups come first
-        latest = {k: max((p.get("published") or "" for p in posts if p["problem"] == k), default="") for k in topic_keys()}
-        for k in sorted(topic_keys(), key=lambda t: latest[t], reverse=True):
-            these = [p for p in posts if p["problem"] == k]
-            if not these:
-                continue
-            see = (f'<a class="cs-see" href="{page_slug(k)}.html">See all {len(these)}{EXT_ARROW}</a>'
-                   if len(these) > PER_SECTION else f'<a class="cs-see" href="{page_slug(k)}.html">Open topic{EXT_ARROW}</a>')
+        counts = {k: sum(1 for p in posts if p["problem"] == k) for k in topic_keys()}
+        sections = []
+        for k in sorted((k for k in topic_keys() if counts[k]), key=lambda t: (-counts[t], problem_name(t))):
+            these = by_detail([p for p in posts if p["problem"] == k])
             sections.append(
-                f'<section class="cs-sec" id="{page_slug(k)}" style="--c:{color(k)}"><div class="cs-sec-head">'
-                f'<div><h2><i aria-hidden="true"></i><a href="{page_slug(k)}.html">{esc(problem_name(k))}</a></h2>'
-                f'<p>{esc(topic_about(k))}</p></div>{see}</div>'
+                f'<section class="cs-sec cf-sec" id="{page_slug(k)}" style="--c:{color(k)}"><div class="cs-sec-head"><div>'
+                f'<p class="cf-kicker"><i aria-hidden="true"></i>{esc(problem_name(k))}</p>'
+                f'<h2>{esc(blurb(k))}</h2><p>Posts with real build details first.</p></div>'
+                f'<a class="cs-see" href="{page_slug(k)}.html" data-cf-see="{esc(k)}">See all {len(these)}{EXT_ARROW}</a></div>'
                 f'<ul class="cs-grid cs-plain">{"".join(card(p) for p in these[:PER_SECTION])}</ul></section>')
-        capped = (f'<p class="cs-cap">Searching the newest {INDEX_FEED} write-ups. Open a topic above to search all of its write-ups.</p>'
-                  if len(posts) > INDEX_FEED else "")
-        inner = f"""{filters(posts, posts)}
-<div data-cs-sections>{"".join(sections)}</div>
-<div data-cs-results hidden>{status(min(len(posts), INDEX_FEED))}{capped}{feed(posts[:INDEX_FEED], " cs-plain")}</div>"""
+        # Our own write-up about building this site closes the page
+        sections.append('<section class="cs-sec cf-sec"><div class="cs-sec-head"><div><p class="cf-kicker">Behind this site</p>'
+                        '<h2>How these write-ups are found and sorted.</h2></div></div>'
+                        f'<ul class="cs-grid cs-plain">{making_of.card()}</ul></section>')
+        body = (f'{HERO}{finder_tools(posts)}</section>{category_chips(posts, counts)}'
+                f'<div data-cf-sections>{"".join(sections)}</div>{FINDER_RESULTS}'
+                f'<script type="application/json" id="cf-index">{index_json(posts)}</script>'
+                f'<script src="../assets/case-finder.js{"?v=" + asset_v if asset_v else ""}" defer></script>')
     else:
-        lead = ("Write-ups from company engineering blogs about AI running in real products, grouped by topic. "
-                "Each card will open the original post on the company’s own blog.")
-        inner = ('<div class="cs-empty"><p><b>No write-ups yet.</b> The first ones arrive with the next blog check, '
-                 'on Monday or Thursday morning.</p></div>')
-    body = f'<section class="cs-top"><h1>How companies build AI</h1><p>{lead}</p></section>{inner}'
+        body = (f'{HERO}</section><div class="cs-empty"><p><b>No write-ups yet.</b> The first ones arrive with the '
+                'next blog check, on Monday morning.</p></div>')
     write(os.path.join(site_dir, DIR, "index.html"),
           page("Case studies", wrap(body), root=ROOT, active="cases", path=f"{DIR}/index.html", description=desc))
     paths = [f"{DIR}/index.html"]

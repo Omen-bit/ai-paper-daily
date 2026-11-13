@@ -49,11 +49,11 @@ def test_page_is_built_with_card_and_sitemap_entry(tmp_path):
     related = page.split("/Related articles", 1)[1]
     assert related.count('rel="noopener" target="_blank"><div class="rel-art">') == 3
     assert "https://a.example/1" in related and "https://a.example/2" not in related
-    # The newest company write-ups lead the Case studies page and the card follows them; the page is in the sitemap
+    # The company write-ups lead the Case studies page and the card follows them; the page is in the sitemap
     index = open(os.path.join(folder, "index.html"), encoding="utf-8").read()
-    newest = index.split("<h2>Newest</h2>", 1)[1].split("</section>", 1)[0]
-    assert newest.index("data-cs-item") < newest.index(f'href="{making_of.SLUG}.html"')
-    assert 1 <= newest.count("data-cs-item") <= 4
+    sections = index.split("data-cf-sections", 1)[1].split("data-cf-results", 1)[0]
+    assert sections.index("data-cs-item") < sections.index(f'href="{making_of.SLUG}.html"')  # it closes the topic sections
+    assert sections.count(f'href="{making_of.SLUG}.html"') == 1
     sitemap = open(os.path.join(site_dir, "sitemap.xml"), encoding="utf-8").read()
     assert f"case-studies/{making_of.SLUG}.html" in sitemap
 

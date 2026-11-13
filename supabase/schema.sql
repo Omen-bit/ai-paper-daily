@@ -360,6 +360,11 @@ create table if not exists public.cases (
   updated_at timestamptz not null default now()
 );
 create index if not exists cases_missing_embedding_idx on public.cases (url) where embedding is null;
+-- Case study finder tags (case_sources.TECHNIQUES, INDUSTRIES, BUILD_DETAILS); empty until a post is tagged
+alter table public.cases add column if not exists techniques text[];
+alter table public.cases add column if not exists industry text;
+alter table public.cases add column if not exists build_details jsonb;
+alter table public.cases add column if not exists build_score smallint;
 alter table public.cases enable row level security;
 drop policy if exists "Anyone can read cases" on public.cases;
 create policy "Anyone can read cases" on public.cases for select using (true);

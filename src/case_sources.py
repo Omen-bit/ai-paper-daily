@@ -259,6 +259,37 @@ TAGS = [
 ]
 TAG_NAMES = [t for t, _ in TAGS]
 
+# The case study finder's filters. Groq picks from these fixed lists in the same call that sorts a
+# post; any other value is dropped and "other" is used instead. Keys are what cases.json stores.
+# The category chips reuse TOPICS (each post's "problem"), so there is no separate use-case list.
+# key -> what it covers (shown to Groq)
+TECHNIQUES = {
+    "rag": "retrieval-augmented generation",
+    "fine-tuning": "training or LoRA-tuning a model on own data",
+    "embeddings": "embeddings or vector search",
+    "agents": "agents or tool calling",
+    "distillation": "distilling a big model into a smaller one",
+    "classical-ml": "non-LLM machine learning: trees, ranking models, two-tower, bandits",
+    "prompt-engineering": "prompt design, few-shot examples, context engineering",
+    "evaluation-harness": "an offline eval set, LLM judges or A/B tests",
+    "guardrails": "filters and checks on inputs or outputs",
+    "llm-routing": "routing requests between models",
+    "quantization": "quantised or compressed models",
+    "caching": "prompt, KV or semantic caching",
+    "other": "none of the above",
+}
+INDUSTRIES = ["fintech", "e-commerce", "travel", "media", "healthcare", "developer-tools", "saas",
+              "marketplace", "social", "logistics", "other"]
+# What a write-up shows about how the system was built; build_score counts the ones it does
+BUILD_DETAILS = {
+    "architecture": "draws or describes the system's components and how data flows between them",
+    "stack": "names the models, libraries, databases or services used",
+    "evaluation": "says how quality was measured (eval set, metrics, A/B test)",
+    "failure_modes": "describes what went wrong, limits or lessons learned",
+    "numbers": "reports concrete numbers: latency, cost, accuracy, scale or business impact",
+}
+MAX_TECHNIQUES = 4
+
 # Posts saved before the topics changed (problem + step) -> today's topic
 _OLD_LLM_STEPS = {0: "llm", 1: "rag", 2: "agents", 3: "safety", 4: "cost", 5: "evals"}
 

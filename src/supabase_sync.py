@@ -120,8 +120,16 @@ def case_rows(posts: list[dict]) -> list[dict]:
             "published": (p.get("published") or "")[:10] or None, "problem": p.get("problem") or "",
             "summary": p.get("summary") or "", "issue": p.get("issue") or "", "result": p.get("result") or "",
             "tags": [t for t in p.get("tags") or [] if isinstance(t, str)],
+            # Case study finder tags; None until the post is tagged
+            "techniques": [t for t in p["techniques"] if isinstance(t, str)] if isinstance(p.get("techniques"), list) else None,
+            "industry": p.get("industry") or None,
+            "build_details": p.get("build_details") if isinstance(p.get("build_details"), dict) else None,
+            "build_score": p.get("build_score") if isinstance(p.get("build_score"), int) else None,
         })
     return rows
+
+
+FINDER_COLUMNS = ("techniques", "industry", "build_details", "build_score")
 
 
 def upsert_cases(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
@@ -133,8 +141,16 @@ def upsert_cases(cfg: dict, data_dir: str = DATA_DIR, session=requests) -> int:
     headers = dict(_headers(cfg["key"]), Prefer="resolution=merge-duplicates,return=minimal")
     try:
         for start in range(0, len(rows), BATCH):
-            r = session.post(f"{cfg['url']}/rest/v1/cases?on_conflict=url", json=rows[start:start + BATCH],
+            batch = rows[start:start + BATCH]
+            r = session.post(f"{cfg['url']}/rest/v1/cases?on_conflict=url", json=batch,
                              headers=headers, timeout=TIMEOUT)
+            if r.status_code >= 300 and any(c in (r.text or "") for c in FINDER_COLUMNS):
+                # The finder columns are not in the table yet (schema.sql not run): upload without them
+                print("[supabase] Case finder columns missing; run supabase/schema.sql. Uploading without them.")
+                rows = [{k: v for k, v in row.items() if k not in FINDER_COLUMNS} for row in rows]
+                batch = rows[start:start + BATCH]
+                r = session.post(f"{cfg['url']}/rest/v1/cases?on_conflict=url", json=batch,
+                                 headers=headers, timeout=TIMEOUT)
             if r.status_code >= 300:
                 raise RuntimeError(f"({r.status_code}) {r.text[:200]}")
     except Exception as exc:

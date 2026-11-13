@@ -74,7 +74,7 @@
     var tag = (document.activeElement && document.activeElement.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
     e.preventDefault();
-    var box = document.getElementById("q") || document.getElementById("cs-q");
+    var box = document.getElementById("q") || document.getElementById("cs-q") || document.getElementById("cf-q");
     if (box) { box.focus(); return; }
     var trigger = document.querySelector("[data-search-trigger]");
     if (trigger) location.href = trigger.getAttribute("href");
@@ -1978,26 +1978,27 @@
 
   // ---- Case studies: search, company and tag filters, showing more, and Save ----
   (function () {
-    var saveBtns = Array.prototype.slice.call(document.querySelectorAll("[data-cs-save]"));
+    // One listener for every Save button, so the cards case-finder.js draws later work too
     function paintSaves() {
-      saveBtns.forEach(function (b) {
+      document.querySelectorAll("[data-cs-save]").forEach(function (b) {
         var on = saved.some(function (s) { return s.id === b.getAttribute("data-cs-save"); });
         b.setAttribute("aria-pressed", on ? "true" : "false");
         b.querySelector("span").textContent = on ? "Saved" : "Save";
       });
     }
-    saveBtns.forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var id = btn.getAttribute("data-cs-save");
-        var on = saved.some(function (s) { return s.id === id; });
-        saved = on ? saved.filter(function (s) { return s.id !== id; })
-                   : [{ id: id, t: btn.getAttribute("data-title"), u: btn.getAttribute("data-url"),
-                        c: btn.getAttribute("data-co"), at: Date.now() }].concat(saved);
-        store("apd.saved", saved);
-        paintSaves();
-        showSavedCount();
-      });
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest && e.target.closest("[data-cs-save]");
+      if (!btn) return;
+      var id = btn.getAttribute("data-cs-save");
+      var on = saved.some(function (s) { return s.id === id; });
+      saved = on ? saved.filter(function (s) { return s.id !== id; })
+                 : [{ id: id, t: btn.getAttribute("data-title"), u: btn.getAttribute("data-url"),
+                      c: btn.getAttribute("data-co"), at: Date.now() }].concat(saved);
+      store("apd.saved", saved);
+      paintSaves();
+      showSavedCount();
     });
+    document.addEventListener("cs:cards", paintSaves);
     paintSaves();
 
     var list = document.querySelector("[data-cs-list]");

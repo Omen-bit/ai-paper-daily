@@ -234,9 +234,9 @@ LOGO_DEV_CREDIT = False
 
 # Runs before first paint so a saved dark theme never flashes white
 def _asset_version() -> str:
-    """Changes whenever style.css or app.js changes, so browsers never keep an old copy."""
+    """Changes whenever style.css, app.js or case-finder.js changes, so browsers never keep an old copy."""
     h = hashlib.sha1()
-    for name in ("style.css", "app.js", "labs.svg"):
+    for name in ("style.css", "app.js", "case-finder.js", "labs.svg"):
         with open(os.path.join(ASSETS_DIR, name), "rb") as f:
             h.update(f.read())
     return h.hexdigest()[:10]
@@ -2088,7 +2088,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     try:  # engineering write-ups from company blogs; the rest of the site never waits on them
         case_paths = case_pages.build_all(case_studies.load(os.path.join(data_dir, "cases.json")), papers,
                                           page, _write, site_dir, os.path.join(data_dir, "case_logos"),
-                                          SITE_URL, THEME_SCRIPT, _making_of_head())
+                                          SITE_URL, THEME_SCRIPT, _making_of_head(), ASSET_V)
     except Exception as exc:
         print(f"  [site] WARNING: case study pages failed: {exc}")
     # Scout draws case study covers like the Case studies page, so it is built after them (they save the logos)
