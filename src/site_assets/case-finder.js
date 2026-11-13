@@ -353,6 +353,16 @@
       url.focus();
     });
     dialog.addEventListener("close", function () { opener.focus(); });  // focus goes back to the button
+    // Tab and Shift+Tab cycle inside the dialog instead of leaving it for the browser's own controls
+    dialog.addEventListener("keydown", function (e) {
+      if (e.key !== "Tab") return;
+      var items = Array.prototype.slice.call(dialog.querySelectorAll("a[href], button, input, textarea, [tabindex='0']"))
+        .filter(function (el) { return !el.disabled && !el.closest("[hidden]") && !el.closest(".sg-hp") && el.getClientRects().length; });
+      if (!items.length) return;
+      var first = items[0], last = items[items.length - 1], at = document.activeElement;
+      if (e.shiftKey && (at === first || !dialog.contains(at) || at === thanks)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (at === last || !dialog.contains(at))) { e.preventDefault(); first.focus(); }
+    });
     dialog.addEventListener("click", function (e) {
       if (e.target === dialog) { dialog.close(); return; }  // a click on the backdrop
       var t = e.target.closest && e.target.closest("[data-sg-close], [data-sg-again]");
