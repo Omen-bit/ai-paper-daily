@@ -43,7 +43,7 @@ def test_a_new_week_reads_the_feeds_and_records_the_day(tmp_path, monkeypatch):
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
     monkeypatch.setitem(sys.modules, "case_logos", None)  # no logo downloads in tests
     cs.run(path)
-    assert len(read) == len(SOURCES)
+    assert len(read) == len(SOURCES) + sum(len(v) for v in cs.EXTRA_FEEDS.values())  # second blogs too
     assert cs.load_all(path)["last_fetch"] == datetime.now(cs.IST).strftime("%Y-%m-%d")
 
 

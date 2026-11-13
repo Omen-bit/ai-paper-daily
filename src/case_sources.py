@@ -160,7 +160,22 @@ SOURCES = [
     ("Vespa", "https://blog.vespa.ai/feed.xml", "https://blog.vespa.ai/", "", "61D790"),
     ("LlamaIndex", "https://www.llamaindex.ai/blog/feed", "https://www.llamaindex.ai/blog", "", "000000"),
     ("Mozilla.ai", "https://blog.mozilla.ai/rss/", "https://blog.mozilla.ai/", "", "000000"),
+    # Added Nov 2026 for the case study finder; each feed was checked to resolve and to carry AI posts
+    ("Figma", "https://www.figma.com/blog/feed/atom.xml", "https://www.figma.com/blog/", "", "F24E1E"),
+    ("Zapier", "https://zapier.com/engineering/feed/", "https://zapier.com/engineering/", "", "FF4F00"),
+    ("Linear", "https://linear.app/rss/blog.xml", "https://linear.app/blog", "", "5E6AD2"),
+    ("Plaid", "https://plaid.com/blog/rss.xml", "https://plaid.com/blog/", "", "111111"),
+    ("Affirm", "https://tech.affirm.com/feed", "https://tech.affirm.com/", "", "4A4AF4"),
+    ("Character.AI", "https://blog.character.ai/rss/", "https://blog.character.ai/", "", "1A1A1A"),
+    ("Zepto", "https://blog.zeptonow.com/feed", "https://blog.zeptonow.com/", "", "5E1BA6"),
+    ("Instawork", "https://medium.com/feed/instawork-engineering", "https://medium.com/instawork-engineering", "", "1F6FEB"),
+    ("eBay", "https://innovation.ebayinc.com/stories/rss/", "https://innovation.ebayinc.com/stories/", "", "E53238"),
 ]
+
+# Second blogs of companies already above: name -> more feeds read the same way under that name
+EXTRA_FEEDS = {
+    "Spotify": ["https://research.atspotify.com/feed/"],
+}
 
 BY_NAME = {s[0]: s for s in SOURCES}
 # Blogs where most posts tell how a customer built something: the card shows the customer's name

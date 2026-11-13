@@ -29,6 +29,15 @@ USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHT
 
 # The company's main website, where its icon lives (its blog is often on Medium or a subdomain)
 SITES = {
+    "Figma": "https://www.figma.com/",
+    "Zapier": "https://zapier.com/",
+    "Linear": "https://linear.app/",
+    "Plaid": "https://plaid.com/",
+    "Affirm": "https://www.affirm.com/",
+    "Character.AI": "https://character.ai/",
+    "Zepto": "https://www.zeptonow.com/",
+    "Instawork": "https://www.instawork.com/",
+    "eBay": "https://www.ebay.com/",
     "Capital One": "https://www.capitalone.com/",
     "Myntra": "https://www.myntra.com/",
     "Meesho": "https://www.meesho.com/",

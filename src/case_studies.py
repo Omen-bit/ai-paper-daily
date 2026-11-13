@@ -21,10 +21,13 @@ The same Groq call also tags each post for the case study finder (techniques, in
 build_details, build_score; see FINDER_FIELDS; the category is the post's "problem" topic). Saved posts without those fields are tagged with
 the week's spare calls. To tag every saved post that has none yet (one Groq call each, resumable):
   python src/case_studies.py --retag            (add --all to tag every post again)
+To grow the Case studies page to a number of write-ups (one Groq call per candidate, resumable;
+see backfill()):  python src/case_studies.py --backfill [--dry-run] [--target 520] [--max-calls 200]
 A feed that is down is skipped; the posts already saved stay.
 """
 import html
 import json
+import math
 import os
 import re
 import sys
@@ -36,7 +39,7 @@ ROOT_DIR = os.path.dirname(SRC_DIR)
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from case_sources import (BUILD_DETAILS, CUSTOMER_BLOGS, FOCUS_WORDS, INDUSTRIES, MAX_TECHNIQUES, SOURCES,
+from case_sources import (BUILD_DETAILS, CUSTOMER_BLOGS, EXTRA_FEEDS, FOCUS_WORDS, INDUSTRIES, MAX_TECHNIQUES, SOURCES,
                           TAG_NAMES, TAGS, TECHNIQUES, TOPIC_RULES, TOPICS,
                           category_norm, match_category, split_agents, topic_of)
 
@@ -80,11 +83,25 @@ def _date(entry) -> str:
 
 
 def normalise_url(url: str) -> str:
-    """One address per post: no tracking query, no trailing slash, https."""
+    """One address per post: no tracking query, no trailing slash, https, a lowercase host."""
     url = (url or "").strip()
     url = re.sub(r"[?#].*$", "", url)
-    url = re.sub(r"^http://", "https://", url)
+    url = re.sub(r"^http://", "https://", url, flags=re.I)
+    url = re.sub(r"^https://[^/]+", lambda m: m.group(0).lower(), url)
     return url.rstrip("/")
+
+
+def title_key(title: str, company: str = "") -> str:
+    """A company's title reduced to its words, so the same post under two addresses (a Medium link
+    and the blog's own domain, say) is caught as one. Two blogs may share a plain title, so the
+    company is part of the key."""
+    words = " ".join(re.sub(r"[^a-z0-9]+", " ", html.unescape(title or "").lower()).split())
+    return f"{company.lower()}|{words}" if words else ""
+
+
+def feeds_of(name: str, feed: str) -> list[str]:
+    """Every feed read for a source: its own, plus any second blog in EXTRA_FEEDS."""
+    return [feed] + EXTRA_FEEDS.get(name, [])
 
 
 def parse_feed(content: bytes, company: str) -> list[dict]:
@@ -391,6 +408,26 @@ _TIRED: set = set()  # models out of calls for today, in this run
 def groq_tag(post: dict, sleep=time.sleep, tries: int = 4) -> dict | None:
     """The finder fields for one saved post, in one Groq call (TAG_PROMPT), with waits on rate limits.
     None when the reply is unusable. Raises GroqOutOfCalls when no model has calls left today."""
+    system = TAG_PROMPT.format(finder_json=FINDER_JSON, finder_rules=FINDER_RULES)
+    user = (f"Company: {post['company']}\nTitle: {post['title']}\n"
+            f"Problem: {post.get('issue', '')}\nSolution: {post.get('summary', '')}\n"
+            f"Post: {post.get('text', '')[:3500]}")
+    return parse_finder(_reply_json(groq_call(system, user, 250, 0.1, sleep, tries)))
+
+
+def groq_sort_paced(post: dict, sleep=time.sleep, tries: int = 4) -> dict | None:
+    """groq_sort for the backfill: the same prompt and reply (sorting plus the finder tags), but it
+    waits out rate limits and raises GroqOutOfCalls at the daily limit instead of giving up."""
+    system = GROQ_PROMPT.format(topics=_topics_text(), tags=", ".join(TAG_NAMES),
+                                finder_json=FINDER_JSON, finder_rules=FINDER_RULES)
+    user = f"Company: {post['company']}\nTitle: {post['title']}\nPost start: {post.get('text', '')[:2500]}"
+    return parse_reply(groq_call(system, user, 600, 0.2, sleep, tries))
+
+
+def groq_call(system: str, user: str, max_tokens: int, temperature: float, sleep=time.sleep, tries: int = 4) -> str:
+    """One Groq chat call on the first model with calls left, waiting as long as Groq asks on a rate
+    limit and moving to the next model at a daily limit. The reply text, or "" when it failed.
+    Raises GroqOutOfCalls when Groq is not set up or every model is out of calls for today."""
     import groq_summarizer as gs
     try:
         client = gs._get_client()
@@ -398,10 +435,6 @@ def groq_tag(post: dict, sleep=time.sleep, tries: int = 4) -> dict | None:
         gs._active_models = models
     except Exception as exc:
         raise GroqOutOfCalls(str(exc)[:120])
-    system = TAG_PROMPT.format(finder_json=FINDER_JSON, finder_rules=FINDER_RULES)
-    user = (f"Company: {post['company']}\nTitle: {post['title']}\n"
-            f"Problem: {post.get('issue', '')}\nSolution: {post.get('summary', '')}\n"
-            f"Post: {post.get('text', '')[:3500]}")
     for _ in range(tries):
         live = [m for m in models[:2] if m not in _TIRED]
         if not live:
@@ -409,10 +442,10 @@ def groq_tag(post: dict, sleep=time.sleep, tries: int = 4) -> dict | None:
         model = live[0]
         try:
             response = client.chat.completions.create(
-                model=model, temperature=0.1,
+                model=model, temperature=temperature,
                 messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
-                **gs.call_options(model, 250))
-            return parse_finder(_reply_json(response.choices[0].message.content))
+                **gs.call_options(model, max_tokens))
+            return response.choices[0].message.content or ""
         except Exception as exc:
             error = str(exc)
             if gs._is_auth_error(error):
@@ -428,7 +461,7 @@ def groq_tag(post: dict, sleep=time.sleep, tries: int = 4) -> dict | None:
                 continue
             print(f"  [cases] Groq error on {model}: {error[:100]}")
             sleep(GROQ_PAUSE)
-    return None
+    return ""
 
 
 def tag_posts(posts: list[dict], tagger=None, reader=None, max_calls: int | None = None,
@@ -551,6 +584,26 @@ def migrate(post: dict, known: dict[str, str] | None = None) -> dict:
     return post
 
 
+def groq_record(post: dict, result: dict, today: str, known_cats: dict[str, str]) -> dict:
+    """The saved record for a new post Groq kept (result from parse_reply)."""
+    problem, summary = result["topic"], result["summary"]
+    tags = result.get("tags") or rule_tags(post)
+    extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION, "cat": CAT_VERSION,
+             **(result.get("finder") or {})}
+    if result.get("category"):
+        named = recategorize({"problem": problem, "category": result["category"]}, known_cats)
+        problem = named["problem"]
+        if named.get("category"):
+            extra["category"] = named["category"]
+    if post["company"] in CUSTOMER_BLOGS and result.get("customer"):
+        # A customer story on a cloud blog: the card is about the customer, written up by the cloud
+        extra["via"] = post["company"]
+        post = {**post, "company": result["customer"]}
+    return {"url": post["url"], "company": post["company"], "title": post["title"],
+            "published": post["published"] or today, "added": today, "problem": problem,
+            "summary": summary, "tags": tags, "sorted_by": "groq", **extra}
+
+
 def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool = True,
            max_calls: int = MAX_GROQ_CALLS, reader=None, rejected: set | None = None,
            per_blog: int = MAX_PER_BLOG) -> tuple[list[dict], dict]:
@@ -560,6 +613,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
     rejected is the set of urls Groq already turned down; new rejections are added to it.
     counts["left"] lists the new posts that were left waiting, to save in the queue."""
     known = {p["url"] for p in existing} | {u for p in existing for u in p.get("aliases", [])}
+    known_titles = {title_key(p.get("title", ""), p.get("company", "")) for p in existing} - {""}
     seen_skips = rejected if rejected is not None else set()
     blog_calls: dict[str, int] = {}
     cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=MAX_AGE_DAYS)).strftime("%Y-%m-%d")
@@ -601,6 +655,9 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
     for post in interleave(fetched):
         if post["url"] in known or post["url"] in seen_skips:
             continue
+        if title_key(post["title"], post["company"]) in known_titles:
+            seen_skips.add(post["url"])  # the same post under another address
+            continue
         if post["published"] and post["published"] < cutoff:
             continue
         if not looks_like_ai(post) or NOT_A_BUILD.search(post["title"]):
@@ -632,19 +689,7 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 counts["skipped"] += 1
                 seen_skips.add(post["url"])
                 continue
-            problem, summary, how = result["topic"], result["summary"], "groq"
-            tags = result.get("tags") or rule_tags(post)
-            extra = {"result": result.get("result", ""), "issue": result.get("issue", ""), "v": VERSION, "cat": CAT_VERSION,
-                     **(result.get("finder") or {})}
-            if result.get("category"):
-                named = recategorize({"problem": problem, "category": result["category"]}, known_cats)
-                problem = named["problem"]
-                if named.get("category"):
-                    extra["category"] = named["category"]
-            if post["company"] in CUSTOMER_BLOGS and result.get("customer"):
-                # A customer story on a cloud blog: the card is about the customer, written up by the cloud
-                extra["via"] = post["company"]
-                post = {**post, "company": result["customer"]}
+            posts.append(groq_record(post, result, today, known_cats))
         else:
             problem = rule_sort(post)
             if not problem:
@@ -652,14 +697,12 @@ def update(existing: list[dict], fetched: list[dict], today: str, use_groq: bool
                 continue
             if problem == "agents":
                 problem = split_agents(post)
-            summary, how = "", "rules"
-            tags = rule_tags(post)
-            extra = {}
             counts["rules"] += 1
-        posts.append({"url": post["url"], "company": post["company"], "title": post["title"],
-                      "published": post["published"] or today, "added": today, "problem": problem,
-                      "summary": summary, "tags": tags, "sorted_by": how, **extra})
+            posts.append({"url": post["url"], "company": post["company"], "title": post["title"],
+                          "published": post["published"] or today, "added": today, "problem": problem,
+                          "summary": "", "tags": rule_tags(post), "sorted_by": "rules"})
         known.add(post["url"])
+        known_titles.add(title_key(post["title"], post["company"]))
         counts["new"] += 1
     counts["calls"] = calls
     return posts, counts
@@ -699,14 +742,18 @@ def run(path: str = CASES_FILE, force: bool = False) -> int:
               "Use --now to read them again.")
         return 0
     fetched, down = [], []
-    for name, feed, *_ in SOURCES:
-        try:
-            got = parse_feed(fetch_feed(feed), name)
-            fetched += got
-            print(f"  [cases] {name}: {len(got)} posts in the feed")
-        except Exception as exc:
+    for name, main, *_ in SOURCES:
+        got, failed = [], 0
+        for feed in feeds_of(name, main):
+            try:
+                got += parse_feed(fetch_feed(feed), name)
+            except Exception as exc:
+                failed += 1
+                print(f"  [cases] {name}: feed failed ({str(exc)[:80]})")
+        if failed == len(feeds_of(name, main)):
             down.append(name)
-            print(f"  [cases] {name}: feed failed ({str(exc)[:80]})")
+        fetched += got
+        print(f"  [cases] {name}: {len(got)} posts in the feed")
     use_groq = bool(os.environ.get("GROQ_API_KEY", "").strip())
     rejected = set(saved.get("rejected", []))
     queue = saved.get("queue", [])
@@ -748,6 +795,167 @@ def recategorize_saved(path: str = CASES_FILE) -> dict[str, int]:
     return dict(sorted(counts.items(), key=lambda kv: -kv[1]))
 
 
+# ---------- backfill: growing the page to a number of write-ups
+
+BACKFILL_TARGET = 520     # write-ups shown on the Case studies page
+BACKFILL_MAX_CALLS = 200  # Groq calls per backfill run; run it again to go on
+BACKFILL_KEEP_RATE = 0.4  # share of keyword-picked candidates Groq keeps, for the dry run's estimate
+DEEP_PAGES = 6            # older feed pages read per blog
+MEDIUM_TAGS = ("machine-learning", "artificial-intelligence", "llm", "generative-ai", "data-science")
+
+
+def older_pages(feed: str, pages: int = DEEP_PAGES) -> list[str]:
+    """Addresses that list a blog's older posts, for blogs whose feed only holds the newest few:
+    WordPress feeds page with ?paged=N, Ghost feeds with /rss/N/, and Medium publications (and
+    Medium blogs on their own domain) have a feed per tag, which reaches further back for AI tags."""
+    out = []
+    if "medium.com/feed/" in feed or re.search(r"\.[a-z]+/feed$", feed):
+        out += [f"{feed}/tagged/{tag}" for tag in MEDIUM_TAGS]
+    if re.search(r"/feed/?$", feed) and "medium.com" not in feed:
+        out += [f"{feed.rstrip('/')}/?paged={n}" for n in range(2, pages + 1)]
+    if re.search(r"/rss/?$", feed):
+        out += [f"{feed.rstrip('/')}/{n}/" for n in range(2, pages + 1)]
+    return out
+
+
+def read_deep(name: str, feed: str, cutoff: str, fetch=None) -> list[dict]:
+    """A blog's posts from its feed and its older pages, back to cutoff. Paging stops at the first
+    page that fails, adds nothing new, or reaches past cutoff."""
+    fetch = fetch or fetch_feed
+    seen: dict[str, dict] = {}
+    paging_over = False
+    for i, url in enumerate([feed] + older_pages(feed)):
+        paged = "paged=" in url or bool(re.search(r"/rss/\d+/$", url))
+        if paged and paging_over:
+            continue
+        try:
+            got = parse_feed(fetch(url), name)
+        except Exception:
+            if i == 0:
+                return []  # the blog's own feed is down: skip the blog this run
+            paging_over = paging_over or paged
+            continue
+        new = [p for p in got if p["url"] not in seen]
+        for p in new:
+            seen[p["url"]] = p
+        if paged and (not new or all(p["published"] and p["published"] < cutoff for p in new)):
+            paging_over = True
+    return [p for p in seen.values() if not p["published"] or p["published"] >= cutoff]
+
+
+def shown_count(posts: list[dict]) -> int:
+    """How many write-ups the Case studies page shows: the valid ones within its one-year window."""
+    import case_pages
+    return len(case_pages.recent(case_pages._clean(posts)))
+
+
+def backfill_candidates(saved: dict, today: str, fetch=None, deep: bool = True,
+                        sources=None) -> tuple[list[dict], dict[str, int]]:
+    """The posts worth asking Groq about: from every blog (older pages too when deep) and the saved
+    queue, within the page's one-year window, not saved or turned down already (by address or by
+    title), and passing the free keyword checks. Returns (candidates in asking order, count per blog)."""
+    from concurrent.futures import ThreadPoolExecutor
+    cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=365)).strftime("%Y-%m-%d")
+    posts = saved.get("posts", [])
+    known = {p["url"] for p in posts} | {u for p in posts for u in p.get("aliases", [])} | set(saved.get("rejected", []))
+    titles = {title_key(p.get("title", ""), p.get("company", "")) for p in posts} - {""}
+    jobs = [(name, feed) for name, main, *_ in (sources or SOURCES) for feed in feeds_of(name, main)]
+    if deep:
+        with ThreadPoolExecutor(12) as pool:
+            batches = list(pool.map(lambda job: read_deep(job[0], job[1], cutoff, fetch), jobs))
+    else:
+        def one(job):
+            try:
+                return parse_feed((fetch or fetch_feed)(job[1]), job[0])
+            except Exception:
+                return []
+        with ThreadPoolExecutor(12) as pool:
+            batches = list(pool.map(one, jobs))
+    found = [p for batch in batches for p in batch] + [dict(p) for p in saved.get("queue", []) if p.get("url")]
+    out, per_source = [], {}
+    for post in found:
+        key = title_key(post.get("title", ""), post.get("company", ""))
+        if post["url"] in known or not key or key in titles:
+            continue
+        if not post.get("published") or post["published"] < cutoff:
+            continue
+        if not looks_like_ai(post) or NOT_A_BUILD.search(post["title"]):
+            continue
+        known.add(post["url"])
+        titles.add(key)
+        out.append(post)
+        per_source[post["company"]] = per_source.get(post["company"], 0) + 1
+    return interleave(out), dict(sorted(per_source.items(), key=lambda kv: -kv[1]))
+
+
+def backfill(path: str = CASES_FILE, target: int = BACKFILL_TARGET, max_calls: int = BACKFILL_MAX_CALLS,
+             dry_run: bool = False, fetch=None, sorter=None, reader=read_article, sleep=time.sleep,
+             today: str | None = None, deep: bool = True) -> dict:
+    """Ask Groq about older posts until the page shows target write-ups or max_calls are used.
+    One Groq call per candidate (the weekly prompt, which also tags it for the finder); the
+    keyword checks drop the rest for free. Saves every 10 calls and at the end; posts not reached
+    go in the queue, so the next run (or the weekly run) carries on. A dry run makes no Groq call:
+    it counts the candidates and estimates the calls needed."""
+    today = today or datetime.now(IST).strftime("%Y-%m-%d")
+    saved = load_all(path)
+    posts = list(saved.get("posts", []))
+    rejected = set(saved.get("rejected", []))
+    shown = shown_count(posts)
+    candidates, per_source = backfill_candidates(saved, today, fetch, deep)
+    need = max(0, target - shown)
+    report = {"shown_before": shown, "target": target, "candidates": len(candidates), "per_source": per_source,
+              "need": need, "estimated_calls": min(len(candidates), math.ceil(need / BACKFILL_KEEP_RATE)) if need else 0,
+              "calls": 0, "kept": 0, "turned_down": 0, "failed": 0, "stopped": ""}
+    if dry_run or not need:
+        report["shown_after"] = shown
+        report["stopped"] = "dry run" if dry_run else "already at target"
+        return report
+    sorter = sorter or (lambda p: groq_sort_paced(p, sleep=sleep))
+    known_cats = known_categories(posts)
+    done: set[str] = set()
+
+    def keep():
+        left = [p for p in candidates if p["url"] not in done]
+        save(posts, path, rejected, saved.get("waiting", 0), saved.get("last_fetch", ""), left)
+
+    for post in candidates:
+        if shown >= target:
+            report["stopped"] = "target reached"
+            break
+        if report["calls"] >= max_calls:
+            report["stopped"] = "call cap reached"
+            break
+        if report["calls"]:
+            sleep(TAG_PAUSE)
+        page = reader(post["url"]) if reader else ""
+        if len(page) > len(post.get("text", "")):
+            post = {**post, "text": page}
+        try:
+            result = sorter(post)
+        except GroqOutOfCalls as exc:
+            report["stopped"] = f"Groq out of calls ({exc})"
+            break
+        report["calls"] += 1
+        if result is None:
+            report["failed"] += 1  # stays a candidate for the next run
+        elif not result["keep"]:
+            report["turned_down"] += 1
+            rejected.add(post["url"])
+            done.add(post["url"])
+        else:
+            posts.append(groq_record(post, result, today, known_cats))
+            done.add(post["url"])
+            report["kept"] += 1
+            shown = shown_count(posts)
+        if report["calls"] % 10 == 0:
+            keep()
+    else:
+        report["stopped"] = report["stopped"] or "no candidates left"
+    keep()
+    report["shown_after"] = shown
+    return report
+
+
 def retag_saved(path: str = CASES_FILE, everything: bool = False, tagger=None, reader=read_article,
                 sleep=time.sleep) -> dict:
     """One-off: tag the saved posts for the finder (only those with no tags yet, unless everything),
@@ -781,6 +989,24 @@ if __name__ == "__main__":
         load_dotenv()
     except ImportError:
         pass
+    if "--backfill" in sys.argv:
+        def flag(name, default):
+            return int(sys.argv[sys.argv.index(name) + 1]) if name in sys.argv else default
+        dry = "--dry-run" in sys.argv
+        if not dry and not os.environ.get("GROQ_API_KEY", "").strip():
+            print("  [cases] GROQ_API_KEY is not set; showing the dry run instead.")
+            dry = True
+        result = backfill(target=flag("--target", BACKFILL_TARGET), max_calls=flag("--max-calls", BACKFILL_MAX_CALLS),
+                          dry_run=dry)
+        print(f"  [cases] Shown before: {result['shown_before']}, target {result['target']}, "
+              f"{result['candidates']} candidates after the keyword checks.")
+        for name, n in result["per_source"].items():
+            print(f"  [cases]   {name}: {n}")
+        print(f"  [cases] Estimated Groq calls to reach the target: {result['estimated_calls']} "
+              f"(if {BACKFILL_KEEP_RATE:.0%} are kept). This run: {result['calls']} calls, {result['kept']} kept, "
+              f"{result['turned_down']} turned down, {result['failed']} unusable; shown now {result['shown_after']} "
+              f"({result['stopped']}).")
+        sys.exit(0)
     if "--retag" in sys.argv:
         if not os.environ.get("GROQ_API_KEY", "").strip():
             print("  [cases] GROQ_API_KEY is not set; nothing tagged.")
