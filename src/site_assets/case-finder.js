@@ -236,6 +236,7 @@
       if (state.topic) params.set("topic", state.topic);
       if (state.tech) params.set("tech", state.tech);
       if (state.ind) params.set("ind", state.ind);
+      if (state.fresh) params.set("new", "1");
       var qs = params.toString();
       history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
     } catch (e) { /* an old browser keeps the address as it is */ }
@@ -452,6 +453,7 @@
     state.q = (params.get("q") || "").slice(0, 200);
     state.topic = index.topics[params.get("topic")] ? params.get("topic") : "";
     // Links from a case page's chips: ?tech=rag, ?ind=fintech; ?suggest=1 opens the suggestion form
+    if (params.get("new") === "1") state.fresh = true;  // "See all N new case studies" on Today
     var tech = params.get("tech") || "", ind = params.get("ind") || "";
     if ((index.labels.x || {})[tech]) { state.tech = tech; if (menus.tech) menus.tech.value = tech; }
     if ((index.labels.n || {})[ind]) { state.ind = ind; if (menus.ind) menus.ind.value = ind; }

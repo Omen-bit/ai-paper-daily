@@ -48,7 +48,7 @@ ASSETS_DIR = os.path.join(SRC_DIR, "site_assets")
 SITE_NAME = "AI Papers Daily"
 TAGLINE = ("We read every new AI paper on arXiv and Hugging Face, choose the ones you can "
            "build something with, and explain why they matter in plain language.")
-MORE_FROM_TODAY = 6  # non-featured papers shown on the home page
+MORE_FROM_TODAY = 5  # non-featured papers shown on the home page
 
 # Where the site lives. Used for canonical links, share images, the RSS feed and
 # the sitemap. Override with the SITE_URL repository variable (for a custom domain).
@@ -415,7 +415,7 @@ def pick_minutes(rec: dict) -> int:
     return max(1, round(words / 200))
 
 
-def featured_card(rec: dict, rank: int, root: str, past: bool = False) -> str:
+def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bool = False) -> str:
     notes = rec.get("curator") or {}
     if notes.get("tldr"):
         blurb = f'<p class="pick-blurb"><b>In short</b>{esc(notes["tldr"])}</p>'
@@ -443,7 +443,7 @@ def featured_card(rec: dict, rank: int, root: str, past: bool = False) -> str:
   <header class="pick-top"><span class="pick-n">{label}</span>{why}<span class="pick-read" hidden>Read ✓</span></header>
   <h3><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></h3>
   {blurb}
-  <p class="pick-date">Published {esc(nice_date(published(rec)))}{OLDER_FLAG if is_older(rec) else ""}</p>
+  <p class="pick-date">{pick_date(rec, today)}{OLDER_FLAG if is_older(rec) else ""}</p>
   <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
   {seen_check(rec)}
 </article>"""
@@ -475,14 +475,43 @@ def paper_row(rec: dict, root: str) -> str:
 </li>"""
 
 
+def pick_date(rec: dict, today: bool = False) -> str:
+    """The date line on a pick card. On Today it says the pick is today's, then when the paper came
+    out on arXiv, so a paper from last week never reads as old news."""
+    if today:
+        try:
+            d = date.fromisoformat(str(published(rec))[:10])
+            on = f"{d.day} {d:%b}"
+        except ValueError:
+            on = nice_date(published(rec), with_year=False)
+        return f'<b>Picked today</b> \u00b7 on arXiv {esc(on)}'
+    return f"Published {esc(nice_date(published(rec)))}"
+
+
+def why_line(rec: dict, limit: int = 150) -> str:
+    """One line on why a paper matters: its summary when it has one, else the first sentence of its
+    abstract. No AI call."""
+    summary = rec.get("summary")
+    text = summary.get("text") if isinstance(summary, dict) else (summary if isinstance(summary, str) else "")
+    text = " ".join(str(text or rec.get("abstract") or "").split())
+    m = re.match(r"(.+?[.!?])(\s|$)", text)
+    line = m.group(1) if m else text
+    if len(line) > limit:
+        line = line[:limit - 1].rsplit(" ", 1)[0].rstrip(",;:") + "\u2026"
+    return line
+
+
 def home_row(rec: dict, n: int) -> str:
-    """A quieter row for the home page: number, title, one topic, authors, quick save."""
+    """A quieter row for the home page: number, title, one topic, authors, a line on why it matters,
+    and a labelled Save button."""
     topic = (rec.get("categories") or ["other-ml"])[0]
+    why = why_line(rec)
     return f"""<li class="row" data-id="{esc(rec['id'])}">
   <span class="row-n">{n:02d}</span>
   <span class="row-title"><a href="paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></span>
   <span class="row-authors">{topic_dot(topic)}<span class="sep"></span>{esc(format_authors(rec.get('authors', []), 2))}</span>
-  <button class="quick-save" type="button" data-quick-save="{esc(rec['id'])}" data-title="{esc(rec['title'])}" aria-pressed="false" aria-label="Save for later">+</button>
+  {f'<span class="row-why">{esc(why)}</span>' if why else ""}
+  <button class="quick-save" type="button" data-quick-save="{esc(rec['id'])}" data-title="{esc(rec['title'])}" data-label aria-pressed="false" aria-label="Save for later">+ <span>Save</span></button>
 </li>"""
 
 
@@ -649,7 +678,7 @@ def trends_teaser(rows: list[dict]) -> str:
 
 
 def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = None,
-                trend_rows: list[dict] | None = None) -> str:
+                trend_rows: list[dict] | None = None, case_row: str = "") -> str:
     most_read = most_read or []
     trend_rows = trend_rows if trend_rows is not None else trends.trend_rows([], papers)[0]
     if not days:
@@ -668,7 +697,12 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
     # Newer editions read every arXiv paper but store only the best ("scanned" counts them all)
     n_scanned = max(latest.get("scanned") or 0, n_today)
 
-    cards = "\n".join(featured_card(r, n, "") for n, r in enumerate(featured, 1))
+    cards = "\n".join(featured_card(r, n, "", today=True) for n, r in enumerate(featured, 1))
+    try:
+        d = date.fromisoformat(latest["date"])
+        eyebrow = f"Today \u00b7 {d:%a} {d.day} {d:%b %Y}"
+    except (KeyError, ValueError):
+        eyebrow = "Today"
     more = ""
     if others:
         rows = "\n".join(home_row(r, n) for n, r in enumerate(others, len(featured) + 1))
@@ -682,7 +716,8 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
 
     body = f"""<section class="hero">
   <div>
-    <h1>Papers worth<br>building on.</h1>
+    <p class="hero-eyebrow">{esc(eyebrow)}</p>
+    <h1>Papers worth building on.</h1>
     <p class="lead">The best new AI paper each day, plus the one everyone is reading. Picked from everything new on arXiv and Hugging Face, and explained so you can build with it.</p>
   </div>
 </section>
@@ -691,6 +726,7 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   <div class="picks">{cards}</div>
 </section>
 {subscribe_box()}
+{case_row}
 <section class="block" data-foryou data-url="{RECOMMEND_URL}" data-names="{esc(json.dumps(CATEGORY_NAMES))}" hidden>
   {section_head("For you", "Recent papers close in meaning to what you’ve read. Worked out from this browser’s history only.")}
   <ol class="foryou" data-foryou-list aria-busy="true">{'<li class="foryou-item skeleton" aria-hidden="true"></li>' * 3}</ol>
@@ -707,7 +743,7 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
   </aside>
 </section>
 {chart}"""
-    return page(SITE_NAME, body, active="today", edition=ticker(days), path="")
+    return page(SITE_NAME, body, active="today", edition=ticker(days), path="", body_class="home-today")
 
 
 # The search function in Supabase (supabase/functions/search). Public by design:
@@ -2045,7 +2081,13 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     if not SHOW_TRENDS:
         print("  [site] Trends hidden: it needs 3 months of papers and only the site's own papers are here. "
               "For a local build, run: python src/supabase_sync.py --export-only")
-    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows))
+    try:  # "How companies built it this week" on Today; the page builds without it
+        case_row = case_pages.home_case_row(case_studies.load(os.path.join(data_dir, "cases.json")),
+                                            os.path.join(data_dir, "case_logos"))
+    except Exception as exc:
+        print(f"  [site] WARNING: case row on Today failed: {exc}")
+        case_row = ""
+    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows, case_row))
     _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers), set(papers),
                                                                        case_studies.load(os.path.join(data_dir, "cases.json"))))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())

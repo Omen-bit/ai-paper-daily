@@ -2695,3 +2695,45 @@ a, button, summary, label { -webkit-tap-highlight-color: transparent; touch-acti
   .cd-build { padding: 16px; }
   .cd-more ul { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ---------- Today, in the Case studies style (site_builder.build_index, body.home-today) ---------- */
+.home-today .hero-eyebrow { margin: 0 0 12px; font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.home-today .hero h1 { font: 600 clamp(40px, 6.4vw, 76px)/.98 var(--sans); letter-spacing: -.05em; }
+.home-today .block-head h2 { font: 600 22px/1.15 var(--sans); letter-spacing: -.02em; }
+.home-today .pick-top { text-transform: none; letter-spacing: 0; }
+.home-today .pick-n { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font: 600 12px/1.2 var(--mono); letter-spacing: .02em; background: var(--yellow-wash); color: var(--ink); }
+.home-today .pick.is-first .pick-n { background: var(--accent); color: var(--on-accent, #fff); }
+.home-today .pick-foot .topic { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); font: 500 12px var(--mono); }
+.home-today .pick-date b { font-weight: 600; color: inherit; }
+/* "Also new today": a line on why it matters, and a labelled 44px Save */
+.home-today .list-home .row { grid-template-columns: 32px minmax(0, 1fr) auto; grid-template-areas: "date title badges" "date authors badges" "date why badges"; }
+.row-why { grid-area: why; margin-top: 4px; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+.home-today .list-home .quick-save { display: inline-flex; align-items: center; gap: 6px; width: auto; min-width: 44px; height: 44px; padding: 0 14px; border-radius: 10px; font: 600 13.5px var(--sans); color: var(--ink); opacity: 1; }
+.home-today .list-home .quick-save[aria-pressed="true"] { color: #111; }
+.home-today .list-home .quick-save:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* "How companies built it this week" */
+.hc-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.hc-list a { display: flex; flex-direction: column; gap: 8px; height: 100%; box-sizing: border-box; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--b) 9%, var(--surface)), var(--surface) 55%); color: var(--ink); text-decoration: none; }
+.hc-list a:hover { border-color: color-mix(in srgb, var(--ink) 30%, var(--line)); }
+.hc-list a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hc-co { display: inline-flex; align-items: center; gap: 8px; font: 600 14px var(--sans); }
+.hc-logo { display: block; width: 20px; height: 20px; flex: none; }
+.hc-logo.cs-mono { font-size: 11px; }
+.hc-list b { font: 600 16px/1.3 var(--sans); letter-spacing: -.01em; overflow-wrap: anywhere; }
+.hc-problem { font-size: 14px; line-height: 1.45; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.hc .cs-pills { margin-top: auto; align-self: flex-start; justify-content: flex-start; }
+.hc .cs-topic, .hc .cs-bd { box-shadow: none; border: 1px solid var(--line); }
+@media (max-width: 900px) { .hc-list { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 680px) {
+  .home-today .hero { padding-top: 18px; padding-bottom: 6px; }
+  .home-today .hero h1 { font-size: 34px; line-height: 1.02; }
+  .home-today .hero .lead { margin-top: 10px; font-size: 15px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .home-today #today { margin-top: 14px; }
+  .home-today .pick h3 { font-size: 19px; }
+  .home-today .pick-blurb { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .home-today .list-home .row { grid-template-columns: 32px minmax(0, 1fr) 44px; grid-template-areas: "date title badges" "date authors badges" "date why badges"; }
+  .home-today .list-home .quick-save { display: inline-flex; justify-content: center; width: 44px; padding: 0; }
+  .home-today .list-home .quick-save span { display: none; }
+  .hc-list a { padding: 14px; }
+}

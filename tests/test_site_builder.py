@@ -307,7 +307,10 @@ def test_picks_show_when_the_paper_came_out(tmp_path):
     save_day(picks, picks, "2026-10-31", data_dir=data_dir)
     build_site(data_dir, site_dir, str(tmp_path / "export"))
     home = open(os.path.join(site_dir, "index.html"), encoding="utf-8").read()
-    assert "Published 30 Oct 2026" in home and "Published 1 Aug 2026" in home
+    # Today says the pick is today's, then when the paper came out on arXiv
+    assert "<b>Picked today</b> · on arXiv 30 Oct" in home and "<b>Picked today</b> · on arXiv 1 Aug" in home
+    day = open(os.path.join(site_dir, "day", "2026-10-31.html"), encoding="utf-8").read()
+    assert "Published 30 Oct 2026" in day  # a past day's page keeps its plain date
     assert home.count("Older paper, trending now") == 1
     old = open(os.path.join(site_dir, "paper", "2608.2.html"), encoding="utf-8").read()
     assert "Trending since" in old

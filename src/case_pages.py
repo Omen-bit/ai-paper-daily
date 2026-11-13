@@ -552,6 +552,38 @@ def new_strip(posts: list[dict], card) -> str:
             f'<ul class="cs-grid cs-plain">{"".join(card(p) for p in fresh[:6])}</ul></section>')
 
 
+def home_case_row(posts: list[dict], logo_dir: str = "", today: str | None = None, n: int = 3) -> str:
+    """ "How companies built it this week" on Today: the n new case studies with the most build
+    details (new_this_week), each linking to its own case page, and a link to all of them on the
+    Case studies page. Nothing when no case study is new."""
+    import case_studies
+    today = today or datetime.now(IST).strftime("%Y-%m-%d")
+    posts = mark_new(recent(_clean(posts)), today)
+    fresh = new_this_week(posts)
+    if not fresh:
+        return ""
+    case_studies.assign_slugs(posts, reserved=set(SLUGS.values()) | {making_of.SLUG})
+    top = fresh[:n]
+    for p in top:  # the icons case_logos.py saved, for companies with no drawn logo
+        if logo_dir and not _slug(p["company"]):
+            name = case_logos.saved_file(p["company"], logo_dir)
+            if name:
+                LOGO_FILES[p["company"]] = name
+
+    def card(p):
+        mark = logo(p["company"], "hc-logo").replace('src="logos/', f'src="{DIR}/logos/')
+        return (f'<li style="--c:{color(p["problem"])};--b:{brand_hex(p["company"])}"><a href="{DIR}/{esc(p["slug"])}.html">'
+                f'<span class="hc-co">{mark}{esc(p["company"])}</span><b>{esc(p["title"])}</b>'
+                + (f'<span class="hc-problem">{esc(p["issue"])}</span>' if p.get("issue") else "")
+                + f'<span class="cs-pills"><span class="cs-topic">{esc(problem_name(p["problem"]))}</span>{detail_pill(p)}</span>'
+                f'</a></li>')
+    return (f'{sprite({p["company"] for p in top})}<section class="block hc" aria-labelledby="hc-h">'
+            f'<div class="block-head"><h2 id="hc-h">How companies built it this week</h2>'
+            f'<span class="sub">From their own engineering blogs</span>'
+            f'<a class="more" href="{DIR}/index.html?new=1">See all {len(fresh)} new case studies →</a></div>'
+            f'<ul class="hc-list">{"".join(card(p) for p in top)}</ul></section>')
+
+
 def category_chips(posts: list[dict], counts: dict[str, int]) -> str:
     """One chip per topic with write-ups, biggest first; a chip filters the page to its topic."""
     mine = ('<button class="cf-mine" type="button" data-cf-mine aria-pressed="false" hidden>'

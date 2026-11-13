@@ -115,13 +115,18 @@
                : [{ id: id, t: btn.getAttribute("data-title"), at: Date.now() }].concat(saved);
     store("apd.saved", saved);
     btn.setAttribute("aria-pressed", on ? "false" : "true");
-    btn.textContent = on ? "+" : "✓";
+    quickLabel(btn, !on);
     showSavedCount();
   });
+  // A button with data-label (Today's "Also new today") keeps its word: "+ Save" / "✓ Saved"
+  function quickLabel(btn, on) {
+    if (btn.hasAttribute("data-label")) btn.innerHTML = on ? "✓ <span>Saved</span>" : "+ <span>Save</span>";
+    else btn.textContent = on ? "✓" : "+";
+  }
   Array.prototype.forEach.call(document.querySelectorAll("[data-quick-save]"), function (btn) {
     if (saved.some(function (s) { return s.id === btn.getAttribute("data-quick-save"); })) {
       btn.setAttribute("aria-pressed", "true");
-      btn.textContent = "✓";
+      quickLabel(btn, true);
     }
   });
 
