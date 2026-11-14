@@ -19,11 +19,12 @@ Preview without sending:  python src/send_newsletter.py --preview [YYYY-MM-DD]
 import html
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from email.utils import parsedate_to_datetime
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,6 +36,11 @@ try:
 except Exception:  # the email must not fail over a label
     CATEGORY_NAMES = {}
 
+try:
+    from case_studies import added_on as _site_added_on  # the site's rule for when a case study is new
+except Exception:  # the email must not fail over case studies; a copy of the rule is below
+    _site_added_on = None
+
 DATA_DIR = os.path.join(ROOT_DIR, "data", "daily")
 SITE_DIR = os.path.join(ROOT_DIR, "site")
 FEED_PATH = os.path.join(SITE_DIR, "feed.xml")
@@ -45,6 +51,14 @@ API_URL = "https://api.buttondown.com/v1/emails"
 SITE_NAME = "AI Papers Daily"
 SITE_URL = (os.environ.get("SITE_URL") or "https://omen-bit.github.io/ai-paper-daily/").rstrip("/") + "/"
 MORE_PAPERS = 0  # other new papers listed (titles only) under the picks; 0 = picks only
+SUBJECT_MAX = 60         # characters; longer subjects are cut at a whole word
+KEY_RESULT_MAX = 170     # characters; a longer key result is left out rather than cut
+CASES_SHOWN = 2          # case studies shown with their result in "AI at work"
+CASE_NEW_FOR_DAYS = 14   # same as case_studies.NEW_FOR_DAYS
+CASE_LOOKBACK_DAYS = 7   # never reach further back than a week for case studies
+# Buttondown's "Classic" template adds only its footer (unsubscribe, manage, view online),
+# so the email has no footer of its own. Its "Accent color" is forced onto every link,
+# which is why link colours here are marked !important (see keep_link_colours).
 
 # Brand colours, the same as the site's.
 INK = "#0e0e10"
@@ -53,6 +67,8 @@ PAPER = "#f2f0eb"
 MUTED = "#5f5e5a"
 LINE = "#e4e1da"
 SOFT = "#faf8f4"
+CARD = "#ffffff"
+CHIP = "#f2f0eb"
 FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
 
 
@@ -139,53 +155,125 @@ def logo() -> str:
 # Sections
 # ---------------------------------------------------------------------------
 
-def header(day: str, scanned: int, n_picks: int) -> str:
+def header(day: str, new_papers: int, n_picks: int) -> str:
+    """Logo, name and date on one line, then the day's promise in one bold line."""
     d = date.fromisoformat(day)
     short_day = f"{d:%a}, {d.day} {d:%b}"
-    count = f"{scanned:,} new papers read." if scanned else "Today's new papers, read for you."
-    worth = "1 worth your time." if n_picks == 1 else f"{n_picks} worth your time."
+    worth = "1 paper worth your time today" if n_picks == 1 else f"{n_picks} papers worth your time today"
+    source = (f"Picked from {new_papers:,} new AI papers on arXiv and Hugging Face." if new_papers
+              else "Picked from today's new AI papers on arXiv and Hugging Face.")
     return (
-        '<tr><td style="padding:24px 28px 4px 28px;">'
+        '<tr><td style="padding:28px 28px 0 28px;">'
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
         f'<td style="width:30px;vertical-align:middle;">{logo()}</td>'
         f'<td style="vertical-align:middle;padding-left:10px;font-family:{FONT};font-size:15px;font-weight:800;'
         f'color:{INK};"><a href="{SITE_URL}?ref=email" style="color:{INK};text-decoration:none;">{SITE_NAME}</a></td>'
-        f'<td align="right" style="vertical-align:middle;font-family:{FONT};font-size:12px;color:{MUTED};'
+        f'<td align="right" style="vertical-align:middle;font-family:{FONT};font-size:13px;color:{MUTED};'
         f'white-space:nowrap;">{esc(short_day)}</td></tr></table>'
-        f'<p style="margin:18px 0 0 0;font-family:{FONT};font-size:15px;line-height:22px;color:{MUTED};">'
-        f'{esc(count)} <strong style="color:{INK};">{esc(worth)}</strong></p>'
+        f'<p style="margin:22px 0 0 0;font-family:{FONT};font-size:24px;line-height:30px;font-weight:800;'
+        f'letter-spacing:-.02em;color:{INK};">{esc(worth)}</p>'
+        f'<p style="margin:6px 0 0 0;font-family:{FONT};font-size:14px;line-height:21px;color:{MUTED};">{esc(source)}</p>'
         '</td></tr>'
     )
 
 
+def _org_name(name: str) -> str:
+    """'agentic learning ai lab' -> 'Agentic Learning AI Lab'; names with capitals are kept as they are."""
+    name = " ".join(str(name or "").split())
+    if not name or name != name.lower():
+        return name
+    small = {"ai": "AI", "ml": "ML", "nlp": "NLP", "of": "of", "and": "and", "for": "for"}
+    return " ".join(small.get(w, w.capitalize()) for w in name.split())
+
+
+def byline(p: dict) -> str:
+    """'Tsinghua University · 11 authors': who made it, in one muted line."""
+    n = len(p.get("authors") or [])
+    parts = [_org_name(p.get("org"))] if p.get("org") else []
+    if n:
+        parts.append("1 author" if n == 1 else f"{n} authors")
+    return " · ".join(x for x in parts if x)
+
+
+def proof(p: dict) -> list[str]:
+    """Short public signs that people care: upvotes, Hacker News points, GitHub stars, code or not."""
+    ev = p.get("evidence") or {}
+    out = []
+    upvotes = max(int(p.get("hf_upvotes") or 0), int(ev.get("upvotes") or 0))
+    hn = int(ev.get("hn_points") or 0)
+    stars = int(ev.get("stars") or 0)
+    if upvotes:
+        out.append(f"▲ {upvotes:,} upvote{'s' if upvotes != 1 else ''}" + ("" if hn or stars else " on Hugging Face"))
+    if hn:
+        out.append(f"{hn:,} points on Hacker News")
+    if stars:
+        out.append(f"★ {stars:,} GitHub stars")
+    if not p.get("code_url"):
+        out.append("No code yet")
+    return out
+
+
+def _chip(text: str) -> str:
+    return (f'<span style="display:inline-block;margin:0 6px 6px 0;padding:3px 10px;border-radius:999px;'
+            f'background:{CHIP};font-family:{FONT};font-size:13px;line-height:20px;color:{MUTED};'
+            f'white-space:nowrap;">{esc(text)}</span>')
+
+
+def _button(url: str, text: str) -> str:
+    """A big orange button made from a table cell, which Outlook draws too."""
+    return ('<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="display:inline-table;'
+            f'vertical-align:middle;"><tr><td style="border-radius:8px;background:{ORANGE};">'
+            f'<a href="{esc(url)}" style="display:inline-block;padding:11px 18px;font-family:{FONT};font-size:15px;'
+            f'font-weight:700;line-height:20px;color:#ffffff;text-decoration:none;border-radius:8px;">{esc(text)}</a>'
+            '</td></tr></table>')
+
+
+def _small_link(url: str, text: str) -> str:
+    return (f'<a href="{esc(url)}" style="font-family:{FONT};font-size:14px;font-weight:600;color:{INK};'
+            f'text-decoration:underline;margin-left:16px;">{esc(text)}</a>')
+
+
 def pick_card(p: dict) -> str:
-    """One pick in five lines: tag, title, what it is, why it matters, link."""
+    """One pick: tag, title, who made it, the plain summary, the key result, why it matters,
+    proof, then one button to the breakdown with Code and Paper beside it."""
     notes = p.get("curator") or {}
     url = paper_url(p["id"])
     slot = "Trending" if p.get("slot") == "trending" else "Top pick"
     cats = (p.get("categories") or [])[:1]
     tag = (f'<span style="color:{ORANGE if slot == "Top pick" else INK};">{esc(slot)}</span>'
            + (f'<span style="color:{MUTED};"> &nbsp;·&nbsp; {esc(category_label(cats[0]))}</span>' if cats else ""))
-    tldr = clip(notes.get("tldr") or (p.get("summary") or {}).get("text") or p.get("abstract"), 200)
-    why = clip(notes.get("why_it_matters"), 160)
-    why_html = (f'<p style="margin:8px 0 0 0;font-family:{FONT};font-size:14px;line-height:21px;color:{MUTED};">'
+    by = byline(p)
+    by_html = (f'<p style="margin:6px 0 0 0;font-family:{FONT};font-size:13px;line-height:19px;color:{MUTED};">'
+               f'{esc(by)}</p>') if by else ""
+    # The plain version first: the email is read by people new to the topic too
+    summary = clip(notes.get("tldr_simple") or notes.get("tldr") or (p.get("summary") or {}).get("text")
+                   or p.get("abstract"), 220)
+    key = " ".join(str(notes.get("key_result") or "").split())
+    key_html = (f'<p style="margin:14px 0 0 0;padding:2px 0 2px 14px;border-left:3px solid {ORANGE};font-family:{FONT};'
+                f'font-size:15px;line-height:23px;color:{INK};"><strong>Key result:</strong> {esc(key)}</p>'
+                ) if key and len(key) <= KEY_RESULT_MAX else ""
+    why = clip(notes.get("why_it_matters"), 170)
+    why_html = (f'<p style="margin:12px 0 0 0;font-family:{FONT};font-size:15px;line-height:23px;color:{MUTED};">'
                 f'<strong style="color:{INK};">Why it matters:</strong> {esc(why)}</p>') if why else ""
-    extras = ""
+    chips = proof(p)
+    chips_html = (f'<p style="margin:14px 0 0 0;">{"".join(_chip(c) for c in chips)}</p>') if chips else ""
+    links = ""
     if p.get("code_url"):
-        extras = (f' &nbsp;<a href="{esc(p["code_url"])}" style="font-family:{FONT};font-size:14px;color:{MUTED};'
-                  'text-decoration:underline;">Code</a>')
+        links += _small_link(p["code_url"], "Code")
+    paper_link = p.get("url") or f"https://arxiv.org/abs/{p['id']}"
+    links += _small_link(paper_link, "Paper")
     return (
-        f'<tr><td style="padding:20px 28px 0 28px;">'
-        f'<div style="padding:18px 0 0 0;border-top:1px solid {LINE};">'
-        f'<p style="margin:0 0 6px 0;font-family:{FONT};font-size:11px;font-weight:700;letter-spacing:.08em;'
+        '<tr><td style="padding:24px 28px 0 28px;">'
+        f'<div style="padding:24px 0 0 0;border-top:1px solid {LINE};">'
+        f'<p style="margin:0 0 10px 0;font-family:{FONT};font-size:11px;font-weight:700;letter-spacing:.09em;'
         f'text-transform:uppercase;">{tag}</p>'
-        f'<p style="margin:0 0 8px 0;font-family:{FONT};font-size:19px;line-height:26px;font-weight:800;'
-        f'letter-spacing:-.01em;"><a href="{esc(url)}" style="color:{INK};text-decoration:none;">'
+        f'<p style="margin:0;font-family:{FONT};font-size:21px;line-height:28px;font-weight:800;'
+        f'letter-spacing:-.015em;"><a href="{esc(url)}" style="color:{INK};text-decoration:none;">'
         f'{esc(p.get("title"))}</a></p>'
-        f'<p style="margin:0;font-family:{FONT};font-size:16px;line-height:24px;color:{INK};">{esc(tldr)}</p>'
-        f'{why_html}'
-        f'<p style="margin:12px 0 0 0;"><a href="{esc(url)}" style="font-family:{FONT};font-size:14px;'
-        f'font-weight:700;color:{ORANGE};text-decoration:none;">Read the breakdown →</a>{extras}</p>'
+        f'{by_html}'
+        f'<p style="margin:14px 0 0 0;font-family:{FONT};font-size:16px;line-height:25px;color:{INK};">{esc(summary)}</p>'
+        f'{key_html}{why_html}{chips_html}'
+        f'<p style="margin:12px 0 0 0;">{_button(url, "Read the breakdown →")}{links}</p>'
         '</div></td></tr>'
     )
 
@@ -205,21 +293,60 @@ def more_papers(rest: list[dict]) -> str:
         f'<p style="margin:0 0 10px 0;font-family:{FONT};font-size:11px;font-weight:700;letter-spacing:.08em;'
         f'text-transform:uppercase;color:{MUTED};">Also new today</p>'
         f'<table role="presentation" cellpadding="0" cellspacing="0" border="0">{items}</table>'
-        f'<p style="margin:6px 0 0 0;"><a href="{SITE_URL}?ref=email" style="font-family:{FONT};font-size:14px;'
-        f'font-weight:700;color:{ORANGE};text-decoration:none;">See all of today’s papers →</a></p>'
         '</div></td></tr>'
     )
 
 
-def new_case_studies(day: str, path: str = CASES_PATH) -> list[dict]:
-    """The case studies added on this day, newest first. Most days there are none."""
+# ---------------------------------------------------------------------------
+# Case studies
+# ---------------------------------------------------------------------------
+
+def _added_on(post: dict) -> str:
+    """When a case study counts as new on the site. The site's own rule (case_studies.added_on):
+    a post that was already old when it was added (a back catalogue or a backfill) counts from
+    its publish date, so it never shows up as new."""
+    if _site_added_on:
+        try:
+            return _site_added_on(post)
+        except Exception:
+            pass
+    added, published = str(post.get("added") or "")[:10], str(post.get("published") or "")[:10]
+    if str(post.get("added_at") or ""):
+        return str(post["added_at"])[:10]
+    if not added or not published:
+        return added or published
+    try:
+        late = (date.fromisoformat(added) - date.fromisoformat(published)).days > CASE_NEW_FOR_DAYS
+    except ValueError:
+        return added
+    return published if late else max(added, published)
+
+
+def last_email_day(day: str, marker_dir: str | None = None) -> str | None:
+    """The newest day before `day` that an email went out for (from the send markers)."""
+    try:
+        names = os.listdir(marker_dir or MARKER_DIR)
+    except OSError:
+        return None
+    days = sorted(n[:-5] for n in names if n.endswith(".json") and len(n) == 15 and n[:-5] < day)
+    return days[-1] if days else None
+
+
+def new_case_studies(day: str, path: str = CASES_PATH, since: str | None = None) -> list[dict]:
+    """Case studies that became new on the site after the last email, up to `day`: posts added
+    later in the day than that email went out are not lost. Only really new posts count.
+    Newest first. Most days there are none."""
     try:
         with open(path, encoding="utf-8") as f:
             posts = json.load(f).get("posts", [])
     except (OSError, ValueError):
         return []
-    fresh = [p for p in posts if p.get("added") == day and str(p.get("url", "")).startswith("https://") and p.get("title")]
-    fresh.sort(key=lambda p: p.get("published") or "", reverse=True)
+    if since is None:
+        since = last_email_day(day) or (date.fromisoformat(day) - timedelta(days=1)).isoformat()
+    since = max(since, (date.fromisoformat(day) - timedelta(days=CASE_LOOKBACK_DAYS)).isoformat())
+    fresh = [p for p in posts if since < _added_on(p) <= day
+             and str(p.get("url", "")).startswith("https://") and p.get("title")]
+    fresh.sort(key=lambda p: (_added_on(p), p.get("published") or ""), reverse=True)
     return fresh
 
 
@@ -233,48 +360,105 @@ def company_list(posts: list[dict], limit: int = MAX_COMPANIES) -> str:
     return names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
 
 
+def with_results(posts: list[dict], n: int = CASES_SHOWN) -> list[dict]:
+    """The posts that report a measured result, at most one per company, up to n.
+    How-to guides and product news rarely have one, so they are left out of the email."""
+    out, seen = [], set()
+    for p in posts:
+        result = " ".join(str(p.get("result") or "").split())
+        company = str(p.get("company") or "").strip()
+        if not result or not company or company in seen:
+            continue
+        seen.add(company)
+        out.append(p)
+        if len(out) == n:
+            break
+    return out
+
+
 def case_studies(posts: list[dict]) -> str:
-    """One line, not a list: how many new case studies came in today, from whom, and a link.
-    Keeps the email short; the case studies page has the details."""
+    """'AI at work': up to two new case studies with a measured result (company, title, result),
+    then a link to all of them. When none has a result, one line with the count instead."""
     if not posts:
         return ""
     n = len(posts)
     what = "1 new case study" if n == 1 else f"{n} new case studies"
-    who = company_list(posts)
-    from_who = f" from {esc(who)}" if who else ""
+    link = (f'<p style="margin:16px 0 0 0;"><a href="{SITE_URL}case-studies/index.html?ref=email" '
+            f'style="font-family:{FONT};font-size:14px;font-weight:700;color:{ORANGE};text-decoration:none;">'
+            f'See {"it" if n == 1 else f"all {n}"} →</a></p>')
+    shown = with_results(posts)
+    if shown:
+        items = ""
+        for p in shown:
+            company = str(p.get("company") or "").strip()
+            initial = esc(company[:1].upper())
+            items += (
+                '<tr><td style="width:36px;vertical-align:top;padding:14px 14px 0 0;">'
+                f'<div style="width:36px;height:36px;line-height:36px;border-radius:8px;background:{CHIP};'
+                f'text-align:center;font-family:{FONT};font-size:13px;font-weight:800;color:{INK};">{initial}</div></td>'
+                '<td style="vertical-align:top;padding:14px 0 0 0;">'
+                f'<p style="margin:0;font-family:{FONT};font-size:15px;line-height:22px;color:{INK};">'
+                f'<strong>{esc(company)}</strong> · <a href="{esc(p["url"])}" style="color:{INK};text-decoration:none;">'
+                f'{esc(clip(p.get("title"), 90))}</a></p>'
+                f'<p style="margin:2px 0 0 0;font-family:{FONT};font-size:14px;line-height:21px;color:{MUTED};">'
+                f'Result: <strong style="color:{INK};">{esc(clip(p.get("result"), 90))}</strong></p></td></tr>')
+        body = f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">{items}</table>'
+    else:
+        who = company_list(posts)
+        body = (f'<p style="margin:0;font-family:{FONT};font-size:15px;line-height:22px;color:{MUTED};">'
+                f'<strong style="color:{INK};">{what}</strong>{f" from {esc(who)}" if who else ""}.</p>')
     return (
-        '<tr><td style="padding:24px 28px 0 28px;">'
-        f'<p style="margin:0;padding:16px 0 0 0;border-top:1px solid {LINE};font-family:{FONT};font-size:15px;'
-        f'line-height:22px;color:{MUTED};"><strong style="color:{INK};">{what}</strong>{from_who} on the site today. '
-        f'<a href="{SITE_URL}case-studies/index.html?ref=email" style="font-weight:700;color:{ORANGE};'
-        f'text-decoration:none;">See how companies use AI →</a></p>'
+        '<tr><td style="padding:26px 28px 0 28px;">'
+        f'<div style="padding:24px 0 0 0;border-top:1px solid {LINE};">'
+        f'<p style="margin:0;font-family:{FONT};font-size:11px;font-weight:700;letter-spacing:.09em;'
+        f'text-transform:uppercase;"><span style="color:{INK};">AI at work</span>'
+        f'<span style="color:{MUTED};"> &nbsp;·&nbsp; {esc(what)}</span></p>'
+        f'{body}{link}</div></td></tr>'
+    )
+
+
+def browse_all(total: int) -> str:
+    what = f"Browse all {total:,} ranked papers →" if total else "Browse all of today’s papers →"
+    return (
+        '<tr><td style="padding:26px 28px 0 28px;">'
+        f'<p style="margin:0;padding:20px 0 24px 0;border-top:1px solid {LINE};font-family:{FONT};font-size:15px;'
+        f'line-height:23px;color:{MUTED};">Not your topic today? <a href="{SITE_URL}?ref=email" '
+        f'style="font-weight:700;color:{ORANGE};text-decoration:none;">{what}</a></p>'
         '</td></tr>'
     )
 
 
-def footer() -> str:
-    return (
-        '<tr><td style="padding:24px 28px 26px 28px;">'
-        f'<p style="margin:0;padding-top:16px;border-top:1px solid {LINE};font-family:{FONT};font-size:12px;'
-        f'line-height:18px;color:{MUTED};"><a href="{SITE_URL}?ref=email" style="color:{INK};font-weight:600;">'
-        f'See all of today’s papers</a> &nbsp;·&nbsp; You get this because you subscribed at {SITE_NAME}.</p>'
-        '</td></tr>'
-    )
+_LINK_STYLE = re.compile(r'(<a\s[^>]*?style="[^"]*?)(?<![-\w])color:\s*(#[0-9a-fA-F]{3,8})(?![0-9a-fA-F])(?!\s*!important)')
+_LINK_LINE = re.compile(r'(<a\s[^>]*?style="[^"]*?)text-decoration:\s*(none|underline)\b(?!\s*!important)')
+
+
+def keep_link_colours(html_text: str) -> str:
+    """Buttondown's template paints every link in its accent colour, over the colours set here
+    (titles would turn orange and the button's white text would vanish on orange).
+    An inline !important beats any stylesheet, so each link keeps its own colour."""
+    previous = None
+    while previous != html_text:  # one colour per link tag each pass
+        previous = html_text
+        html_text = _LINK_STYLE.sub(r"\1color:\2 !important", html_text)
+        html_text = _LINK_LINE.sub(r"\1text-decoration:\2 !important", html_text)
+    return html_text
 
 
 def wrap(rows: str, preheader: str) -> str:
     # Everything on one line with no indentation: Buttondown reads the body as
     # Markdown, where indented or blank-line-separated HTML can be mangled.
+    # One white card on the brand's paper colour: no boxes inside boxes.
     hidden = (f'<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">'
               f'{esc(preheader)}{"&#847;&zwnj;&nbsp;" * 30}</div>')
-    return (
+    return keep_link_colours(
         hidden
         + f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:{PAPER};">'
-        '<tr><td align="center" style="padding:16px 8px;">'
+        '<tr><td align="center" style="padding:16px 0 28px 0;">'
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" '
-        f'style="max-width:600px;background:{SOFT};border-radius:14px;border-collapse:separate;">'
+        f'style="max-width:600px;background:{CARD};border-radius:14px;border-collapse:separate;">'
         f'{rows}'
-        '</table></td></tr></table>'
+        '</table>'
+        '</td></tr></table>'
     )
 
 
@@ -282,21 +466,55 @@ def wrap(rows: str, preheader: str) -> str:
 # Building and sending the email
 # ---------------------------------------------------------------------------
 
+def _cut(text: str, limit: int) -> str:
+    """Cut at a whole word, never mid-word."""
+    text = " ".join(str(text or "").split())
+    if len(text) <= limit:
+        return text
+    return text[:limit].rsplit(" ", 1)[0].rstrip(",;:·-–—") + "…"
+
+
+def subject_line(picks: list[dict]) -> str:
+    """The top pick's plain headline (written with its notes), else its short name or title,
+    cut at a whole word. No "plus 1 more pick": the preview text names the second pick."""
+    lead = picks[0]
+    hook = ((lead.get("curator") or {}).get("headline") or "").strip()
+    if hook:
+        return _cut(hook, SUBJECT_MAX)
+    return _cut(lead.get("title", ""), SUBJECT_MAX)
+
+
+def preheader_text(picks: list[dict], new_papers: int) -> str:
+    """The grey line after the subject in the inbox: the second pick, then the count."""
+    n = len(picks)
+    count = f"{n} pick{'s' if n != 1 else ''} from {new_papers:,} new papers." if new_papers else ""
+    if n > 1:
+        second = _cut(short_title(picks[1].get("title", ""), 70), 70)
+        org = _org_name(picks[1].get("org"))
+        return " ".join(x for x in [f"+ {second}{f' from {org}' if org else ''}.", count] if x)
+    notes = picks[0].get("curator") or {}
+    lead = notes.get("tldr_simple") or notes.get("tldr") or (picks[0].get("summary") or {}).get("text") or ""
+    return " ".join(x for x in [clip(lead, 110), count] if x)
+
+
+def new_paper_count(edition: dict) -> int:
+    """Papers not seen in an earlier run (new_count), else everything the run read (older files)."""
+    n = edition.get("new_count")
+    return n if isinstance(n, int) and not isinstance(n, bool) else (edition.get("scanned") or 0)
+
+
 def build_email_from_edition(edition: dict, day: str, cases: list[dict] | None = None) -> dict | None:
     picks, rest = split_edition(edition)
     if not picks:
         return None
-    rows = header(day, edition.get("scanned") or 0, len(picks))
+    new_papers = new_paper_count(edition)
+    rows = header(day, new_papers, len(picks))
     for p in picks:
         rows += pick_card(p)
     rows += more_papers(rest)
     rows += case_studies(new_case_studies(day) if cases is None else cases)
-    rows += footer()
-
-    names = [short_title(p.get("title", "")) for p in picks]
-    subject = names[0] if len(names) == 1 else f"{names[0]} · plus {len(names) - 1} more pick{'s' if len(names) > 2 else ''}"
-    preheader = (picks[0].get("curator") or {}).get("tldr") or (picks[0].get("summary") or {}).get("text") or ""
-    return {"subject": subject, "body": wrap(rows, clip(preheader, 140))}
+    rows += browse_all(len(edition.get("papers") or []))
+    return {"subject": subject_line(picks), "body": wrap(rows, preheader_text(picks, new_papers))}
 
 
 def build_email(items: list[dict], day: str) -> dict:

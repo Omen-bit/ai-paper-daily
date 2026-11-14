@@ -66,17 +66,47 @@ EDITION = {
 
 
 def test_edition_email_layout(tmp_path):
-    email = sn.build_email_from_edition(EDITION, "2026-11-02")
+    email = sn.build_email_from_edition(EDITION, "2026-11-02", cases=[])
     body = email["body"]
-    assert email["subject"] == "SpecSlot · plus 1 more pick"
-    assert "916 new papers read." in body and "2 worth your time." in body
-    assert body.index("SpecSlot") < body.index("Does Scaling Work")
+    assert email["subject"] == "SpecSlot: Spectral slots"  # no "plus 1 more pick"
+    assert "2 papers worth your time today" in body and "Picked from 916 new AI papers" in body
+    assert body.index("SpecSlot") < body.rindex("Does Scaling Work")  # (the preview text names it first)
     assert "Other" not in body and "Also new today" not in body  # picks only
     assert "TLDR one." in body and "Cheaper." in body and "https://github.com/x/y" in body
+    assert "Key result:</strong> FID -2.8." in body and "4 authors" in body
+    assert "▲ 25 upvotes on Hugging Face" in body and "Read the breakdown →" in body
+    assert "No code yet" in body  # the trending pick has no code
+    assert "Browse all 3 ranked papers" in body
+    assert "Unsubscribe" not in body  # Buttondown's own footer has it
     # kept short: no long notes, quiz or build ideas
     assert "New thing." not in body and "How does it work?" not in body and "Idea A" not in body
-    assert "ref=email" in body and "\n    " not in body  # no indented lines for Markdown to mangle
-    assert len(body) < 12000
+    assert "ref=email" in body and "\n" not in body  # one line, nothing for Markdown to mangle
+    assert len(body) < 16000
+
+
+def test_subject_uses_headline_and_never_cuts_mid_word():
+    long = {"id": "x", "title": "The Surprising Effectiveness of Deleting Weights in LLM Post-Training"}
+    subject = sn.subject_line([long])
+    assert subject == "The Surprising Effectiveness of Deleting Weights in LLM…"
+    assert len(subject) <= sn.SUBJECT_MAX + 1
+    hooked = {**long, "curator": {"headline": "Delete 0.05% of an LLM's weights, skip fine-tuning"}}
+    assert sn.subject_line([hooked]) == "Delete 0.05% of an LLM's weights, skip fine-tuning"
+
+
+def test_preheader_names_the_second_pick_and_the_count():
+    picks = [{"id": "a", "title": "A"}, {"id": "b", "title": "APEX: Few-step video", "org": "Tsinghua University"}]
+    assert sn.preheader_text(picks, 955) == "+ APEX from Tsinghua University. 2 picks from 955 new papers."
+
+
+def test_new_count_wins_over_scanned():
+    assert sn.new_paper_count({"scanned": 955, "new_count": 610}) == 610
+    assert sn.new_paper_count({"scanned": 955}) == 955
+    assert sn.new_paper_count({"scanned": 955, "new_count": 0}) == 0
+
+
+def test_org_names_are_tidied():
+    assert sn._org_name("agentic learning ai lab") == "Agentic Learning AI Lab"
+    assert sn._org_name("HKUSTGZ") == "HKUSTGZ"
 
 
 def test_compose_prefers_edition_file(monkeypatch, tmp_path):
@@ -86,12 +116,54 @@ def test_compose_prefers_edition_file(monkeypatch, tmp_path):
     assert sn.compose("2026-11-02")["subject"].startswith("SpecSlot")
 
 
-def test_case_studies_are_one_line_with_a_count():
+def test_case_studies_without_results_are_one_line_with_a_count():
     posts = [{"company": "NVIDIA"}, {"company": "Pinterest"}, {"company": "NVIDIA"}, {"company": "Meta"},
              {"company": "Stripe"}]
     row = sn.case_studies(posts)
-    assert "5 new case studies</strong> from NVIDIA, Pinterest, Meta and 1 more on the site today" in row
-    assert "case-studies/index.html?ref=email" in row
-    assert row.count("<p") == 1  # a single line, no list of titles
+    assert "5 new case studies</strong> from NVIDIA, Pinterest, Meta and 1 more." in row
+    assert "case-studies/index.html?ref=email" in row and "See all 5" in row
     assert "1 new case study</strong> from Apple" in sn.case_studies([{"company": "Apple"}])
     assert sn.case_studies([]) == ""
+
+
+def test_case_studies_show_two_with_a_result():
+    posts = [{"company": "Postman", "title": "How to migrate tests", "url": "https://p", "result": ""},
+             {"company": "Meta", "title": "Better ads", "url": "https://m", "result": "About 10% better ranking"},
+             {"company": "Meta", "title": "Other", "url": "https://m2", "result": "Faster"},
+             {"company": "DXC", "title": "Bedrock", "url": "https://d", "result": "Resolution time down 95%"},
+             {"company": "Ramp", "title": "Third", "url": "https://r", "result": "2x"}]
+    row = sn.case_studies(posts)
+    assert "AI at work" in row and "5 new case studies" in row
+    assert "About 10% better ranking" in row and "Resolution time down 95%" in row
+    assert "How to migrate tests" not in row and "Other" not in row and "Third" not in row
+
+
+def test_new_case_studies_skip_old_posts_and_catch_up_since_last_email(tmp_path):
+    import json
+    posts = [
+        {"url": "https://a", "title": "Fresh", "company": "A", "added": "2026-11-12", "published": "2026-11-11"},
+        {"url": "https://b", "title": "Backfilled", "company": "B", "added": "2026-11-12", "published": "2026-06-01"},
+        {"url": "https://c", "title": "Today", "company": "C", "added": "2026-11-13", "published": "2026-11-13"},
+        {"url": "https://d", "title": "Already sent", "company": "D", "added": "2026-11-10", "published": "2026-11-10"},
+    ]
+    path = tmp_path / "cases.json"
+    path.write_text(json.dumps({"posts": posts}), encoding="utf-8")
+    got = sn.new_case_studies("2026-11-13", path=str(path), since="2026-11-11")
+    assert [p["title"] for p in got] == ["Today", "Fresh"]
+
+
+def test_last_email_day_reads_the_markers(tmp_path):
+    for d in ("2026-11-10", "2026-11-12", "2026-11-13"):
+        (tmp_path / f"{d}.json").write_text("{}", encoding="utf-8")
+    assert sn.last_email_day("2026-11-13", str(tmp_path)) == "2026-11-12"
+    assert sn.last_email_day("2026-11-01", str(tmp_path)) is None
+
+
+def test_link_colours_survive_the_accent_colour():
+    email = sn.build_email_from_edition(EDITION, "2026-11-02", cases=[])
+    import re
+    links = re.findall(r"<a\s[^>]*>", email["body"])
+    assert links and all("!important" in a for a in links if "color:" in a)
+    assert "color:#ffffff !important" in email["body"]  # the button's text stays white
+    assert sn.keep_link_colours('<a href="x" style="color:#111;background-color:#fff;">') == \
+        '<a href="x" style="color:#111 !important;background-color:#fff;">'

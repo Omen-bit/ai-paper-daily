@@ -40,6 +40,7 @@ LIMITS = {
     "check_answer": 40,
     "tldr_simple": 35,
     "tldr_expert": 40,
+    "headline": 10,
     "term": 5,
     "meaning": 30,
 }
@@ -50,13 +51,14 @@ Read the paper's title and abstract and return reading notes as one JSON object 
 "tldr": one plain sentence, at most 25 words, saying what the paper does.
 "whats_new": one or two sentences, at most 40 words, on what is new compared with earlier work.
 "key_result": the single most important result stated in the abstract, with its number if one is given, at most 35 words. Use null if the abstract states no result.
-"why_it_matters": one sentence, at most 30 words, on why builders should care. Do not start with "This paper".
+"why_it_matters": one sentence, at most 30 words, on why builders should care. Speak to the reader as "you". Do not start with "This paper", "Developers" or "Builders".
 "build_ideas": a list of 2 or 3 concrete projects a developer could build with this work, each at most 20 words and starting with a verb.
 "difficulty": one of "beginner", "intermediate", "advanced", for how hard it is to reproduce or use.
 "difficulty_reason": one short phrase, at most 20 words, explaining the difficulty (for example the compute or background needed).
 "check_question": one short question, at most 25 words, that checks whether a reader understood the paper's main idea. Its answer must be in the abstract.
 "check_answer": the answer to check_question in one or two sentences, at most 35 words.
 "tldr_simple": the tldr again for someone new to AI, at most 30 words, with no jargon and no acronyms.
+"headline": an email subject line, at most 9 words and 60 characters, stating the main finding in plain words, for example "Delete 0.05% of an LLM's weights, skip fine-tuning". No colon, no question, no hype.
 "tldr_expert": the tldr again for a researcher in the field, at most 35 words, naming the exact technique and setting.
 "terms": a list of up to 3 objects {"term": ..., "meaning": ...} for technical terms a newcomer would not know. Each term must appear word for word in the tldr or the abstract. Each meaning is one plain sentence, at most 25 words.
 
@@ -139,6 +141,20 @@ def _why_not(value, limit: int) -> str:
     return "too short"
 
 
+HEADLINE_MAX_CHARS = 60
+
+
+def _headline(value, source: str) -> Optional[str]:
+    """The email subject the model wrote: short, plain, and with no number the paper doesn't have."""
+    text = _sentence(value, LIMITS["headline"])
+    if not text:
+        return None
+    text = text.rstrip(".")
+    if len(text) > HEADLINE_MAX_CHARS or "?" in text or not _numbers_known(text, source):
+        return None
+    return text
+
+
 def _new_numbers(text: str, source: str) -> list[str]:
     plain = source.replace(",", "")
     return [n for n in re.findall(r"\d[\d,.]*\d|\d", text or "") if n.replace(",", "") not in plain]
@@ -186,6 +202,7 @@ def check_notes(data: Optional[dict], abstract: str = "") -> tuple[Optional[dict
     for key in ("tldr_simple", "tldr_expert"):
         text = _sentence(data.get(key), LIMITS[key])
         notes[key] = text if text and _numbers_known(text, source_text) else None
+    notes["headline"] = _headline(data.get("headline"), source_text)
     notes["terms"] = _terms(data.get("terms"), source_text)
     # The question is only useful with its answer, so keep both or neither
     if not (notes["check_question"] and notes["check_answer"]):

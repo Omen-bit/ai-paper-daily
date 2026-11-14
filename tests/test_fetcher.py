@@ -170,3 +170,9 @@ def test_hf_items_keep_the_claiming_org():
     items = [{"paper": {"id": "2601.00009v2", "title": "T", "summary": "S", "authors": [{"name": "A"}]},
               "organization": {"name": "nvidia", "fullname": "NVIDIA"}, "upvotes": 4}]
     assert parse_hf_items(items)[0]["hf_org"] == {"name": "nvidia", "fullname": "NVIDIA"}
+
+
+def test_lookback_is_96_hours_every_day():
+    # The Monday evening arXiv batch holds Friday's papers; a 48h window on Tuesday missed them
+    from fetcher import get_default_lookback_hours
+    assert get_default_lookback_hours() == 96

@@ -25,6 +25,7 @@ ARXIV_CATEGORIES = [
 ]
 
 ARXIV_API_BASE = "https://export.arxiv.org/api/query"
+LOOKBACK_HOURS = 96
 REQUEST_TIMEOUT = 15
 USER_AGENT = "ai-paper-daily/1.0 (https://github.com/Omen-bit/ai-paper-daily)"
 RETRY_DELAYS = [2, 4, 8]  # seconds between attempts 1, 2, 3
@@ -34,15 +35,14 @@ _TRANSIENT_ERRORS = ("timeout", "Timeout", "ConnectionError", "503", "502", "500
 
 def get_default_lookback_hours() -> int:
     """
-    arXiv does not publish new papers over the weekend (Friday night to Sunday night UTC).
-    On Friday, Saturday, Sunday, and Monday, use a 96-hour lookback window so weekend
-    and Monday runs always capture the latest research.
+    How far back to look, by each paper's *submission* time. arXiv releases a batch most
+    evenings, and a batch holds papers submitted up to about three days earlier: the Monday
+    evening batch holds Friday's papers, which a 48-hour window on Tuesday missed entirely
+    (on 10 Nov 2026 the run got no arXiv papers at all). So every day looks back 96 hours.
+    Papers already seen are not lost or double-counted: the run's ids are de-duplicated,
+    and paper_store counts only the ones no earlier run saw as new.
     """
-    now = datetime.now(timezone.utc)
-    # 4: Friday, 5: Saturday, 6: Sunday, 0: Monday
-    if now.weekday() in (4, 5, 6, 0):
-        return 96
-    return 48
+    return LOOKBACK_HOURS
 
 
 def _strip_version(arxiv_id: str) -> str:
@@ -111,7 +111,7 @@ def fetch_arxiv_papers(max_results: int = ARXIV_MAX_RESULTS, lookback_hours: int
     """
     Fetch every recent paper in the tracked arXiv categories, page by page,
     newest first, until a page reaches past the lookback window.
-    Uses a dynamic lookback window (96h on weekends/Mondays, 48h on weekdays).
+    Looks back 96 hours by submission time (see get_default_lookback_hours).
     max_results is a safety cap, not the expected count.
     Strips version suffixes from arXiv IDs before returning.
     """

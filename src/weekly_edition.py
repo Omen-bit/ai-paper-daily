@@ -155,7 +155,7 @@ def collect(sunday: date, daily_dir: str = DAILY_DIR, cases_path: str = CASES_PA
         if not edition:
             continue
         days_found.append(day)
-        scanned += int(edition.get("scanned") or 0)
+        scanned += int(edition.get("new_count") if isinstance(edition.get("new_count"), int) else (edition.get("scanned") or 0))  # papers no earlier day had
         for p in edition.get("papers") or []:
             pid = p.get("id")
             seen = str(p.get("first_seen") or day)

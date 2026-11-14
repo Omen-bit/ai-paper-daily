@@ -25,6 +25,11 @@ SCHEMA_VERSION = 2  # 2: score out of 100 with score_parts, evidence, claims, ra
 # still considered for the day's picks.
 KEEP_PER_DAY = 200
 
+# Every paper id each run fetched, for the last SEEN_DAYS runs, so a paper read again the
+# next day (the arXiv window overlaps) is not counted as new twice. data/seen.json.
+SEEN_FILE = "seen.json"
+SEEN_DAYS = 10
+
 
 def _category_slugs(categories: list) -> list[str]:
     """Categories arrive as classifier dicts or as bare slugs (from older records)."""
@@ -132,12 +137,41 @@ def _write_json(path: str, data) -> None:
         json.dump(data, f, ensure_ascii=False, indent=1)
 
 
+def load_seen(data_dir: str = DATA_DIR) -> dict[str, list[str]] | None:
+    """{date: [ids fetched that day]}, or None when there is no history yet."""
+    try:
+        with open(os.path.join(data_dir, SEEN_FILE), encoding="utf-8") as f:
+            seen = json.load(f)
+        return seen if isinstance(seen, dict) else None
+    except (OSError, ValueError):
+        return None
+
+
+def count_new(ids: list[str], date_str: str, data_dir: str = DATA_DIR) -> int | None:
+    """How many of today's ids no earlier run saw, and remember today's ids.
+    None on the first run, when there is nothing to compare with (the email then uses "scanned")."""
+    seen = load_seen(data_dir)
+    earlier = {pid for day, day_ids in (seen or {}).items() if day < date_str for pid in day_ids or []}
+    new = None if seen is None else sum(1 for pid in set(ids) if pid not in earlier)
+    kept = {day: day_ids for day, day_ids in (seen or {}).items() if day != date_str}
+    kept[date_str] = sorted(set(ids))
+    kept = dict(sorted(kept.items())[-SEEN_DAYS:])
+    try:
+        os.makedirs(data_dir, exist_ok=True)
+        with open(os.path.join(data_dir, SEEN_FILE), "w", encoding="utf-8") as f:
+            json.dump(kept, f, separators=(",", ":"))
+    except OSError as exc:  # only the count suffers
+        print(f"  [store] WARNING: could not save {SEEN_FILE} ({exc})")
+    return new
+
+
 def save_day(all_papers: list[dict], selected: list[dict], date_str: str,
              data_dir: str = DATA_DIR, keep: int = KEEP_PER_DAY) -> str:
     """
     Write data/daily/<date>.json with the day's featured papers first, then the
     best of the other candidates by score, up to `keep` records in all.
-    "scanned" records how many papers the run considered.
+    "scanned" records how many papers the run considered, "new_count" how many of
+    them no earlier run had seen (None on the very first run).
     """
     featured_ids = [p["id"] for p in selected]
     # The selected list carries the summaries, so prefer it over all_papers
@@ -147,6 +181,7 @@ def save_day(all_papers: list[dict], selected: list[dict], date_str: str,
     records = [to_record(p, date_str, p["id"] in featured_ids) for p in by_id.values()]
     records.sort(key=lambda r: (not r["featured"], -(r["score"] or 0)))
     scanned = len(records)
+    new_count = count_new([r["id"] for r in records], date_str, data_dir)
     records = records[:max(keep, len(featured_ids))]
 
     day = {
@@ -155,12 +190,13 @@ def save_day(all_papers: list[dict], selected: list[dict], date_str: str,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "featured": featured_ids,
         "scanned": scanned,
+        "new_count": new_count,
         "papers": records,
     }
     path = os.path.join(data_dir, "daily", f"{date_str}.json")
     _write_json(path, day)
     rebuild_index(data_dir)
-    print(f"  [store] Saved the best {len(records)} of {scanned} papers to {path}")
+    print(f"  [store] Saved the best {len(records)} of {scanned} papers ({new_count if new_count is not None else 'all'} new) to {path}")
     return path
 
 

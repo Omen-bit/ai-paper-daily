@@ -241,3 +241,13 @@ def test_curate_papers_records_the_log():
          patch.object(gs, "_active_models", ["m1"]), patch.object(gs, "_auth_failed", False):
         curator.curate_papers([paper])
     assert paper["curator_log"] == {"repairs": 0, "grounded": True, "flagged": []}
+
+
+def test_headline_is_optional_short_and_grounded():
+    import curator
+    src = "We delete 0.05% of weights."
+    assert curator._headline("Delete 0.05% of an LLM's weights, skip fine-tuning.", src) == \
+        "Delete 0.05% of an LLM's weights, skip fine-tuning"
+    assert curator._headline("Delete 7% of weights", src) is None  # a number the paper doesn't have
+    assert curator._headline("Is deleting weights all you need for every model?", src) is None
+    assert curator._headline(None, src) is None

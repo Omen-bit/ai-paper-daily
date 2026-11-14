@@ -89,3 +89,19 @@ def test_save_day_keeps_only_the_best_but_counts_everything(tmp_path):
     day = json.loads((tmp_path / "daily" / "2026-10-31.json").read_text(encoding="utf-8"))
     assert day["scanned"] == 10
     assert [p["id"] for p in day["papers"]] == ["p0", "p9", "p8", "p7"]
+
+
+def test_new_count_skips_papers_an_earlier_run_saw(tmp_path):
+    from paper_store import count_new, load_seen
+    assert count_new(["a", "b"], "2026-11-12", str(tmp_path)) is None  # first run: nothing to compare with
+    assert count_new(["b", "c", "d"], "2026-11-13", str(tmp_path)) == 2
+    assert count_new(["b", "c", "d", "e"], "2026-11-13", str(tmp_path)) == 3  # a re-run replaces its own day
+    assert sorted(load_seen(str(tmp_path))) == ["2026-11-12", "2026-11-13"]
+
+
+def test_save_day_records_new_count(tmp_path):
+    import json
+    save_day([_paper("a"), _paper("b")], [_paper("a")], "2026-10-30", data_dir=str(tmp_path))
+    save_day([_paper("b"), _paper("c")], [_paper("c")], "2026-10-31", data_dir=str(tmp_path))
+    day = json.loads((tmp_path / "daily" / "2026-10-31.json").read_text(encoding="utf-8"))
+    assert day["scanned"] == 2 and day["new_count"] == 1
