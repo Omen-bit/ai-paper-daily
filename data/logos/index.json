@@ -41,6 +41,11 @@
   "source": "website https://www.aalto.fi",
   "v": 6
  },
+ "Abdul Wali Khan University Mardan": {
+  "checked": "2026-11-14",
+  "qid": "Q16057940",
+  "v": 6
+ },
  "Adam Mickiewicz University in Poznań": {
   "checked": "2026-11-07",
   "file": "adam-mickiewicz-university-in-pozna.png",
@@ -55,6 +60,7 @@
   "source": "Lobe Icons",
   "v": 5
  },
+ "Advanced Micro Devices": {},
  "African Institute for Mathematical Sciences": {
   "checked": "2026-11-07",
   "file": "african-institute-for-mathematical-sciences.png",
@@ -235,6 +241,11 @@
   "v": 6
  },
  "Beijing Information Science & Technology University": {},
+ "Beijing Institute of Technology": {
+  "checked": "2026-11-14",
+  "qid": "Q23101",
+  "v": 6
+ },
  "Beijing Jiaotong University": {
   "checked": "2026-11-12",
   "qid": "Q4587760",
@@ -251,6 +262,13 @@
   "v": 6
  },
  "Beijing University of Posts and Telecommunications": {},
+ "Ben-Gurion University of the Negev": {
+  "checked": "2026-11-14",
+  "file": "ben-gurion-university-of-the-negev.png",
+  "qid": "Q737332",
+  "source": "website https://www.bgu.ac.il",
+  "v": 6
+ },
  "BenchFlow": {
   "checked": "2026-11-06",
   "file": "benchflow.png",
@@ -383,6 +401,11 @@
   "file": "chang-an-university.png",
   "qid": "Q5071561",
   "source": "website https://chd.edu.cn",
+  "v": 6
+ },
+ "Charles University": {
+  "checked": "2026-11-14",
+  "qid": "Q31519",
   "v": 6
  },
  "China People's Public Security University": {},
@@ -609,6 +632,13 @@
   "qid": "Q2034790",
   "v": 6
  },
+ "Edge Hill University": {
+  "checked": "2026-11-14",
+  "file": "edge-hill-university.png",
+  "qid": "Q937482",
+  "source": "website https://www.edgehill.ac.uk",
+  "v": 6
+ },
  "Edinburgh Napier University": {},
  "Edison Scientific Inc.": {
   "checked": "2026-11-07",
@@ -657,6 +687,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Federal University of Technology Minna": {
+  "checked": "2026-11-14",
+  "file": "federal-university-of-technology-minna.png",
+  "qid": "Q17105410",
+  "source": "website https://www.futminna.edu.ng",
+  "v": 6
+ },
  "Figma": {
   "checked": "2026-11-11",
   "file": "figma.png",
@@ -697,6 +734,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Fraunhofer Institute for Computer Graphics Research": {
+  "checked": "2026-11-14",
+  "file": "fraunhofer-institute-for-computer-graphics-research.png",
+  "qid": "Q1452008",
+  "source": "website https://www.igd.fraunhofer.de/en",
+  "v": 6
+ },
  "Friedrich-Alexander-Universität Erlangen-Nürnberg": {
   "checked": "2026-11-07",
   "file": "friedrich-alexander-universit-t-erlangen-n-rnberg.png",
@@ -710,6 +754,13 @@
   "qid": "Q495015",
   "source": "Hugging Face",
   "v": 3
+ },
+ "Fundamental AI Lab at UTN": {
+  "checked": "2026-11-14",
+  "file": "fundamental-ai-lab-at-utn.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "Fundação Getulio Vargas": {},
  "Futurewei Technologies": {
@@ -751,6 +802,13 @@
   "qid": "Q864855",
   "source": "Hugging Face",
   "v": 3
+ },
+ "Ghent University": {
+  "checked": "2026-11-14",
+  "file": "ghent-university.png",
+  "qid": "Q1137665",
+  "source": "website https://www.ugent.be",
+  "v": 6
  },
  "Google": {
   "checked": "2026-11-07",
@@ -802,6 +860,13 @@
   "file": "huawei-computing-systems-lab.png",
   "qid": "",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Harbin Engineering University": {
+  "checked": "2026-11-14",
+  "file": "harbin-engineering-university.png",
+  "qid": "Q23102",
+  "source": "website http://www.hrbeu.edu.cn",
   "v": 6
  },
  "Harbin Institute of Technology": {
@@ -870,6 +935,11 @@
   "source": "Lobe Icons",
   "v": 5
  },
+ "Huizhou University": {
+  "checked": "2026-11-14",
+  "qid": "Q11073383",
+  "v": 6
+ },
  "Humboldt-Universität zu Berlin": {
   "checked": "2026-11-12",
   "file": "humboldt-universit-t-zu-berlin.png",
@@ -882,6 +952,13 @@
   "file": "hunan-university.png",
   "qid": "Q649868",
   "source": "website https://www.hnu.edu.cn",
+  "v": 6
+ },
+ "Huzhou Normal University": {
+  "checked": "2026-11-14",
+  "file": "huzhou-normal-university.png",
+  "qid": "Q15940681",
+  "source": "website https://www.huznu.edu.cn",
   "v": 6
  },
  "Hydro-Québec": {
@@ -991,6 +1068,13 @@
   "v": 4
  },
  "Inje University": {},
+ "Institut Polytechnique de Paris": {
+  "checked": "2026-11-14",
+  "file": "institut-polytechnique-de-paris.png",
+  "qid": "Q48759778",
+  "source": "website https://www.ip-paris.fr",
+  "v": 6
+ },
  "Institute for Computer Science, Artificial intelligence and Technology": {
   "checked": "2026-11-10",
   "file": "institute-for-computer-science-artificial-intelligence-and-t.png",
@@ -1145,6 +1229,11 @@
   "v": 4
  },
  "Klaipėda University": {},
+ "Korea University": {
+  "checked": "2026-11-14",
+  "qid": "Q840647",
+  "v": 6
+ },
  "Kuaishou": {
   "checked": "2026-11-10",
   "file": "kuaishou.png",
@@ -1247,6 +1336,13 @@
   "qid": "Q847993",
   "v": 6
  },
+ "Machine Learning in Neurosurgery Lab": {
+  "checked": "2026-11-14",
+  "file": "machine-learning-in-neurosurgery-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Mathis Group @ EPFL": {
   "checked": "2026-11-05",
   "file": "mathis-group-epfl.png",
@@ -1273,12 +1369,26 @@
   "source": "Lobe Icons",
   "v": 5
  },
+ "Michigan State University": {
+  "checked": "2026-11-14",
+  "file": "michigan-state-university.png",
+  "qid": "Q270222",
+  "source": "website https://msu.edu/",
+  "v": 6
+ },
  "Microsoft": {
   "checked": "2026-11-07",
   "file": "microsoft.png",
   "qid": "Q2283",
   "source": "Lobe Icons",
   "v": 5
+ },
+ "Mininglamp": {
+  "checked": "2026-11-14",
+  "file": "mininglamp.png",
+  "qid": "",
+  "source": "website https://www.mininglamp.com",
+  "v": 6
  },
  "Mississippi State University": {
   "checked": "2026-11-12",
@@ -1404,6 +1514,11 @@
   "source": "website https://nankai.edu.cn",
   "v": 6
  },
+ "Nantong University": {
+  "checked": "2026-11-14",
+  "qid": "Q6964345",
+  "v": 6
+ },
  "National Chung Hsing University": {
   "checked": "2026-11-12",
   "file": "national-chung-hsing-university.png",
@@ -1444,6 +1559,13 @@
   "source": "website https://www.ntua.gr",
   "v": 6
  },
+ "National University of Defense Technology": {
+  "checked": "2026-11-14",
+  "file": "national-university-of-defense-technology.png",
+  "qid": "Q831227",
+  "source": "website https://www.nudt.edu.cn/",
+  "v": 6
+ },
  "National Yang Ming Chiao Tung University": {
   "checked": "2026-11-12",
   "qid": "Q43401",
@@ -1473,6 +1595,11 @@
  "Newcastle University": {
   "checked": "2026-11-12",
   "qid": "Q837164",
+  "v": 6
+ },
+ "North Carolina State University": {
+  "checked": "2026-11-14",
+  "qid": "Q1132346",
   "v": 6
  },
  "Northeastern University": {
@@ -1521,6 +1648,13 @@
   "checked": "2026-11-12",
   "file": "openfinmind.png",
   "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "Orange": {
+  "checked": "2026-11-14",
+  "file": "orange.png",
+  "qid": "Q1431486",
   "source": "Hugging Face",
   "v": 6
  },
@@ -1609,6 +1743,13 @@
   "source": "website http://www.purdue.edu/",
   "v": 6
  },
+ "Pusan National University": {
+  "checked": "2026-11-14",
+  "file": "pusan-national-university.png",
+  "qid": "Q53122",
+  "source": "website https://www.pusan.ac.kr",
+  "v": 6
+ },
  "Qilu University of Technology": {
   "checked": "2026-11-12",
   "qid": "Q11180290",
@@ -1652,6 +1793,13 @@
   "checked": "2026-11-11",
   "file": "robbyant.png",
   "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "Roblox Corporation": {
+  "checked": "2026-11-14",
+  "file": "roblox-corporation.png",
+  "qid": "Q67186598",
   "source": "Hugging Face",
   "v": 6
  },
@@ -1761,6 +1909,11 @@
   "qid": "Q3817847",
   "v": 6
  },
+ "Shanxi University": {
+  "checked": "2026-11-14",
+  "qid": "Q7489128",
+  "v": 6
+ },
  "Sharpa": {
   "checked": "2026-11-12",
   "file": "sharpa.png",
@@ -1840,6 +1993,13 @@
   "source": "website https://e.sookmyung.ac.kr/",
   "v": 6
  },
+ "Sorbonne University, Institute of Intelligent Systems and Robotics": {
+  "checked": "2026-11-14",
+  "file": "sorbonne-university-institute-of-intelligent-systems-and-rob.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Sorbonne Université": {
   "checked": "2026-11-12",
   "qid": "Q41497113",
@@ -1860,6 +2020,16 @@
  "Southeast University": {
   "checked": "2026-11-12",
   "qid": "Q3551770",
+  "v": 6
+ },
+ "Southern University of Science and Technology": {
+  "checked": "2026-11-14",
+  "qid": "Q7568723",
+  "v": 6
+ },
+ "Southwestern University of Finance and Economics": {
+  "checked": "2026-11-14",
+  "qid": "Q1107944",
   "v": 6
  },
  "SpeedAI": {
@@ -1900,6 +2070,13 @@
  "State Key Laboratory of Tribology": {
   "checked": "2026-11-07",
   "qid": "",
+  "v": 6
+ },
+ "State University of New York": {
+  "checked": "2026-11-14",
+  "file": "state-university-of-new-york.png",
+  "qid": "Q1140241",
+  "source": "website https://www.suny.edu/",
   "v": 6
  },
  "StepFun": {
@@ -2004,6 +2181,13 @@
   "file": "technische-hochschule-ingolstadt.png",
   "qid": "Q1622111",
   "source": "website https://www.thi.de",
+  "v": 6
+ },
+ "Technische Universität Berlin": {
+  "checked": "2026-11-14",
+  "file": "technische-universit-t-berlin.png",
+  "qid": "Q51985",
+  "source": "website https://www.tu.berlin",
   "v": 6
  },
  "Technische Universität Braunschweig": {
@@ -2234,6 +2418,13 @@
   "source": "website https://www.unizar.es",
   "v": 6
  },
+ "Universitat Autònoma de Barcelona": {
+  "checked": "2026-11-14",
+  "file": "universitat-aut-noma-de-barcelona.png",
+  "qid": "Q43452",
+  "source": "website https://www.uab.cat",
+  "v": 6
+ },
  "University College London": {
   "checked": "2026-11-05",
   "file": "university-college-london.png",
@@ -2286,6 +2477,13 @@
   "qid": "Q492467",
   "v": 6
  },
+ "University of Bern": {
+  "checked": "2026-11-14",
+  "file": "university-of-bern.png",
+  "qid": "Q659080",
+  "source": "website https://www.unibe.ch",
+  "v": 6
+ },
  "University of Bologna": {
   "checked": "2026-11-12",
   "file": "university-of-bologna.png",
@@ -2306,6 +2504,13 @@
   "qid": "Q391028",
   "source": "Hugging Face",
   "v": 4
+ },
+ "University of Calgary": {
+  "checked": "2026-11-14",
+  "file": "university-of-calgary.png",
+  "qid": "Q1067471",
+  "source": "website https://www.ucalgary.ca",
+  "v": 6
  },
  "University of California San Diego": {
   "checked": "2026-11-07",
@@ -2417,6 +2622,13 @@
   "source": "website https://www.unige.ch/",
   "v": 6
  },
+ "University of Göttingen": {
+  "checked": "2026-11-14",
+  "file": "university-of-g-ttingen.png",
+  "qid": "Q152838",
+  "source": "website http://www.uni-goettingen.de/en/1.html",
+  "v": 6
+ },
  "University of Illinois Urbana-Champaign": {
   "checked": "2026-11-07",
   "file": "university-of-illinois-urbana-champaign.png",
@@ -2438,6 +2650,13 @@
   "source": "website https://uiowa.edu",
   "v": 6
  },
+ "University of Leeds": {
+  "checked": "2026-11-14",
+  "file": "university-of-leeds.png",
+  "qid": "Q503424",
+  "source": "website https://www.leeds.ac.uk",
+  "v": 6
+ },
  "University of Liverpool": {
   "checked": "2026-11-07",
   "file": "university-of-liverpool.png",
@@ -2453,6 +2672,13 @@
  "University of Manchester": {
   "checked": "2026-11-12",
   "qid": "Q230899",
+  "v": 6
+ },
+ "University of Maryland, Baltimore County": {
+  "checked": "2026-11-14",
+  "file": "university-of-maryland-baltimore-county.png",
+  "qid": "Q735049",
+  "source": "website https://umbc.edu",
   "v": 6
  },
  "University of Maryland, College Park": {
@@ -2484,6 +2710,11 @@
   "v": 6
  },
  "University of Missouri": {},
+ "University of Missouri–Kansas City": {
+  "checked": "2026-11-14",
+  "qid": "Q940690",
+  "v": 6
+ },
  "University of Moratuwa": {
   "checked": "2026-11-07",
   "file": "university-of-moratuwa.png",
@@ -2491,12 +2722,23 @@
   "source": "website https://uom.lk",
   "v": 6
  },
+ "University of Mumbai": {},
  "University of North Carolina at Chapel Hill": {},
+ "University of North Texas": {
+  "checked": "2026-11-14",
+  "qid": "Q860527",
+  "v": 6
+ },
  "University of Pennsylvania": {
   "checked": "2026-11-07",
   "file": "university-of-pennsylvania.png",
   "qid": "Q49117",
   "source": "website https://www.upenn.edu",
+  "v": 6
+ },
+ "University of Qom": {
+  "checked": "2026-11-14",
+  "qid": "Q4115886",
   "v": 6
  },
  "University of Seoul": {
@@ -2582,11 +2824,23 @@
   "source": "website https://unitn.it",
   "v": 6
  },
+ "University of Twente": {
+  "checked": "2026-11-14",
+  "file": "university-of-twente.png",
+  "qid": "Q1547084",
+  "source": "website https://www.utwente.nl",
+  "v": 6
+ },
  "University of Utah": {
   "checked": "2026-11-12",
   "file": "university-of-utah.png",
   "qid": "Q168515",
   "source": "website https://www.utah.edu",
+  "v": 6
+ },
+ "University of Verona": {
+  "checked": "2026-11-14",
+  "qid": "Q2531629",
   "v": 6
  },
  "University of Washington": {
@@ -2637,6 +2891,16 @@
   "source": "website https://www.uni-trier.de/",
   "v": 6
  },
+ "Universität der Bundeswehr München": {
+  "checked": "2026-11-14",
+  "qid": "Q283099",
+  "v": 6
+ },
+ "Université Paris Sciences et Lettres": {
+  "checked": "2026-11-14",
+  "qid": "Q1163431",
+  "v": 6
+ },
  "Vanderbilt University": {
   "checked": "2026-11-07",
   "qid": "Q29052",
@@ -2682,6 +2946,13 @@
   "source": "website https://www.waseda.jp/top/",
   "v": 6
  },
+ "Wellcome Sanger Institute": {
+  "checked": "2026-11-14",
+  "file": "wellcome-sanger-institute.png",
+  "qid": "Q1142544",
+  "source": "website https://www.sanger.ac.uk",
+  "v": 6
+ },
  "Westlake University": {
   "checked": "2026-11-12",
   "file": "westlake-university.png",
@@ -2702,6 +2973,18 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 4
+ },
+ "Wuhan University of Technology": {
+  "checked": "2026-11-14",
+  "qid": "Q832355",
+  "v": 6
+ },
+ "XJTLU": {
+  "checked": "2026-11-14",
+  "file": "xjtlu.png",
+  "qid": "Q13562485",
+  "source": "Hugging Face",
+  "v": 6
  },
  "Xi'an Jiaotong University": {
   "checked": "2026-11-07",
@@ -2760,6 +3043,13 @@
   "file": "yonsei-university.png",
   "qid": "Q39988",
   "source": "website https://www.yonsei.ac.kr",
+  "v": 6
+ },
+ "ZHAW Zurich University of Applied Sciences": {
+  "checked": "2026-11-14",
+  "file": "zhaw-zurich-university-of-applied-sciences.png",
+  "qid": "Q2605554",
+  "source": "website https://www.zhaw.ch",
   "v": 6
  },
  "Zhejiang Gongshang University": {
