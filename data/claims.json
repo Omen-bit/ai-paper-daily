@@ -1,4 +1,24 @@
 {
+ "2608.22237": {
+  "claims": [
+   {
+    "benchmark": "Web deep-search tasks",
+    "metric": "tokens",
+    "quote": "On Web deep-search tasks, it reduces tokens by 31.0--43.0% and task completion time by 23.0--37.0%.",
+    "result": "31.0--43.0%",
+    "task": "token reduction"
+   },
+   {
+    "benchmark": "Web deep-search tasks",
+    "metric": "task completion time",
+    "quote": "On Web deep-search tasks, it reduces tokens by 31.0--43.0% and task completion time by 23.0--37.0%.",
+    "result": "23.0--37.0%",
+    "task": "task completion time reduction"
+   }
+  ],
+  "date": "2026-11-14",
+  "proposed": 2
+ },
  "2610.40754": {
   "claims": [],
   "date": "2026-11-13",
@@ -30,6 +50,26 @@
   ],
   "date": "2026-11-13",
   "proposed": 3
+ },
+ "2611.08286": {
+  "claims": [
+   {
+    "benchmark": "IVG-Bench",
+    "metric": "interaction scenarios",
+    "quote": "We instantiate the framework as IVG-Bench, a benchmark with 315 interaction scenarios.",
+    "result": "315",
+    "task": "benchmark size"
+   },
+   {
+    "benchmark": "IVG-Bench",
+    "metric": "task completion within time limit",
+    "quote": "the best-performing model, Gemini 4 Argon, completes only 53.4% of tasks within the time limit",
+    "result": "53.4%",
+    "task": "task completion rate"
+   }
+  ],
+  "date": "2026-11-14",
+  "proposed": 2
  },
  "2611.10649": {
   "claims": [
@@ -84,6 +124,11 @@
   "date": "2026-11-13",
   "proposed": 1
  },
+ "2611.12304": {
+  "claims": [],
+  "date": "2026-11-14",
+  "proposed": 0
+ },
  "2611.12527": {
   "claims": [
    {
@@ -103,6 +148,31 @@
   ],
   "date": "2026-11-13",
   "proposed": 2
+ },
+ "2611.13410": {
+  "claims": [
+   {
+    "benchmark": "W4A16",
+    "metric": "average score",
+    "quote": "SteerDistill exceeds the strongest quantized baseline by 1.67--2.18 points in average score under W4A16",
+    "result": "1.67--2.18 points",
+    "task": "agentic benchmark performance"
+   },
+   {
+    "benchmark": "$τ^2$-Bench",
+    "metric": "success rate",
+    "quote": "it outperforms QeRL by 1.84 percentage points in success rate",
+    "result": "1.84 percentage points",
+    "task": "success rate"
+   }
+  ],
+  "date": "2026-11-14",
+  "proposed": 3
+ },
+ "2611.13766": {
+  "claims": [],
+  "date": "2026-11-14",
+  "proposed": 0
  },
  "2611.14210": {
   "claims": [
@@ -148,6 +218,11 @@
  "2611.14320": {
   "claims": [],
   "date": "2026-11-13",
+  "proposed": 0
+ },
+ "2611.14516": {
+  "claims": [],
+  "date": "2026-11-14",
   "proposed": 0
  }
 }
