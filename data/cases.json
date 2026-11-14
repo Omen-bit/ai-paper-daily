@@ -2,6 +2,42 @@
  "last_fetch": "2026-11-12",
  "posts": [
   {
+   "v": 3,
+   "cat": 2,
+   "url": "https://www.zenml.io/llmops-database/building-modular-and-scalable-rag-systems-with-hybrid-batch-incremental-processing",
+   "tags": [
+    "Hybrid search",
+    "Chunking",
+    "Embeddings"
+   ],
+   "added": "2026-11-14",
+   "issue": "Documentation changed constantly, making it hard to keep the RAG system fast and up‑to‑date.",
+   "title": "Bell: Building Modular and Scalable RAG Systems with Hybrid Batch/Incremental Processing",
+   "result": "",
+   "company": "Zenml",
+   "problem": "rag",
+   "summary": "They built a modular hybrid RAG pipeline that runs batch jobs for static docs and incremental jobs for new docs, using Apache Beam, Cloud Composer and GCP services.",
+   "added_at": "2026-11-14",
+   "industry": "other",
+   "published": "2026-11-14",
+   "sorted_by": "groq",
+   "techniques": [
+    "rag",
+    "embeddings"
+   ],
+   "build_score": 2,
+   "build_details": {
+    "stack": true,
+    "numbers": false,
+    "evaluation": false,
+    "architecture": true,
+    "failure_modes": false
+   },
+   "suggested": true,
+   "suggested_by": "Darshan Chougule",
+   "slug": "zenml-bell-building-modular-and-scalable-rag-systems-with-hybrid"
+  },
+  {
    "url": "https://zendesk.engineering/building-an-open-service-directory-registry-for-your-platforms-support-services-4074b0cffc3c",
    "company": "Zendesk",
    "title": "Building an Open Service Directory registry for your platform’s support services",

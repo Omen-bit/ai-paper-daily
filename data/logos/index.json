@@ -1058,7 +1058,11 @@
   "source": "Hugging Face",
   "v": 3
  },
- "Indian Statistical Institute": {},
+ "Indian Statistical Institute": {
+  "checked": "2026-11-14",
+  "qid": "Q3105568",
+  "v": 6
+ },
  "Industrial Systems Institute": {},
  "InfiX.ai": {
   "checked": "2026-11-07",
@@ -1472,7 +1476,11 @@
   "source": "Lobe Icons",
   "v": 5
  },
- "NYU": {},
+ "NYU": {
+  "checked": "2026-11-14",
+  "qid": "Q49210",
+  "v": 6
+ },
  "Nace.AI": {
   "checked": "2026-11-07",
   "file": "nace-ai.png",
