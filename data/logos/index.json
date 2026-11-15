@@ -1173,6 +1173,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "KU Leuven": {
+  "checked": "2026-11-15",
+  "file": "ku-leuven.png",
+  "qid": "Q833670",
+  "source": "website https://www.kuleuven.be",
+  "v": 6
+ },
  "Kansas State University": {
   "checked": "2026-11-07",
   "qid": "Q31249",
@@ -1560,6 +1567,13 @@
   "source": "website https://www.hse.ru/",
   "v": 6
  },
+ "National Taiwan University": {
+  "checked": "2026-11-15",
+  "file": "national-taiwan-university.png",
+  "qid": "Q32746",
+  "source": "website https://www.ntu.edu.tw/",
+  "v": 6
+ },
  "National Technical University of Athens": {
   "checked": "2026-11-07",
   "file": "national-technical-university-of-athens.png",
@@ -1864,6 +1878,13 @@
   "qid": "Q112629176",
   "source": "Hugging Face",
   "v": 3
+ },
+ "Sejong University": {
+  "checked": "2026-11-15",
+  "file": "sejong-university.png",
+  "qid": "Q491711",
+  "source": "website https://www.sejong.ac.kr/",
+  "v": 6
  },
  "Seoul National University": {
   "checked": "2026-11-05",
@@ -2576,6 +2597,13 @@
   "source": "website https://www.ucas.ac.cn",
   "v": 6
  },
+ "University of Cologne": {
+  "checked": "2026-11-15",
+  "file": "university-of-cologne.png",
+  "qid": "Q54096",
+  "source": "website https://uni-koeln.de/",
+  "v": 6
+ },
  "University of Colorado Boulder": {
   "checked": "2026-11-12",
   "file": "university-of-colorado-boulder.png",
@@ -2909,6 +2937,13 @@
   "qid": "Q1163431",
   "v": 6
  },
+ "Université de Toulouse": {
+  "checked": "2026-11-15",
+  "file": "universit-de-toulouse.png",
+  "qid": "Q135218300",
+  "source": "website https://www.univ-tlse3.fr",
+  "v": 6
+ },
  "Vanderbilt University": {
   "checked": "2026-11-07",
   "qid": "Q29052",
@@ -2938,6 +2973,11 @@
   "file": "vietnam-national-university-ho-chi-minh-city.png",
   "qid": "Q943759",
   "source": "website https://vnuhcm.edu.vn",
+  "v": 6
+ },
+ "Visa": {
+  "checked": "2026-11-15",
+  "qid": "",
   "v": 6
  },
  "Vrije Universiteit Brussel": {
