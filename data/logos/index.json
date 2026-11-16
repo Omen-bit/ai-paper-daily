@@ -509,6 +509,13 @@
   "source": "website https://www.cornell.edu",
   "v": 6
  },
+ "Coventry University": {
+  "checked": "2026-11-16",
+  "file": "coventry-university.png",
+  "qid": "Q1138080",
+  "source": "website https://www.coventry.ac.uk/",
+  "v": 6
+ },
  "Cracow University of Technology": {
   "checked": "2026-11-12",
   "qid": "Q931642",
@@ -741,6 +748,13 @@
   "source": "website https://www.igd.fraunhofer.de/en",
   "v": 6
  },
+ "Fraunhofer Institute for Intelligent Analysis and Information Systems": {
+  "checked": "2026-11-16",
+  "file": "fraunhofer-institute-for-intelligent-analysis-and-informatio.png",
+  "qid": "",
+  "source": "website https://www.iais.fraunhofer.de",
+  "v": 6
+ },
  "Friedrich-Alexander-Universität Erlangen-Nürnberg": {
   "checked": "2026-11-07",
   "file": "friedrich-alexander-universit-t-erlangen-n-rnberg.png",
@@ -862,6 +876,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Hanbat National University": {
+  "checked": "2026-11-16",
+  "file": "hanbat-national-university.png",
+  "qid": "Q482669",
+  "source": "website https://hanbat.ac.kr",
+  "v": 6
+ },
  "Harbin Engineering University": {
   "checked": "2026-11-14",
   "file": "harbin-engineering-university.png",
@@ -902,6 +923,11 @@
   "source": "website http://www.helmholtz-muenchen.de",
   "v": 6
  },
+ "Ho Chi Minh City University of Technology": {
+  "checked": "2026-11-16",
+  "qid": "Q3101701",
+  "v": 6
+ },
  "Hong Kong Baptist University": {
   "checked": "2026-11-12",
   "file": "hong-kong-baptist-university.png",
@@ -914,6 +940,13 @@
   "file": "hong-kong-polytechnic-university.png",
   "qid": "Q1187271",
   "source": "website https://www.polyu.edu.hk/",
+  "v": 6
+ },
+ "Hosei University": {
+  "checked": "2026-11-16",
+  "file": "hosei-university.png",
+  "qid": "Q1323040",
+  "source": "website http://www.hosei.ac.jp/english/index.html",
   "v": 6
  },
  "Huawei": {
@@ -973,6 +1006,11 @@
   "file": "ibm.png",
   "qid": "Q37156",
   "source": "Lobe Icons",
+  "v": 6
+ },
+ "IBM Research - Zurich": {
+  "checked": "2026-11-16",
+  "qid": "Q1474431",
   "v": 6
  },
  "IDEA FinAI": {
@@ -1464,6 +1502,11 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "NTT": {
+  "checked": "2026-11-16",
+  "qid": "",
+  "v": 6
+ },
  "NTU Singapore": {
   "checked": "2026-11-07",
   "qid": "Q721064",
@@ -1638,6 +1681,13 @@
   "source": "website https://www.northwestern.edu/",
   "v": 6
  },
+ "Northwestern University in Qatar": {
+  "checked": "2026-11-16",
+  "file": "northwestern-university-in-qatar.png",
+  "qid": "Q890759",
+  "source": "website https://www.qatar.northwestern.edu",
+  "v": 6
+ },
  "Norwegian University of Science and Technology": {
   "checked": "2026-11-12",
   "file": "norwegian-university-of-science-and-technology.png",
@@ -1782,6 +1832,11 @@
   "qid": "Q544847",
   "v": 6
  },
+ "Queen Mary University of London": {
+  "checked": "2026-11-16",
+  "qid": "Q195668",
+  "v": 6
+ },
  "Queen's University": {
   "checked": "2026-11-12",
   "file": "queen-s-university.png",
@@ -1809,6 +1864,13 @@
   "file": "rensselaer-polytechnic-institute.png",
   "qid": "Q49211",
   "source": "website https://www.rpi.edu",
+  "v": 6
+ },
+ "RheinMain University of Applied Sciences": {
+  "checked": "2026-11-16",
+  "file": "rheinmain-university-of-applied-sciences.png",
+  "qid": "Q542415",
+  "source": "website http://www.hs-rm.de/de/",
   "v": 6
  },
  "Robbyant": {
@@ -1870,6 +1932,13 @@
  "Sapienza University of Rome": {
   "checked": "2026-11-12",
   "qid": "Q209344",
+  "v": 6
+ },
+ "Sardar Vallabhbhai National Institute of Technology Surat": {
+  "checked": "2026-11-16",
+  "file": "sardar-vallabhbhai-national-institute-of-technology-surat.png",
+  "qid": "Q7423738",
+  "source": "website https://www.svnit.ac.in/",
   "v": 6
  },
  "Scale AI": {
@@ -2015,6 +2084,7 @@
   "qid": "",
   "v": 6
  },
+ "Soochow University": {},
  "Sookmyung Women's University": {
   "checked": "2026-11-07",
   "file": "sookmyung-women-s-university.png",
@@ -2068,6 +2138,7 @@
   "source": "Lobe Icons",
   "v": 6
  },
+ "Sri Lanka Institute of Information Technology": {},
  "Ss. Cyril and Methodius University in Skopje": {
   "checked": "2026-11-07",
   "file": "ss-cyril-and-methodius-university-in-skopje.png",
@@ -3077,6 +3148,13 @@
   "file": "yale-university.png",
   "qid": "Q49112",
   "source": "website https://www.yale.edu",
+  "v": 6
+ },
+ "Yandex": {
+  "checked": "2026-11-16",
+  "file": "yandex.png",
+  "qid": "Q5281",
+  "source": "Lobe Icons",
   "v": 6
  },
  "Yandex Research": {
