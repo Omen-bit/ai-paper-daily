@@ -259,8 +259,9 @@ def get_summary(paper: dict) -> tuple[str, str]:
     """
     global _active_models, _auth_failed
 
-    title = paper.get("title", "")
-    abstract = paper.get("abstract", "")
+    # `or ""`, not a default: a stored paper can carry the key with a None value
+    title = paper.get("title") or ""
+    abstract = paper.get("abstract") or ""
 
     if _auth_failed:
         return _heuristic_summary(abstract), "heuristic"

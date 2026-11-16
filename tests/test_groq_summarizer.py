@@ -163,3 +163,19 @@ def test_default_models_are_not_retired_and_reasoning_models_get_room():
     assert opts["max_tokens"] == 1104
     assert opts["extra_body"] == {"reasoning_effort": "low", "include_reasoning": False}
     assert gs.call_options("other-model", 80) == {"max_tokens": 80}
+
+
+def test_get_summary_handles_a_none_abstract_and_title():
+    # A stored paper can carry "abstract": None; .get("abstract", "") returned None and
+    # _truncate_abstract crashed with a TypeError before any call was made.
+    mock_client = MagicMock()
+    mock_choice = MagicMock()
+    mock_choice.message.content = "Reduces compute requirements by 50% for large-scale training."
+    mock_choice.finish_reason = "stop"
+    mock_client.chat.completions.create.return_value.choices = [mock_choice]
+    mock_client.models.list.return_value.data = [MagicMock(id="openai/gpt-oss-120b")]
+
+    with patch("groq_summarizer._get_client", return_value=mock_client), \
+         patch("groq_summarizer._get_api_key", return_value="dummy_key"):
+        text, source = get_summary({"title": None, "abstract": None})
+        assert isinstance(text, str) and source

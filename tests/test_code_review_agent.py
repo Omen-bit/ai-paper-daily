@@ -168,3 +168,25 @@ def test_similar_titles_on_the_same_file_count_as_duplicates():
 def test_the_graph_has_the_documented_steps(tmp_path):
     nodes = set(agent.build_graph(deps_for(str(tmp_path))).get_graph().nodes)
     assert {"collect", "review", "verify", "dedupe", "file"} <= nodes
+
+
+def test_a_syntax_claim_about_a_file_that_compiles_is_dropped(tmp_path):
+    # The weekly run filed "Truncated line causing syntax error" and "Invalid for-loop syntax" for
+    # files that compile: the model had read a diff cut mid-line. Those claims are now checked.
+    root = repo_with_planted_bug(tmp_path)
+    cut = dict(REAL, title="Truncated line causing syntax error", reason="The line is cut off.",
+               code="return sum(xs) / (len(xs)")
+    lines = open(os.path.join(root, "src", "stats.py")).read().splitlines()
+    assert agent.verify([cut], lambda p: lines) == []
+    broken = lines[:4] + ["    return sum(xs) / (len(xs)"]
+    assert len(agent.verify([cut], lambda p: broken)) == 1  # a file that really doesn't parse keeps it
+    assert agent.verify([REAL], lambda p: lines)[0]["title"] == REAL["title"]  # real bugs still pass
+
+
+def test_a_long_diff_is_cut_at_a_line_end_with_a_marker():
+    diff = "\n".join(f"{n:5} + |    for item in items_{n}:" for n in range(1, 2000))
+    out = agent.clip_diff(diff, 500)
+    body, marker = out.rsplit("\n", 1)
+    assert marker == agent.DIFF_CUT and len(body) <= 500
+    assert all(line.endswith(":") for line in body.splitlines())  # no half lines
+    assert agent.clip_diff("short", 500) == "short"
