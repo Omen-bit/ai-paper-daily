@@ -51,6 +51,19 @@
   "date": "2026-11-13",
   "proposed": 3
  },
+ "2611.05984": {
+  "claims": [
+   {
+    "benchmark": "vanilla residual baseline",
+    "metric": "extra end-to-end training time",
+    "quote": "SimpleHC incurs only 2.4% extra end-to-end training time over a vanilla residual baseline at the largest tested scale.",
+    "result": "2.4%",
+    "task": "training time"
+   }
+  ],
+  "date": "2026-11-15",
+  "proposed": 1
+ },
  "2611.08286": {
   "claims": [
    {
@@ -149,6 +162,11 @@
   "date": "2026-11-13",
   "proposed": 2
  },
+ "2611.13004": {
+  "claims": [],
+  "date": "2026-11-15",
+  "proposed": 0
+ },
  "2611.13410": {
   "claims": [
    {
@@ -223,6 +241,79 @@
  "2611.14516": {
   "claims": [],
   "date": "2026-11-14",
+  "proposed": 0
+ },
+ "2611.15131": {
+  "claims": [],
+  "date": "2026-11-15",
+  "proposed": 0
+ },
+ "2611.15777": {
+  "claims": [
+   {
+    "benchmark": "SO-Arena",
+    "metric": "number of models evaluated",
+    "quote": "Evaluations across 21 models reveal that the benefits of scaling and additional reasoning vary substantially across domains.",
+    "result": "21",
+    "task": "evaluation"
+   }
+  ],
+  "date": "2026-11-15",
+  "proposed": 2
+ },
+ "2611.15844": {
+  "claims": [
+   {
+    "benchmark": "Cityscapes",
+    "metric": "mIoU",
+    "quote": "OVB surpasses Vision Banana's reported Cityscapes zero-shot performance (73.9 vs. 69.9 mIoU)",
+    "result": "73.9",
+    "task": "Zero-shot segmentation"
+   },
+   {
+    "benchmark": "Cityscapes",
+    "metric": "mIoU",
+    "quote": "improving mIoU by up to 8.7 points on Cityscapes",
+    "result": "8.7",
+    "task": "Test-time scaling improvement"
+   },
+   {
+    "benchmark": "COCO-Object",
+    "metric": "mIoU",
+    "quote": "improving mIoU by up to 8.7 points on Cityscapes and 15.0 points on COCO-Object",
+    "result": "15.0",
+    "task": "Test-time scaling improvement"
+   }
+  ],
+  "date": "2026-11-15",
+  "proposed": 3
+ },
+ "2611.16748": {
+  "claims": [],
+  "date": "2026-11-15",
+  "proposed": 0
+ },
+ "2611.17060": {
+  "claims": [],
+  "date": "2026-11-16",
+  "proposed": 0
+ },
+ "2611.17167": {
+  "claims": [
+   {
+    "benchmark": "ALFWorld",
+    "metric": "success",
+    "quote": "As a teacher, JEV raises a Qwen2.5-1.5B policy over GRPO from 72.8% to 82.9% success on ALFWorld",
+    "result": "82.9%",
+    "task": "success rate"
+   }
+  ],
+  "date": "2026-11-15",
+  "proposed": 2
+ },
+ "2611.17331": {
+  "claims": [],
+  "date": "2026-11-16",
   "proposed": 0
  }
 }
