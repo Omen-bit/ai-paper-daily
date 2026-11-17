@@ -162,6 +162,11 @@
   "date": "2026-11-13",
   "proposed": 2
  },
+ "2611.12869": {
+  "claims": [],
+  "date": "2026-11-17",
+  "proposed": 0
+ },
  "2611.13004": {
   "claims": [],
   "date": "2026-11-15",
@@ -243,6 +248,11 @@
   "date": "2026-11-14",
   "proposed": 0
  },
+ "2611.15094": {
+  "claims": [],
+  "date": "2026-11-17",
+  "proposed": 0
+ },
  "2611.15131": {
   "claims": [],
   "date": "2026-11-15",
@@ -288,10 +298,60 @@
   "date": "2026-11-15",
   "proposed": 3
  },
+ "2611.16409": {
+  "claims": [],
+  "date": "2026-11-17",
+  "proposed": 0
+ },
+ "2611.16728": {
+  "claims": [
+   {
+    "benchmark": "cross-embodiment pretraining",
+    "metric": "average normalized task progress",
+    "quote": "cross-embodiment pretraining raises MXT+'s average normalized task progress from 0.63 to 0.80 over training from scratch.",
+    "result": "0.63 to 0.80",
+    "task": "average normalized task progress"
+   },
+   {
+    "benchmark": "out-of-distribution conditions",
+    "metric": "average task progress",
+    "quote": "average task progress increases from 0.53 to 0.77.",
+    "result": "0.53 to 0.77",
+    "task": "average task progress"
+   }
+  ],
+  "date": "2026-11-17",
+  "proposed": 2
+ },
  "2611.16748": {
   "claims": [],
   "date": "2026-11-15",
   "proposed": 0
+ },
+ "2611.16905": {
+  "claims": [],
+  "date": "2026-11-17",
+  "proposed": 0
+ },
+ "2611.16961": {
+  "claims": [
+   {
+    "benchmark": "JevBench",
+    "metric": "accuracy",
+    "quote": "Specifically, on JevBench HDM-4B scores 0.857 against Jev's 0.851 (+0.7%) at a median 0.179\\,s against 0.652 (-72.5%).",
+    "result": "0.857",
+    "task": "JevBench"
+   },
+   {
+    "benchmark": "MiniWoB",
+    "metric": "token cost reduction",
+    "quote": "On the agentic venue MiniWoB HDM-27B cuts token cost by 80.1%.",
+    "result": "80.1%",
+    "task": "MiniWoB"
+   }
+  ],
+  "date": "2026-11-17",
+  "proposed": 2
  },
  "2611.17060": {
   "claims": [],
@@ -310,6 +370,47 @@
   ],
   "date": "2026-11-15",
   "proposed": 2
+ },
+ "2611.17190": {
+  "claims": [
+   {
+    "benchmark": "static protocol",
+    "metric": "mean average accuracy (mAA)",
+    "quote": "retuning the matcher thresholds raises the mean average accuracy (mAA) by at most 0.0062",
+    "result": "0.0062",
+    "task": "registration accuracy"
+   },
+   {
+    "benchmark": "static protocol",
+    "metric": "masking cost",
+    "quote": "masking costs less than 0.005",
+    "result": "0.005",
+    "task": "registration cost"
+   },
+   {
+    "benchmark": "real-time dynamic pairs",
+    "metric": "capture count",
+    "quote": "Unmasked ORB is captured on 28 of 304 real-time dynamic pairs",
+    "result": "28 of 304",
+    "task": "capture rate"
+   },
+   {
+    "benchmark": "offline",
+    "metric": "capture count",
+    "quote": "and on 6 offline",
+    "result": "6",
+    "task": "capture rate"
+   },
+   {
+    "benchmark": "real-time dynamic pairs",
+    "metric": "median corner error",
+    "quote": "its real-time captured estimates have a median corner error of 18.8 px",
+    "result": "18.8 px",
+    "task": "registration error"
+   }
+  ],
+  "date": "2026-11-17",
+  "proposed": 5
  },
  "2611.17331": {
   "claims": [],

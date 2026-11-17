@@ -459,6 +459,13 @@
   "qid": "Q491714",
   "v": 6
  },
+ "CincyNLP Lab @ University of Cincinnati": {
+  "checked": "2026-11-17",
+  "file": "cincynlp-lab-university-of-cincinnati.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "City University of Hong Kong": {
   "checked": "2026-11-12",
   "file": "city-university-of-hong-kong.png",
@@ -597,6 +604,13 @@
   "file": "delft-university-of-technology.png",
   "qid": "Q752663",
   "source": "website https://www.tudelft.nl",
+  "v": 6
+ },
+ "Delhi Technological University": {
+  "checked": "2026-11-17",
+  "file": "delhi-technological-university.png",
+  "qid": "Q3630445",
+  "source": "Hugging Face",
   "v": 6
  },
  "Duke University": {
@@ -1048,6 +1062,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "ITMO University": {
+  "checked": "2026-11-17",
+  "file": "itmo-university.png",
+  "qid": "Q1342013",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Imperial College London": {
   "checked": "2026-11-06",
   "file": "imperial-college-london.png",
@@ -1278,6 +1299,13 @@
   "v": 4
  },
  "Klaipėda University": {},
+ "Kling-Keye": {
+  "checked": "2026-11-17",
+  "file": "kling-keye.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Korea University": {
   "checked": "2026-11-14",
   "qid": "Q840647",
@@ -1380,6 +1408,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "MOTIF-LAB": {
+  "checked": "2026-11-17",
+  "file": "motif-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Macau University of Science and Technology": {
   "checked": "2026-11-12",
   "qid": "Q847993",
@@ -1398,6 +1433,13 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 4
+ },
+ "McGill NLP Group": {
+  "checked": "2026-11-17",
+  "file": "mcgill-nlp-group.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "McGill University": {
   "checked": "2026-11-07",
@@ -1702,6 +1744,7 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Novosibirsk State University": {},
  "Nutanix": {
   "checked": "2026-11-12",
   "file": "nutanix.png",
@@ -1738,6 +1781,13 @@
   "v": 6
  },
  "Ostim Technical University": {},
+ "Output Labs": {
+  "checked": "2026-11-17",
+  "file": "output-labs.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Oxford": {
   "checked": "2026-11-07",
   "file": "oxford.png",
@@ -1852,6 +1902,13 @@
   "source": "website https://www.rwth-aachen.de/",
   "v": 6
  },
+ "ReDiverse": {
+  "checked": "2026-11-17",
+  "file": "rediverse.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Renmin University": {
   "checked": "2026-11-05",
   "file": "renmin-university.png",
@@ -1876,6 +1933,13 @@
  "Robbyant": {
   "checked": "2026-11-11",
   "file": "robbyant.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "Robbyant Research": {
+  "checked": "2026-11-17",
+  "file": "robbyant-research.png",
   "qid": "",
   "source": "Hugging Face",
   "v": 6
@@ -1913,6 +1977,13 @@
   "file": "saarland-university.png",
   "qid": "Q700758",
   "source": "website https://www.uni-saarland.de/",
+  "v": 6
+ },
+ "Sakana AI": {
+  "checked": "2026-11-17",
+  "file": "sakana-ai.png",
+  "qid": "Q126691075",
+  "source": "Lobe Icons",
   "v": 6
  },
  "Salesforce": {
@@ -2138,7 +2209,13 @@
   "source": "Lobe Icons",
   "v": 6
  },
- "Sri Lanka Institute of Information Technology": {},
+ "Sri Lanka Institute of Information Technology": {
+  "checked": "2026-11-17",
+  "file": "sri-lanka-institute-of-information-technology.png",
+  "qid": "Q7585924",
+  "source": "website https://www.sliit.lk",
+  "v": 6
+ },
  "Ss. Cyril and Methodius University in Skopje": {
   "checked": "2026-11-07",
   "file": "ss-cyril-and-methodius-university-in-skopje.png",
@@ -2504,6 +2581,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Unify": {
+  "checked": "2026-11-17",
+  "file": "unify.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Universidad Autónoma de Madrid": {
   "checked": "2026-11-07",
   "file": "universidad-aut-noma-de-madrid.png",
@@ -2816,7 +2900,11 @@
   "source": "website https://twin-cities.umn.edu",
   "v": 6
  },
- "University of Missouri": {},
+ "University of Missouri": {
+  "checked": "2026-11-17",
+  "qid": "Q579968",
+  "v": 6
+ },
  "University of Missouri–Kansas City": {
   "checked": "2026-11-14",
   "qid": "Q940690",
@@ -2830,7 +2918,13 @@
   "v": 6
  },
  "University of Mumbai": {},
- "University of North Carolina at Chapel Hill": {},
+ "University of North Carolina at Chapel Hill": {
+  "checked": "2026-11-17",
+  "file": "university-of-north-carolina-at-chapel-hill.png",
+  "qid": "Q192334",
+  "source": "website https://www.unc.edu",
+  "v": 6
+ },
  "University of North Texas": {
   "checked": "2026-11-14",
   "qid": "Q860527",
@@ -2962,6 +3056,13 @@
   "file": "university-of-windsor.png",
   "qid": "Q2065769",
   "source": "website https://www.uwindsor.ca",
+  "v": 6
+ },
+ "University of Wisconsin - Madison": {
+  "checked": "2026-11-17",
+  "file": "university-of-wisconsin-madison.png",
+  "qid": "Q838330",
+  "source": "Hugging Face",
   "v": 6
  },
  "University of Wisconsin–Madison": {
@@ -3245,6 +3346,13 @@
   "qid": "Q141595982",
   "source": "Hugging Face",
   "v": 4
+ },
+ "speridlabs": {
+  "checked": "2026-11-17",
+  "file": "speridlabs.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "ucas": {
   "checked": "2026-11-05",
