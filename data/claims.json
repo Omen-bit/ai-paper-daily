@@ -192,6 +192,33 @@
   "date": "2026-11-14",
   "proposed": 3
  },
+ "2611.13509": {
+  "claims": [
+   {
+    "benchmark": "five tasks",
+    "metric": "accuracy difference",
+    "quote": "its on-device models outperform two five-shot frontier models on five tasks, by up to 0.34, and match them on three more.",
+    "result": "0.34",
+    "task": "on-device model performance"
+   },
+   {
+    "benchmark": "entity extraction task",
+    "metric": "performance gap",
+    "quote": "Its search comes within 0.03 of exhaustively training all 27 model variants on an entity extraction task",
+    "result": "0.03",
+    "task": "search efficiency"
+   },
+   {
+    "benchmark": "GPU time",
+    "metric": "time reduction",
+    "quote": "while using 19times less GPU time",
+    "result": "19",
+    "task": "search efficiency"
+   }
+  ],
+  "date": "2026-11-18",
+  "proposed": 5
+ },
  "2611.13766": {
   "claims": [],
   "date": "2026-11-14",
@@ -412,9 +439,119 @@
   "date": "2026-11-17",
   "proposed": 5
  },
+ "2611.17321": {
+  "claims": [],
+  "date": "2026-11-18",
+  "proposed": 0
+ },
  "2611.17331": {
   "claims": [],
   "date": "2026-11-16",
+  "proposed": 0
+ },
+ "2611.17811": {
+  "claims": [],
+  "date": "2026-11-18",
+  "proposed": 3
+ },
+ "2611.17831": {
+  "claims": [
+   {
+    "benchmark": "speed questions",
+    "metric": "accuracy",
+    "quote": "a linear probe reads speed from frozen V-JEPA features at 87%",
+    "result": "87%",
+    "task": "speed reading"
+   },
+   {
+    "benchmark": "average score across eleven video benchmarks",
+    "metric": "score",
+    "quote": "our 4B model scores 72.1, against 61.1 for the best open 4B and 64.8 for the best open 8B model",
+    "result": "72.1",
+    "task": "average score across eleven video benchmarks"
+   },
+   {
+    "benchmark": "average score across eleven video benchmarks",
+    "metric": "score",
+    "quote": "our 4B model scores 72.1, against 61.1 for the best open 4B and 64.8 for the best open 8B model",
+    "result": "61.1",
+    "task": "average score across eleven video benchmarks"
+   },
+   {
+    "benchmark": "average score across eleven video benchmarks",
+    "metric": "score",
+    "quote": "our 4B model scores 72.1, against 61.1 for the best open 4B and 64.8 for the best open 8B model",
+    "result": "64.8",
+    "task": "average score across eleven video benchmarks"
+   },
+   {
+    "benchmark": "speed questions of natural benchmarks",
+    "metric": "points added",
+    "quote": "counterfactual supervision adds 4.5 points on average and 38 on the speed questions of natural benchmarks",
+    "result": "38",
+    "task": "speed questions of natural benchmarks"
+   }
+  ],
+  "date": "2026-11-18",
+  "proposed": 5
+ },
+ "2611.17878": {
+  "claims": [
+   {
+    "benchmark": "mIoU",
+    "metric": "mIoU",
+    "quote": "boosting downstream prediction performance by 8% mIoU",
+    "result": "8%",
+    "task": "downstream prediction"
+   },
+   {
+    "benchmark": "accuracy",
+    "metric": "accuracy",
+    "quote": "improved prediction performance (8.7% accuracy)",
+    "result": "8.7%",
+    "task": "prediction"
+   },
+   {
+    "benchmark": "CVRMSE",
+    "metric": "CVRMSE",
+    "quote": "reduced prediction error (9%-18% CVRMSE, ASHRAE)",
+    "result": "9%-18%",
+    "task": "prediction error"
+   }
+  ],
+  "date": "2026-11-18",
+  "proposed": 3
+ },
+ "2611.18429": {
+  "claims": [
+   {
+    "benchmark": "five references",
+    "metric": "Cohen's kappa",
+    "quote": "the best worst-case Cohen's kappa over the five references is only 0.23 (Q-Align)",
+    "result": "0.23",
+    "task": "Cohen's kappa evaluation"
+   },
+   {
+    "benchmark": "our study",
+    "metric": "median kappa",
+    "quote": "two raters in our study agree with a median kappa of 0.41",
+    "result": "0.41",
+    "task": "Median kappa agreement"
+   },
+   {
+    "benchmark": "Nano Banana Pro replica chain",
+    "metric": "scores decrease count",
+    "quote": "On a Nano Banana Pro replica chain that should leave the image unchanged, only 22 of 73 scores decrease at every checkpoint",
+    "result": "22 of 73",
+    "task": "Score decrease count"
+   }
+  ],
+  "date": "2026-11-18",
+  "proposed": 3
+ },
+ "2611.18550": {
+  "claims": [],
+  "date": "2026-11-18",
   "proposed": 0
  }
 }

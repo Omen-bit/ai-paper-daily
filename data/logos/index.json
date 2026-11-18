@@ -6,6 +6,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "AAIRE - Agents, AI and Retrieval Lab": {
+  "checked": "2026-11-18",
+  "file": "aaire-agents-ai-and-retrieval-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "AIEyes Technologies (Hong Kong) Co., Limited": {
   "checked": "2026-11-12",
   "file": "aieyes-technologies-hong-kong-co-limited.png",
@@ -26,6 +33,11 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 3
+ },
+ "AXA": {
+  "checked": "2026-11-18",
+  "qid": "",
+  "v": 6
  },
  "Aalborg University": {
   "checked": "2026-11-11",
@@ -73,6 +85,13 @@
   "file": "african-leadership-university.png",
   "qid": "Q25104613",
   "source": "website https://www.alueducation.com",
+  "v": 6
+ },
+ "Airbnb": {
+  "checked": "2026-11-18",
+  "file": "airbnb.png",
+  "qid": "Q63327",
+  "source": "website https://airbnb.com",
   "v": 6
  },
  "Airun Intelligence Labs": {
@@ -283,6 +302,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Bineric AI": {
+  "checked": "2026-11-18",
+  "file": "bineric-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Bread Studio": {
   "checked": "2026-11-07",
   "file": "bread-studio.png",
@@ -370,6 +396,11 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Centre Inria d'Université Côte d'Azur": {
+  "checked": "2026-11-18",
+  "qid": "",
+  "v": 6
+ },
  "Centre National de la Recherche Scientifique": {
   "checked": "2026-11-07",
   "file": "centre-national-de-la-recherche-scientifique.png",
@@ -403,9 +434,28 @@
   "source": "website https://chd.edu.cn",
   "v": 6
  },
+ "Charcot AI": {
+  "checked": "2026-11-18",
+  "file": "charcot-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "Charité – Universitätsmedizin Berlin": {
+  "checked": "2026-11-18",
+  "file": "charit-universit-tsmedizin-berlin.png",
+  "qid": "Q162684",
+  "source": "website https://www.charite.de",
+  "v": 6
+ },
  "Charles University": {
   "checked": "2026-11-14",
   "qid": "Q31519",
+  "v": 6
+ },
+ "Chengdu University of Information Technology": {
+  "checked": "2026-11-18",
+  "qid": "Q5091337",
   "v": 6
  },
  "China People's Public Security University": {},
@@ -613,6 +663,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Deutsches Zentrum für Luft- und Raumfahrt e. V.": {
+  "checked": "2026-11-18",
+  "file": "deutsches-zentrum-f-r-luft-und-raumfahrt-e-v.png",
+  "qid": "Q157332",
+  "source": "website https://www.dlr.de/EN/Home/home_node.html",
+  "v": 6
+ },
  "Duke University": {
   "checked": "2026-11-07",
   "file": "duke-university.png",
@@ -769,6 +826,13 @@
   "source": "website https://www.iais.fraunhofer.de",
   "v": 6
  },
+ "Fraunhofer Institute of Optronics, System Technologies and Image Exploitation": {
+  "checked": "2026-11-18",
+  "file": "fraunhofer-institute-of-optronics-system-technologies-and-im.png",
+  "qid": "Q1432182",
+  "source": "website https://www.iosb.fraunhofer.de/",
+  "v": 6
+ },
  "Friedrich-Alexander-Universität Erlangen-Nürnberg": {
   "checked": "2026-11-07",
   "file": "friedrich-alexander-universit-t-erlangen-n-rnberg.png",
@@ -783,6 +847,7 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Fujitsu": {},
  "Fundamental AI Lab at UTN": {
   "checked": "2026-11-14",
   "file": "fundamental-ai-lab-at-utn.png",
@@ -810,6 +875,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Genentech": {
+  "checked": "2026-11-18",
+  "file": "genentech.png",
+  "qid": "Q899140",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Georg Simon Ohm University of Applied Sciences Nuremberg": {
   "checked": "2026-11-07",
   "file": "georg-simon-ohm-university-of-applied-sciences-nuremberg.png",
@@ -830,6 +902,11 @@
   "qid": "Q864855",
   "source": "Hugging Face",
   "v": 3
+ },
+ "Georgia State University": {
+  "checked": "2026-11-18",
+  "qid": "Q1509333",
+  "v": 6
  },
  "Ghent University": {
   "checked": "2026-11-14",
@@ -890,6 +967,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Hamad bin Khalifa University": {
+  "checked": "2026-11-18",
+  "file": "hamad-bin-khalifa-university.png",
+  "qid": "Q24911975",
+  "source": "website https://www.hbku.edu.qa/",
+  "v": 6
+ },
  "Hanbat National University": {
   "checked": "2026-11-16",
   "file": "hanbat-national-university.png",
@@ -897,6 +981,7 @@
   "source": "website https://hanbat.ac.kr",
   "v": 6
  },
+ "Hanyang University": {},
  "Harbin Engineering University": {
   "checked": "2026-11-14",
   "file": "harbin-engineering-university.png",
@@ -1159,6 +1244,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Institute of Foundation Models": {
+  "checked": "2026-11-18",
+  "file": "institute-of-foundation-models.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Institute of Information Science, Academia Sinica": {
   "checked": "2026-11-12",
   "qid": "Q20872470",
@@ -1204,6 +1296,18 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Iowa State University": {
+  "checked": "2026-11-18",
+  "file": "iowa-state-university.png",
+  "qid": "Q1136919",
+  "source": "website https://www.iastate.edu",
+  "v": 6
+ },
+ "Iran University of Science and Technology": {
+  "checked": "2026-11-18",
+  "qid": "Q4115110",
+  "v": 6
+ },
  "JD.com": {
   "checked": "2026-11-07",
   "file": "jd-com.png",
@@ -1230,6 +1334,13 @@
   "file": "kaist.png",
   "qid": "Q39949",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "KIOXIA Corporation": {
+  "checked": "2026-11-18",
+  "file": "kioxia-corporation.png",
+  "qid": "Q28840043",
+  "source": "website https://www.kioxia.com",
   "v": 6
  },
  "KU Leuven": {
@@ -1306,6 +1417,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Knovel Engineering": {
+  "checked": "2026-11-18",
+  "file": "knovel-engineering.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Korea University": {
   "checked": "2026-11-14",
   "qid": "Q840647",
@@ -1316,6 +1434,13 @@
   "file": "kuaishou.png",
   "qid": "Q47015540",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Kyoto University": {
+  "checked": "2026-11-18",
+  "file": "kyoto-university.png",
+  "qid": "Q336264",
+  "source": "website http://www.kyoto-u.ac.jp/en",
   "v": 6
  },
  "LG AI Research": {
@@ -1380,6 +1505,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "MIT Computer Science and Artificial Intelligence Laboratory": {
+  "checked": "2026-11-18",
+  "file": "mit-computer-science-and-artificial-intelligence-laboratory.png",
+  "qid": "Q1354917",
+  "source": "website http://www.csail.mit.edu",
+  "v": 6
+ },
  "MIT Media Lab": {
   "checked": "2026-11-10",
   "file": "mit-media-lab.png",
@@ -1413,6 +1545,13 @@
   "file": "motif-lab.png",
   "qid": "",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Maastricht University": {
+  "checked": "2026-11-18",
+  "file": "maastricht-university.png",
+  "qid": "Q1137652",
+  "source": "website https://www.maastrichtuniversity.nl",
   "v": 6
  },
  "Macau University of Science and Technology": {
@@ -1617,6 +1756,13 @@
  "Nantong University": {
   "checked": "2026-11-14",
   "qid": "Q6964345",
+  "v": 6
+ },
+ "National Centre of Scientific Research \"Demokritos\"": {
+  "checked": "2026-11-18",
+  "file": "national-centre-of-scientific-research-demokritos.png",
+  "qid": "Q3559155",
+  "source": "website https://www.demokritos.gr",
   "v": 6
  },
  "National Chung Hsing University": {
@@ -1824,6 +1970,13 @@
   "v": 3
  },
  "Peng Cheng Laboratory": {},
+ "Pennsylvania State University": {
+  "checked": "2026-11-18",
+  "file": "pennsylvania-state-university.png",
+  "qid": "Q739627",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Philipps University of Marburg": {
   "checked": "2026-11-07",
   "file": "philipps-university-of-marburg.png",
@@ -1895,6 +2048,13 @@
   "v": 6
  },
  "Queensland University of Technology": {},
+ "QwenBusinessUnit-Edu": {
+  "checked": "2026-11-18",
+  "file": "qwenbusinessunit-edu.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "RWTH Aachen University": {
   "checked": "2026-11-07",
   "file": "rwth-aachen-university.png",
@@ -1944,6 +2104,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Robert Bosch": {
+  "checked": "2026-11-18",
+  "file": "robert-bosch.png",
+  "qid": "Q234021",
+  "source": "website https://www.bosch.com/",
+  "v": 6
+ },
  "Roblox Corporation": {
   "checked": "2026-11-14",
   "file": "roblox-corporation.png",
@@ -1957,6 +2124,13 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 3
+ },
+ "SAINT Machines": {
+  "checked": "2026-11-18",
+  "file": "saint-machines.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "SIB Swiss Institute of Bioinformatics": {
   "checked": "2026-11-12",
@@ -2073,6 +2247,11 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Shanghai Qi Zhi Institute": {
+  "checked": "2026-11-18",
+  "qid": "",
+  "v": 6
+ },
  "ShanghaiTech University": {
   "checked": "2026-11-12",
   "qid": "Q3817847",
@@ -2155,12 +2334,26 @@
   "qid": "",
   "v": 6
  },
+ "Sony Computer Science Laboratories": {
+  "checked": "2026-11-18",
+  "file": "sony-computer-science-laboratories.png",
+  "qid": "Q11315182",
+  "source": "website https://www.sonycsl.co.jp/",
+  "v": 6
+ },
  "Soochow University": {},
  "Sookmyung Women's University": {
   "checked": "2026-11-07",
   "file": "sookmyung-women-s-university.png",
   "qid": "Q482735",
   "source": "website https://e.sookmyung.ac.kr/",
+  "v": 6
+ },
+ "Soongsil University": {
+  "checked": "2026-11-18",
+  "file": "soongsil-university.png",
+  "qid": "Q489331",
+  "source": "website https://www.ssu.ac.kr/",
   "v": 6
  },
  "Sorbonne University, Institute of Intelligent Systems and Robotics": {
@@ -2515,6 +2708,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Tokenwave.AI": {
+  "checked": "2026-11-18",
+  "file": "tokenwave-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Tongji University": {
   "checked": "2026-11-07",
   "qid": "Q16947",
@@ -2539,6 +2739,11 @@
   "file": "toyota-technological-institute-at-chicago.png",
   "qid": "Q7830888",
   "source": "website http://www.ttic.edu/",
+  "v": 6
+ },
+ "Trường Đại học Khoa học và Công nghệ Hà Nội": {
+  "checked": "2026-11-18",
+  "qid": "Q15260958",
   "v": 6
  },
  "Tsinghua Shenzhen International Graduate School": {
@@ -2703,6 +2908,11 @@
   "source": "website https://ucsd.edu",
   "v": 6
  },
+ "University of California, Davis": {
+  "checked": "2026-11-18",
+  "qid": "Q129421",
+  "v": 6
+ },
  "University of California, Irvine": {
   "checked": "2026-11-12",
   "file": "university-of-california-irvine.png",
@@ -2771,6 +2981,13 @@
   "file": "university-of-copenhagen.png",
   "qid": "Q186285",
   "source": "website https://www.ku.dk",
+  "v": 6
+ },
+ "University of Edinburgh": {
+  "checked": "2026-11-18",
+  "file": "university-of-edinburgh.png",
+  "qid": "Q160302",
+  "source": "Hugging Face",
   "v": 6
  },
  "University of Electronic Science and Technology of China": {
@@ -3032,6 +3249,13 @@
   "source": "website https://www.utwente.nl",
   "v": 6
  },
+ "University of Tübingen": {
+  "checked": "2026-11-18",
+  "file": "university-of-t-bingen.png",
+  "qid": "Q153978",
+  "source": "website https://uni-tuebingen.de/",
+  "v": 6
+ },
  "University of Utah": {
   "checked": "2026-11-12",
   "file": "university-of-utah.png",
@@ -3049,6 +3273,13 @@
   "file": "university-of-washington.png",
   "qid": "Q219563",
   "source": "website https://www.washington.edu",
+  "v": 6
+ },
+ "University of Waterloo": {
+  "checked": "2026-11-18",
+  "file": "university-of-waterloo.png",
+  "qid": "Q1049470",
+  "source": "website https://uwaterloo.ca/",
   "v": 6
  },
  "University of Windsor": {
@@ -3109,11 +3340,30 @@
   "qid": "Q1163431",
   "v": 6
  },
+ "Université d'Orléans": {
+  "checked": "2026-11-18",
+  "qid": "Q13334",
+  "v": 6
+ },
+ "Université de Montréal": {
+  "checked": "2026-11-18",
+  "file": "universit-de-montr-al.png",
+  "qid": "Q392189",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Université de Toulouse": {
   "checked": "2026-11-15",
   "file": "universit-de-toulouse.png",
   "qid": "Q135218300",
   "source": "website https://www.univ-tlse3.fr",
+  "v": 6
+ },
+ "Uppsala University": {
+  "checked": "2026-11-18",
+  "file": "uppsala-university.png",
+  "qid": "Q185246",
+  "source": "website https://www.uu.se/en/",
   "v": 6
  },
  "Vanderbilt University": {
@@ -3124,6 +3374,13 @@
  "Vanguard": {
   "checked": "2026-11-07",
   "qid": "Q849363",
+  "v": 6
+ },
+ "Vector Institute": {
+  "checked": "2026-11-18",
+  "file": "vector-institute.png",
+  "qid": "Q4106097",
+  "source": "GitHub",
   "v": 6
  },
  "Video Rebirth": {
@@ -3150,6 +3407,13 @@
  "Visa": {
   "checked": "2026-11-15",
   "qid": "",
+  "v": 6
+ },
+ "VoxDance-Lab": {
+  "checked": "2026-11-18",
+  "file": "voxdance-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Vrije Universiteit Brussel": {
@@ -3193,6 +3457,13 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 4
+ },
+ "Wuhan University": {
+  "checked": "2026-11-18",
+  "file": "wuhan-university.png",
+  "qid": "Q1108197",
+  "source": "website https://www.whu.edu.cn",
+  "v": 6
  },
  "Wuhan University of Technology": {
   "checked": "2026-11-14",
@@ -3319,6 +3590,13 @@
   "source": "Lobe Icons",
   "v": 6
  },
+ "galbot": {
+  "checked": "2026-11-18",
+  "file": "galbot.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "galilai-group": {
   "checked": "2026-11-05",
   "file": "galilai-group.png",
@@ -3366,6 +3644,13 @@
   "file": "xai.png",
   "qid": "",
   "source": "Lobe Icons",
+  "v": 6
+ },
+ "École Normale Supérieure - PSL": {
+  "checked": "2026-11-18",
+  "file": "cole-normale-sup-rieure-psl.png",
+  "qid": "Q83259",
+  "source": "website https://www.ens.psl.eu/",
   "v": 6
  },
  "École Polytechnique": {
