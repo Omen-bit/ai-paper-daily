@@ -133,6 +133,8 @@
   // ---- Home: "For you", papers close in meaning to this browser's reading ----
   // Only the IDs of papers opened here are sent, to our own Supabase function.
   // Results are kept for the day so the function is not called on every visit.
+  // The section stays hidden until it has papers to show: a first visit, a failed
+  // call or an empty answer never shows an empty box or loading placeholders.
   var forYou = document.querySelector("[data-foryou]");
   if (forYou && reads.length && window.fetch) {
     var fyIds = reads.slice(0, 50).map(function (h) { return h.id; });
@@ -176,7 +178,6 @@
           store("apd.foryou", { key: fyKey, results: results });
           return results;
         });
-    forYou.hidden = false;
     Promise.all([recReq, idsReq]).then(function (both) {
       var onSite = {};
       (both[1] || []).forEach(function (id) { onSite[id] = true; });
@@ -273,8 +274,9 @@
           .sort(function (a, b) { return b.similarity - a.similarity; }).slice(0, 3);
       });
     };
+    // Shown only for projects with new papers: "Nothing new" cards stay on Scout
     var paintWatch = function (news, onSite) {
-      var list = window.apdWatch.list();
+      var list = window.apdWatch.list().filter(function (w) { return (news[w.key] || []).length; });
       if (!list.length) { watchBox.hidden = true; return; }
       watchList.innerHTML = list.map(function (w) {
         var items = news[w.key] || [];
@@ -297,7 +299,7 @@
         card.querySelector("[data-unwatch]").addEventListener("click", function () {
           store("apd.watch", window.apdWatch.list().filter(function (x) { return x.key !== key; }));
           card.remove();
-          if (!window.apdWatch.list().length) watchBox.hidden = true;
+          if (!watchList.querySelector(".watch-card")) watchBox.hidden = true;
         });
         card.querySelector("[data-rescout]").addEventListener("click", function () { store("apd.scoutdraft", w.description); });
       });
@@ -312,7 +314,6 @@
         store("apd.watchnews", { day: isoToday(), items: items });
         return items;
       });
-    watchBox.hidden = false;
     Promise.all([newsReq, fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })])
       .then(function (both) {
         var onSite = {};

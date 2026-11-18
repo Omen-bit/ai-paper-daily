@@ -5,7 +5,8 @@ written by Groq as JSON (TL;DR, what's new, key result, build ideas, difficulty)
 
 It runs as a small LangGraph graph per paper:
   draft     one call for the full notes (the next model in GROQ_MODELS if a call fails)
-  validate  every field checked: word limits, required fields, and no numbers the abstract lacks
+  validate  every field checked: word limits, required fields, no numbers the abstract lacks,
+            and no claim wider than what the paper tested ("any phone" for four phones)
   repair    asks the same model to fix only the failing fields, with the reasons (2 rounds at most)
   ground    a smaller model checks each fact against the abstract; flagged optional
             fields are dropped and a flagged required field goes back to repair
@@ -24,6 +25,7 @@ from typing import Optional, TypedDict
 from langgraph.graph import END, START, StateGraph
 
 import groq_summarizer as gs
+import scope
 
 DIFFICULTIES = ("beginner", "intermediate", "advanced")
 
@@ -48,10 +50,10 @@ LIMITS = {
 SYSTEM_PROMPT = """You are the Curator for AI Papers Daily, a site for people who read AI papers and build projects from them.
 Read the paper's title and abstract and return reading notes as one JSON object with exactly these keys:
 
-"tldr": one plain sentence, at most 25 words, saying what the paper does.
+"tldr": one plain sentence, at most 25 words, saying what the paper does and, when the abstract says, what it was tested on (devices, datasets or model sizes).
 "whats_new": one or two sentences, at most 40 words, on what is new compared with earlier work.
 "key_result": the single most important result stated in the abstract, with its number if one is given, at most 35 words. Use null if the abstract states no result.
-"why_it_matters": one sentence, at most 30 words, on why builders should care. Speak to the reader as "you". Do not start with "This paper", "Developers" or "Builders".
+"why_it_matters": one sentence, at most 30 words, on why builders should care, within what the paper tested. Speak to the reader as "you". Do not start with "This paper", "Developers" or "Builders".
 "build_ideas": a list of 2 or 3 concrete projects a developer could build with this work, each at most 20 words and starting with a verb.
 "difficulty": one of "beginner", "intermediate", "advanced", for how hard it is to reproduce or use.
 "difficulty_reason": one short phrase, at most 20 words, explaining the difficulty (for example the compute or background needed).
@@ -62,7 +64,7 @@ Read the paper's title and abstract and return reading notes as one JSON object 
 "tldr_expert": the tldr again for a researcher in the field, at most 35 words, naming the exact technique and setting.
 "terms": a list of up to 3 objects {"term": ..., "meaning": ...} for technical terms a newcomer would not know. Each term must appear word for word in the tldr or the abstract. Each meaning is one plain sentence, at most 25 words.
 
-Rules: use only facts from the abstract and never invent numbers, datasets or links. Write in plain language and avoid hype words such as "groundbreaking" or "revolutionary". Return only the JSON object."""
+Rules: use only facts from the abstract and never invent numbers, datasets or links. """ + scope.PROMPT_RULE + """ Write in plain language and avoid hype words such as "groundbreaking" or "revolutionary". Return only the JSON object."""
 
 _CODE_LINK = re.compile(r"https?://(?:www\.)?(?:github\.com|gitlab\.com|huggingface\.co)/[\w.\-/]+", re.I)
 
@@ -160,13 +162,16 @@ def _new_numbers(text: str, source: str) -> list[str]:
     return [n for n in re.findall(r"\d[\d,.]*\d|\d", text or "") if n.replace(",", "") not in plain]
 
 
-def check_notes(data: Optional[dict], abstract: str = "") -> tuple[Optional[dict], list[str]]:
+def check_notes(data: Optional[dict], abstract: str = "",
+                strict_scope: bool = True) -> tuple[Optional[dict], list[str]]:
     """
     Clean notes from the model's JSON, plus the problems with any required field.
     Notes are None when a required field fails; the problems say which and why,
     so the repair step can ask for just those fields again.
     Optional fields that fail their checks are dropped quietly.
-    With an abstract, numbers it doesn't contain are not allowed in the notes.
+    With an abstract, numbers it doesn't contain are not allowed in the notes, and a
+    required sentence that claims more than the paper tested ("any phone" when it
+    tested four) is a problem; strict_scope=False lets it through once repairs ran out.
     """
     if not isinstance(data, dict):
         return None, ["the reply was not a JSON object"]
@@ -187,6 +192,8 @@ def check_notes(data: Optional[dict], abstract: str = "") -> tuple[Optional[dict
         elif abstract and _new_numbers(notes[key], abstract):
             problems.append(f"{key}: mentions {', '.join(_new_numbers(notes[key], abstract))}, "
                             "which the abstract doesn't")
+        elif abstract and strict_scope and scope.overreach(notes[key], abstract):
+            problems.append(scope.problem(key, scope.overreach(notes[key], abstract)))
     if notes["why_it_matters"] and notes["why_it_matters"].lower().startswith("this paper"):
         problems.append('why_it_matters: must not start with "This paper"')
     if notes["difficulty"] not in DIFFICULTIES:
@@ -194,14 +201,15 @@ def check_notes(data: Optional[dict], abstract: str = "") -> tuple[Optional[dict
     # Optional facts with numbers the abstract doesn't have are dropped
     if abstract:
         for key in ("key_result", "check_answer"):
-            if notes[key] and _new_numbers(notes[key], abstract):
+            if notes[key] and (_new_numbers(notes[key], abstract) or scope.overreach(notes[key], abstract)):
                 notes[key] = None
 
     # The other reading levels may not add facts: every number in them must be in the abstract
     source_text = (abstract or "") + " " + (notes["tldr"] or "")
     for key in ("tldr_simple", "tldr_expert"):
         text = _sentence(data.get(key), LIMITS[key])
-        notes[key] = text if text and _numbers_known(text, source_text) else None
+        widens = abstract and text and scope.overreach(text, abstract)
+        notes[key] = text if text and _numbers_known(text, source_text) and not widens else None
     notes["headline"] = _headline(data.get("headline"), source_text)
     notes["terms"] = _terms(data.get("terms"), source_text)
     # The question is only useful with its answer, so keep both or neither
@@ -233,10 +241,11 @@ REPAIR_PROMPT = """Your reading notes for this paper failed some checks. Fix onl
 Problems:
 {problems}
 Return one JSON object with exactly these keys, fixed: {keys}.
-Follow the same rules as before: plain language, facts only from the abstract, and keep within the word limits."""
+Follow the same rules as before: plain language, facts only from the abstract, claims only as wide as what the paper tested, and keep within the word limits."""
 
 GROUND_PROMPT = """You check reading notes about an AI paper against its abstract. Be strict.
 A field is unsupported if it states a fact, number, name, dataset or comparison that the abstract does not state or clearly imply.
+A field is also unsupported if it claims more than the paper tested, for example "works on any phone" when the paper tested four Android phones, or "all languages" when it tested three.
 Build ideas and difficulty are opinions, so never flag them.
 Return one JSON object: {"unsupported": ["field_name", ...], "why": "one short sentence"}. Use an empty list when everything is supported."""
 
@@ -317,7 +326,15 @@ def _draft(state: CuratorState) -> dict:
 
 
 def _validate(state: CuratorState) -> dict:
-    notes, problems = check_notes(state.get("data"), state["paper"].get("abstract", ""))
+    # A wording check, unlike a wrong number: once repairs ran out the notes stand, with a warning
+    strict = state.get("repairs", 0) < MAX_REPAIRS
+    abstract = state["paper"].get("abstract", "")
+    notes, problems = check_notes(state.get("data"), abstract, strict_scope=strict)
+    if notes and not strict:
+        for key in ("tldr", "whats_new", "why_it_matters"):
+            if scope.overreach(notes[key], abstract):
+                print(f"  [curator] Keeping {key} after {MAX_REPAIRS} repairs, but it still says "
+                      f"{', '.join(scope.overreach(notes[key], abstract))}")
     if problems:
         print(f"  [curator] {state['models'][0]}: {'; '.join(problems)}")
     # A grounding flag on a required field counts as a problem too

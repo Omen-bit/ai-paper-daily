@@ -95,14 +95,14 @@
    "featured": true,
    "slot": "pick",
    "summary": {
-    "text": "You can get a performant, privacy‑preserving language model on any phone without manual tuning or heavy compute.",
+    "text": "You could get a private, task‑specific language model onto an Android phone without hand‑tuning; it was tested on ten tasks across four Android phones.",
     "source": "groq:openai/gpt-oss-120b"
    },
    "curator": {
     "tldr": "Mobile AI Factory automatically builds and quantizes task‑specific small language models for a given Android phone.",
     "whats_new": "It combines an orchestrator LLM with rule‑based rollbacks to search model size, quantization, and data generation without expert tuning. It also uses real on‑device measurements.",
     "key_result": "On ten tasks and four phones, its models beat two five‑shot frontier models on five tasks (up to 0.34) and match on three, using 19× less GPU time than exhaustive search.",
-    "why_it_matters": "You can get a performant, privacy‑preserving language model on any phone without manual tuning or heavy compute.",
+    "why_it_matters": "You could get a private, task‑specific language model onto an Android phone without hand‑tuning; it was tested on ten tasks across four Android phones.",
     "difficulty": "intermediate",
     "difficulty_reason": "Requires integration of LLM orchestrator, quantization tools, and phone measurement APIs.",
     "check_question": "How much GPU time does Mobile AI Factory save compared to exhaustive training of all model variants?",
@@ -9953,4 +9953,4 @@
    "first_seen": "2026-11-18"
   }
  ]
-}
+}

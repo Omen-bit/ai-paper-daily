@@ -251,3 +251,42 @@ def test_headline_is_optional_short_and_grounded():
     assert curator._headline("Delete 7% of weights", src) is None  # a number the paper doesn't have
     assert curator._headline("Is deleting weights all you need for every model?", src) is None
     assert curator._headline(None, src) is None
+
+
+# ---- Claims no wider than what the paper tested (tester report: "any phone" for four phones) ----
+
+PHONES = ("We evaluate Mobile AI Factory on ten tasks and four Android phones. "
+          "Its search comes within 0.03 of exhaustively training all 27 model variants.")
+
+
+def test_a_sentence_wider_than_the_paper_is_a_problem():
+    wide = dict(GOOD, why_it_matters="You can get a private language model on any phone without tuning.")
+    notes, problems = curator.check_notes(wide, PHONES)
+    assert notes is None and len(problems) == 1
+    assert problems[0].startswith('why_it_matters: says "any phone", which claims more than the paper tested')
+    narrow = dict(GOOD, why_it_matters="You can get a private language model onto an Android phone; it was tested on four.")
+    assert curator.check_notes(narrow, PHONES)[1] == []
+
+
+def test_wide_optional_fields_are_dropped():
+    notes, problems = curator.check_notes(dict(GOOD, tldr_simple="A model that runs on every device you own.",
+                                               key_result="It wins on all benchmarks."), PHONES)
+    assert problems == [] and notes["tldr_simple"] is None and notes["key_result"] is None
+
+
+def test_a_wide_line_is_repaired_with_the_reason():
+    wide = dict(GOOD, why_it_matters="You can run a tuned model on any phone.")
+    fixed = {"why_it_matters": "You can run a tuned model on an Android phone; it was tested on four of them."}
+    notes, source, log, client = _run([wide, fixed, {"unsupported": []}], abstract=PHONES)
+    assert notes["why_it_matters"] == fixed["why_it_matters"] and log["repairs"] == 1
+    assert '"any phone"' in _users(client)[1]
+
+
+def test_prompts_ask_for_what_was_tested():
+    assert "never \"on any phone\"" in curator.SYSTEM_PROMPT and "never \"on any phone\"" in gs.SYSTEM_PROMPT
+    assert "claims more than the paper tested" in curator.GROUND_PROMPT
+
+
+def test_the_summarizer_rejects_a_wide_line():
+    assert not gs._is_valid_output("You can run a language model on any phone now.", "stop", PHONES)
+    assert gs._is_valid_output("You can run a language model on four Android phones.", "stop", PHONES)

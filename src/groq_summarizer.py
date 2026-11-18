@@ -10,6 +10,8 @@ import re
 import time
 from typing import Optional
 
+import scope
+
 # Preferred model order. Dynamic filtering at startup removes retired models.
 # Groq retired the Llama 3 models on 16 Aug 2026; set GROQ_MODELS (comma-separated)
 # to change the order without a code change.
@@ -38,6 +40,7 @@ SYSTEM_PROMPT = (
     "why a paper matters. Given a paper title and abstract, write a SINGLE sentence "
     "(max 30 words) explaining: what problem it solves OR what it enables, and why it "
     "is significant to the AI/ML community. Be direct, specific, and avoid jargon. "
+    + scope.PROMPT_RULE + " "
     "Do NOT start with 'This paper'. Output ONLY the sentence, no preamble."
 )
 
@@ -122,7 +125,7 @@ def _clean_output(text: str) -> str:
     return text
 
 
-def _is_valid_output(text: str, finish_reason: str) -> bool:
+def _is_valid_output(text: str, finish_reason: str, abstract: str = "") -> bool:
     if not text or len(text) < 10:
         return False
     if text.lower().startswith("this paper"):
@@ -130,6 +133,10 @@ def _is_valid_output(text: str, finish_reason: str) -> bool:
     if finish_reason == "length":
         return False
     if len(text.split()) > 40:
+        return False
+    # "Any phone" for a paper that tested four phones: try the next model, then the abstract's own words
+    if abstract and scope.overreach(text, abstract):
+        print(f"  [groq] Rejected: says {', '.join(scope.overreach(text, abstract))}, wider than the paper tested")
         return False
     return True
 
@@ -297,7 +304,7 @@ def get_summary(paper: dict) -> tuple[str, str]:
             continue
 
         cleaned = _clean_output(raw_text)
-        if _is_valid_output(cleaned, finish_reason):
+        if _is_valid_output(cleaned, finish_reason, abstract):
             print(f"  [groq] Summary from {model}")
             return cleaned, f"groq:{model}"
 

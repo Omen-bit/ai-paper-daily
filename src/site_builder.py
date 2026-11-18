@@ -37,6 +37,7 @@ import trends
 import case_pages
 import case_studies
 import ranking_pages
+import why_now
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SITE_DIR = os.path.join(ROOT_DIR, "site")
@@ -415,7 +416,17 @@ def pick_minutes(rec: dict) -> int:
     return max(1, round(words / 200))
 
 
-def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bool = False) -> str:
+def pick_now_line(rec: dict, rank: int, edition: str, today: bool, data_dir: str = DATA_DIR) -> str:
+    """The "why it's here now" line for a top pick that came out on arXiv more than
+    3 days before the edition, or "" (why_now.py)."""
+    if rank != 1 or rec.get("slot") != "pick" or not edition:
+        return ""
+    gained, span = why_now.stars_this_week(rec.get("id", ""), edition, data_dir)
+    return why_now.why_now(rec, edition, today=today, stars_week=gained, span=span)
+
+
+def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bool = False,
+                  now_line: str = "") -> str:
     notes = rec.get("curator") or {}
     if notes.get("tldr"):
         blurb = f'<p class="pick-blurb"><b>In short</b>{esc(notes["tldr"])}</p>'
@@ -435,7 +446,7 @@ def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bo
         why = f'<span class="pick-why">{int(rec["hf_upvotes"])} upvotes on Hugging Face</span>'
     elif rec.get("slot") == "most-read":
         why = f'<span class="pick-why">{int(rec.get("readers") or 0)} readers this week</span>'
-    elif rec.get("slot") == "pick":
+    elif rec.get("slot") == "pick" and not now_line:
         why = '<span class="pick-why">Best new paper by our score</span>'
     topic = (rec.get("categories") or ["other-ml"])[0]
     code = f'<span class="has-code">{icon("code", 14)}Code available</span>' if rec.get("code_url") else ""
@@ -443,10 +454,16 @@ def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bo
   <header class="pick-top"><span class="pick-n">{label}</span>{why}<span class="pick-read" hidden>Read ✓</span></header>
   <h3><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></h3>
   {blurb}
-  <p class="pick-date">{pick_date(rec, today)}{OLDER_FLAG if is_older(rec) else ""}</p>
+  {now_html(now_line) if now_line else f'<p class="pick-date">{pick_date(rec, today)}{OLDER_FLAG if is_older(rec) else ""}</p>'}
   <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
   {seen_check(rec)}
 </article>"""
+
+
+def now_html(line: str) -> str:
+    """The why-now line, its date in bold: "From 9 Nov. Picked today because ..." """
+    head, _, rest = line.partition(". ")
+    return f'<p class="pick-date pick-now"><b>{esc(head)}.</b> {esc(rest)}</p>'
 
 
 # Slots whose cards ask "Seen this already?". The answers, and the clicks on
@@ -678,7 +695,7 @@ def trends_teaser(rows: list[dict]) -> str:
 
 
 def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = None,
-                trend_rows: list[dict] | None = None, case_row: str = "") -> str:
+                trend_rows: list[dict] | None = None, case_row: str = "", data_dir: str = DATA_DIR) -> str:
     most_read = most_read or []
     trend_rows = trend_rows if trend_rows is not None else trends.trend_rows([], papers)[0]
     if not days:
@@ -697,7 +714,9 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
     # Newer editions read every arXiv paper but store only the best ("scanned" counts them all)
     n_scanned = max(latest.get("scanned") or 0, n_today)
 
-    cards = "\n".join(featured_card(r, n, "", today=True) for n, r in enumerate(featured, 1))
+    cards = "\n".join(featured_card(r, n, "", today=True,
+                                    now_line=pick_now_line(r, n, latest.get("date", ""), True, data_dir))
+                      for n, r in enumerate(featured, 1))
     try:
         d = date.fromisoformat(latest["date"])
         eyebrow = f"Today \u00b7 {d:%a} {d.day} {d:%b %Y}"
@@ -1113,11 +1132,13 @@ def build_archive(days: list[dict], papers: dict) -> str:
     return page("Archive", body, active="papers", path="archive.html")
 
 
-def build_day(day: dict, papers: dict) -> str:
+def build_day(day: dict, papers: dict, data_dir: str = DATA_DIR) -> str:
     featured_ids = day.get("featured", [])
     featured = [papers[i] for i in featured_ids if i in papers]
     rest = [papers[p["id"]] for p in day["papers"] if p["id"] not in featured_ids]
-    cards = "\n".join(featured_card(r, n, "../", past=True) for n, r in enumerate(featured, 1))
+    cards = "\n".join(featured_card(r, n, "../", past=True,
+                                    now_line=pick_now_line(r, n, day.get("date", ""), False, data_dir))
+                      for n, r in enumerate(featured, 1))
     rest_html = ""
     if rest:
         rows = "\n".join(paper_row(r, "../") for r in rest)
@@ -2087,7 +2108,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     except Exception as exc:
         print(f"  [site] WARNING: case row on Today failed: {exc}")
         case_row = ""
-    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows, case_row))
+    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows, case_row, data_dir))
     _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers), set(papers),
                                                                        case_studies.load(os.path.join(data_dir, "cases.json"))))
     _write(os.path.join(site_dir, "papers.html"), build_papers_page())
@@ -2099,7 +2120,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
     neighbours: dict[str, tuple] = {}
     for day in days:
         try:
-            _write(os.path.join(site_dir, "day", f"{day['date']}.html"), build_day(day, papers))
+            _write(os.path.join(site_dir, "day", f"{day['date']}.html"), build_day(day, papers, data_dir))
         except Exception as exc:  # one bad day page must not stop the edition
             print(f"  [site] WARNING: day page {day.get('date')} failed: {exc}")
         ids = [p["id"] for p in day["papers"] if papers.get(p["id"], {}).get("first_seen") == day["date"]]

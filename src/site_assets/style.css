@@ -1199,6 +1199,9 @@ body.focus .ask-fab { display: none; }
 /* When a paper came out */
 .pick-date { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; font-size: 13px; color: var(--muted); position: relative; z-index: 1; }
 .pick.is-first .pick-date { color: color-mix(in srgb, var(--bg) 70%, transparent); }
+/* "From 9 Nov. Picked today because ...": an older top pick says why it is here now */
+.pick-now { display: block; max-width: 62ch; line-height: 1.45; text-wrap: pretty; }
+.pick-now b { font-weight: 600; }
 .old-flag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; background: var(--yellow-wash); color: var(--ink); font: 500 12px/1.4 var(--sans); white-space: nowrap; }
 .pick.is-first .old-flag { background: var(--yellow); color: #111; }
 .pub-date { font-size: 13px; color: var(--muted); }
