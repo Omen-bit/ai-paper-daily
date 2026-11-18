@@ -1,0 +1,765 @@
+diff --git a/data/daily/2026-11-18.json b/data/daily/2026-11-18.json
+index 2000d21..5fb23f1 100644
+--- a/data/daily/2026-11-18.json
++++ b/data/daily/2026-11-18.json
+@@ -95,14 +95,14 @@
+    "featured": true,
+    "slot": "pick",
+    "summary": {
+-    "text": "You can get a performant, privacy‑preserving language model on any phone without manual tuning or heavy compute.",
++    "text": "You could get a private, task‑specific language model onto an Android phone without hand‑tuning; it was tested on ten tasks across four Android phones.",
+     "source": "groq:openai/gpt-oss-120b"
+    },
+    "curator": {
+     "tldr": "Mobile AI Factory automatically builds and quantizes task‑specific small language models for a given Android phone.",
+     "whats_new": "It combines an orchestrator LLM with rule‑based rollbacks to search model size, quantization, and data generation without expert tuning. It also uses real on‑device measurements.",
+     "key_result": "On ten tasks and four phones, its models beat two five‑shot frontier models on five tasks (up to 0.34) and match on three, using 19× less GPU time than exhaustive search.",
+-    "why_it_matters": "You can get a performant, privacy‑preserving language model on any phone without manual tuning or heavy compute.",
++    "why_it_matters": "You could get a private, task‑specific language model onto an Android phone without hand‑tuning; it was tested on ten tasks across four Android phones.",
+     "difficulty": "intermediate",
+     "difficulty_reason": "Requires integration of LLM orchestrator, quantization tools, and phone measurement APIs.",
+     "check_question": "How much GPU time does Mobile AI Factory save compared to exhaustive training of all model variants?",
+diff --git a/data/latest.json b/data/latest.json
+index 2000d21..5fb23f1 100644
+--- a/data/latest.json
++++ b/data/latest.json
+@@ -95,14 +95,14 @@
+    "featured": true,
+    "slot": "pick",
+    "summary": {
+-    "text": "You can get a performant, privacy‑preserving language model on any phone without manual tuning or heavy compute.",
++    "text": "You could get a private, task‑specific language model onto an Android phone without hand‑tuning; it was tested on ten tasks across four Android phones.",
+     "source": "groq:openai/gpt-oss-120b"
+    },
+    "curator": {
+     "tldr": "Mobile AI Factory automatically builds and quantizes task‑specific small language models for a given Android phone.",
+     "whats_new": "It combines an orchestrator LLM with rule‑based rollbacks to search model size, quantization, and data generation without expert tuning. It also uses real on‑device measurements.",
+     "key_result": "On ten tasks and four phones, its models beat two five‑shot frontier models on five tasks (up to 0.34) and match on three, using 19× less GPU time than exhaustive search.",
+-    "why_it_matters": "You can get a performant, privacy‑preserving language model on any phone without manual tuning or heavy compute.",
++    "why_it_matters": "You could get a private, task‑specific language model onto an Android phone without hand‑tuning; it was tested on ten tasks across four Android phones.",
+     "difficulty": "intermediate",
+     "difficulty_reason": "Requires integration of LLM orchestrator, quantization tools, and phone measurement APIs.",
+     "check_question": "How much GPU time does Mobile AI Factory save compared to exhaustive training of all model variants?",
+diff --git a/src/curator.py b/src/curator.py
+index ac89e6c..576bfec 100644
+--- a/src/curator.py
++++ b/src/curator.py
+@@ -5,7 +5,8 @@ written by Groq as JSON (TL;DR, what's new, key result, build ideas, difficulty)
+ 
+ It runs as a small LangGraph graph per paper:
+   draft     one call for the full notes (the next model in GROQ_MODELS if a call fails)
+-  validate  every field checked: word limits, required fields, and no numbers the abstract lacks
++  validate  every field checked: word limits, required fields, no numbers the abstract lacks,
++            and no claim wider than what the paper tested ("any phone" for four phones)
+   repair    asks the same model to fix only the failing fields, with the reasons (2 rounds at most)
+   ground    a smaller model checks each fact against the abstract; flagged optional
+             fields are dropped and a flagged required field goes back to repair
+@@ -24,6 +25,7 @@ from typing import Optional, TypedDict
+ from langgraph.graph import END, START, StateGraph
+ 
+ import groq_summarizer as gs
++import scope
+ 
+ DIFFICULTIES = ("beginner", "intermediate", "advanced")
+ 
+@@ -48,10 +50,10 @@ LIMITS = {
+ SYSTEM_PROMPT = """You are the Curator for AI Papers Daily, a site for people who read AI papers and build projects from them.
+ Read the paper's title and abstract and return reading notes as one JSON object with exactly these keys:
+ 
+-"tldr": one plain sentence, at most 25 words, saying what the paper does.
++"tldr": one plain sentence, at most 25 words, saying what the paper does and, when the abstract says, what it was tested on (devices, datasets or model sizes).
+ "whats_new": one or two sentences, at most 40 words, on what is new compared with earlier work.
+ "key_result": the single most important result stated in the abstract, with its number if one is given, at most 35 words. Use null if the abstract states no result.
+-"why_it_matters": one sentence, at most 30 words, on why builders should care. Speak to the reader as "you". Do not start with "This paper", "Developers" or "Builders".
++"why_it_matters": one sentence, at most 30 words, on why builders should care, within what the paper tested. Speak to the reader as "you". Do not start with "This paper", "Developers" or "Builders".
+ "build_ideas": a list of 2 or 3 concrete projects a developer could build with this work, each at most 20 words and starting with a verb.
+ "difficulty": one of "beginner", "intermediate", "advanced", for how hard it is to reproduce or use.
+ "difficulty_reason": one short phrase, at most 20 words, explaining the difficulty (for example the compute or background needed).
+@@ -62,7 +64,7 @@ Read the paper's title and abstract and return reading notes as one JSON object
+ "tldr_expert": the tldr again for a researcher in the field, at most 35 words, naming the exact technique and setting.
+ "terms": a list of up to 3 objects {"term": ..., "meaning": ...} for technical terms a newcomer would not know. Each term must appear word for word in the tldr or the abstract. Each meaning is one plain sentence, at most 25 words.
+ 
+-Rules: use only facts from the abstract and never invent numbers, datasets or links. Write in plain language and avoid hype words such as "groundbreaking" or "revolutionary". Return only the JSON object."""
++Rules: use only facts from the abstract and never invent numbers, datasets or links. """ + scope.PROMPT_RULE + """ Write in plain language and avoid hype words such as "groundbreaking" or "revolutionary". Return only the JSON object."""
+ 
+ _CODE_LINK = re.compile(r"https?://(?:www\.)?(?:github\.com|gitlab\.com|huggingface\.co)/[\w.\-/]+", re.I)
+ 
+@@ -160,13 +162,16 @@ def _new_numbers(text: str, source: str) -> list[str]:
+     return [n for n in re.findall(r"\d[\d,.]*\d|\d", text or "") if n.replace(",", "") not in plain]
+ 
+ 
+-def check_notes(data: Optional[dict], abstract: str = "") -> tuple[Optional[dict], list[str]]:
++def check_notes(data: Optional[dict], abstract: str = "",
++                strict_scope: bool = True) -> tuple[Optional[dict], list[str]]:
+     """
+     Clean notes from the model's JSON, plus the problems with any required field.
+     Notes are None when a required field fails; the problems say which and why,
+     so the repair step can ask for just those fields again.
+     Optional fields that fail their checks are dropped quietly.
+-    With an abstract, numbers it doesn't contain are not allowed in the notes.
++    With an abstract, numbers it doesn't contain are not allowed in the notes, and a
++    required sentence that claims more than the paper tested ("any phone" when it
++    tested four) is a problem; strict_scope=False lets it through once repairs ran out.
+     """
+     if not isinstance(data, dict):
+         return None, ["the reply was not a JSON object"]
+@@ -187,6 +192,8 @@ def check_notes(data: Optional[dict], abstract: str = "") -> tuple[Optional[dict
+         elif abstract and _new_numbers(notes[key], abstract):
+             problems.append(f"{key}: mentions {', '.join(_new_numbers(notes[key], abstract))}, "
+                             "which the abstract doesn't")
++        elif abstract and strict_scope and scope.overreach(notes[key], abstract):
++            problems.append(scope.problem(key, scope.overreach(notes[key], abstract)))
+     if notes["why_it_matters"] and notes["why_it_matters"].lower().startswith("this paper"):
+         problems.append('why_it_matters: must not start with "This paper"')
+     if notes["difficulty"] not in DIFFICULTIES:
+@@ -194,14 +201,15 @@ def check_notes(data: Optional[dict], abstract: str = "") -> tuple[Optional[dict
+     # Optional facts with numbers the abstract doesn't have are dropped
+     if abstract:
+         for key in ("key_result", "check_answer"):
+-            if notes[key] and _new_numbers(notes[key], abstract):
++            if notes[key] and (_new_numbers(notes[key], abstract) or scope.overreach(notes[key], abstract)):
+                 notes[key] = None
+ 
+     # The other reading levels may not add facts: every number in them must be in the abstract
+     source_text = (abstract or "") + " " + (notes["tldr"] or "")
+     for key in ("tldr_simple", "tldr_expert"):
+         text = _sentence(data.get(key), LIMITS[key])
+-        notes[key] = text if text and _numbers_known(text, source_text) else None
++        widens = abstract and text and scope.overreach(text, abstract)
++        notes[key] = text if text and _numbers_known(text, source_text) and not widens else None
+     notes["headline"] = _headline(data.get("headline"), source_text)
+     notes["terms"] = _terms(data.get("terms"), source_text)
+     # The question is only useful with its answer, so keep both or neither
+@@ -233,10 +241,11 @@ REPAIR_PROMPT = """Your reading notes for this paper failed some checks. Fix onl
+ Problems:
+ {problems}
+ Return one JSON object with exactly these keys, fixed: {keys}.
+-Follow the same rules as before: plain language, facts only from the abstract, and keep within the word limits."""
++Follow the same rules as before: plain language, facts only from the abstract, claims only as wide as what the paper tested, and keep within the word limits."""
+ 
+ GROUND_PROMPT = """You check reading notes about an AI paper against its abstract. Be strict.
+ A field is unsupported if it states a fact, number, name, dataset or comparison that the abstract does not state or clearly imply.
++A field is also unsupported if it claims more than the paper tested, for example "works on any phone" when the paper tested four Android phones, or "all languages" when it tested three.
+ Build ideas and difficulty are opinions, so never flag them.
+ Return one JSON object: {"unsupported": ["field_name", ...], "why": "one short sentence"}. Use an empty list when everything is supported."""
+ 
+@@ -317,7 +326,15 @@ def _draft(state: CuratorState) -> dict:
+ 
+ 
+ def _validate(state: CuratorState) -> dict:
+-    notes, problems = check_notes(state.get("data"), state["paper"].get("abstract", ""))
++    # A wording check, unlike a wrong number: once repairs ran out the notes stand, with a warning
++    strict = state.get("repairs", 0) < MAX_REPAIRS
++    abstract = state["paper"].get("abstract", "")
++    notes, problems = check_notes(state.get("data"), abstract, strict_scope=strict)
++    if notes and not strict:
++        for key in ("tldr", "whats_new", "why_it_matters"):
++            if scope.overreach(notes[key], abstract):
++                print(f"  [curator] Keeping {key} after {MAX_REPAIRS} repairs, but it still says "
++                      f"{', '.join(scope.overreach(notes[key], abstract))}")
+     if problems:
+         print(f"  [curator] {state['models'][0]}: {'; '.join(problems)}")
+     # A grounding flag on a required field counts as a problem too
+diff --git a/src/groq_summarizer.py b/src/groq_summarizer.py
+index 626b757..cd334f6 100644
+--- a/src/groq_summarizer.py
++++ b/src/groq_summarizer.py
+@@ -10,6 +10,8 @@ import re
+ import time
+ from typing import Optional
+ 
++import scope
++
+ # Preferred model order. Dynamic filtering at startup removes retired models.
+ # Groq retired the Llama 3 models on 16 Aug 2026; set GROQ_MODELS (comma-separated)
+ # to change the order without a code change.
+@@ -38,6 +40,7 @@ SYSTEM_PROMPT = (
+     "why a paper matters. Given a paper title and abstract, write a SINGLE sentence "
+     "(max 30 words) explaining: what problem it solves OR what it enables, and why it "
+     "is significant to the AI/ML community. Be direct, specific, and avoid jargon. "
++    + scope.PROMPT_RULE + " "
+     "Do NOT start with 'This paper'. Output ONLY the sentence, no preamble."
+ )
+ 
+@@ -122,7 +125,7 @@ def _clean_output(text: str) -> str:
+     return text
+ 
+ 
+-def _is_valid_output(text: str, finish_reason: str) -> bool:
++def _is_valid_output(text: str, finish_reason: str, abstract: str = "") -> bool:
+     if not text or len(text) < 10:
+         return False
+     if text.lower().startswith("this paper"):
+@@ -131,6 +134,10 @@ def _is_valid_output(text: str, finish_reason: str) -> bool:
+         return False
+     if len(text.split()) > 40:
+         return False
++    # "Any phone" for a paper that tested four phones: try the next model, then the abstract's own words
++    if abstract and scope.overreach(text, abstract):
++        print(f"  [groq] Rejected: says {', '.join(scope.overreach(text, abstract))}, wider than the paper tested")
++        return False
+     return True
+ 
+ 
+@@ -297,7 +304,7 @@ def get_summary(paper: dict) -> tuple[str, str]:
+             continue
+ 
+         cleaned = _clean_output(raw_text)
+-        if _is_valid_output(cleaned, finish_reason):
++        if _is_valid_output(cleaned, finish_reason, abstract):
+             print(f"  [groq] Summary from {model}")
+             return cleaned, f"groq:{model}"
+ 
+diff --git a/src/scope.py b/src/scope.py
+new file mode 100644
+index 0000000..7148992
+--- /dev/null
++++ b/src/scope.py
+@@ -0,0 +1,75 @@
++"""
++scope.py
++Catches a summary that claims more than the paper tested.
++
++A paper that tested four Android phones must not be summed up as working "on any
++phone". The prompts ask the model to name what was tested; this module is the
++check in code behind that rule. It looks for widening words ("any phone",
++"every language", "all devices", "universally", "regardless of") that the
++abstract itself doesn't use, so a model can be asked to fix the sentence.
++
++No model call: plain text matching, so it is cheap to run on every note.
++"""
++import re
++
++# "any"/"every" widen almost whatever follows them in a summary
++_ANY = re.compile(r"\b(any|every)\s+([a-z][a-z\-]+)", re.IGNORECASE)
++# "all" is common in plain writing ("all its stars"), so only flag it before a
++# word that names what a paper is tested on
++_SCOPE_NOUNS = (
++    "phones?|smartphones?|devices?|hardware|gpus?|cpus?|chips?|platforms?|robots?|"
++    "models?|llms?|architectures?|sizes?|scales?|languages?|tasks?|domains?|datasets?|"
++    "benchmarks?|settings?|environments?|users?|apps?|applications?|images?|videos?|"
++    "modalities|languages|codebases?|problems?|cases?"
++)
++_ALL = re.compile(rf"\ball\s+(?:kinds\s+of\s+|types\s+of\s+|sorts\s+of\s+)?({_SCOPE_NOUNS})\b", re.IGNORECASE)
++_ALWAYS = re.compile(r"\b(universal(?:ly)?|regardless of|no matter (?:what|which)|out of the box on|works everywhere)\b", re.IGNORECASE)
++
++# "any" phrases that don't widen a result
++_HARMLESS = {"any time", "any longer", "any more", "any of", "any other", "every time", "every step",
++             "every day", "every paper", "every token", "every layer", "every query", "every round"}
++
++_NEGATIONS = {"without", "no", "not", "never", "nor", "hardly", "rarely"}
++
++
++def _in_source(phrase: str, source: str) -> bool:
++    return phrase.lower() in " ".join(source.lower().split())
++
++
++def overreach(text: str, abstract: str = "") -> list[str]:
++    """
++    The widening phrases in text that the abstract doesn't use, in order, e.g. ["any phone"].
++    Empty when the sentence stays within what the paper states.
++    """
++    if not text:
++        return []
++    found = []
++    for m in _ANY.finditer(text):
++        phrase = f"{m.group(1)} {m.group(2)}".lower()
++        before = text[:m.start()].split()[-1:]
++        # "without any tuning" and "not every case" narrow, they don't widen
++        if phrase in _HARMLESS or (before and before[0].lower().strip(",") in _NEGATIONS):
++            continue
++        found.append(phrase)
++    found += [m.group(0).lower() for m in _ALL.finditer(text)]
++    found += [m.group(0).lower() for m in _ALWAYS.finditer(text)]
++    out = []
++    for phrase in found:
++        if not _in_source(phrase, abstract) and phrase not in out:
++            out.append(phrase)
++    return out
++
++
++def problem(field: str, phrases: list[str]) -> str:
++    """A repair instruction a model can act on."""
++    quoted = ", ".join(f'"{p}"' for p in phrases)
++    return (f"{field}: says {quoted}, which claims more than the paper tested. "
++            "Name what it was actually tested on instead (the devices, datasets, tasks or model sizes in the abstract)")
++
++
++PROMPT_RULE = (
++    "Say what the paper actually tested. When the abstract names the devices, datasets, tasks, "
++    "languages or model sizes it was tested on, keep every claim within them and name them where it helps "
++    "(for example \"on four Android phones\", never \"on any phone\"). Do not widen a result with words "
++    "such as any, every, all, always or universal unless the abstract itself says so."
++)
+diff --git a/src/site_assets/app.js b/src/site_assets/app.js
+index 06079b0..783ed11 100644
+--- a/src/site_assets/app.js
++++ b/src/site_assets/app.js
+@@ -133,6 +133,8 @@
+   // ---- Home: "For you", papers close in meaning to this browser's reading ----
+   // Only the IDs of papers opened here are sent, to our own Supabase function.
+   // Results are kept for the day so the function is not called on every visit.
++  // The section stays hidden until it has papers to show: a first visit, a failed
++  // call or an empty answer never shows an empty box or loading placeholders.
+   var forYou = document.querySelector("[data-foryou]");
+   if (forYou && reads.length && window.fetch) {
+     var fyIds = reads.slice(0, 50).map(function (h) { return h.id; });
+@@ -176,7 +178,6 @@
+           store("apd.foryou", { key: fyKey, results: results });
+           return results;
+         });
+-    forYou.hidden = false;
+     Promise.all([recReq, idsReq]).then(function (both) {
+       var onSite = {};
+       (both[1] || []).forEach(function (id) { onSite[id] = true; });
+@@ -273,8 +274,9 @@
+           .sort(function (a, b) { return b.similarity - a.similarity; }).slice(0, 3);
+       });
+     };
++    // Shown only for projects with new papers: "Nothing new" cards stay on Scout
+     var paintWatch = function (news, onSite) {
+-      var list = window.apdWatch.list();
++      var list = window.apdWatch.list().filter(function (w) { return (news[w.key] || []).length; });
+       if (!list.length) { watchBox.hidden = true; return; }
+       watchList.innerHTML = list.map(function (w) {
+         var items = news[w.key] || [];
+@@ -297,7 +299,7 @@
+         card.querySelector("[data-unwatch]").addEventListener("click", function () {
+           store("apd.watch", window.apdWatch.list().filter(function (x) { return x.key !== key; }));
+           card.remove();
+-          if (!window.apdWatch.list().length) watchBox.hidden = true;
++          if (!watchList.querySelector(".watch-card")) watchBox.hidden = true;
+         });
+         card.querySelector("[data-rescout]").addEventListener("click", function () { store("apd.scoutdraft", w.description); });
+       });
+@@ -312,7 +314,6 @@
+         store("apd.watchnews", { day: isoToday(), items: items });
+         return items;
+       });
+-    watchBox.hidden = false;
+     Promise.all([newsReq, fetch("data/ids.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })])
+       .then(function (both) {
+         var onSite = {};
+diff --git a/src/site_assets/style.css b/src/site_assets/style.css
+index 7b8c882..db331f3 100644
+--- a/src/site_assets/style.css
++++ b/src/site_assets/style.css
+@@ -1199,6 +1199,9 @@ body.focus .ask-fab { display: none; }
+ /* When a paper came out */
+ .pick-date { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; font-size: 13px; color: var(--muted); position: relative; z-index: 1; }
+ .pick.is-first .pick-date { color: color-mix(in srgb, var(--bg) 70%, transparent); }
++/* "From 9 Nov. Picked today because ...": an older top pick says why it is here now */
++.pick-now { display: block; max-width: 62ch; line-height: 1.45; text-wrap: pretty; }
++.pick-now b { font-weight: 600; }
+ .old-flag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; background: var(--yellow-wash); color: var(--ink); font: 500 12px/1.4 var(--sans); white-space: nowrap; }
+ .pick.is-first .old-flag { background: var(--yellow); color: #111; }
+ .pub-date { font-size: 13px; color: var(--muted); }
+diff --git a/src/site_builder.py b/src/site_builder.py
+index 21e9ab6..ed2c30d 100644
+--- a/src/site_builder.py
++++ b/src/site_builder.py
+@@ -37,6 +37,7 @@ import trends
+ import case_pages
+ import case_studies
+ import ranking_pages
++import why_now
+ 
+ DATA_DIR = os.path.join(ROOT_DIR, "data")
+ SITE_DIR = os.path.join(ROOT_DIR, "site")
+@@ -415,7 +416,17 @@ def pick_minutes(rec: dict) -> int:
+     return max(1, round(words / 200))
+ 
+ 
+-def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bool = False) -> str:
++def pick_now_line(rec: dict, rank: int, edition: str, today: bool, data_dir: str = DATA_DIR) -> str:
++    """The "why it's here now" line for a top pick that came out on arXiv more than
++    3 days before the edition, or "" (why_now.py)."""
++    if rank != 1 or rec.get("slot") != "pick" or not edition:
++        return ""
++    gained, span = why_now.stars_this_week(rec.get("id", ""), edition, data_dir)
++    return why_now.why_now(rec, edition, today=today, stars_week=gained, span=span)
++
++
++def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bool = False,
++                  now_line: str = "") -> str:
+     notes = rec.get("curator") or {}
+     if notes.get("tldr"):
+         blurb = f'<p class="pick-blurb"><b>In short</b>{esc(notes["tldr"])}</p>'
+@@ -435,7 +446,7 @@ def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bo
+         why = f'<span class="pick-why">{int(rec["hf_upvotes"])} upvotes on Hugging Face</span>'
+     elif rec.get("slot") == "most-read":
+         why = f'<span class="pick-why">{int(rec.get("readers") or 0)} readers this week</span>'
+-    elif rec.get("slot") == "pick":
++    elif rec.get("slot") == "pick" and not now_line:
+         why = '<span class="pick-why">Best new paper by our score</span>'
+     topic = (rec.get("categories") or ["other-ml"])[0]
+     code = f'<span class="has-code">{icon("code", 14)}Code available</span>' if rec.get("code_url") else ""
+@@ -443,12 +454,18 @@ def featured_card(rec: dict, rank: int, root: str, past: bool = False, today: bo
+   <header class="pick-top"><span class="pick-n">{label}</span>{why}<span class="pick-read" hidden>Read ✓</span></header>
+   <h3><a href="{root}paper/{esc(rec['id'])}.html">{esc(rec['title'])}</a></h3>
+   {blurb}
+-  <p class="pick-date">{pick_date(rec, today)}{OLDER_FLAG if is_older(rec) else ""}</p>
++  {now_html(now_line) if now_line else f'<p class="pick-date">{pick_date(rec, today)}{OLDER_FLAG if is_older(rec) else ""}</p>'}
+   <footer class="pick-foot">{topic_dot(topic)}{level_meter(notes.get("difficulty"))}{code}<span class="mins">{pick_minutes(rec)} min</span></footer>
+   {seen_check(rec)}
+ </article>"""
+ 
+ 
++def now_html(line: str) -> str:
++    """The why-now line, its date in bold: "From 9 Nov. Picked today because ..." """
++    head, _, rest = line.partition(". ")
++    return f'<p class="pick-date pick-now"><b>{esc(head)}.</b> {esc(rest)}</p>'
++
++
+ # Slots whose cards ask "Seen this already?". The answers, and the clicks on
+ # each card, show whether readers get something from us that Hugging Face
+ # didn't already give them.
+@@ -678,7 +695,7 @@ def trends_teaser(rows: list[dict]) -> str:
+ 
+ 
+ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = None,
+-                trend_rows: list[dict] | None = None, case_row: str = "") -> str:
++                trend_rows: list[dict] | None = None, case_row: str = "", data_dir: str = DATA_DIR) -> str:
+     most_read = most_read or []
+     trend_rows = trend_rows if trend_rows is not None else trends.trend_rows([], papers)[0]
+     if not days:
+@@ -697,7 +714,9 @@ def build_index(days: list[dict], papers: dict, most_read: list[dict] | None = N
+     # Newer editions read every arXiv paper but store only the best ("scanned" counts them all)
+     n_scanned = max(latest.get("scanned") or 0, n_today)
+ 
+-    cards = "\n".join(featured_card(r, n, "", today=True) for n, r in enumerate(featured, 1))
++    cards = "\n".join(featured_card(r, n, "", today=True,
++                                    now_line=pick_now_line(r, n, latest.get("date", ""), True, data_dir))
++                      for n, r in enumerate(featured, 1))
+     try:
+         d = date.fromisoformat(latest["date"])
+         eyebrow = f"Today \u00b7 {d:%a} {d.day} {d:%b %Y}"
+@@ -1113,11 +1132,13 @@ def build_archive(days: list[dict], papers: dict) -> str:
+     return page("Archive", body, active="papers", path="archive.html")
+ 
+ 
+-def build_day(day: dict, papers: dict) -> str:
++def build_day(day: dict, papers: dict, data_dir: str = DATA_DIR) -> str:
+     featured_ids = day.get("featured", [])
+     featured = [papers[i] for i in featured_ids if i in papers]
+     rest = [papers[p["id"]] for p in day["papers"] if p["id"] not in featured_ids]
+-    cards = "\n".join(featured_card(r, n, "../", past=True) for n, r in enumerate(featured, 1))
++    cards = "\n".join(featured_card(r, n, "../", past=True,
++                                    now_line=pick_now_line(r, n, day.get("date", ""), False, data_dir))
++                      for n, r in enumerate(featured, 1))
+     rest_html = ""
+     if rest:
+         rows = "\n".join(paper_row(r, "../") for r in rest)
+@@ -2087,7 +2108,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
+     except Exception as exc:
+         print(f"  [site] WARNING: case row on Today failed: {exc}")
+         case_row = ""
+-    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows, case_row))
++    _write(os.path.join(site_dir, "index.html"), build_index(days, papers, load_most_read(export_dir), rows, case_row, data_dir))
+     _write(os.path.join(site_dir, "trends.html"), build_trends_page(rows, source, len(archive) or len(papers), set(papers),
+                                                                        case_studies.load(os.path.join(data_dir, "cases.json"))))
+     _write(os.path.join(site_dir, "papers.html"), build_papers_page())
+@@ -2099,7 +2120,7 @@ def build_site(data_dir: str = DATA_DIR, site_dir: str = SITE_DIR, export_dir: s
+     neighbours: dict[str, tuple] = {}
+     for day in days:
+         try:
+-            _write(os.path.join(site_dir, "day", f"{day['date']}.html"), build_day(day, papers))
++            _write(os.path.join(site_dir, "day", f"{day['date']}.html"), build_day(day, papers, data_dir))
+         except Exception as exc:  # one bad day page must not stop the edition
+             print(f"  [site] WARNING: day page {day.get('date')} failed: {exc}")
+         ids = [p["id"] for p in day["papers"] if papers.get(p["id"], {}).get("first_seen") == day["date"]]
+diff --git a/src/why_now.py b/src/why_now.py
+new file mode 100644
+index 0000000..d77036b
+--- /dev/null
++++ b/src/why_now.py
+@@ -0,0 +1,114 @@
++"""
++why_now.py
++The "why it's here now" line on a top pick that came out on arXiv a while ago.
++
++A reader who sees a 9 Nov paper as the 18 Nov pick should not have to guess why.
++When the pick is more than OLD_AFTER_DAYS days older than the edition, its card
++says when it came out and what changed since, from the measured signals only:
++
++  From 9 Nov. Picked today because it gained 1,200 GitHub stars this week.
++
++Every number comes from the evidence the scorer recorded (GitHub, Hugging Face,
++Hacker News) or from the daily signal snapshots in data/signals/. A value the
++scorer marked as estimated is never used, and no model writes any of it.
++"""
++import json
++import os
++from datetime import date, timedelta
++
++OLD_AFTER_DAYS = 3      # a pick this many days old or newer needs no explanation
++MIN_STARS = 20          # fewer new stars than this is not a reason worth naming
++MIN_UPVOTES = 5
++MIN_HN_POINTS = 20
++MIN_MODELS = 2
++WEEK = 7
++
++
++def _day(iso) -> date | None:
++    try:
++        return date.fromisoformat(str(iso or "")[:10])
++    except ValueError:
++        return None
++
++
++def short_date(d: date) -> str:
++    return f"{d.day} {d:%b}"
++
++
++def _n(x) -> str:
++    return f"{int(x):,}"
++
++
++def stars_this_week(paper_id: str, edition: str, data_dir: str) -> tuple[int | None, int]:
++    """
++    (stars gained, over how many days) from the signal snapshots of the last week,
++    or (None, 0) when there is no earlier count to compare with.
++    """
++    end = _day(edition)
++    folder = os.path.join(data_dir, "signals")
++    if not end or not os.path.isdir(folder):
++        return None, 0
++    counts = {}
++    for back in range(WEEK + 1):
++        d = end - timedelta(days=back)
++        path = os.path.join(folder, f"{d.isoformat()}.json")
++        try:
++            with open(path, encoding="utf-8") as f:
++                sig = (json.load(f).get("papers") or {}).get(paper_id) or {}
++        except (OSError, ValueError, AttributeError):
++            continue
++        if isinstance(sig.get("stars"), int):
++            counts[d] = sig["stars"]
++    if end not in counts:
++        return None, 0
++    earlier = [d for d in counts if d < end]
++    if not earlier:
++        return None, 0
++    first = min(earlier)
++    return max(0, counts[end] - counts[first]), (end - first).days
++
++
++def reasons(rec: dict, stars_week: int | None = None, span: int = 0) -> list[str]:
++    """What changed for the paper lately, strongest first, as clauses after "because"."""
++    ev = rec.get("evidence") or {}
++    estimated = set(ev.get("estimated") or [])
++    out = []
++    if stars_week is not None and stars_week >= MIN_STARS:
++        out.append(f"it gained {_n(stars_week)} GitHub stars {'since yesterday' if span == 1 else 'this week'}")
++    elif "stars_gain" not in estimated and (ev.get("stars_gain") or 0) >= MIN_STARS:
++        gain, stars = ev["stars_gain"], ev.get("stars")
++        if stars is not None and gain >= stars:
++            out.append(f"its new code repo drew {_n(gain)} GitHub stars")
++        else:
++            out.append(f"it gained {_n(gain)} GitHub stars since yesterday")
++    upvotes = ev.get("upvotes", rec.get("hf_upvotes")) or 0
++    models = ev.get("hf_models") or 0
++    on_hf = "HuggingFace" in str(rec.get("source") or "") or rec.get("slot") == "trending"
++    if on_hf and upvotes >= MIN_UPVOTES:
++        extra = f" and {_n(models)} models built on it" if models >= MIN_MODELS else ""
++        out.append(f"it made Hugging Face’s daily papers with {_n(upvotes)} upvotes{extra}")
++    elif models >= MIN_MODELS:
++        out.append(f"{_n(models)} models built on it are now on Hugging Face")
++    if "hn_points" not in estimated and (ev.get("hn_points") or 0) >= MIN_HN_POINTS:
++        out.append(f"it reached {_n(ev['hn_points'])} points on Hacker News")
++    return out
++
++
++def why_now(rec: dict, edition: str, today: bool = True,
++            stars_week: int | None = None, span: int = 0) -> str:
++    """
++    The plain-text line, or "" when the paper is recent enough to need none.
++    today=False words it for a past edition's page ("Picked on 18 Nov").
++    """
++    out, ed = _day(rec.get("submitted")), _day(edition)
++    if not out or not ed or (ed - out).days <= OLD_AFTER_DAYS:
++        return ""
++    picked = "Picked today" if today else f"Picked on {short_date(ed)}"
++    why = reasons(rec, stars_week, span)[:2]
++    if why:
++        because = why[0] if len(why) == 1 else f"{why[0]}, and {why[1]}"
++    elif rec.get("rank") and rec.get("of"):
++        because = f"it scored highest of the {_n(rec['of'])} papers we ranked that morning"
++    else:
++        because = "it scored highest of the papers we ranked that morning"
++    return f"From {short_date(out)}. {picked} because {because}."
+diff --git a/tests/test_curator.py b/tests/test_curator.py
+index 5ee6bcd..e4f03d0 100644
+--- a/tests/test_curator.py
++++ b/tests/test_curator.py
+@@ -251,3 +251,42 @@ def test_headline_is_optional_short_and_grounded():
+     assert curator._headline("Delete 7% of weights", src) is None  # a number the paper doesn't have
+     assert curator._headline("Is deleting weights all you need for every model?", src) is None
+     assert curator._headline(None, src) is None
++
++
++# ---- Claims no wider than what the paper tested (tester report: "any phone" for four phones) ----
++
++PHONES = ("We evaluate Mobile AI Factory on ten tasks and four Android phones. "
++          "Its search comes within 0.03 of exhaustively training all 27 model variants.")
++
++
++def test_a_sentence_wider_than_the_paper_is_a_problem():
++    wide = dict(GOOD, why_it_matters="You can get a private language model on any phone without tuning.")
++    notes, problems = curator.check_notes(wide, PHONES)
++    assert notes is None and len(problems) == 1
++    assert problems[0].startswith('why_it_matters: says "any phone", which claims more than the paper tested')
++    narrow = dict(GOOD, why_it_matters="You can get a private language model onto an Android phone; it was tested on four.")
++    assert curator.check_notes(narrow, PHONES)[1] == []
++
++
++def test_wide_optional_fields_are_dropped():
++    notes, problems = curator.check_notes(dict(GOOD, tldr_simple="A model that runs on every device you own.",
++                                               key_result="It wins on all benchmarks."), PHONES)
++    assert problems == [] and notes["tldr_simple"] is None and notes["key_result"] is None
++
++
++def test_a_wide_line_is_repaired_with_the_reason():
++    wide = dict(GOOD, why_it_matters="You can run a tuned model on any phone.")
++    fixed = {"why_it_matters": "You can run a tuned model on an Android phone; it was tested on four of them."}
++    notes, source, log, client = _run([wide, fixed, {"unsupported": []}], abstract=PHONES)
++    assert notes["why_it_matters"] == fixed["why_it_matters"] and log["repairs"] == 1
++    assert '"any phone"' in _users(client)[1]
++
++
++def test_prompts_ask_for_what_was_tested():
++    assert "never \"on any phone\"" in curator.SYSTEM_PROMPT and "never \"on any phone\"" in gs.SYSTEM_PROMPT
++    assert "claims more than the paper tested" in curator.GROUND_PROMPT
++
++
++def test_the_summarizer_rejects_a_wide_line():
++    assert not gs._is_valid_output("You can run a language model on any phone now.", "stop", PHONES)
++    assert gs._is_valid_output("You can run a language model on four Android phones.", "stop", PHONES)
+diff --git a/tests/test_scope.py b/tests/test_scope.py
+new file mode 100644
+index 0000000..4fb58ef
+--- /dev/null
++++ b/tests/test_scope.py
+@@ -0,0 +1,34 @@
++"""
++tests/test_scope.py
++scope.overreach: a summary may not claim more than the paper tested.
++"""
++import os
++import sys
++
++sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
++
++import scope
++
++ABSTRACT = ("We evaluate Mobile AI Factory on ten tasks and four Android phones. "
++            "Its search comes within 0.03 of exhaustively training all 27 model variants. "
++            "Our encoder handles every modality.")
++
++
++def test_widening_words_the_abstract_lacks_are_found():
++    assert scope.overreach("A tuned model on any phone without manual tuning.", ABSTRACT) == ["any phone"]
++    assert scope.overreach("Works on all devices, universally.", ABSTRACT) == ["all devices", "universally"]
++    assert scope.overreach("It helps regardless of hardware.", ABSTRACT) == ["regardless of"]
++
++
++def test_words_the_abstract_uses_or_that_narrow_are_fine():
++    assert scope.overreach("It handles every modality with one encoder.", ABSTRACT) == []
++    assert scope.overreach("Tested on four Android phones and ten tasks.", ABSTRACT) == []
++    assert scope.overreach("It works without any manual tuning.", ABSTRACT) == []
++    assert scope.overreach("It nearly matches training all 27 model variants.", ABSTRACT) == []
++    assert scope.overreach("Use it any time you fine-tune.", ABSTRACT) == []
++    assert scope.overreach("", ABSTRACT) == []
++
++
++def test_the_problem_tells_the_model_what_to_do():
++    text = scope.problem("why_it_matters", ["any phone"])
++    assert text.startswith('why_it_matters: says "any phone"') and "devices, datasets, tasks or model sizes" in text
+diff --git a/tests/test_why_now.py b/tests/test_why_now.py
+new file mode 100644
+index 0000000..15649e5
+--- /dev/null
++++ b/tests/test_why_now.py
+@@ -0,0 +1,82 @@
++"""
++tests/test_why_now.py
++The "why it's here now" line on a top pick that came out on arXiv more than 3 days earlier.
++"""
++import json
++import os
++import sys
++
++sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
++
++import site_builder as sb
++import why_now
++
++
++def _pick(**extra):
++    rec = {"id": "2611.1", "title": "Mobile AI Factory", "submitted": "2026-11-09", "slot": "pick",
++           "featured": True, "source": "HuggingFace", "hf_upvotes": 19, "rank": 1, "of": 50,
++           "abstract": "We build models. We test four phones.",
++           "evidence": {"stars": 8, "stars_gain": 4, "hf_models": 4, "upvotes": 19, "estimated": ["stars_gain"]}}
++    rec.update(extra)
++    return rec
++
++
++def test_a_recent_pick_needs_no_line():
++    assert why_now.why_now(_pick(submitted="2026-11-15"), "2026-11-18") == ""
++    assert why_now.why_now(_pick(submitted="2026-11-16"), "2026-11-18") == ""
++    assert why_now.why_now(_pick(submitted=None), "2026-11-18") == ""
++
++
++def test_an_older_pick_says_when_and_why():
++    line = why_now.why_now(_pick(), "2026-11-18")
++    assert line == ("From 9 Nov. Picked today because it made Hugging Face’s daily papers "
++                    "with 19 upvotes and 4 models built on it.")
++    past = why_now.why_now(_pick(), "2026-11-18", today=False)
++    assert past.startswith("From 9 Nov. Picked on 18 Nov because")
++
++
++def test_stars_this_week_lead_and_estimates_are_never_used():
++    line = why_now.why_now(_pick(), "2026-11-18", stars_week=1200, span=6)
++    assert line.startswith("From 9 Nov. Picked today because it gained 1,200 GitHub stars this week, and it made")
++    # the scorer's stars_gain was estimated, so it is not a reason
++    est = _pick(source="arXiv", evidence={"stars_gain": 500, "estimated": ["stars_gain"]})
++    assert "stars" not in why_now.why_now(est, "2026-11-18")
++    assert why_now.why_now(est, "2026-11-18").endswith("because it scored highest of the 50 papers we ranked that morning.")
++    measured = _pick(source="arXiv", evidence={"stars": 900, "stars_gain": 300})
++    assert "it gained 300 GitHub stars since yesterday" in why_now.why_now(measured, "2026-11-18")
++    hn = _pick(source="arXiv", evidence={"hn_points": 240})
++    assert "it reached 240 points on Hacker News" in why_now.why_now(hn, "2026-11-18")
++
++
++def test_stars_this_week_come_from_the_snapshots(tmp_path):
++    os.makedirs(tmp_path / "signals")
++    for day, stars in (("2026-11-12", 100), ("2026-11-15", 400), ("2026-11-18", 1300)):
++        with open(tmp_path / "signals" / f"{day}.json", "w") as f:
++            json.dump({"papers": {"2611.1": {"stars": stars}}}, f)
++    assert why_now.stars_this_week("2611.1", "2026-11-18", str(tmp_path)) == (1200, 6)
++    assert why_now.stars_this_week("2611.1", "2026-11-12", str(tmp_path)) == (None, 0)
++    assert why_now.stars_this_week("2611.9", "2026-11-18", str(tmp_path)) == (None, 0)
++
++
++def test_the_top_pick_card_shows_the_line(tmp_path):
++    rec = _pick()
++    days = [{"date": "2026-11-18", "featured": ["2611.1"], "papers": [rec]}]
++    html = sb.build_index(days, {"2611.1": rec}, [], [], "", str(tmp_path))
++    assert ('<p class="pick-date pick-now"><b>From 9 Nov.</b> Picked today because it made Hugging Face’s '
++            'daily papers with 19 upvotes and 4 models built on it.</p>') in html
++    assert "Best new paper by our score" not in html
++    day = sb.build_day(days[0], {"2611.1": rec}, str(tmp_path))
++    assert "<b>From 9 Nov.</b> Picked on 18 Nov because" in day
++    # the second slot and a fresh pick keep the usual date line
++    fresh = _pick(submitted="2026-11-17")
++    assert "pick-now" not in sb.build_index([dict(days[0], papers=[fresh])], {"2611.1": fresh}, [], [], "", str(tmp_path))
++    assert "pick-now" not in sb.featured_card(dict(rec, slot="trending"), 2, "", today=True)
++
++
++def test_for_you_and_your_projects_start_hidden():
++    rec = _pick()
++    html = sb.build_index([{"date": "2026-11-18", "featured": ["2611.1"], "papers": [rec]}], {"2611.1": rec}, [], [], "")
++    assert "data-foryou " in html and "<section class=\"block\" data-watch " in html
++    for marker in ("data-foryou ", "data-watch "):
++        tag = html[html.index(marker):].split(">", 1)[0]
++        assert tag.rstrip().endswith("hidden"), tag
