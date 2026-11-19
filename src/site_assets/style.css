@@ -1,7 +1,7 @@
 /* AI Papers Daily
    Design plan: a research terminal, not a blog.
    - Full width with small gutters. Pages read like a dashboard you check every morning.
-   - Geist Pixel for headlines, numbers and labels; Geist for reading; Geist Mono for arXiv IDs.
+   - DM Sans for headlines, numbers and labels; Inter for reading; Geist Mono for arXiv IDs.
    - Warm paper grey and near-black ink. International orange marks what matters most
      (top pick, today, progress); highlighter yellow marks what the reader chose (highlights, notes).
    - Topic colours appear only as small dots, mini charts and bars. Colour means "which topic". */
@@ -9,6 +9,8 @@
 @font-face { font-family: "Geist"; src: url(fonts/geist.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "Geist Mono"; src: url(fonts/geist-mono.woff2) format("woff2"); font-weight: 400 600; font-display: swap; }
 @font-face { font-family: "Geist Pixel"; src: url(fonts/geist-pixel-square.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url(fonts/dm-sans.woff2) format("woff2"); font-weight: 100 1000; font-display: swap; }
+@font-face { font-family: "Inter"; src: url(fonts/inter.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
 
 /* ---------- Tokens ---------- */
 :root {
@@ -18,8 +20,9 @@
   --cal-0: #ebe8e1; --cal-1: #ffe1cf; --cal-2: #ffb48c; --cal-3: #ff8549; --cal-4: #ff5a14; --cal-5: #b83500;
   --yellow: #ffd23f; --yellow-wash: #fff1b8; --blue: #2643ff; --good: #13995a; --bad: #d6402b;
   --ticker-bg: #0e0e10; --ticker-ink: #ff6a1f;
-  --pixel: "Geist Pixel", "Geist Mono", ui-monospace, monospace;
-  --sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --heading: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --pixel: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --mono: "Geist Mono", ui-monospace, monospace;
   --gutter: clamp(16px, 2.6vw, 40px); --r: 14px; --r-sm: 9px;
   --shadow: 0 1px 0 rgb(0 0 0 / .03), 0 8px 24px -12px rgb(0 0 0 / .12);
@@ -78,6 +81,7 @@
 [hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--heading); letter-spacing: -.025em; font-weight: 700; color: inherit; }
 a { color: inherit; text-decoration: none; }
 button, input, select { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
@@ -152,18 +156,18 @@ button, input, select { font: inherit; color: inherit; }
 .pad { padding: 20px; }
 .block { padding: 24px 0; min-width: 0; }
 .block-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 16px; padding-top: 14px; border-top: 1px solid var(--ink); }
-.block-head h2 { margin: 0; font: 400 22px/1.1 var(--pixel); letter-spacing: .01em; }
+.block-head h2 { margin: 0; font: 700 22px/1.2 var(--heading); letter-spacing: -.02em; }
 .block-head .sub { font-size: 14px; color: var(--muted); }
 .more { margin-left: auto; font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--accent); }
 .page-head { padding: 40px 0 16px; }
-.page-head h1 { margin: 0; font: 400 clamp(40px, 5.5vw, 80px)/.95 var(--pixel); letter-spacing: -.02em; }
+.page-head h1 { margin: 0; font: 700 clamp(36px, 5vw, 68px)/1.02 var(--heading); letter-spacing: -.03em; }
 .page-head p { margin: 16px 0 0; max-width: 64ch; font-size: 17px; color: var(--muted); }
 .crumbs { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; font-size: 14px; font-weight: 500; color: var(--muted); }
 .crumbs:hover { color: var(--ink); }
 
 /* ---------- Home ---------- */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 460px); gap: var(--gutter); align-items: end; padding: 36px 0 20px; }
-.hero h1 { margin: 0; font: 400 clamp(40px, 5.6vw, 88px)/.92 var(--pixel); letter-spacing: -.02em; }
+.hero h1 { margin: 0; font: 700 clamp(38px, 5.2vw, 76px)/1.02 var(--heading); letter-spacing: -.035em; }
 .lead { margin: 20px 0 0; max-width: 54ch; font-size: 18px; color: var(--muted); }
 .daily { display: flex; gap: 20px; align-items: center; padding: 20px; }
 .ring { --p: 0; flex: none; position: relative; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center;
@@ -181,7 +185,7 @@ button, input, select { font: inherit; color: inherit; }
 .pick { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 24px 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease; }
 .pick:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -20px rgb(0 0 0 / .25); }
 .pick.is-first { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.pick-top { display: flex; justify-content: space-between; gap: 12px; font: 400 13px/1 var(--pixel); letter-spacing: .06em; text-transform: uppercase; }
+.pick-top { display: flex; justify-content: space-between; gap: 12px; font: 600 13px/1 var(--heading); letter-spacing: .06em; text-transform: uppercase; }
 .pick-n { color: var(--accent-ink); }
 .pick.is-first .pick-n { color: var(--accent); }
 .pick-read { color: var(--good); }
@@ -189,7 +193,7 @@ button, input, select { font: inherit; color: inherit; }
 .pick-why { margin-right: auto; font: 400 13px/1.2 var(--sans); letter-spacing: 0; text-transform: none; color: var(--muted); }
 .pick.is-first .pick-why { color: color-mix(in srgb, var(--bg) 70%, transparent); }
 .pick[data-slot="trending"] .pick-n { padding: 4px 7px; border-radius: 4px; background: var(--yellow); color: #111; }
-.pick h3 { margin: 0; font: 600 clamp(21px, 1.9vw, 29px)/1.15 var(--sans); letter-spacing: -.025em; text-wrap: balance; }
+.pick h3 { margin: 0; font: 700 clamp(22px, 2vw, 30px)/1.2 var(--heading); letter-spacing: -.03em; text-wrap: balance; }
 .pick h3 a::after { content: ""; position: absolute; inset: 0; border-radius: var(--r); }
 .pick-blurb { margin: 0; font-size: 16px; line-height: 1.55; max-width: 62ch; }
 .pick-blurb b { display: block; margin-bottom: 4px; font: 400 11px/1 var(--pixel); letter-spacing: .08em; text-transform: uppercase; color: var(--accent-ink); }
@@ -1250,7 +1254,7 @@ body.focus .ask-fab { display: none; }
 .sig.sig-topic { gap: 6px; background: transparent; border: 1px solid var(--line); color: var(--muted); }
 .sig.sig-topic .dot { width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
 .sig.sig-topic:hover { color: var(--ink); border-color: var(--c); }
-.pcard h3 { margin: 0; min-height: 2.64em; font: 600 17px/1.32 var(--sans); letter-spacing: -.014em; text-wrap: pretty; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pcard h3 { margin: 0; min-height: 2.64em; font: 700 17px/1.32 var(--heading); letter-spacing: -.02em; text-wrap: pretty; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pcard h3 a::after { content: ""; position: absolute; inset: 0; border-radius: var(--r); }
 .pcard h3 a:focus-visible { outline: none; }
 .pcard-sum { margin: 0; min-height: 6em; font-size: 14px; line-height: 1.5; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }

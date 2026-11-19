@@ -18,3 +18,5 @@ site/
 .cache/
 # LangGraph.js, installed only to run the Scout graph tests
 node_modules/
+# Local AI reference guide (kept on this computer, never committed)
+AI_PROJECT_GUIDE.md

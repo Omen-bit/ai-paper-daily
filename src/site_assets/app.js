@@ -1414,7 +1414,7 @@
       if (b[2]) return '<img class="' + cls + ' cs-img" src="case-studies/logos/' + esc(b[2]) + '" alt="" loading="lazy" decoding="async">';
       return '<span class="' + cls + ' cs-mono" style="--b:' + esc(b[1] || "#5D5C63") + '" aria-hidden="true">' + esc((company || "?").charAt(0).toUpperCase()) + "</span>";
     };
-    var BOOKMARK = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>';
+    var BOOKMARK = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 18.212V8.23515C4.5 5.53157 4.5 4.17979 5.32376 3.33989C6.14752 2.5 7.47335 2.5 10.125 2.5H13.875C16.5267 2.5 17.8525 2.5 18.6762 3.33989C19.5 4.17979 19.5 5.53158 19.5 8.23515V18.212C19.5 20.1274 19.5 21.0852 18.8987 21.4076C18.2975 21.7301 17.5234 21.1875 15.9753 20.1024L14.1245 18.805C13.0964 18.0843 12.5824 17.724 12 17.724C11.4176 17.724 10.9036 18.0843 9.87552 18.805L8.02469 20.1024C6.47657 21.1875 5.70252 21.7301 5.10126 21.4076C4.5 21.0852 4.5 20.1274 4.5 18.212Z"/></svg>';
     var host = function (url) { return String(url || "").split("://").pop().split("/")[0].replace(/^www\./, ""); };
     var caseCard = function (c, data) {
       var nums = (c.needs || []).map(function (id) { return needNum(data, id); }).filter(Boolean);
