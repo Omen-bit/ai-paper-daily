@@ -6,7 +6,7 @@
 
 <h1>AI Papers Daily</h1>
 
-<p><strong>Papers worth building on.</strong><br>
+<p><strong>Papers worth building on !</strong><br>
 The best new AI paper each day, plus the one everyone is reading,<br>explained so you can build with it.</p>
 
 <p>

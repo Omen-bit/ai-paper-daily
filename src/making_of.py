@@ -29,8 +29,8 @@ CARD_TEXT = ("How every part of this site works, from the 07:00 morning job to t
 MEDIA = "../assets/making-of/"  # from case-studies/ to the copied site_assets/making-of/
 VIDEOS = ("morning", "judge", "curator", "ask", "scout")
 IMAGES = ("today", "paper", "abstract", "ask", "papers", "labs", "scout", "trends", "cases", "phone")
-ARROW = ('<svg class="ar" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" '
-         'fill="none" stroke="currentColor" stroke-width="1.6"/></svg>')
+ARROW = ('<svg class="ar" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+         '<path d="M18.5 12L4.99997 12"/><path d="M13 18C13 18 19 13.5811 19 12C19 10.4188 13 6 13 6"/></svg>')
 N = {"fig": 0}
 
 
