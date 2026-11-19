@@ -84,6 +84,46 @@
   "date": "2026-11-14",
   "proposed": 2
  },
+ "2611.08977": {
+  "claims": [
+   {
+    "benchmark": "Sudoku-Extreme",
+    "metric": "accuracy",
+    "quote": "achieving 99.9% accuracy on Sudoku-Extreme while using 345times less inference compute than the next-best model",
+    "result": "99.9%",
+    "task": "reasoning"
+   }
+  ],
+  "date": "2026-11-19",
+  "proposed": 1
+ },
+ "2611.09825": {
+  "claims": [
+   {
+    "benchmark": "BF16 KV accuracy",
+    "metric": "points",
+    "quote": "stays within 0.5 points of BF16 KV accuracy with NVFP4",
+    "result": "0.5",
+    "task": "accuracy"
+   },
+   {
+    "benchmark": "BF16 KV accuracy",
+    "metric": "points",
+    "quote": "(1 point with MXFP4)",
+    "result": "1",
+    "task": "accuracy"
+   },
+   {
+    "benchmark": "peak serving throughput",
+    "metric": "times higher",
+    "quote": "delivers 2.4-3.0times higher peak serving throughput than BF16 KV",
+    "result": "2.4-3.0",
+    "task": "throughput"
+   }
+  ],
+  "date": "2026-11-19",
+  "proposed": 3
+ },
  "2611.10649": {
   "claims": [
    {
@@ -123,6 +163,26 @@
   ],
   "date": "2026-11-13",
   "proposed": 1
+ },
+ "2611.11657": {
+  "claims": [
+   {
+    "benchmark": "S&P 500 fund SPY",
+    "metric": "return",
+    "quote": "From March 11 to August 28, 2026, the account returned 34.5%, compared with 14.4% for the S&P 500 fund SPY over the same dates.",
+    "result": "34.5%",
+    "task": "portfolio performance"
+   },
+   {
+    "benchmark": "S&P 500 fund SPY",
+    "metric": "return",
+    "quote": "From March 11 to August 28, 2026, the account returned 34.5%, compared with 14.4% for the S&P 500 fund SPY over the same dates.",
+    "result": "14.4%",
+    "task": "portfolio performance"
+   }
+  ],
+  "date": "2026-11-19",
+  "proposed": 2
  },
  "2611.12177": {
   "claims": [
@@ -330,6 +390,26 @@
   "date": "2026-11-17",
   "proposed": 0
  },
+ "2611.16694": {
+  "claims": [
+   {
+    "benchmark": "evidence-grounded decisions in medicine, science, and law",
+    "metric": "accuracy",
+    "quote": "accuracy falls by up to 16.1 points.",
+    "result": "up to 16.1 points",
+    "task": "binary decision revision"
+   },
+   {
+    "benchmark": "evidence-grounded decisions in medicine, science, and law",
+    "metric": "accuracy",
+    "quote": "its effect on accuracy ranges from a 5.2-point loss to a 2.4-point gain",
+    "result": "5.2-point loss to 2.4-point gain",
+    "task": "binary decision revision"
+   }
+  ],
+  "date": "2026-11-19",
+  "proposed": 2
+ },
  "2611.16728": {
   "claims": [
    {
@@ -449,6 +529,11 @@
   "date": "2026-11-16",
   "proposed": 0
  },
+ "2611.17610": {
+  "claims": [],
+  "date": "2026-11-19",
+  "proposed": 0
+ },
  "2611.17811": {
   "claims": [],
   "date": "2026-11-18",
@@ -522,6 +607,47 @@
   "date": "2026-11-18",
   "proposed": 3
  },
+ "2611.18330": {
+  "claims": [
+   {
+    "benchmark": "private conversational test sets",
+    "metric": "AUROC",
+    "quote": "On private conversational test sets, decoder AUROC is 0.80-0.92",
+    "result": "0.80-0.92",
+    "task": "decoder"
+   },
+   {
+    "benchmark": "public read speech",
+    "metric": "AUROC",
+    "quote": "on public read speech it is 0.92-0.97",
+    "result": "0.92-0.97",
+    "task": "decoder"
+   },
+   {
+    "benchmark": "four-way accuracy",
+    "metric": "accuracy",
+    "quote": "Speech Commands four-way accuracy is 0.93",
+    "result": "0.93",
+    "task": "Speech Commands"
+   },
+   {
+    "benchmark": "synthetic Brazilian Portuguese speech",
+    "metric": "item-level F1",
+    "quote": "reaches item-level F1 0.904 on synthetic Brazilian Portuguese speech",
+    "result": "0.904",
+    "task": "Personal-information detection"
+   },
+   {
+    "benchmark": "reference transcripts",
+    "metric": "item-level F1",
+    "quote": "(1.000 on reference transcripts)",
+    "result": "1.000",
+    "task": "Personal-information detection"
+   }
+  ],
+  "date": "2026-11-19",
+  "proposed": 6
+ },
  "2611.18429": {
   "claims": [
    {
@@ -553,5 +679,59 @@
   "claims": [],
   "date": "2026-11-18",
   "proposed": 0
+ },
+ "2611.21072": {
+  "claims": [
+   {
+    "benchmark": "OfficeQA Pro",
+    "metric": "score",
+    "quote": "it ranks first on OfficeQA Pro (72.2)",
+    "result": "72.2",
+    "task": "ranking"
+   },
+   {
+    "benchmark": "MLE-bench Lite",
+    "metric": "HumanRank",
+    "quote": "MLE-bench Lite (90.3 HumanRank)",
+    "result": "90.3",
+    "task": "ranking"
+   },
+   {
+    "benchmark": "OSWorld-Verified",
+    "metric": "score",
+    "quote": "second on OSWorld-Verified (85.2)",
+    "result": "85.2",
+    "task": "ranking"
+   },
+   {
+    "benchmark": "WebArena-Verified",
+    "metric": "score",
+    "quote": "WebArena-Verified (67.6)",
+    "result": "67.6",
+    "task": "ranking"
+   },
+   {
+    "benchmark": "DeepResearch Bench~II",
+    "metric": "score",
+    "quote": "DeepResearch Bench~II (54.2)",
+    "result": "54.2",
+    "task": "ranking"
+   }
+  ],
+  "date": "2026-11-19",
+  "proposed": 5
+ },
+ "2611.21605": {
+  "claims": [
+   {
+    "benchmark": "ViRA-Bench",
+    "metric": "set accuracy",
+    "quote": "CrossRPO achieves 63.3% set accuracy on ViRA-Bench at the maximum resolution, against 59.3% for GRPO.",
+    "result": "63.3%",
+    "task": "set accuracy"
+   }
+  ],
+  "date": "2026-11-19",
+  "proposed": 1
  }
 }
