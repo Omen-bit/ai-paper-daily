@@ -366,6 +366,8 @@ Without the export, the site still builds, but Trends is hidden because the site
 
 Released under the [MIT License](LICENSE).
 
+Icons are from the [Hugeicons](https://hugeicons.com) free set (MIT). Fonts are self-hosted copies of DM Sans, Inter, Geist and Geist Mono (SIL Open Font License 1.1).
+
 <div align="center">
 <br>
 <sub>Data from <a href="https://arxiv.org">arXiv</a> and <a href="https://huggingface.co/papers">Hugging Face</a>. Thank you to arXiv for use of its open access interoperability.</sub>

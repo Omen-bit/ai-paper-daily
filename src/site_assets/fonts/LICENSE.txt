@@ -1,4 +1,6 @@
 Fonts in this folder are copies of:
+- DM Sans by Colophon Foundry (headlines and labels)
+- Inter by Rasmus Andersson (reading text)
 - Geist, Geist Mono and Geist Pixel (Square) by Vercel
 - Newsreader by Production Type (no longer used by the pages)
 All are licensed under the SIL Open Font License 1.1: https://openfontlicense.org
