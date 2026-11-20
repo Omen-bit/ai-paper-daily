@@ -364,6 +364,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Brunel University of London": {
+  "checked": "2026-11-20",
+  "file": "brunel-university-of-london.png",
+  "qid": "Q932411",
+  "source": "website https://www.brunel.ac.uk",
+  "v": 6
+ },
  "ByteDance": {
   "checked": "2026-11-07",
   "file": "bytedance.png",
@@ -442,6 +449,13 @@
   "file": "centre-national-de-la-recherche-scientifique.png",
   "qid": "Q280413",
   "source": "website https://www.cnrs.fr",
+  "v": 6
+ },
+ "Centre de Recerca Matemàtica": {
+  "checked": "2026-11-20",
+  "file": "centre-de-recerca-matem-tica.png",
+  "qid": "Q2757630",
+  "source": "website https://www.crm.cat/",
   "v": 6
  },
  "Centre de Recherche en Informatique, Signal et Automatique de Lille": {
@@ -1100,6 +1114,13 @@
   "qid": "Q3101701",
   "v": 6
  },
+ "Honda Research Institute, USA": {
+  "checked": "2026-11-20",
+  "file": "honda-research-institute-usa.png",
+  "qid": "",
+  "source": "website https://usa.honda-ri.com",
+  "v": 6
+ },
  "Hong Kong Baptist University": {
   "checked": "2026-11-12",
   "file": "hong-kong-baptist-university.png",
@@ -1287,6 +1308,13 @@
   "qid": "Q3105568",
   "v": 6
  },
+ "Indiana University Bloomington": {
+  "checked": "2026-11-20",
+  "file": "indiana-university-bloomington.png",
+  "qid": "Q1079140",
+  "source": "website https://bloomington.iu.edu",
+  "v": 6
+ },
  "Industrial Systems Institute": {},
  "InfiX.ai": {
   "checked": "2026-11-07",
@@ -1301,6 +1329,11 @@
   "file": "institut-polytechnique-de-paris.png",
   "qid": "Q48759778",
   "source": "website https://www.ip-paris.fr",
+  "v": 6
+ },
+ "Institut national de recherche en sciences et technologies du numérique": {
+  "checked": "2026-11-20",
+  "qid": "Q1146208",
   "v": 6
  },
  "Institute for Computer Science, Artificial intelligence and Technology": {
@@ -1707,6 +1740,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Manifestro": {
+  "checked": "2026-11-20",
+  "file": "manifestro.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Mathis Group @ EPFL": {
   "checked": "2026-11-05",
   "file": "mathis-group-epfl.png",
@@ -1732,6 +1772,13 @@
   "qid": "Q15907772",
   "source": "Hugging Face",
   "v": 4
+ },
+ "Meshy": {
+  "checked": "2026-11-20",
+  "file": "meshy.png",
+  "qid": "",
+  "source": "Lobe Icons",
+  "v": 6
  },
  "Meta": {
   "checked": "2026-11-07",
@@ -2012,6 +2059,13 @@
   "qid": "Q837164",
   "v": 6
  },
+ "Nex AGI": {
+  "checked": "2026-11-20",
+  "file": "nex-agi.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "North Carolina State University": {
   "checked": "2026-11-14",
   "qid": "Q1132346",
@@ -2043,6 +2097,13 @@
   "file": "northwestern-university-in-qatar.png",
   "qid": "Q890759",
   "source": "website https://www.qatar.northwestern.edu",
+  "v": 6
+ },
+ "Norwegian Defence Research Establishment": {
+  "checked": "2026-11-20",
+  "file": "norwegian-defence-research-establishment.png",
+  "qid": "Q1770047",
+  "source": "website https://www.ffi.no",
   "v": 6
  },
  "Norwegian University of Science and Technology": {
@@ -2740,6 +2801,13 @@
   "source": "website https://www.tuwien.at",
   "v": 6
  },
+ "TabBioMed": {
+  "checked": "2026-11-20",
+  "file": "tabbiomed.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Taiyuan University of Technology": {
   "checked": "2026-11-12",
   "file": "taiyuan-university-of-technology.png",
@@ -3042,6 +3110,11 @@
   "source": "website https://www.uam.es",
   "v": 6
  },
+ "Universidad Rey Juan Carlos": {
+  "checked": "2026-11-20",
+  "qid": "Q2000629",
+  "v": 6
+ },
  "Universidad de Zaragoza": {
   "checked": "2026-11-07",
   "file": "universidad-de-zaragoza.png",
@@ -3054,6 +3127,11 @@
   "file": "universidade-federal-rural-de-pernambuco.png",
   "qid": "Q7894368",
   "source": "website https://www.ufrpe.br",
+  "v": 6
+ },
+ "Universidade de São Paulo": {
+  "checked": "2026-11-20",
+  "qid": "Q835960",
   "v": 6
  },
  "Universitat Autònoma de Barcelona": {
@@ -3348,6 +3426,13 @@
   "qid": "Q59668",
   "v": 6
  },
+ "University of Lübeck": {
+  "checked": "2026-11-20",
+  "file": "university-of-l-beck.png",
+  "qid": "Q317087",
+  "source": "website https://www.uni-luebeck.de/",
+  "v": 6
+ },
  "University of Manchester": {
   "checked": "2026-11-12",
   "qid": "Q230899",
@@ -3418,9 +3503,23 @@
   "qid": "Q860527",
   "v": 6
  },
+ "University of Notre Dame": {
+  "checked": "2026-11-20",
+  "file": "university-of-notre-dame.png",
+  "qid": "Q178848",
+  "source": "website https://www.nd.edu/",
+  "v": 6
+ },
  "University of Nottingham": {
   "checked": "2026-11-19",
   "qid": "Q472316",
+  "v": 6
+ },
+ "University of Oulu": {
+  "checked": "2026-11-20",
+  "file": "university-of-oulu.png",
+  "qid": "Q1357517",
+  "source": "website https://www.oulu.fi",
   "v": 6
  },
  "University of Pennsylvania": {
@@ -3428,6 +3527,11 @@
   "file": "university-of-pennsylvania.png",
   "qid": "Q49117",
   "source": "website https://www.upenn.edu",
+  "v": 6
+ },
+ "University of Pisa": {
+  "checked": "2026-11-20",
+  "qid": "Q645663",
   "v": 6
  },
  "University of Qom": {
@@ -3544,6 +3648,7 @@
   "qid": "Q2531629",
   "v": 6
  },
+ "University of Virginia": {},
  "University of Washington": {
   "checked": "2026-11-07",
   "file": "university-of-washington.png",
@@ -3699,6 +3804,13 @@
   "source": "website https://www.vub.be/",
   "v": 6
  },
+ "Wake Forest University Health Sciences": {
+  "checked": "2026-11-20",
+  "file": "wake-forest-university-health-sciences.png",
+  "qid": "Q131346559",
+  "source": "website https://school.wakehealth.edu",
+  "v": 6
+ },
  "Warsaw University of Life Sciences": {
   "checked": "2026-11-19",
   "file": "warsaw-university-of-life-sciences.png",
@@ -3739,6 +3851,13 @@
   "file": "worcester-polytechnic-institute.png",
   "qid": "Q195046",
   "source": "website https://www.wpi.edu",
+  "v": 6
+ },
+ "World Snapshot": {
+  "checked": "2026-11-20",
+  "file": "world-snapshot.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Writer": {
@@ -3876,6 +3995,13 @@
  "agentic learning ai lab": {
   "checked": "2026-11-12",
   "file": "agentic-learning-ai-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "agentscope-ai": {
+  "checked": "2026-11-20",
+  "file": "agentscope-ai.png",
   "qid": "",
   "source": "Hugging Face",
   "v": 6

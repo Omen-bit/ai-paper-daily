@@ -84,6 +84,26 @@
   "date": "2026-11-14",
   "proposed": 2
  },
+ "2611.08922": {
+  "claims": [
+   {
+    "benchmark": "abdominal CT volumes, CT radiology reports and laboratory measurements",
+    "metric": "number of predictive concepts",
+    "quote": "We identified 397 predictive concepts supported by 4,463 Bonferroni-significant associations.",
+    "result": "397",
+    "task": "predictive concept identification"
+   },
+   {
+    "benchmark": "abdominal CT volumes, CT radiology reports and laboratory measurements",
+    "metric": "number of Bonferroni-significant associations",
+    "quote": "We identified 397 predictive concepts supported by 4,463 Bonferroni-significant associations.",
+    "result": "4,463",
+    "task": "association discovery"
+   }
+  ],
+  "date": "2026-11-20",
+  "proposed": 3
+ },
  "2611.08977": {
   "claims": [
    {
@@ -534,6 +554,11 @@
   "date": "2026-11-19",
   "proposed": 0
  },
+ "2611.17621": {
+  "claims": [],
+  "date": "2026-11-20",
+  "proposed": 0
+ },
  "2611.17811": {
   "claims": [],
   "date": "2026-11-18",
@@ -680,6 +705,19 @@
   "date": "2026-11-18",
   "proposed": 0
  },
+ "2611.18856": {
+  "claims": [
+   {
+    "benchmark": "coding",
+    "metric": "final scores",
+    "quote": "Across ten independent source runs in coding, paired continuations with SIM improve final scores by an average of 2.36 points over harness-only continuation (p=0.003).",
+    "result": "2.36 points",
+    "task": "coding"
+   }
+  ],
+  "date": "2026-11-20",
+  "proposed": 1
+ },
  "2611.21072": {
   "claims": [
    {
@@ -733,5 +771,45 @@
   ],
   "date": "2026-11-19",
   "proposed": 1
+ },
+ "2611.22115": {
+  "claims": [],
+  "date": "2026-11-20",
+  "proposed": 0
+ },
+ "2611.22563": {
+  "claims": [],
+  "date": "2026-11-20",
+  "proposed": 0
+ },
+ "2611.22565": {
+  "claims": [],
+  "date": "2026-11-20",
+  "proposed": 0
+ },
+ "2611.23144": {
+  "claims": [],
+  "date": "2026-11-20",
+  "proposed": 0
+ },
+ "2611.23226": {
+  "claims": [
+   {
+    "benchmark": "single B200 GPU",
+    "metric": "ms per frame",
+    "quote": "Our 1.3B variant runs at 36 ms per frame, or 28 responses per second (RPS), on a single B200 GPU while matching the generation quality of a state-of-the-art model that is nearly 8x slower.",
+    "result": "36 ms per frame",
+    "task": "inference latency"
+   },
+   {
+    "benchmark": "8x B200 GPU node",
+    "metric": "ms per frame",
+    "quote": "Our 14B variant runs at 45 ms per frame, or 22 RPS, on an 8x B200 GPU node and yields significantly better visual quality and realism.",
+    "result": "45 ms per frame",
+    "task": "inference latency"
+   }
+  ],
+  "date": "2026-11-20",
+  "proposed": 2
  }
 }
