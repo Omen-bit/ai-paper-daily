@@ -173,6 +173,13 @@
   "source": "website https://www.aus.edu",
   "v": 6
  },
+ "Ankara University": {
+  "checked": "2026-11-21",
+  "file": "ankara-university.png",
+  "qid": "Q1060621",
+  "source": "website https://ankara.edu.tr",
+  "v": 6
+ },
  "Ant Group": {
   "checked": "2026-11-07",
   "file": "ant-group.png",
@@ -239,6 +246,13 @@
  "AutoLab": {
   "checked": "2026-11-10",
   "file": "autolab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "BE2R Lab": {
+  "checked": "2026-11-21",
+  "file": "be2r-lab.png",
   "qid": "",
   "source": "Hugging Face",
   "v": 6
@@ -343,6 +357,11 @@
   "file": "bineric-ai.png",
   "qid": "",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Boğaziçi University": {
+  "checked": "2026-11-21",
+  "qid": "Q896267",
   "v": 6
  },
  "Bread Studio": {
@@ -592,6 +611,13 @@
   "source": "website https://www.cuny.edu/",
   "v": 6
  },
+ "Clemson University School of Computing": {
+  "checked": "2026-11-21",
+  "file": "clemson-university-school-of-computing.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "CodeFuse AI": {
   "checked": "2026-11-05",
   "file": "codefuse-ai.png",
@@ -613,6 +639,13 @@
   "file": "commissariat-l-nergie-atomique-et-aux-nergies-alternatives.png",
   "qid": "Q868550",
   "source": "website https://www.cea.fr",
+  "v": 6
+ },
+ "Concordia University": {
+  "checked": "2026-11-21",
+  "file": "concordia-university.png",
+  "qid": "Q5159001",
+  "source": "website https://www.csp.edu/",
   "v": 6
  },
  "Copenhagen University Hospital": {
@@ -1076,6 +1109,13 @@
   "source": "website https://www.hit.edu.cn",
   "v": 6
  },
+ "Harokopio University of Athens": {
+  "checked": "2026-11-21",
+  "file": "harokopio-university-of-athens.png",
+  "qid": "Q1067642",
+  "source": "website https://www.hua.gr",
+  "v": 6
+ },
  "Harvard": {
   "checked": "2026-11-07",
   "file": "harvard.png",
@@ -1128,6 +1168,7 @@
   "source": "website https://www.hkbu.edu.hk",
   "v": 6
  },
+ "Hong Kong Metropolitan University": {},
  "Hong Kong Polytechnic University": {
   "checked": "2026-11-07",
   "file": "hong-kong-polytechnic-university.png",
@@ -1276,6 +1317,13 @@
   "source": "website https://www.iiserb.ac.in",
   "v": 6
  },
+ "Indian Institute of Technology Delhi": {
+  "checked": "2026-11-21",
+  "file": "indian-institute-of-technology-delhi.png",
+  "qid": "Q1194650",
+  "source": "website https://home.iitd.ac.in",
+  "v": 6
+ },
  "Indian Institute of Technology Guwahati": {
   "checked": "2026-11-12",
   "file": "indian-institute-of-technology-guwahati.png",
@@ -1324,6 +1372,13 @@
   "v": 4
  },
  "Inje University": {},
+ "Institut Clément Ader": {
+  "checked": "2026-11-21",
+  "file": "institut-cl-ment-ader.png",
+  "qid": "Q30297078",
+  "source": "website https://ica.cnrs.fr",
+  "v": 6
+ },
  "Institut Polytechnique de Paris": {
   "checked": "2026-11-14",
   "file": "institut-polytechnique-de-paris.png",
@@ -1524,6 +1579,11 @@
   "source": "website https://www.keio.ac.jp",
   "v": 6
  },
+ "Keio University Global Research Institute": {
+  "checked": "2026-11-21",
+  "qid": "",
+  "v": 6
+ },
  "Kimia Therapeutics": {
   "checked": "2026-11-12",
   "file": "kimia-therapeutics.png",
@@ -1565,6 +1625,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "KlingAI Research": {
+  "checked": "2026-11-21",
+  "file": "klingai-research.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Knovel Engineering": {
   "checked": "2026-11-18",
   "file": "knovel-engineering.png",
@@ -1589,6 +1656,13 @@
   "file": "kyoto-university.png",
   "qid": "Q336264",
   "source": "website http://www.kyoto-u.ac.jp/en",
+  "v": 6
+ },
+ "Kyutai": {
+  "checked": "2026-11-21",
+  "file": "kyutai.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "LG AI Research": {
@@ -1625,6 +1699,13 @@
   "v": 6
  },
  "Lanzhou University": {},
+ "Lawful Computing Lab": {
+  "checked": "2026-11-21",
+  "file": "lawful-computing-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Lawrence Berkeley National Laboratory": {
   "checked": "2026-11-12",
   "file": "lawrence-berkeley-national-laboratory.png",
@@ -1658,6 +1739,13 @@
   "file": "lila-sciences.png",
   "qid": "",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "London Institute for Mathematical Sciences": {
+  "checked": "2026-11-21",
+  "file": "london-institute-for-mathematical-sciences.png",
+  "qid": "Q30290373",
+  "source": "website https://lims.ac.uk",
   "v": 6
  },
  "Lufthansa": {
@@ -1740,11 +1828,23 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Maincode": {
+  "checked": "2026-11-21",
+  "file": "maincode.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Manifestro": {
   "checked": "2026-11-20",
   "file": "manifestro.png",
   "qid": "",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Marquette University": {
+  "checked": "2026-11-21",
+  "qid": "Q188370",
   "v": 6
  },
  "Mathis Group @ EPFL": {
@@ -1764,6 +1864,11 @@
  "McGill University": {
   "checked": "2026-11-07",
   "qid": "Q201492",
+  "v": 6
+ },
+ "McMaster University": {
+  "checked": "2026-11-21",
+  "qid": "Q632891",
   "v": 6
  },
  "Meituan": {
@@ -1806,6 +1911,13 @@
   "file": "mila-quebec-artificial-intelligence-institute.png",
   "qid": "Q67182995",
   "source": "website https://mila.quebec",
+  "v": 6
+ },
+ "Mind2Act-World": {
+  "checked": "2026-11-21",
+  "file": "mind2act-world.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Mininglamp": {
@@ -1926,6 +2038,13 @@
   "qid": "Q1149777",
   "v": 6
  },
+ "Nanchang University": {
+  "checked": "2026-11-21",
+  "file": "nanchang-university.png",
+  "qid": "Q3497259",
+  "source": "website https://www.ncu.edu.cn",
+  "v": 6
+ },
  "Nanjing University": {
   "checked": "2026-11-06",
   "file": "nanjing-university.png",
@@ -1936,6 +2055,11 @@
  "Nanjing University of Aeronautics and Astronautics": {
   "checked": "2026-11-07",
   "qid": "Q23110",
+  "v": 6
+ },
+ "Nanjing University of Finance and Economics": {
+  "checked": "2026-11-21",
+  "qid": "Q13651860",
   "v": 6
  },
  "Nanjing University of Information Science and Technology": {
@@ -1960,6 +2084,7 @@
   "qid": "Q6964345",
   "v": 6
  },
+ "National Central University": {},
  "National Centre of Scientific Research \"Demokritos\"": {
   "checked": "2026-11-18",
   "file": "national-centre-of-scientific-research-demokritos.png",
@@ -2242,6 +2367,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Planet Labs PBC": {
+  "checked": "2026-11-21",
+  "file": "planet-labs-pbc.png",
+  "qid": "Q17085620",
+  "source": "website https://www.planet.com",
+  "v": 6
+ },
  "Pohang University of Science and Technology": {
   "checked": "2026-11-19",
   "file": "pohang-university-of-science-and-technology.png",
@@ -2254,6 +2386,11 @@
   "file": "politecnico-di-milano.png",
   "qid": "Q392904",
   "source": "website https://polimi.it",
+  "v": 6
+ },
+ "Polytechnique Montréal": {
+  "checked": "2026-11-21",
+  "qid": "Q273619",
   "v": 6
  },
  "Prince Mohammad bin Fahd University": {
@@ -2314,6 +2451,13 @@
  "QwenBusinessUnit-Edu": {
   "checked": "2026-11-18",
   "file": "qwenbusinessunit-edu.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "RUC-AIBOX": {
+  "checked": "2026-11-21",
+  "file": "ruc-aibox.png",
   "qid": "",
   "source": "Hugging Face",
   "v": 6
@@ -2754,6 +2898,13 @@
   "source": "Lobe Icons",
   "v": 6
  },
+ "StepFun AI": {
+  "checked": "2026-11-21",
+  "file": "stepfun-ai.png",
+  "qid": "Q137204546",
+  "source": "Lobe Icons",
+  "v": 6
+ },
  "Stevens Institute of Technology": {
   "checked": "2026-11-07",
   "file": "stevens-institute-of-technology.png",
@@ -3063,6 +3214,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Télécom Paris": {
+  "checked": "2026-11-21",
+  "file": "t-l-com-paris.png",
+  "qid": "Q2311820",
+  "source": "website https://www.telecom-paris.fr",
+  "v": 6
+ },
  "UC Berkeley": {
   "checked": "2026-11-05",
   "file": "uc-berkeley.png",
@@ -3127,6 +3285,13 @@
   "file": "universidade-federal-rural-de-pernambuco.png",
   "qid": "Q7894368",
   "source": "website https://www.ufrpe.br",
+  "v": 6
+ },
+ "Universidade Federal de São Carlos": {
+  "checked": "2026-11-21",
+  "file": "universidade-federal-de-s-o-carlos.png",
+  "qid": "Q5440482",
+  "source": "website https://www.ufscar.br",
   "v": 6
  },
  "Universidade de São Paulo": {
@@ -3378,6 +3543,13 @@
   "source": "website http://www.uni-goettingen.de/en/1.html",
   "v": 6
  },
+ "University of Haifa": {
+  "checked": "2026-11-21",
+  "file": "university-of-haifa.png",
+  "qid": "Q591115",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "University of Illinois Chicago": {},
  "University of Illinois Urbana-Champaign": {
   "checked": "2026-11-07",
@@ -3508,6 +3680,13 @@
   "file": "university-of-notre-dame.png",
   "qid": "Q178848",
   "source": "website https://www.nd.edu/",
+  "v": 6
+ },
+ "University of Notre Dame DM2 Lab": {
+  "checked": "2026-11-21",
+  "file": "university-of-notre-dame-dm2-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "University of Nottingham": {
@@ -3714,6 +3893,13 @@
  "Universität der Bundeswehr München": {
   "checked": "2026-11-14",
   "qid": "Q283099",
+  "v": 6
+ },
+ "Université Laval": {
+  "checked": "2026-11-21",
+  "file": "universit-laval.png",
+  "qid": "Q1067935",
+  "source": "website https://www.ulaval.ca",
   "v": 6
  },
  "Université Paris Sciences et Lettres": {
@@ -3966,11 +4152,25 @@
   "source": "website https://www.yonsei.ac.kr",
   "v": 6
  },
+ "York University": {
+  "checked": "2026-11-21",
+  "file": "york-university.png",
+  "qid": "Q8055402",
+  "source": "website https://york.edu",
+  "v": 6
+ },
  "ZHAW Zurich University of Applied Sciences": {
   "checked": "2026-11-14",
   "file": "zhaw-zurich-university-of-applied-sciences.png",
   "qid": "Q2605554",
   "source": "website https://www.zhaw.ch",
+  "v": 6
+ },
+ "ZYT AI Team": {
+  "checked": "2026-11-21",
+  "file": "zyt-ai-team.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Zhejiang Gongshang University": {
@@ -4020,6 +4220,13 @@
   "source": "Lobe Icons",
   "v": 6
  },
+ "ernie-research": {
+  "checked": "2026-11-21",
+  "file": "ernie-research.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "galbot": {
   "checked": "2026-11-18",
   "file": "galbot.png",
@@ -4033,6 +4240,13 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 3
+ },
+ "high-quality llm benchmarks": {
+  "checked": "2026-11-21",
+  "file": "high-quality-llm-benchmarks.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "logitly-ai": {
   "checked": "2026-11-11",

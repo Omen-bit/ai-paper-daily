@@ -355,6 +355,33 @@
   "date": "2026-11-14",
   "proposed": 0
  },
+ "2611.14848": {
+  "claims": [
+   {
+    "benchmark": "end-to-end latency",
+    "metric": "speedup",
+    "quote": "On average, TIDEWAY achieves speedups of 1.97x in end-to-end latency and 2.40x in Time-to-First-Token (TTFT), along with 1.61x higher decode throughput against the fastest baseline.",
+    "result": "1.97x",
+    "task": "Inference of large MoE models"
+   },
+   {
+    "benchmark": "Time-to-First-Token (TTFT)",
+    "metric": "speedup",
+    "quote": "On average, TIDEWAY achieves speedups of 1.97x in end-to-end latency and 2.40x in Time-to-First-Token (TTFT), along with 1.61x higher decode throughput against the fastest baseline.",
+    "result": "2.40x",
+    "task": "Inference of large MoE models"
+   },
+   {
+    "benchmark": "decode throughput",
+    "metric": "speedup",
+    "quote": "On average, TIDEWAY achieves speedups of 1.97x in end-to-end latency and 2.40x in Time-to-First-Token (TTFT), along with 1.61x higher decode throughput against the fastest baseline.",
+    "result": "1.61x",
+    "task": "Inference of large MoE models"
+   }
+  ],
+  "date": "2026-11-21",
+  "proposed": 3
+ },
  "2611.15094": {
   "claims": [],
   "date": "2026-11-17",
@@ -718,6 +745,33 @@
   "date": "2026-11-20",
   "proposed": 1
  },
+ "2611.21053": {
+  "claims": [
+   {
+    "benchmark": "requests to 157 biomedical tools",
+    "metric": "accuracy",
+    "quote": "On 1,952 requests to 157 biomedical tools, the best System 1 agent chose the right tool, or correctly declined, for 97.0% of requests, significantly ahead of all 18 local LLM-agent settings (best 95.2%).",
+    "result": "97.0%",
+    "task": "tool selection"
+   },
+   {
+    "benchmark": "6,056 stated argument values",
+    "metric": "completion rate",
+    "quote": "The System 1 agent filled 97.0% of 6,056 stated argument values.",
+    "result": "97.0%",
+    "task": "argument filling"
+   },
+   {
+    "benchmark": "LLM calls",
+    "metric": "invented content rate",
+    "quote": "No System 1 call contained invented content, against 5.5-19.7% of LLM calls.",
+    "result": "5.5-19.7%",
+    "task": "invented content detection"
+   }
+  ],
+  "date": "2026-11-21",
+  "proposed": 3
+ },
  "2611.21072": {
   "claims": [
    {
@@ -810,6 +864,110 @@
    }
   ],
   "date": "2026-11-20",
+  "proposed": 2
+ },
+ "2611.23236": {
+  "claims": [],
+  "date": "2026-11-21",
+  "proposed": 0
+ },
+ "2611.23257": {
+  "claims": [
+   {
+    "benchmark": "DeepStateBench",
+    "metric": "completion rate",
+    "quote": "a GUI agent seeded with synthesized checkpoints completes 10.4% of trials, compared with 0% without seeding under the same pixel action space, while StatePortal, which also delivers the target action through the hook, completes 27.5%",
+    "result": "10.4%",
+    "task": "GUI state completion"
+   },
+   {
+    "benchmark": "DeepStateBench",
+    "metric": "completion rate",
+    "quote": "a GUI agent seeded with synthesized checkpoints completes 10.4% of trials, compared with 0% without seeding under the same pixel action space, while StatePortal, which also delivers the target action through the hook, completes 27.5%",
+    "result": "27.5%",
+    "task": "GUI state completion"
+   },
+   {
+    "benchmark": "DeepStateBench",
+    "metric": "reproduction rate",
+    "quote": "Over 1,361 replays of 112 checkpoints, 98.90% reproduce the original verdict with zero model calls",
+    "result": "98.90%",
+    "task": "Reproduction of verdicts"
+   },
+   {
+    "benchmark": "DeepStateBench",
+    "metric": "fault detection rate",
+    "quote": "the hybrid oracle detects 96.25% (77/80) of controlled visual faults invisible to programmatic-state checks alone",
+    "result": "96.25%",
+    "task": "Controlled visual fault detection"
+   }
+  ],
+  "date": "2026-11-21",
+  "proposed": 4
+ },
+ "2611.23388": {
+  "claims": [
+   {
+    "benchmark": "W4A16",
+    "metric": "percentage points",
+    "quote": "Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search.",
+    "result": "0.9",
+    "task": "accuracy improvement"
+   },
+   {
+    "benchmark": "W4A8",
+    "metric": "percentage points",
+    "quote": "Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search.",
+    "result": "1.4",
+    "task": "accuracy improvement"
+   },
+   {
+    "benchmark": "W3A16",
+    "metric": "percentage points",
+    "quote": "Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search.",
+    "result": "2.2",
+    "task": "accuracy improvement"
+   },
+   {
+    "benchmark": "NVFP4 W4A4",
+    "metric": "percentage of FP8 accuracy",
+    "quote": "On the 320B-parameter MoE model GLM-5.3-Flash at NVFP4 W4A4, it recovers 98.3% of the FP8 model's accuracy, against 96.9% for the best vendor checkpoint.",
+    "result": "98.3%",
+    "task": "accuracy recovery"
+   }
+  ],
+  "date": "2026-11-21",
+  "proposed": 4
+ },
+ "2611.23779": {
+  "claims": [],
+  "date": "2026-11-21",
+  "proposed": 0
+ },
+ "2611.24408": {
+  "claims": [
+   {
+    "benchmark": "StrideWorld",
+    "metric": "offsets relative to rigid rendering",
+    "quote": "with offsets up to $7.3$ times those of a rigid rendering along the same camera path",
+    "result": "7.3",
+    "task": "scene rigidity"
+   }
+  ],
+  "date": "2026-11-21",
+  "proposed": 1
+ },
+ "2611.24738": {
+  "claims": [
+   {
+    "benchmark": "existing unified models",
+    "metric": "speedup factor",
+    "quote": "Experiments show that Jeveration generates a 512x512 image in 78 ms, up to 122x faster than existing unified models, while maintaining competitive image quality and dense prediction performance.",
+    "result": "122x",
+    "task": "speedup"
+   }
+  ],
+  "date": "2026-11-21",
   "proposed": 2
  }
 }
