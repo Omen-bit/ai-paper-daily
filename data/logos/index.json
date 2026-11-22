@@ -58,6 +58,13 @@
   "qid": "Q16057940",
   "v": 6
  },
+ "Abel AI": {
+  "checked": "2026-11-22",
+  "file": "abel-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Accio": {
   "checked": "2026-11-19",
   "file": "accio.png",
@@ -396,6 +403,13 @@
   "qid": "Q55606242",
   "source": "Lobe Icons",
   "v": 5
+ },
+ "COMSATS University Islamabad": {
+  "checked": "2026-11-22",
+  "file": "comsats-university-islamabad.png",
+  "qid": "Q5013372",
+  "source": "website https://www.comsats.edu.pk/",
+  "v": 6
  },
  "CUHK": {
   "checked": "2026-11-05",
@@ -880,11 +894,21 @@
   "source": "website https://www.futminna.edu.ng",
   "v": 6
  },
+ "Fields Institute for Research in Mathematical Sciences": {
+  "checked": "2026-11-22",
+  "qid": "Q544545",
+  "v": 6
+ },
  "Figma": {
   "checked": "2026-11-11",
   "file": "figma.png",
   "qid": "Q11859536",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Flanders Make": {
+  "checked": "2026-11-22",
+  "qid": "",
   "v": 6
  },
  "Florida International University": {
@@ -1094,6 +1118,13 @@
   "source": "website https://hanbat.ac.kr",
   "v": 6
  },
+ "Hangzhou Dianzi University": {
+  "checked": "2026-11-22",
+  "file": "hangzhou-dianzi-university.png",
+  "qid": "Q11102606",
+  "source": "website https://www.hdu.edu.cn",
+  "v": 6
+ },
  "Hanyang University": {},
  "Harbin Engineering University": {
   "checked": "2026-11-14",
@@ -1147,6 +1178,13 @@
   "file": "helmholtz-munich.png",
   "qid": "Q878592",
   "source": "website http://www.helmholtz-muenchen.de",
+  "v": 6
+ },
+ "Heriot-Watt University": {
+  "checked": "2026-11-22",
+  "file": "heriot-watt-university.png",
+  "qid": "Q1610024",
+  "source": "website https://www.hw.ac.uk/",
   "v": 6
  },
  "Ho Chi Minh City University of Technology": {
@@ -1983,6 +2021,7 @@
   "source": "website https://www.navercloudcorp.com",
   "v": 6
  },
+ "NEC": {},
  "NJU-LINK Lab": {
   "checked": "2026-11-05",
   "file": "nju-link-lab.png",
@@ -2856,6 +2895,13 @@
   "source": "website https://spbu.ru/",
   "v": 6
  },
+ "St. Jude Children's Research Hospital": {
+  "checked": "2026-11-22",
+  "file": "st-jude-children-s-research-hospital.png",
+  "qid": "Q1164246",
+  "source": "website https://www.stjude.org/",
+  "v": 6
+ },
  "Stable AI": {
   "checked": "2026-11-07",
   "file": "stable-ai.png",
@@ -3019,6 +3065,13 @@
  "Technische Universität Braunschweig": {
   "checked": "2026-11-07",
   "qid": "Q734324",
+  "v": 6
+ },
+ "Technische Universität Darmstadt": {
+  "checked": "2026-11-22",
+  "file": "technische-universit-t-darmstadt.png",
+  "qid": "Q310695",
+  "source": "website https://www.tu-darmstadt.de",
   "v": 6
  },
  "Tel Aviv University": {
@@ -3285,6 +3338,13 @@
   "file": "universidade-federal-rural-de-pernambuco.png",
   "qid": "Q7894368",
   "source": "website https://www.ufrpe.br",
+  "v": 6
+ },
+ "Universidade Federal de Santa Catarina": {
+  "checked": "2026-11-22",
+  "file": "universidade-federal-de-santa-catarina.png",
+  "qid": "Q1851075",
+  "source": "website http://en.ufsc.br/",
   "v": 6
  },
  "Universidade Federal de São Carlos": {
@@ -3971,6 +4031,13 @@
   "source": "website https://vnuhcm.edu.vn",
   "v": 6
  },
+ "Virginia Tech": {
+  "checked": "2026-11-22",
+  "file": "virginia-tech.png",
+  "qid": "Q65379",
+  "source": "website https://www.vt.edu",
+  "v": 6
+ },
  "Visa": {
   "checked": "2026-11-15",
   "qid": "",
@@ -4246,6 +4313,11 @@
   "file": "high-quality-llm-benchmarks.png",
   "qid": "",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "insitro, inc.": {
+  "checked": "2026-11-22",
+  "qid": "Q135398357",
   "v": 6
  },
  "logitly-ai": {

@@ -813,6 +813,26 @@
   "date": "2026-11-19",
   "proposed": 5
  },
+ "2611.21373": {
+  "claims": [
+   {
+    "benchmark": "in-domain, out-of-domain and agentic benchmarks",
+    "metric": "detection accuracy",
+    "quote": "WeVisForensics averages 95.2% detection accuracy across in-domain, out-of-domain and agentic benchmarks, 9.0% above the strongest prior detector, while grounding its verdicts in localized evidence.",
+    "result": "95.2%",
+    "task": "video forensic artifact detection"
+   },
+   {
+    "benchmark": "strongest prior detector",
+    "metric": "improvement over prior",
+    "quote": "WeVisForensics averages 95.2% detection accuracy across in-domain, out-of-domain and agentic benchmarks, 9.0% above the strongest prior detector, while grounding its verdicts in localized evidence.",
+    "result": "9.0%",
+    "task": "video forensic artifact detection"
+   }
+  ],
+  "date": "2026-11-22",
+  "proposed": 2
+ },
  "2611.21605": {
   "claims": [
    {
@@ -969,5 +989,63 @@
   ],
   "date": "2026-11-21",
   "proposed": 2
+ },
+ "2611.26409": {
+  "claims": [],
+  "date": "2026-11-22",
+  "proposed": 0
+ },
+ "2611.26414": {
+  "claims": [],
+  "date": "2026-11-22",
+  "proposed": 0
+ },
+ "2611.26444": {
+  "claims": [
+   {
+    "benchmark": "Mind2Act World",
+    "metric": "number of tasks",
+    "quote": "Mind2Act World, a diagnostic benchmark of 30 simulated manipulation tasks",
+    "result": "30",
+    "task": "dataset size"
+   },
+   {
+    "benchmark": "Mind2Act World",
+    "metric": "total configurations",
+    "quote": "yielding 180 configurations",
+    "result": "180",
+    "task": "dataset size"
+   }
+  ],
+  "date": "2026-11-22",
+  "proposed": 8
+ },
+ "2611.26510": {
+  "claims": [
+   {
+    "benchmark": "4B and 9B target models",
+    "metric": "mean performance over Vanilla SFT on successful unguided teacher trajectories",
+    "quote": "Across Terminal, Search, and software engineering tasks with 4B and 9B target models, AutoMaster improves mean performance over Vanilla SFT on successful unguided teacher trajectories by 1.42-8.99 percentage points",
+    "result": "1.42-8.99 percentage points",
+    "task": "Terminal, Search, and software engineering tasks"
+   }
+  ],
+  "date": "2026-11-22",
+  "proposed": 1
+ },
+ "2611.26511": {
+  "claims": [],
+  "date": "2026-11-22",
+  "proposed": 0
+ },
+ "2611.26603": {
+  "claims": [],
+  "date": "2026-11-22",
+  "proposed": 0
+ },
+ "2611.26629": {
+  "claims": [],
+  "date": "2026-11-22",
+  "proposed": 0
  }
 }
