@@ -990,6 +990,24 @@
   "date": "2026-11-21",
   "proposed": 2
  },
+ "2611.25279": {
+  "claims": [
+   {
+    "benchmark": "mean F-score at 5 cm",
+    "metric": "F-score",
+    "quote": "Accord achieves consistently best/second-best mean F-score at 5 cm on every platform.",
+    "result": "5 cm",
+    "task": "dense metric mapping"
+   }
+  ],
+  "date": "2026-11-23",
+  "proposed": 1
+ },
+ "2611.26107": {
+  "claims": [],
+  "date": "2026-11-23",
+  "proposed": 0
+ },
  "2611.26409": {
   "claims": [],
   "date": "2026-11-22",
@@ -1036,6 +1054,11 @@
  "2611.26511": {
   "claims": [],
   "date": "2026-11-22",
+  "proposed": 0
+ },
+ "2611.26595": {
+  "claims": [],
+  "date": "2026-11-23",
   "proposed": 0
  },
  "2611.26603": {

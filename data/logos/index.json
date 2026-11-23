@@ -2021,7 +2021,11 @@
   "source": "website https://www.navercloudcorp.com",
   "v": 6
  },
- "NEC": {},
+ "NEC": {
+  "checked": "2026-11-23",
+  "qid": "Q14705363",
+  "v": 6
+ },
  "NJU-LINK Lab": {
   "checked": "2026-11-05",
   "file": "nju-link-lab.png",
@@ -3933,6 +3937,13 @@
   "file": "university-of-zurich.png",
   "qid": "Q206702",
   "source": "website https://uzh.ch/de.html",
+  "v": 6
+ },
+ "UniversityofIllinoisUrbanaChampaign": {
+  "checked": "2026-11-23",
+  "file": "universityofillinoisurbanachampaign.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Università della Svizzera italiana": {},
