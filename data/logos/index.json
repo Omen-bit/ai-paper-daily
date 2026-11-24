@@ -165,6 +165,13 @@
   "source": "Lobe Icons",
   "v": 5
  },
+ "Alibaba multimodal & industrial AI": {
+  "checked": "2026-11-24",
+  "file": "alibaba-multimodal-industrial-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Aligarh Muslim University": {},
  "Amazon": {
   "checked": "2026-11-07",
@@ -404,6 +411,13 @@
   "source": "Lobe Icons",
   "v": 5
  },
+ "CIPLAB": {
+  "checked": "2026-11-24",
+  "file": "ciplab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "COMSATS University Islamabad": {
   "checked": "2026-11-22",
   "file": "comsats-university-islamabad.png",
@@ -548,6 +562,13 @@
   "qid": "Q5091337",
   "v": 6
  },
+ "Chenyan Xiong Research Group at CMU": {
+  "checked": "2026-11-24",
+  "file": "chenyan-xiong-research-group-at-cmu.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "China People's Public Security University": {},
  "China Telecom": {
   "checked": "2026-11-12",
@@ -653,6 +674,13 @@
   "file": "commissariat-l-nergie-atomique-et-aux-nergies-alternatives.png",
   "qid": "Q868550",
   "source": "website https://www.cea.fr",
+  "v": 6
+ },
+ "Computer Incident Response Center Luxembourg": {
+  "checked": "2026-11-24",
+  "file": "computer-incident-response-center-luxembourg.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Concordia University": {
@@ -790,6 +818,13 @@
   "file": "deutsches-zentrum-f-r-luft-und-raumfahrt-e-v.png",
   "qid": "Q157332",
   "source": "website https://www.dlr.de/EN/Home/home_node.html",
+  "v": 6
+ },
+ "Diffuspace": {
+  "checked": "2026-11-24",
+  "file": "diffuspace.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Duke University": {
@@ -1059,9 +1094,23 @@
   "source": "Lobe Icons",
   "v": 5
  },
+ "Google DeepMind": {
+  "checked": "2026-11-24",
+  "file": "google-deepmind.png",
+  "qid": "Q15733006",
+  "source": "Lobe Icons",
+  "v": 6
+ },
  "Graz University of Technology": {
   "checked": "2026-11-12",
   "qid": "Q689775",
+  "v": 6
+ },
+ "Grid Robotics": {
+  "checked": "2026-11-24",
+  "file": "grid-robotics.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Guangdong University of Technology": {
@@ -3271,6 +3320,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Tsinghua-LeapLab": {
+  "checked": "2026-11-24",
+  "file": "tsinghua-leaplab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Télécom Paris": {
   "checked": "2026-11-21",
   "file": "t-l-com-paris.png",
@@ -3383,6 +3439,13 @@
   "qid": "Q2456800",
   "source": "Hugging Face",
   "v": 3
+ },
+ "University at Buffalo": {
+  "checked": "2026-11-24",
+  "file": "university-at-buffalo.png",
+  "qid": "Q681025",
+  "source": "Hugging Face",
+  "v": 6
  },
  "University for Development Studies": {
   "checked": "2026-11-07",
@@ -3978,6 +4041,11 @@
   "qid": "Q1163431",
   "v": 6
  },
+ "Université Paris-Saclay": {
+  "checked": "2026-11-24",
+  "qid": "Q109409389",
+  "v": 6
+ },
  "Université d'Orléans": {
   "checked": "2026-11-18",
   "qid": "Q13334",
@@ -4371,6 +4439,13 @@
   "file": "xai.png",
   "qid": "",
   "source": "Lobe Icons",
+  "v": 6
+ },
+ "xpeng-robotics": {
+  "checked": "2026-11-24",
+  "file": "xpeng-robotics.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "École Normale Supérieure - PSL": {

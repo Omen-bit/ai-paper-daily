@@ -1003,10 +1003,49 @@
   "date": "2026-11-23",
   "proposed": 1
  },
+ "2611.25604": {
+  "claims": [
+   {
+    "benchmark": "NavTest",
+    "metric": "EPDMS",
+    "quote": "On DiffusionDrive, PAD improves EPDMS over real-only training by 3.5 points on NavTest",
+    "result": "3.5 points",
+    "task": "autonomous driving"
+   }
+  ],
+  "date": "2026-11-24",
+  "proposed": 2
+ },
  "2611.26107": {
   "claims": [],
   "date": "2026-11-23",
   "proposed": 0
+ },
+ "2611.26248": {
+  "claims": [
+   {
+    "benchmark": "TwinLab-Bench",
+    "metric": "score",
+    "quote": "the strongest, Claude Fable 5.2, averages a score of only 45.0",
+    "result": "45.0",
+    "task": ""
+   }
+  ],
+  "date": "2026-11-24",
+  "proposed": 1
+ },
+ "2611.26268": {
+  "claims": [
+   {
+    "benchmark": "RULER",
+    "metric": "mean RULER score",
+    "quote": "mean RULER score from 74.42 to 75.28",
+    "result": "75.28",
+    "task": "generation"
+   }
+  ],
+  "date": "2026-11-24",
+  "proposed": 1
  },
  "2611.26409": {
   "claims": [],
@@ -1056,6 +1095,40 @@
   "date": "2026-11-22",
   "proposed": 0
  },
+ "2611.26540": {
+  "claims": [
+   {
+    "benchmark": "576p video",
+    "metric": "fps",
+    "quote": "AURA 1.3B streams 576p video in real time on a single GPU (20.7 fps for a 16 Hz playback rate)",
+    "result": "20.7",
+    "task": "video generation"
+   },
+   {
+    "benchmark": "720p video",
+    "metric": "fps",
+    "quote": "AURA 5B streams 720p video at 9.7 fps",
+    "result": "9.7",
+    "task": "video generation"
+   },
+   {
+    "benchmark": "its own bidirectional teacher",
+    "metric": "speedup",
+    "quote": "AURA 1.3B runs 23x faster than its own bidirectional teacher",
+    "result": "23x",
+    "task": "speed comparison"
+   },
+   {
+    "benchmark": "TalkVerse teacher at 720p",
+    "metric": "speedup",
+    "quote": "AURA 5B matches its TalkVerse teacher at 720p while running 17x faster",
+    "result": "17x",
+    "task": "speed comparison"
+   }
+  ],
+  "date": "2026-11-24",
+  "proposed": 4
+ },
  "2611.26595": {
   "claims": [],
   "date": "2026-11-23",
@@ -1064,6 +1137,11 @@
  "2611.26603": {
   "claims": [],
   "date": "2026-11-22",
+  "proposed": 0
+ },
+ "2611.26617": {
+  "claims": [],
+  "date": "2026-11-24",
   "proposed": 0
  },
  "2611.26629": {
