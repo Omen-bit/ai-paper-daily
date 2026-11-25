@@ -846,6 +846,19 @@
   "date": "2026-11-19",
   "proposed": 1
  },
+ "2611.21885": {
+  "claims": [
+   {
+    "benchmark": "six image benchmarks",
+    "metric": "accuracy",
+    "quote": "found on text math problems alone, the repair lifts the copy on six image benchmarks it never saw from 7% to 70% accuracy, 83% of the undamaged model's.",
+    "result": "70%",
+    "task": "self-rewriting weight edit"
+   }
+  ],
+  "date": "2026-11-25",
+  "proposed": 1
+ },
  "2611.22115": {
   "claims": [],
   "date": "2026-11-20",
@@ -963,6 +976,19 @@
   "claims": [],
   "date": "2026-11-21",
   "proposed": 0
+ },
+ "2611.24077": {
+  "claims": [
+   {
+    "benchmark": "TravelUAV",
+    "metric": "success rate",
+    "quote": "On TravelUAV, three rounds raise the success rate of a supervised 2B-parameter policy from 46.4% to 67.5%",
+    "result": "67.5%",
+    "task": "success rate"
+   }
+  ],
+  "date": "2026-11-25",
+  "proposed": 1
  },
  "2611.24408": {
   "claims": [
@@ -1148,5 +1174,53 @@
   "claims": [],
   "date": "2026-11-22",
   "proposed": 0
+ },
+ "2611.26954": {
+  "claims": [],
+  "date": "2026-11-25",
+  "proposed": 2
+ },
+ "2611.27193": {
+  "claims": [],
+  "date": "2026-11-25",
+  "proposed": 0
+ },
+ "2611.27630": {
+  "claims": [],
+  "date": "2026-11-25",
+  "proposed": 0
+ },
+ "2611.27876": {
+  "claims": [
+   {
+    "benchmark": "clinical follow-up CTs",
+    "metric": "agreement rate",
+    "quote": "On clinical follow-up CTs, it agrees with the radiologists' response at 20 of 23 follow-ups, including every change in response",
+    "result": "20 of 23 follow-ups",
+    "task": "radiologist agreement"
+   },
+   {
+    "benchmark": "DeepLesion",
+    "metric": "retrieval rate",
+    "quote": "without training on DeepLesion, it retrieves more of its lesions than every tracker trained on it (89.0% vs. 87.4%)",
+    "result": "89.0% vs. 87.4%",
+    "task": "lesion retrieval"
+   }
+  ],
+  "date": "2026-11-25",
+  "proposed": 6
+ },
+ "2611.27963": {
+  "claims": [
+   {
+    "benchmark": "NoPeBench",
+    "metric": "physical violation rate",
+    "quote": "Despite its simplicity, NoPeWorld substantially reduces the physical violation rate, averaged over six video world models, from 74% to 16%.",
+    "result": "74% to 16%",
+    "task": "preventing object penetration"
+   }
+  ],
+  "date": "2026-11-25",
+  "proposed": 1
  }
 }
