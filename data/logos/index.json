@@ -276,6 +276,11 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Aston University": {
+  "checked": "2026-11-27",
+  "qid": "Q750066",
+  "v": 6
+ },
  "Atal Bihari Vajpayee Indian Institute of Information Technology and Management": {
   "checked": "2026-11-19",
   "file": "atal-bihari-vajpayee-indian-institute-of-information-technol.png",
@@ -456,6 +461,11 @@
   "source": "website https://www.brunel.ac.uk",
   "v": 6
  },
+ "Budapest University of Technology and Economics": {
+  "checked": "2026-11-27",
+  "qid": "Q1186843",
+  "v": 6
+ },
  "ByteDance": {
   "checked": "2026-11-07",
   "file": "bytedance.png",
@@ -600,6 +610,13 @@
   "file": "chang-an-university.png",
   "qid": "Q5071561",
   "source": "website https://chd.edu.cn",
+  "v": 6
+ },
+ "Changzhou University": {
+  "checked": "2026-11-27",
+  "file": "changzhou-university.png",
+  "qid": "Q8802965",
+  "source": "website http://eng.cczu.edu.cn/",
   "v": 6
  },
  "Charcot AI": {
@@ -767,6 +784,13 @@
   "file": "cornell-university.png",
   "qid": "Q49115",
   "source": "website https://www.cornell.edu",
+  "v": 6
+ },
+ "Counterfactual SQL Rewards": {
+  "checked": "2026-11-27",
+  "file": "counterfactual-sql-rewards.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Coventry University": {
@@ -975,6 +999,7 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "Embrapa": {},
  "Embry–Riddle Aeronautical University": {
   "checked": "2026-11-25",
   "qid": "Q3052113",
@@ -1489,6 +1514,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "InSAI Lab": {
+  "checked": "2026-11-27",
+  "file": "insai-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Indian Institute of Science Bangalore": {
   "checked": "2026-11-07",
   "file": "indian-institute-of-science-bangalore.png",
@@ -1501,6 +1533,11 @@
   "file": "indian-institute-of-science-education-and-research-bhopal.png",
   "qid": "Q6020697",
   "source": "website https://www.iiserb.ac.in",
+  "v": 6
+ },
+ "Indian Institute of Technology Bombay": {
+  "checked": "2026-11-27",
+  "qid": "Q1661242",
   "v": 6
  },
  "Indian Institute of Technology Delhi": {
@@ -1557,6 +1594,13 @@
   "qid": "",
   "source": "Hugging Face",
   "v": 4
+ },
+ "Information Technologies Institute": {
+  "checked": "2026-11-27",
+  "file": "information-technologies-institute.png",
+  "qid": "Q28913412",
+  "source": "website https://www.iti.gr/iti",
+  "v": 6
  },
  "Inje University": {},
  "Inserm": {
@@ -1763,6 +1807,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "KAIST VIClab": {
+  "checked": "2026-11-27",
+  "file": "kaist-viclab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "KIOXIA Corporation": {
   "checked": "2026-11-18",
   "file": "kioxia-corporation.png",
@@ -1875,6 +1926,7 @@
   "qid": "Q840647",
   "v": 6
  },
+ "Koç University": {},
  "Kuaishou": {
   "checked": "2026-11-10",
   "file": "kuaishou.png",
@@ -1882,6 +1934,7 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Kuopio University Hospital": {},
  "Kyoto University": {
   "checked": "2026-11-18",
   "file": "kyoto-university.png",
@@ -2140,6 +2193,13 @@
   "qid": "Q632891",
   "v": 6
  },
+ "Meijo University": {
+  "checked": "2026-11-27",
+  "file": "meijo-university.png",
+  "qid": "Q847117",
+  "source": "website https://www.meijo-u.ac.jp",
+  "v": 6
+ },
  "Meituan": {
   "checked": "2026-11-06",
   "file": "meituan.png",
@@ -2252,6 +2312,13 @@
   "source": "Lobe Icons",
   "v": 6
  },
+ "Moorcheh.ai": {
+  "checked": "2026-11-27",
+  "file": "moorcheh-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Moscow Technical University of Communication and Informatics": {},
  "Multimedia and Human Understanding Group": {
   "checked": "2026-11-05",
@@ -2265,6 +2332,13 @@
   "file": "munich-center-for-machine-learning.png",
   "qid": "Q117044341",
   "source": "website https://mcml.ai",
+  "v": 6
+ },
+ "Munich Re": {
+  "checked": "2026-11-27",
+  "file": "munich-re.png",
+  "qid": "Q166637",
+  "source": "website http://www.munichre.com",
   "v": 6
  },
  "Munich University of Applied Sciences": {
@@ -2656,6 +2730,13 @@
  "PKU-VaLuE-Lab": {
   "checked": "2026-11-25",
   "file": "pku-value-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "POSTECH Computer Vision Lab": {
+  "checked": "2026-11-27",
+  "file": "postech-computer-vision-lab.png",
   "qid": "",
   "source": "Hugging Face",
   "v": 6
@@ -3079,6 +3160,11 @@
   "qid": "",
   "v": 6
  },
+ "Shanghai University of Finance and Economics": {
+  "checked": "2026-11-27",
+  "qid": "Q6129947",
+  "v": 6
+ },
  "ShanghaiTech University": {
   "checked": "2026-11-12",
   "qid": "Q3817847",
@@ -3464,6 +3550,13 @@
  "Tel Aviv University": {
   "checked": "2026-11-07",
   "qid": "Q319239",
+  "v": 6
+ },
+ "Telecom Paris": {
+  "checked": "2026-11-27",
+  "file": "telecom-paris.png",
+  "qid": "",
+  "source": "Hugging Face",
   "v": 6
  },
  "Temple University": {
@@ -4237,6 +4330,7 @@
   "qid": "Q940690",
   "v": 6
  },
+ "University of Mons": {},
  "University of Moratuwa": {
   "checked": "2026-11-07",
   "file": "university-of-moratuwa.png",
@@ -4322,6 +4416,13 @@
  "University of Qom": {
   "checked": "2026-11-14",
   "qid": "Q4115886",
+  "v": 6
+ },
+ "University of Queensland": {
+  "checked": "2026-11-27",
+  "file": "university-of-queensland.png",
+  "qid": "Q866012",
+  "source": "Hugging Face",
   "v": 6
  },
  "University of Rochester": {

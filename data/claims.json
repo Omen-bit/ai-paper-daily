@@ -1029,6 +1029,19 @@
   "date": "2026-11-23",
   "proposed": 1
  },
+ "2611.25403": {
+  "claims": [
+   {
+    "benchmark": "XGB-Online",
+    "metric": "overall loss rate",
+    "quote": "the model reduced the overall loss rate by 37.88% relative to XGB-Online",
+    "result": "37.88%",
+    "task": "payment risk detection"
+   }
+  ],
+  "date": "2026-11-27",
+  "proposed": 1
+ },
  "2611.25604": {
   "claims": [
    {
@@ -1335,6 +1348,37 @@
    }
   ],
   "date": "2026-11-26",
+  "proposed": 1
+ },
+ "2611.32884": {
+  "claims": [],
+  "date": "2026-11-27",
+  "proposed": 0
+ },
+ "2611.33010": {
+  "claims": [
+   {
+    "benchmark": "RoboDojo-Mirror",
+    "metric": "drop in success rate",
+    "quote": "every mirror condition reduces aggregate success rates: averaged over the three conditions, the drop ranges from 10.8 to 56.7 percentage points across policies, and it reaches 62.5 points on the mirrored tabletop.",
+    "result": "10.8 to 56.7 percentage points",
+    "task": "aggregate success rates"
+   }
+  ],
+  "date": "2026-11-27",
+  "proposed": 2
+ },
+ "2611.33143": {
+  "claims": [
+   {
+    "benchmark": "ROAM-Bench",
+    "metric": "%",
+    "quote": "Human evaluators achieve 84% strict task success on 100 sampled tasks",
+    "result": "84%",
+    "task": "strict task success"
+   }
+  ],
+  "date": "2026-11-27",
   "proposed": 1
  }
 }
