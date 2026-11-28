@@ -41,6 +41,13 @@
   "source": "Hugging Face",
   "v": 3
  },
+ "AMAP-ML": {
+  "checked": "2026-11-28",
+  "file": "amap-ml.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "AMD": {
   "checked": "2026-11-25",
   "file": "amd.png",
@@ -958,6 +965,11 @@
   "source": "website https://ethz.ch",
   "v": 6
  },
+ "EURECAT Centre Tecnològic de Catalunya": {
+  "checked": "2026-11-28",
+  "qid": "Q66491039",
+  "v": 6
+ },
  "East China Normal University": {
   "checked": "2026-11-07",
   "qid": "Q2034790",
@@ -1339,6 +1351,13 @@
   "source": "website https://www.heidelberg.edu/",
   "v": 6
  },
+ "Helmholtz Center for Information Security": {
+  "checked": "2026-11-28",
+  "file": "helmholtz-center-for-information-security.png",
+  "qid": "Q55436361",
+  "source": "website https://cispa.de",
+  "v": 6
+ },
  "Helmholtz Munich": {
   "checked": "2026-11-07",
   "file": "helmholtz-munich.png",
@@ -1561,6 +1580,11 @@
   "source": "website https://iith.ac.in",
   "v": 6
  },
+ "Indian Institute of Technology Kanpur": {
+  "checked": "2026-11-28",
+  "qid": "Q782682",
+  "v": 6
+ },
  "Indian Institute of Technology Kharagpur": {},
  "Indian Institute of Technology Madras": {
   "checked": "2026-11-13",
@@ -1602,6 +1626,11 @@
   "source": "website https://www.iti.gr/iti",
   "v": 6
  },
+ "Inha University": {
+  "checked": "2026-11-28",
+  "qid": "Q488851",
+  "v": 6
+ },
  "Inje University": {},
  "Inserm": {
   "checked": "2026-11-25",
@@ -1632,6 +1661,11 @@
   "file": "institute-for-computer-science-artificial-intelligence-and-t.png",
   "qid": "Q135917731",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Institute for System Programming": {
+  "checked": "2026-11-28",
+  "qid": "Q4201729",
   "v": 6
  },
  "Institute of Automation": {
@@ -1970,6 +2004,13 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "LL Lab": {
+  "checked": "2026-11-28",
+  "file": "ll-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Lab of Efficient AI and Data": {
   "checked": "2026-11-19",
   "file": "lab-of-efficient-ai-and-data.png",
@@ -2026,6 +2067,13 @@
  "Level5": {
   "checked": "2026-11-19",
   "file": "level5.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
+ "LibreDB": {
+  "checked": "2026-11-28",
+  "file": "libredb.png",
   "qid": "",
   "source": "Hugging Face",
   "v": 6
@@ -2171,6 +2219,7 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "Mayo Clinic": {},
  "McGill NLP Group": {
   "checked": "2026-11-17",
   "file": "mcgill-nlp-group.png",
@@ -2206,6 +2255,13 @@
   "qid": "Q15907772",
   "source": "Hugging Face",
   "v": 4
+ },
+ "MemTensor": {
+  "checked": "2026-11-28",
+  "file": "memtensor.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "Mercor": {
   "checked": "2026-11-26",
@@ -2670,6 +2726,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Obuda University": {
+  "checked": "2026-11-28",
+  "file": "obuda-university.png",
+  "qid": "Q1412435",
+  "source": "website https://uni-obuda.hu",
+  "v": 6
+ },
  "Ocean University of China": {
   "checked": "2026-11-19",
   "file": "ocean-university-of-china.png",
@@ -3040,6 +3103,13 @@
   "source": "website https://www.uni-saarland.de/",
   "v": 6
  },
+ "Sage Physical AI": {
+  "checked": "2026-11-28",
+  "file": "sage-physical-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Sakana AI": {
   "checked": "2026-11-17",
   "file": "sakana-ai.png",
@@ -3079,6 +3149,13 @@
   "qid": "Q112629176",
   "source": "Hugging Face",
   "v": 3
+ },
+ "SeekMind Lab": {
+  "checked": "2026-11-28",
+  "file": "seekmind-lab.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
  },
  "Sejong University": {
   "checked": "2026-11-15",
@@ -3158,6 +3235,11 @@
  "Shanghai Qi Zhi Institute": {
   "checked": "2026-11-18",
   "qid": "",
+  "v": 6
+ },
+ "Shanghai University": {
+  "checked": "2026-11-28",
+  "qid": "Q1343386",
   "v": 6
  },
  "Shanghai University of Finance and Economics": {
@@ -3745,6 +3827,13 @@
   "source": "Hugging Face",
   "v": 6
  },
+ "Touchstone AI": {
+  "checked": "2026-11-28",
+  "file": "touchstone-ai.png",
+  "qid": "",
+  "source": "Hugging Face",
+  "v": 6
+ },
  "Toyota Motor Corporation": {
   "checked": "2026-11-07",
   "file": "toyota-motor-corporation.png",
@@ -3789,6 +3878,13 @@
   "file": "tsinghua-leaplab.png",
   "qid": "",
   "source": "Hugging Face",
+  "v": 6
+ },
+ "Tulane University": {
+  "checked": "2026-11-28",
+  "file": "tulane-university.png",
+  "qid": "Q1193547",
+  "source": "website https://tulane.edu",
   "v": 6
  },
  "Télécom Paris": {
@@ -4024,6 +4120,11 @@
   "source": "Hugging Face",
   "v": 4
  },
+ "University of Bucharest": {
+  "checked": "2026-11-28",
+  "qid": "Q608338",
+  "v": 6
+ },
  "University of Calgary": {
   "checked": "2026-11-14",
   "file": "university-of-calgary.png",
@@ -4223,6 +4324,11 @@
   "source": "website https://uiowa.edu",
   "v": 6
  },
+ "University of Klagenfurt": {
+  "checked": "2026-11-28",
+  "qid": "Q690639",
+  "v": 6
+ },
  "University of Lausanne": {
   "checked": "2026-11-25",
   "file": "university-of-lausanne.png",
@@ -4389,6 +4495,13 @@
   "qid": "Q472316",
   "v": 6
  },
+ "University of Ottawa": {
+  "checked": "2026-11-28",
+  "file": "university-of-ottawa.png",
+  "qid": "Q627969",
+  "source": "website https://www.uottawa.ca",
+  "v": 6
+ },
  "University of Oulu": {
   "checked": "2026-11-20",
   "file": "university-of-oulu.png",
@@ -4411,6 +4524,20 @@
  "University of Pisa": {
   "checked": "2026-11-20",
   "qid": "Q645663",
+  "v": 6
+ },
+ "University of Pittsburgh": {
+  "checked": "2026-11-28",
+  "file": "university-of-pittsburgh.png",
+  "qid": "Q235034",
+  "source": "website https://www.pitt.edu/",
+  "v": 6
+ },
+ "University of Potsdam": {
+  "checked": "2026-11-28",
+  "file": "university-of-potsdam.png",
+  "qid": "Q153012",
+  "source": "website https://www.uni-potsdam.de/en/",
   "v": 6
  },
  "University of Qom": {
@@ -4554,6 +4681,13 @@
   "v": 6
  },
  "University of Virginia": {},
+ "University of Warwick": {
+  "checked": "2026-11-28",
+  "file": "university-of-warwick.png",
+  "qid": "Q865528",
+  "source": "website https://warwick.ac.uk/",
+  "v": 6
+ },
  "University of Washington": {
   "checked": "2026-11-07",
   "file": "university-of-washington.png",
@@ -4608,6 +4742,13 @@
   "source": "website https://www.ehu.eus",
   "v": 6
  },
+ "University of the District of Columbia": {
+  "checked": "2026-11-28",
+  "file": "university-of-the-district-of-columbia.png",
+  "qid": "Q3551751",
+  "source": "website https://www.udc.edu/",
+  "v": 6
+ },
  "UniversityofIllinoisUrbanaChampaign": {
   "checked": "2026-11-23",
   "file": "universityofillinoisurbanachampaign.png",
@@ -4628,6 +4769,13 @@
   "file": "universit-t-trier.png",
   "qid": "Q702486",
   "source": "website https://www.uni-trier.de/",
+  "v": 6
+ },
+ "Universität Ulm": {
+  "checked": "2026-11-28",
+  "file": "universit-t-ulm.png",
+  "qid": "Q835662",
+  "source": "website https://www.uni-ulm.de",
   "v": 6
  },
  "Universität der Bundeswehr München": {

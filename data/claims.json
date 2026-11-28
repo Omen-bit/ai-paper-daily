@@ -1337,6 +1337,11 @@
   "date": "2026-11-26",
   "proposed": 0
  },
+ "2611.31237": {
+  "claims": [],
+  "date": "2026-11-28",
+  "proposed": 0
+ },
  "2611.31358": {
   "claims": [
    {
@@ -1349,6 +1354,47 @@
   ],
   "date": "2026-11-26",
   "proposed": 1
+ },
+ "2611.31619": {
+  "claims": [
+   {
+    "benchmark": "GIFT-Eval",
+    "metric": "rank places",
+    "quote": "GIFT-Eval resolves 6.8 rank places, and its displayed neighbours sit 0.91 apart.",
+    "result": "6.8",
+    "task": "resolution"
+   },
+   {
+    "benchmark": "GIFT-Eval",
+    "metric": "neighbour gap",
+    "quote": "GIFT-Eval resolves 6.8 rank places, and its displayed neighbours sit 0.91 apart.",
+    "result": "0.91",
+    "task": "resolution"
+   },
+   {
+    "benchmark": "fev-bench, Chronos Benchmark II and TIME",
+    "metric": "resolution relative to neighbour gap",
+    "quote": "fev-bench, Chronos Benchmark II and TIME show the same pattern: their resolution is 3.6 to 19 times the gap between neighbours.",
+    "result": "3.6 to 19",
+    "task": "resolution"
+   },
+   {
+    "benchmark": "BOOM",
+    "metric": "independent series",
+    "quote": "With each of its 2,554 series as an independent source, BOOM is the one board that resolves its top ten.",
+    "result": "2,554",
+    "task": "series count"
+   },
+   {
+    "benchmark": "across four boards",
+    "metric": "top-ten pairs reversed",
+    "quote": "across four boards, rules that rank against the pool reversed 43 top-ten pairs with neither entry rerun, in one update in seven.",
+    "result": "43",
+    "task": "reversed pairs"
+   }
+  ],
+  "date": "2026-11-28",
+  "proposed": 7
  },
  "2611.32884": {
   "claims": [],
@@ -1380,5 +1426,173 @@
   ],
   "date": "2026-11-27",
   "proposed": 1
+ },
+ "2611.33457": {
+  "claims": [
+   {
+    "benchmark": "GameCraft-Bench",
+    "metric": "score",
+    "quote": "scoring 60.05 on GameCraft-Bench compared with 50.81 after Game Initialization and 52.46 for Play2Code.",
+    "result": "60.05",
+    "task": ""
+   },
+   {
+    "benchmark": "Game Initialization",
+    "metric": "score",
+    "quote": "scoring 60.05 on GameCraft-Bench compared with 50.81 after Game Initialization and 52.46 for Play2Code.",
+    "result": "50.81",
+    "task": ""
+   },
+   {
+    "benchmark": "Play2Code",
+    "metric": "score",
+    "quote": "scoring 60.05 on GameCraft-Bench compared with 50.81 after Game Initialization and 52.46 for Play2Code.",
+    "result": "52.46",
+    "task": ""
+   },
+   {
+    "benchmark": "Human overall-quality ratings",
+    "metric": "rating",
+    "quote": "Human overall-quality ratings reach 3.67, compared with 2.38 and 2.43, respectively.",
+    "result": "3.67",
+    "task": ""
+   },
+   {
+    "benchmark": "Human overall-quality ratings",
+    "metric": "rating",
+    "quote": "Human overall-quality ratings reach 3.67, compared with 2.38 and 2.43, respectively.",
+    "result": "2.38",
+    "task": ""
+   }
+  ],
+  "date": "2026-11-28",
+  "proposed": 6
+ },
+ "2611.33579": {
+  "claims": [
+   {
+    "benchmark": "RL-based ones",
+    "metric": "speed",
+    "quote": "runs over 10x faster than RL-based ones",
+    "result": "10x",
+    "task": "runtime"
+   }
+  ],
+  "date": "2026-11-28",
+  "proposed": 2
+ },
+ "2611.34147": {
+  "claims": [],
+  "date": "2026-11-28",
+  "proposed": 1
+ },
+ "2611.34693": {
+  "claims": [
+   {
+    "benchmark": "480p generation",
+    "metric": "fps",
+    "quote": "our 5B model sustains 480p generation at 16 fps with eight prepared futures.",
+    "result": "16",
+    "task": "video generation"
+   },
+   {
+    "benchmark": "ViZDoom",
+    "metric": "median input-to-display latency (ms)",
+    "quote": "In ViZDoom, the complete ShowNow deployment reduces median input-to-display latency from 620 to 208 ms relative to the native-block SolarWM-FT deployment.",
+    "result": "208",
+    "task": "input-to-display latency"
+   },
+   {
+    "benchmark": "matched-policy experiments",
+    "metric": "restart empty ticks (%)",
+    "quote": "Matched-policy experiments reduce restart empty ticks from 1.56% to 0.09% (94%)",
+    "result": "0.09",
+    "task": "restart empty ticks"
+   }
+  ],
+  "date": "2026-11-28",
+  "proposed": 3
+ },
+ "2611.34811": {
+  "claims": [
+   {
+    "benchmark": "Mixed-noise",
+    "metric": "success",
+    "quote": "Mixed-noise success increases from 78.86% to 82.86% relative to FastWAM, with comparable performance on clean scenes.",
+    "result": "82.86%",
+    "task": "Mixed-noise success"
+   },
+   {
+    "benchmark": "LIBERO Plus",
+    "metric": "success",
+    "quote": "On LIBERO Plus, overall success increases from 74.49% to 75.26%, with the largest gain under sensor noise, from 74.14% to 78.89%.",
+    "result": "75.26%",
+    "task": "Overall success"
+   },
+   {
+    "benchmark": "LIBERO Plus",
+    "metric": "success",
+    "quote": "On LIBERO Plus, overall success increases from 74.49% to 75.26%, with the largest gain under sensor noise, from 74.14% to 78.89%.",
+    "result": "78.89%",
+    "task": "Sensor noise success"
+   },
+   {
+    "benchmark": "Franka tasks",
+    "metric": "success",
+    "quote": "Across four Franka tasks, average success increases from 40% to 59% under clean observations and from 17% to 24% under noisy observations.",
+    "result": "59%",
+    "task": "Average success under clean observations"
+   },
+   {
+    "benchmark": "Franka tasks",
+    "metric": "success",
+    "quote": "Across four Franka tasks, average success increases from 40% to 59% under clean observations and from 17% to 24% under noisy observations.",
+    "result": "24%",
+    "task": "Average success under noisy observations"
+   }
+  ],
+  "date": "2026-11-28",
+  "proposed": 5
+ },
+ "2611.34923": {
+  "claims": [
+   {
+    "benchmark": "OLMo3",
+    "metric": "validation cross-entropy token efficiency",
+    "quote": "In 400B-token pretraining, U-MoLT outperforms OLMo3 across 700M/1.5B dense and 3B MoE models, achieving 1.7x validation cross-entropy (CE) token efficiency at 700M while improving 3B MoE 10-domain perplexity by 0.75 and 10-task accuracy by 2.1 percentage points.",
+    "result": "1.7x",
+    "task": "pretraining"
+   },
+   {
+    "benchmark": "3B MoE",
+    "metric": "10-domain perplexity",
+    "quote": "In 400B-token pretraining, U-MoLT outperforms OLMo3 across 700M/1.5B dense and 3B MoE models, achieving 1.7x validation cross-entropy (CE) token efficiency at 700M while improving 3B MoE 10-domain perplexity by 0.75 and 10-task accuracy by 2.1 percentage points.",
+    "result": "0.75",
+    "task": "pretraining"
+   },
+   {
+    "benchmark": "3B MoE",
+    "metric": "10-task accuracy",
+    "quote": "In 400B-token pretraining, U-MoLT outperforms OLMo3 across 700M/1.5B dense and 3B MoE models, achieving 1.7x validation cross-entropy (CE) token efficiency at 700M while improving 3B MoE 10-domain perplexity by 0.75 and 10-task accuracy by 2.1 percentage points.",
+    "result": "2.1 percentage points",
+    "task": "pretraining"
+   },
+   {
+    "benchmark": "matched baseline",
+    "metric": "mean token efficiency",
+    "quote": "In 100B-token continued pretraining of Qwen3.5-0.8B-Base, our U-MoLT adaptation lowers CE on all 11 domains over the matched baseline with 1.4x mean token efficiency.",
+    "result": "1.4x",
+    "task": "continued pretraining"
+   },
+   {
+    "benchmark": "OLMo3",
+    "metric": "latency",
+    "quote": "At inference, U-MoLT with MoL-Hybrid-2 matches non-looped OLMo3 latency at 996.6 vs. 1,000.6 ms on S-size (~113M) models.",
+    "result": "996.6 vs. 1,000.6 ms",
+    "task": "inference"
+   }
+  ],
+  "date": "2026-11-28",
+  "proposed": 5
  }
 }
